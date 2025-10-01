@@ -1,0 +1,58 @@
+Freemium Model (Core Free, Premium Features Locked)
+Core features stay free: menu creation, guest selection, contributions.
+Premium features unlock with a monthly or annual subscription:
+Premium Perks Include:
+AI menu suggestions (e.g., pairings)
+Custom themes & branding
+RSVP tracking + auto reminders
+Guest limits >20
+Downloadable/printable event sheets
+Advanced analytics for hosts
+Pricing suggestion: $8.99/month or $99.99/year (host-only)
+
+2.  Event-Based Microtransactions
+Let hosts unlock add-ons per event:
+•	Add-on guest packs (e.g., $2 for +10 guests)
+•	Upgrade to “Premium Menu Layouts” (themed or seasonal)
+•	Custom invitation designs ($1.99 per template)
+•	Host Tools Pack: music playlists, trivia builder, scavenger hunt generator
+
+3. Affiliate Marketing (Integrated Recommendations)
+Monetize within the app’s ecosystem by recommending:
+•	Alcohol brands (drink recipes powered by sponsorship)
+•	Food delivery or catering services
+•	Party supply companies (Amazon, Target, Party City)
+•	Spotify playlists for party mood matching
+Each partner link can offer referral revenue via affiliate programs.
+
+4.  Branded Vendor Marketplace
+Launch a section for local vendors to list their services:
+•	Bartenders, DJs, decorators, photographers
+•	Caterers or food trucks
+•	Venues (for larger parties)
+Monetization model: charge vendors for listings, visibility boosts, or lead generation ($15–$50/month per vendor).
+
+5. White-Label Licensing
+Offer a white-label version of your app for:
+•	Event planners
+•	Wedding coordinators
+•	Team-building companies
+•	Corporates hosting internal events
+You could charge a monthly enterprise fee (e.g., $99–$499) for full-featured access and private branding.
+
+6.  In-App Ads (Optional)
+If you want to offer a fully free tier, you can:
+•	Show non-intrusive banner ads on free accounts only
+•	Partner with party-related brands (games, drinks, playlists)
+•	Offer sponsored menus or items (e.g., “Try Tito’s Vodka Mojito!”)
+
+7. Corporate & B2B Events Market
+Develop a B2B-facing dashboard for HR teams or marketing departments to:
+•	Plan team events, product launches, holiday parties
+•	Assign tasks to team members (like contributions)
+•	Export budgets, contributions, and feedback
+Charge per seat or per event ($49–$149/event).
+
+ Bonus: Gamification-Based Upsells
+Introduce a "Vibe Score" or “Event Heat Meter” that improves as users fill menu gaps, RSVP, or add extras—offering cosmetic or planning incentives to boost engagement.
+

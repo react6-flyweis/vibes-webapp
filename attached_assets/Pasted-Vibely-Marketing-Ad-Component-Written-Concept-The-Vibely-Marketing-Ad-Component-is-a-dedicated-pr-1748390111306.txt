@@ -1,0 +1,45 @@
+Vibely Marketing Ad Component (Written Concept)
+The Vibely Marketing Ad Component is a dedicated promotional feature that allows businesses and vendors to advertise their products or services directly to Vibely users. This component is built into the platform under a clearly labeled section—“Promote Your Business”—and is designed to be simple, engaging, and effective for local and event-related advertisers.
+
+Purpose
+To enable businesses (e.g., liquor stores, DJs, caterers, decor companies) to submit, showcase, and promote their offerings to event hosts and guests using Vibely, thus creating a new monetization stream for the platform while adding value to users.
+
+ Key Features
+1. Business Ad Submission Form
+•	Fields include:
+o	Business Name
+o	Product/Service Title
+o	Short Description (200–300 characters)
+o	Website or booking link
+o	Image or logo upload
+•	CTA: A “Submit Ad” button completes the process.
+2. User Experience
+•	Accessed via a prominent “Promote Your Business” button within the Vendor or Explore tab.
+•	Opens as a clean, modern modal window that walks the user through the process step by step.
+•	On submission, the business receives a confirmation message stating:
+“Thank you! Your ad has been submitted and is under review. You will be notified once it's live.”
+3. Review Workflow (Admin Side)
+•	Submissions go to a moderation queue for admin approval.
+•	Admins can:
+o	Approve or reject ads
+o	Tag them by category (e.g., food, drinks, entertainment)
+o	Schedule start and end dates
+4. Display Logic
+•	Ads are displayed throughout the app in targeted zones:
+o	“Suggested Vendors” sidebar during event planning
+o	“Local Services” carousel on event pages
+o	Occasional pop-ups for high-performing or paid vendors
+
+ Monetization Options
+•	Free Basic Listing: Name, logo, and category placement
+•	Premium Featured Ad: Prioritized placement, image, and click-through stats for $15–$50/month
+•	Event-Specific Sponsorship: Businesses can promote custom offers to users planning events in their area
+
+ Benefits to Vibely
+•	Creates a scalable advertising channel for local businesses
+•	Drives revenue through featured listings and sponsorships
+•	Enhances user experience by connecting them with curated vendors
+•	Enables data tracking on ad performance (clicks, views, bookings)
+
+
+

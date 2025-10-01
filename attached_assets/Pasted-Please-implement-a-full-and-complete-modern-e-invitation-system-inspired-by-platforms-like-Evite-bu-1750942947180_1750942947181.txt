@@ -1,0 +1,55 @@
+Please implement a full and complete modern e-invitation system inspired by platforms like Evite, but supercharged for Vibes, our next-gen party experience app.
+
+ VibeInvite: Feature-Rich E-Invitation System
+ Modern & Intuitive Invitation Dashboard
+•	Hosts can create and manage events with wide-ranging customization:
+o	Event title, date/time, location, RSVP style
+o	Choose from premium VibeCard invites (static, animated, 3D, video-backed)
+o	Upload custom graphics, music snippets, and themes
+o	Track engagement with live analytics—opens, RSVPs, shares
+
+Smart RSVP Options
+•	Beyond Yes/No: Guests can also select "Maybe," "+Guest," or reply with emoji/GIF
+•	Custom response questions: Dietary needs, arrival time, song request
+•	Auto-reminders sent via push, email, or SMS, customizable by the host
+
+ Social Sharing & Collaboration
+•	Easily share invites via social platforms or generate QR codes
+•	Guests can comment on invites (e.g., "Can't wait!", "Saving the date!")
+•	Collaborative planning tools include song suggestions, poll creation, or item contributions, integrated tightly within the invite
+ AI-powered Personalization
+•	Auto-suggested invite copy based on the type of event
+•	Theme assistant: Suggests color palettes, assets, and mood music
+•	Visual suggestions matched to your music or menu entries
+
+ Multimedia & Interactivity
+•	Embed video intros (host-recorded or animated)
+•	Include live countdown timers and interactive “song polls”
+•	Option for AR filters guests can unlock when viewing the invite
+
+ Smart Blockchain Integration (VIP NFTs)
+•	For premium or ticketed events, NFT-based digital invite/ticket
+•	Ensures verified attendance, collectible mementos, and resale capability
+•	Guests hold exclusive access via the NFT pass
+
+Guest Engagement & Braided Social Features
+•	Guests can:
+o	Post or vote on “What are you most excited about?”
+o	Suggest games, themes, or shots via pre-populated polls
+o	Contribute photos and voice replies directly to the invite
+
+ Integrated Vendor-Built Experience
+•	Decorators and caterers can co-brand invites for sponsored events
+•	Guests can RSVP with meal/beer choices (vendor-integrated ordering directly via the invite)
+
+ Analytics & Host Feedback
+•	Hosts receive actionable insights:
+o	Engagement heatmaps (when people viewed, opened, and revisited)
+o	Poll responses and menu preferences
+o	AI-generated recommendations leading up to the event—e.g., “RSVP drop-off predicted?”
+
+ Cross-Platform & Accessibility
+•	Fully responsive across Web, iOS, and Android
+•	Accessibility features: voice-over compatibility, large text modes, high contrast
+•	QR codes for offline invitations or event registration
+

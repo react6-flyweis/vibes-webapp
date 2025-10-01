@@ -1,0 +1,154 @@
+{
+  "name": "Vibes - Event Planning Platform",
+  "short_name": "Vibes",
+  "description": "The ultimate AI-powered event planning and community platform with blockchain integration and immersive experiences",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["social", "lifestyle", "entertainment"],
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+vibes",
+      "url": "/event/%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/import-event",
+      "accept": {
+        "application/json": [".json"],
+        "text/calendar": [".ics"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share-event",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "images",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  "icons": [
+    {
+      "src": "/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Event",
+      "short_name": "Create",
+      "description": "Create a new event with AI assistance",
+      "url": "/create-event",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Find Events",
+      "short_name": "Discover",
+      "description": "Discover and book events near you",
+      "url": "/find-events",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "VibeMall",
+      "short_name": "Shop",
+      "description": "Shop from event vendors and sponsors",
+      "url": "/vibe-mall",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Events",
+      "short_name": "Events",
+      "description": "View and manage your events",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Scan QR Code",
+      "short_name": "Scan",
+      "description": "Scan QR codes for instant event access",
+      "url": "/scan",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.vibes.app",
+      "id": "com.vibes.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/vibes-event-planning/id123456789",
+      "id": "123456789"
+    }
+  ]
+}

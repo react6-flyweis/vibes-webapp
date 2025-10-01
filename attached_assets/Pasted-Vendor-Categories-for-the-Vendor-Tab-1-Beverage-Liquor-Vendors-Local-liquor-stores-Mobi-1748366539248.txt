@@ -1,0 +1,79 @@
+Vendor Categories for the “Vendor” Tab
+ 1. Beverage & Liquor Vendors
+•	Local liquor stores
+•	Mobile bartending services
+•	Alcohol delivery services (e.g., Drizly, Saucey)
+•	Beverage caterers (mocktail/cocktail bars)
+•	Specialty drink vendors (craft sodas, coffee trucks, juice bars)
+
+ 2. Food Vendors & Caterers
+•	Full-service caterers
+•	Food trucks
+•	Personal/private chefs
+•	Grazing table providers
+•	Dessert specialists (cake, cupcakes, cotton candy, churros)
+•	Snack vendors (popcorn, pretzels, candy carts)
+
+ 3. Entertainment Providers
+•	DJs and mobile DJ services
+•	Live bands / solo musicians
+•	Karaoke machine rentals
+•	Audio/visual technicians
+•	Party hosts or MCs
+•	Magicians, dancers, comedians
+
+ 4. Decor & Rentals
+•	Event decorators
+•	Balloon artists / balloon arches
+•	Table and chair rental companies
+•	Tent and canopy rental providers
+•	Linen and tableware rental
+•	Flower arrangement vendors
+
+ 5. Photo & Video
+•	Photographers (event/wedding/party)
+•	Videographers
+•	Photo booth rental (standard, 360°, green screen)
+•	Social media “content concierge” services
+
+ 6. Party Planners & Coordinators
+•	Full-service event planners
+•	Themed party designers
+•	Wedding planners
+•	Kids party coordinators
+•	Corporate event managers
+
+7. Supplies & Party Favors
+•	Local party supply stores
+•	Online favor boutiques (personalized gifts, swag bags)
+•	Eco-friendly party suppliers
+•	Custom print shops (T-shirts, signage, menus)
+
+ 8. Activities & Games
+•	Bounce house or inflatable rentals
+•	Game rentals (giant Jenga, trivia kits, lawn games)
+•	Face painting / caricature artists
+•	Craft stations or DIY booths
+
+ 9. Logistics
+•	Valet or parking attendants
+•	Event security
+•	Cleaning crews (pre-/post-event)
+•	Delivery drivers / runners
+•	Portable restroom providers
+
+ 10. Local Vendor Market (Optional Section)
+•	Boutique alcohol brands
+•	Home-based bakers or chefs
+•	Cultural or themed service providers (e.g., Latin DJs, Caribbean caterers)
+•	Minority/women-owned businesses spotlight
+
+ Integration Features
+Each listing in the vendor tab should include:
+•	Name, logo, description
+•	Contact info or direct booking button
+•	Rating/reviews
+•	Service area coverage
+•	Minimum order/pricing
+•	Integration with user’s event timeline (optional)
+

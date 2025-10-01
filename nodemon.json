@@ -1,0 +1,9 @@
+{
+  "watch": ["server"],
+  "ext": "ts,json",
+  "exec": "tsx server/index.ts",
+  "restartable": "rs",
+  "ignore": ["*.test.ts"],
+  "delay": "2000",
+  "exitcrash": false
+}

@@ -1,0 +1,79 @@
+Features to Include in “My Event”
+
+ 1. Event Overview
+•	Event Name (e.g., “Jordan’s 30th Birthday Bash”)
+•	Date & Time
+•	Location with map integration
+•	Event Type (e.g., birthday, baby shower, graduation, corporate, etc.)
+•	Theme & Dress Code
+•	Countdown Timer
+
+ 2. Guest Management
+•	Invite via email, phone, or QR code
+•	Track RSVPs (Yes, No, Maybe)
+•	Guest list with response status
+•	Guest notes (e.g., allergies, plus-ones)
+•	Option to message or notify guests (push/email)
+
+ 3. Collaborative Menu Planning
+•	Food Menu: Add/edit items, assign who’s bringing what
+•	Drink Menu: Add beverages, mark contributors
+•	Other Menus: Desserts, snacks, appetizers, etc.
+•	Contribution tracking with user profiles
+
+ 4. Vendor Integration
+•	Add/select vendors from the marketplace
+•	Track vendor bookings and payments
+•	Vendor contact info and chat
+•	Upload contracts or invoices (PDF, image)
+
+ 5. Group Chat / Discussion Board
+•	Allow guests to interact, suggest ideas, or coordinate
+•	Threaded conversations by topic (e.g., “Decor,” “Games”)
+•	GIFs, images, and links supported
+
+ 6. To-Do List / Checklist
+•	Shared or private task manager
+•	Assign tasks to guests (e.g., “Pick up balloons – assigned to Sarah”)
+•	Set deadlines and reminders
+•	Check off completed items
+
+7. Budget Tracker
+•	Total event budget
+•	Track expenses by category (food, drinks, entertainment, rentals)
+•	Add receipts or payment confirmations
+•	Graphs showing budget used vs. remaining
+
+ 8. Photo & Media Gallery
+•	Upload and view event-related photos (decor ideas, outfits, etc.)
+•	Post-event uploads from guests
+•	Option to export or share gallery
+
+ 9. Music Playlist Integration
+•	Link Spotify, Apple Music, or YouTube playlists
+•	Allow guests to suggest or vote on songs
+•	Toggle party mode: autoplay during event
+
+ 10. Smart Recommendations (Optional AI Feature)
+•	Auto-suggest menu items based on theme
+•	Recommend vendors near the event location
+•	Highlight to-do items based on event date
+•	Forecast guest count based on RSVP trends
+
+ 11. Privacy & Sharing Controls
+•	Make event private, public with link, or invite-only
+•	QR code for quick access
+•	Share event summary via email or text
+
+ 12. Export & Print Tools
+•	Generate a printable version of:
+o	Guest list
+o	Menu
+o	Task checklist
+o	Final budget
+o	Event schedule
+
+Bonus: Reusable Event Templates
+•	Save an event as a template to duplicate in the future
+•	Useful for annual parties, recurring themes, or professional event planners
+
