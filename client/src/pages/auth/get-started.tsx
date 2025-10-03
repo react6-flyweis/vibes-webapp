@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import userIcon from "@/assets/icons/user.svg";
 import vendorIcon from "@/assets/icons/vendor.svg";
 
-export function GetStarted() {
+export default function GetStarted() {
   const [, setLocation] = useLocation();
   const choose = (role: string) => {
     setLocation(`/signup?role=${encodeURIComponent(role)}`);
