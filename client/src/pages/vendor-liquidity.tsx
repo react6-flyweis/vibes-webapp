@@ -162,18 +162,18 @@ export default function VendorLiquidity() {
 
   if (poolsLoading || receivablesLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-blue-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 to-blue-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-blue-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 to-blue-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             DeFi Vendor Liquidity
           </h1>
           <p className="text-blue-100 text-lg max-w-2xl mx-auto">
@@ -183,7 +183,7 @@ export default function VendorLiquidity() {
 
         {/* Stats Overview */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <DollarSign className="h-5 w-5 text-green-400" />
@@ -198,7 +198,7 @@ export default function VendorLiquidity() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <TrendingUp className="h-5 w-5 text-blue-400" />
@@ -213,7 +213,7 @@ export default function VendorLiquidity() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <Clock className="h-5 w-5 text-purple-400" />
@@ -231,7 +231,7 @@ export default function VendorLiquidity() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* DeFi Liquidity Pools */}
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <Coins className="h-6 w-6 text-yellow-400" />
@@ -330,7 +330,7 @@ export default function VendorLiquidity() {
           </Card>
 
           {/* Available Vendor Receivables */}
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <CreditCard className="h-6 w-6 text-green-400" />
@@ -414,7 +414,7 @@ export default function VendorLiquidity() {
         </div>
 
         {/* How It Works */}
-        <Card className="mt-8 bg-white/10 backdrop-blur border-white/20">
+        <Card className="mt-8 bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Info className="h-6 w-6 text-blue-400" />

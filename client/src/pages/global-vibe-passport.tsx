@@ -375,7 +375,7 @@ export default function GlobalVibePassport() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -524,7 +524,7 @@ export default function GlobalVibePassport() {
                       </div>
                       
                       <div className="text-center mb-3">
-                        <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                           <MapPin className="h-8 w-8 text-white" />
                         </div>
                       </div>
@@ -675,7 +675,7 @@ export default function GlobalVibePassport() {
                   {rewards.map((reward) => (
                     <div key={reward.id} className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
                       <div className="relative mb-3">
-                        <div className="w-full h-32 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg flex items-center justify-center">
+                        <div className="w-full h-32 bg-linear-to-br from-pink-500 to-purple-500 rounded-lg flex items-center justify-center">
                           <Gift className="h-12 w-12 text-white" />
                         </div>
                         <Badge 

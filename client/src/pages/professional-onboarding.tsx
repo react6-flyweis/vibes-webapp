@@ -194,15 +194,15 @@ export default function ProfessionalOnboarding() {
   const progressPercentage = (currentStep / 5) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-blue-900/20">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50 to-blue-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-blue-900/20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
+            <div className="p-3 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl">
               <Building2 className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Professional Onboarding
             </h1>
           </div>
@@ -243,7 +243,7 @@ export default function ProfessionalOnboarding() {
 
         {/* Step Content */}
         <div className="max-w-4xl mx-auto">
-          <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
             <CardContent className="p-8">
               {/* Step 1: Business Info */}
               {currentStep === 1 && (
@@ -502,7 +502,7 @@ export default function ProfessionalOnboarding() {
                       onClick={() => updateFormData("plan", plan.id)}>
                         {plan.popular && (
                           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600">
+                            <Badge className="bg-linear-to-r from-purple-600 to-blue-600">
                               Most Popular
                             </Badge>
                           </div>
@@ -577,7 +577,7 @@ export default function ProfessionalOnboarding() {
                   <Button 
                     onClick={handleSubmit}
                     disabled={onboardingMutation.isPending}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 flex items-center gap-2"
+                    className="bg-linear-to-r from-purple-600 to-blue-600 flex items-center gap-2"
                   >
                     {onboardingMutation.isPending ? "Setting up..." : "Get Started"}
                     <ArrowRight className="h-4 w-4" />
@@ -585,7 +585,7 @@ export default function ProfessionalOnboarding() {
                 ) : (
                   <Button 
                     onClick={handleNext}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 flex items-center gap-2"
+                    className="bg-linear-to-r from-purple-600 to-blue-600 flex items-center gap-2"
                   >
                     Next
                     <ArrowRight className="h-4 w-4" />

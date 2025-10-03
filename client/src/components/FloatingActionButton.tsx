@@ -118,7 +118,7 @@ export default function FloatingActionButton() {
           ))}
 
           {/* Additional Quick Features */}
-          <Card className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 w-56">
+          <Card className="bg-linear-to-r from-purple-600 to-pink-600 text-white border-0 w-56">
             <CardContent className="p-4">
               <div className="text-center">
                 <Zap className="w-8 h-8 mx-auto mb-2" />
@@ -155,7 +155,7 @@ export default function FloatingActionButton() {
         className={`w-14 h-14 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 ${
           isOpen 
             ? 'bg-red-500 hover:bg-red-600 rotate-45' 
-            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+            : 'bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
         }`}
         size="lg"
       >

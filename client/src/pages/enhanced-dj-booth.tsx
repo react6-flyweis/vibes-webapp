@@ -218,7 +218,7 @@ export default function EnhancedDJBooth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900">
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -264,7 +264,7 @@ export default function EnhancedDJBooth() {
                   {currentTrack && (
                     <>
                       <div className="text-center space-y-4">
-                        <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
+                        <div className="w-32 h-32 bg-linear-to-br from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
                           <Music className="h-16 w-16 text-white" />
                         </div>
                         <div>

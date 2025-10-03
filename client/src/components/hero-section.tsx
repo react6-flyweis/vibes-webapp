@@ -35,13 +35,13 @@ export default function HeroSection({ event, stats }: HeroSectionProps) {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {/* Confirmed */}
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+          <div className="bg-white bg-opacity-20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">{stats?.confirmedCount || 0}</div>
             <div className="text-sm sm:text-base text-white">Confirmed</div>
           </div>
 
           {/* Date */}
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+          <div className="bg-white bg-opacity-20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">
               {event.date.split(",")[1]?.trim().split(" ")[0] || "Dec 15"}
             </div>
@@ -49,13 +49,13 @@ export default function HeroSection({ event, stats }: HeroSectionProps) {
           </div>
 
           {/* Menu Items */}
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+          <div className="bg-white bg-opacity-20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">{stats?.totalItems || 0}</div>
             <div className="text-sm sm:text-base text-white">Menu Items</div>
           </div>
 
           {/* Completion */}
-          <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 flex flex-col items-center">
+          <div className="bg-white bg-opacity-20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">{completionPercentage}%</div>
             <div className="text-sm sm:text-base text-white">Complete</div>
           </div>

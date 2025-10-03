@@ -206,12 +206,12 @@ export default function GuestMatchmaking() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Video className="h-8 w-8 text-blue-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Large-Scale Meeting Management
             </h1>
             <Users className="h-8 w-8 text-purple-600" />
@@ -486,7 +486,7 @@ export default function GuestMatchmaking() {
                     <h3 className="font-medium">Suggested Connections</h3>
                     <div className="grid gap-4">
                       {matches.map((match, index) => (
-                        <div key={index} className="p-4 border rounded-lg bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
+                        <div key={index} className="p-4 border rounded-lg bg-linear-to-r from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
                           <div className="flex items-center gap-2 mb-2">
                             <Heart className="h-4 w-4 text-pink-600" />
                             <span className="font-medium">Connection Match</span>
@@ -730,7 +730,7 @@ export default function GuestMatchmaking() {
                     <div key={index} className="p-4 border rounded-lg space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 bg-linear-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold">
                             {guest.name.split(' ').map(n => n[0]).join('')}
                           </div>
                           <div>
@@ -1152,7 +1152,7 @@ export default function GuestMatchmaking() {
                     {guests.map((guest, index) => (
                       <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                             {guest.name?.charAt(0) || 'G'}
                           </div>
                           <div>
@@ -1247,7 +1247,7 @@ export default function GuestMatchmaking() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    <div className="p-3 border rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                    <div className="p-3 border rounded-lg bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
                       <div className="flex items-center gap-2 mb-2">
                         <CreditCard className="h-4 w-4 text-blue-600" />
                         <span className="font-medium text-sm">Credit/Debit Cards</span>
@@ -1256,7 +1256,7 @@ export default function GuestMatchmaking() {
                       <p className="text-xs text-gray-600">Visa, Mastercard, American Express</p>
                     </div>
                     
-                    <div className="p-3 border rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+                    <div className="p-3 border rounded-lg bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
                       <div className="flex items-center gap-2 mb-2">
                         <Coins className="h-4 w-4 text-purple-600" />
                         <span className="font-medium text-sm">Crypto Wallets</span>
@@ -1265,7 +1265,7 @@ export default function GuestMatchmaking() {
                       <p className="text-xs text-gray-600">ETH, BTC, USDC, and more</p>
                     </div>
 
-                    <div className="p-3 border rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+                    <div className="p-3 border rounded-lg bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
                       <div className="flex items-center gap-2 mb-2">
                         <Smartphone className="h-4 w-4 text-green-600" />
                         <span className="font-medium text-sm">Mobile Payments</span>
@@ -1274,7 +1274,7 @@ export default function GuestMatchmaking() {
                       <p className="text-xs text-gray-600">Apple Pay, Google Pay, Venmo</p>
                     </div>
 
-                    <div className="p-3 border rounded-lg bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20">
+                    <div className="p-3 border rounded-lg bg-linear-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20">
                       <div className="flex items-center gap-2 mb-2">
                         <QrCode className="h-4 w-4 text-orange-600" />
                         <span className="font-medium text-sm">QR Code Payments</span>
@@ -1350,7 +1350,7 @@ export default function GuestMatchmaking() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border">
+                  <div className="p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border">
                     <div className="flex items-center gap-2 mb-2">
                       <TrendingUp className="h-5 w-5 text-blue-600" />
                       <span className="font-semibold text-blue-700 dark:text-blue-300">Monthly Growth</span>
@@ -1359,7 +1359,7 @@ export default function GuestMatchmaking() {
                     <p className="text-sm text-blue-600 dark:text-blue-400">Compared to last month</p>
                   </div>
 
-                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border">
+                  <div className="p-4 bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border">
                     <div className="flex items-center gap-2 mb-2">
                       <DollarSign className="h-5 w-5 text-green-600" />
                       <span className="font-semibold text-green-700 dark:text-green-300">Average Contribution</span>
@@ -1368,7 +1368,7 @@ export default function GuestMatchmaking() {
                     <p className="text-sm text-green-600 dark:text-green-400">Per member per month</p>
                   </div>
 
-                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg border">
+                  <div className="p-4 bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg border">
                     <div className="flex items-center gap-2 mb-2">
                       <Users className="h-5 w-5 text-purple-600" />
                       <span className="font-semibold text-purple-700 dark:text-purple-300">Payment Rate</span>
@@ -1377,7 +1377,7 @@ export default function GuestMatchmaking() {
                     <p className="text-sm text-purple-600 dark:text-purple-400">On-time payments</p>
                   </div>
 
-                  <div className="p-4 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 rounded-lg border">
+                  <div className="p-4 bg-linear-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 rounded-lg border">
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar className="h-5 w-5 text-orange-600" />
                       <span className="font-semibold text-orange-700 dark:text-orange-300">Next Event</span>

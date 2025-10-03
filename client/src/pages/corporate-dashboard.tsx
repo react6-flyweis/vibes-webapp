@@ -198,14 +198,14 @@ export default function CorporateDashboard() {
 
   if (clientsLoading || eventsLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -217,7 +217,7 @@ export default function CorporateDashboard() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -230,7 +230,7 @@ export default function CorporateDashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -243,7 +243,7 @@ export default function CorporateDashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -256,7 +256,7 @@ export default function CorporateDashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -272,7 +272,7 @@ export default function CorporateDashboard() {
         </div>
 
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="bg-white/10 backdrop-blur border-white/20 text-slate-200">
+          <TabsList className="bg-white/10 backdrop-blur-sm border-white/20 text-slate-200">
             <TabsTrigger value="clients" className="">
               Clients
             </TabsTrigger>
@@ -290,7 +290,7 @@ export default function CorporateDashboard() {
           <TabsContent value="clients">
             <div className="space-y-6">
               {/* Add New Client */}
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Plus className="h-5 w-5" />
@@ -355,7 +355,7 @@ export default function CorporateDashboard() {
               {/* Clients List */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {corporateClients.map((client) => (
-                  <Card key={client.id} className="bg-white/10 backdrop-blur border-white/20">
+                  <Card key={client.id} className="bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div>
@@ -402,7 +402,7 @@ export default function CorporateDashboard() {
           </TabsContent>
 
           <TabsContent value="events">
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Recent Corporate Events</CardTitle>
               </CardHeader>
@@ -436,7 +436,7 @@ export default function CorporateDashboard() {
           <TabsContent value="pricing">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {pricingPlans.map((plan) => (
-                <Card key={plan.id} className="bg-white/10 backdrop-blur border-white/20">
+                <Card key={plan.id} className="bg-white/10 backdrop-blur-sm border-white/20">
                   <CardHeader>
                     <CardTitle className="text-white">{plan.name}</CardTitle>
                     <p className="text-slate-300">{plan.description}</p>
@@ -464,7 +464,7 @@ export default function CorporateDashboard() {
 
           <TabsContent value="analytics">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
@@ -478,7 +478,7 @@ export default function CorporateDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Target className="h-5 w-5" />

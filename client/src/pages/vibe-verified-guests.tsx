@@ -133,7 +133,7 @@ const VibeVerifiedGuests = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-red-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-yellow-50 via-orange-50 to-red-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -156,7 +156,7 @@ const VibeVerifiedGuests = () => {
           </div>
 
           {/* User Profile Card */}
-          <Card className="mb-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+          <Card className="mb-6 bg-linear-to-r from-yellow-500 to-orange-500 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">

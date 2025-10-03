@@ -1,24 +1,70 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
-  Camera, Video, Smile, Heart, ThumbsUp, Flame, Star, Zap, 
-  TrendingUp, Laugh, Trophy, Send, PlayCircle, PauseCircle,
-  Volume2, VolumeX, Filter, Grid, Users, Clock, Eye,
-  Share2, Download, Flag, MoreVertical, RefreshCw,
-  Sparkles, Crown, Award, Target, MessageCircle
+  Camera,
+  Video,
+  Smile,
+  Heart,
+  ThumbsUp,
+  Flame,
+  Star,
+  Zap,
+  TrendingUp,
+  Laugh,
+  Trophy,
+  Send,
+  PlayCircle,
+  PauseCircle,
+  Volume2,
+  VolumeX,
+  Filter,
+  Grid,
+  Users,
+  Clock,
+  Eye,
+  Share2,
+  Download,
+  Flag,
+  MoreVertical,
+  RefreshCw,
+  Sparkles,
+  Crown,
+  Award,
+  Target,
+  MessageCircle,
 } from "lucide-react";
 
 interface Reaction {
@@ -70,7 +116,9 @@ export default function LiveReactionWalls() {
 
   // Core state
   const [selectedWall, setSelectedWall] = useState<WallDisplay | null>(null);
-  const [activeFilter, setActiveFilter] = useState<"trending" | "funniest" | "most-hyped" | "newest" | "vip-only">("trending");
+  const [activeFilter, setActiveFilter] = useState<
+    "trending" | "funniest" | "most-hyped" | "newest" | "vip-only"
+  >("trending");
   const [isRecording, setIsRecording] = useState(false);
   const [recordingProgress, setRecordingProgress] = useState(0);
   const [cameraMode, setCameraMode] = useState<"photo" | "video">("photo");
@@ -80,7 +128,9 @@ export default function LiveReactionWalls() {
   // UI state
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showWallView, setShowWallView] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState<Reaction | null>(null);
+  const [selectedReaction, setSelectedReaction] = useState<Reaction | null>(
+    null
+  );
   const [isPlaying, setIsPlaying] = useState<Record<string, boolean>>({});
   const [isMuted, setIsMuted] = useState<Record<string, boolean>>({});
 
@@ -102,7 +152,11 @@ export default function LiveReactionWalls() {
 
   // Mutations
   const postEmojiMutation = useMutation({
-    mutationFn: async (data: { emoji: string; eventId: string; caption?: string }) => {
+    mutationFn: async (data: {
+      emoji: string;
+      eventId: string;
+      caption?: string;
+    }) => {
       return await apiRequest("/api/reactions/emoji", "POST", data);
     },
     onSuccess: () => {
@@ -126,7 +180,12 @@ export default function LiveReactionWalls() {
   });
 
   const postSelfieMutation = useMutation({
-    mutationFn: async (data: { imageData: string; eventId: string; caption?: string; filters?: string[] }) => {
+    mutationFn: async (data: {
+      imageData: string;
+      eventId: string;
+      caption?: string;
+      filters?: string[];
+    }) => {
       return await apiRequest("/api/reactions/selfie", "POST", data);
     },
     onSuccess: () => {
@@ -149,7 +208,12 @@ export default function LiveReactionWalls() {
   });
 
   const postVideoMutation = useMutation({
-    mutationFn: async (data: { videoData: string; eventId: string; caption?: string; duration: number }) => {
+    mutationFn: async (data: {
+      videoData: string;
+      eventId: string;
+      caption?: string;
+      duration: number;
+    }) => {
       return await apiRequest("/api/reactions/video", "POST", data);
     },
     onSuccess: () => {
@@ -245,7 +309,8 @@ export default function LiveReactionWalls() {
       author: {
         id: "user-1",
         name: "DJ Mike",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        avatar:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
         tier: "vip",
       },
       timestamp: "2025-07-01T13:47:00Z",
@@ -261,11 +326,13 @@ export default function LiveReactionWalls() {
     {
       id: "reaction-2",
       type: "selfie",
-      content: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400",
+      content:
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400",
       author: {
         id: "user-2",
         name: "Sarah Chen",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b45d0dfc?w=150",
+        avatar:
+          "https://images.unsplash.com/photo-1494790108755-2616b45d0dfc?w=150",
         tier: "premium",
       },
       timestamp: "2025-07-01T13:46:45Z",
@@ -282,11 +349,13 @@ export default function LiveReactionWalls() {
     {
       id: "reaction-3",
       type: "video",
-      content: "https://sample-videos.com/zip/10/mp4/SampleVideo_720x480_1mb.mp4",
+      content:
+        "https://sample-videos.com/zip/10/mp4/SampleVideo_720x480_1mb.mp4",
       author: {
         id: "user-3",
         name: "Alex Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
         tier: "general",
       },
       timestamp: "2025-07-01T13:46:20Z",
@@ -304,9 +373,30 @@ export default function LiveReactionWalls() {
   ];
 
   const popularEmojis = [
-    "🔥", "💃", "🎉", "🎵", "✨", "🚀", "⚡", "💫",
-    "🎊", "🥳", "😍", "🤩", "💯", "🙌", "👏", "💪",
-    "🎭", "🎪", "🎨", "🎯", "🎸", "🎤", "🎺", "🥂"
+    "🔥",
+    "💃",
+    "🎉",
+    "🎵",
+    "✨",
+    "🚀",
+    "⚡",
+    "💫",
+    "🎊",
+    "🥳",
+    "😍",
+    "🤩",
+    "💯",
+    "🙌",
+    "👏",
+    "💪",
+    "🎭",
+    "🎪",
+    "🎨",
+    "🎯",
+    "🎸",
+    "🎤",
+    "🎺",
+    "🥂",
   ];
 
   const filterOptions = [
@@ -327,9 +417,9 @@ export default function LiveReactionWalls() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: cameraMode === "video" 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: cameraMode === "video",
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -347,7 +437,7 @@ export default function LiveReactionWalls() {
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
   };
@@ -358,19 +448,19 @@ export default function LiveReactionWalls() {
       const video = videoRef.current;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
-      const ctx = canvas.getContext('2d');
+
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/jpeg', 0.8);
-        
+        const imageData = canvas.toDataURL("image/jpeg", 0.8);
+
         postSelfieMutation.mutate({
           imageData,
           eventId: selectedWall?.id || "event-1",
           caption: reactionCaption,
           filters: ["party-filter"],
         });
-        
+
         stopCamera();
         setShowCreateDialog(false);
       }
@@ -380,17 +470,17 @@ export default function LiveReactionWalls() {
   const startVideoRecording = () => {
     setIsRecording(true);
     setRecordingProgress(0);
-    
+
     // Simulate 6-second recording
     const interval = setInterval(() => {
-      setRecordingProgress(prev => {
+      setRecordingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsRecording(false);
           finishVideoRecording();
           return 100;
         }
-        return prev + (100 / 60); // 60 updates over 6 seconds
+        return prev + 100 / 60; // 60 updates over 6 seconds
       });
     }, 100);
   };
@@ -398,14 +488,14 @@ export default function LiveReactionWalls() {
   const finishVideoRecording = () => {
     // In a real implementation, this would process the recorded video
     const mockVideoData = "data:video/mp4;base64,mock-video-data";
-    
+
     postVideoMutation.mutate({
       videoData: mockVideoData,
       eventId: selectedWall?.id || "event-1",
       caption: reactionCaption,
       duration: 6,
     });
-    
+
     stopCamera();
     setShowCreateDialog(false);
     setRecordingProgress(0);
@@ -433,11 +523,11 @@ export default function LiveReactionWalls() {
   };
 
   const toggleVideoPlay = (reactionId: string) => {
-    setIsPlaying(prev => ({ ...prev, [reactionId]: !prev[reactionId] }));
+    setIsPlaying((prev) => ({ ...prev, [reactionId]: !prev[reactionId] }));
   };
 
   const toggleVideoMute = (reactionId: string) => {
-    setIsMuted(prev => ({ ...prev, [reactionId]: !prev[reactionId] }));
+    setIsMuted((prev) => ({ ...prev, [reactionId]: !prev[reactionId] }));
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -454,7 +544,7 @@ export default function LiveReactionWalls() {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInSeconds = Math.floor((now.getTime() - time.getTime()) / 1000);
-    
+
     if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -468,7 +558,7 @@ export default function LiveReactionWalls() {
   }, [showCreateDialog, cameraMode]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -478,7 +568,7 @@ export default function LiveReactionWalls() {
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
             Share your energy with emojis, selfies, and 6-second video bursts
           </p>
-          
+
           {/* Quick Stats */}
           <div className="flex justify-center gap-6 mb-6">
             <div className="text-center">
@@ -506,15 +596,17 @@ export default function LiveReactionWalls() {
                   <Grid className="w-5 h-5" />
                   Live Walls
                 </CardTitle>
-                <CardDescription>Choose a wall to view and interact with</CardDescription>
+                <CardDescription>
+                  Choose a wall to view and interact with
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {sampleWalls.map((wall) => (
-                  <Card 
+                  <Card
                     key={wall.id}
                     className={`cursor-pointer transition-all ${
-                      selectedWall?.id === wall.id 
-                        ? "ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/20" 
+                      selectedWall?.id === wall.id
+                        ? "ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/20"
                         : "hover:shadow-md"
                     }`}
                     onClick={() => setSelectedWall(wall)}
@@ -524,7 +616,9 @@ export default function LiveReactionWalls() {
                         <h3 className="font-semibold">{wall.name}</h3>
                         <div className="flex items-center gap-1">
                           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                          <Badge variant="outline" className="text-xs">LIVE</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            LIVE
+                          </Badge>
                         </div>
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
@@ -552,12 +646,16 @@ export default function LiveReactionWalls() {
               <CardContent className="space-y-4">
                 {/* Popular Emojis */}
                 <div>
-                  <Label className="text-sm font-medium mb-2 block">Popular Reactions</Label>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Popular Reactions
+                  </Label>
                   <div className="grid grid-cols-6 gap-2">
                     {popularEmojis.slice(0, 12).map((emoji) => (
                       <Button
                         key={emoji}
-                        variant={selectedEmoji === emoji ? "default" : "outline"}
+                        variant={
+                          selectedEmoji === emoji ? "default" : "outline"
+                        }
                         size="sm"
                         className="text-lg p-2 h-10"
                         onClick={() => setSelectedEmoji(emoji)}
@@ -576,14 +674,17 @@ export default function LiveReactionWalls() {
                 />
 
                 <div className="grid grid-cols-2 gap-2">
-                  <Button 
+                  <Button
                     onClick={handleEmojiPost}
                     disabled={!selectedEmoji || postEmojiMutation.isPending}
                     className="bg-purple-600 hover:bg-purple-700"
                   >
                     {postEmojiMutation.isPending ? "Posting..." : "Post Emoji"}
                   </Button>
-                  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                  <Dialog
+                    open={showCreateDialog}
+                    onOpenChange={setShowCreateDialog}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline">
                         <Camera className="w-4 h-4 mr-2" />
@@ -597,9 +698,12 @@ export default function LiveReactionWalls() {
                           Take a selfie or record a 6-second video
                         </DialogDescription>
                       </DialogHeader>
-                      
+
                       <div className="space-y-4">
-                        <Tabs value={cameraMode} onValueChange={(value: any) => setCameraMode(value)}>
+                        <Tabs
+                          value={cameraMode}
+                          onValueChange={(value: any) => setCameraMode(value)}
+                        >
                           <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="photo">📸 Selfie</TabsTrigger>
                             <TabsTrigger value="video">🎥 Video</TabsTrigger>
@@ -614,14 +718,20 @@ export default function LiveReactionWalls() {
                             className="w-full h-full object-cover"
                           />
                           <canvas ref={canvasRef} className="hidden" />
-                          
+
                           {isRecording && (
                             <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
                               <div className="text-center">
-                                <div className="text-white font-bold text-lg mb-2">RECORDING</div>
-                                <Progress value={recordingProgress} className="w-32" />
+                                <div className="text-white font-bold text-lg mb-2">
+                                  RECORDING
+                                </div>
+                                <Progress
+                                  value={recordingProgress}
+                                  className="w-32"
+                                />
                                 <div className="text-white text-sm mt-1">
-                                  {Math.ceil((6 - (recordingProgress / 100) * 6))}s left
+                                  {Math.ceil(6 - (recordingProgress / 100) * 6)}
+                                  s left
                                 </div>
                               </div>
                             </div>
@@ -637,21 +747,28 @@ export default function LiveReactionWalls() {
                       </div>
 
                       <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowCreateDialog(false)}
+                        >
                           Cancel
                         </Button>
                         {cameraMode === "photo" ? (
-                          <Button 
+                          <Button
                             onClick={capturePhoto}
                             disabled={postSelfieMutation.isPending}
                             className="bg-purple-600 hover:bg-purple-700"
                           >
-                            {postSelfieMutation.isPending ? "Posting..." : "Take Photo"}
+                            {postSelfieMutation.isPending
+                              ? "Posting..."
+                              : "Take Photo"}
                           </Button>
                         ) : (
-                          <Button 
+                          <Button
                             onClick={startVideoRecording}
-                            disabled={isRecording || postVideoMutation.isPending}
+                            disabled={
+                              isRecording || postVideoMutation.isPending
+                            }
                             className="bg-red-600 hover:bg-red-700"
                           >
                             {isRecording ? "Recording..." : "Record 6s"}
@@ -688,9 +805,12 @@ export default function LiveReactionWalls() {
                       </CardDescription>
                     )}
                   </div>
-                  
+
                   {selectedWall && (
-                    <Select value={activeFilter} onValueChange={(value: any) => setActiveFilter(value)}>
+                    <Select
+                      value={activeFilter}
+                      onValueChange={(value: any) => setActiveFilter(value)}
+                    >
                       <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
@@ -705,29 +825,34 @@ export default function LiveReactionWalls() {
                   )}
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 {selectedWall ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
                     {sampleReactions.map((reaction) => (
-                      <Card key={reaction.id} className="relative group hover:shadow-lg transition-all">
+                      <Card
+                        key={reaction.id}
+                        className="relative group hover:shadow-lg transition-all"
+                      >
                         <CardContent className="p-3">
                           {/* Reaction Content */}
                           <div className="aspect-square mb-3 relative">
                             {reaction.type === "emoji" && (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-lg">
-                                <span className="text-6xl">{reaction.content}</span>
+                              <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-lg">
+                                <span className="text-6xl">
+                                  {reaction.content}
+                                </span>
                               </div>
                             )}
-                            
+
                             {reaction.type === "selfie" && (
-                              <img 
-                                src={reaction.content} 
+                              <img
+                                src={reaction.content}
                                 alt="Selfie reaction"
                                 className="w-full h-full object-cover rounded-lg"
                               />
                             )}
-                            
+
                             {reaction.type === "video" && (
                               <div className="relative w-full h-full">
                                 <video
@@ -768,28 +893,45 @@ export default function LiveReactionWalls() {
 
                             {/* Priority Badge */}
                             {reaction.priority !== "normal" && (
-                              <Badge 
-                                className={`absolute top-2 left-2 ${getPriorityBadge(reaction.priority).className}`}
+                              <Badge
+                                className={`absolute top-2 left-2 ${
+                                  getPriorityBadge(reaction.priority).className
+                                }`}
                               >
                                 {getPriorityBadge(reaction.priority).label}
                               </Badge>
                             )}
 
                             {/* Mood Indicator */}
-                            <div className={`absolute top-2 right-2 w-3 h-3 rounded-full ${moodColors[reaction.mood]}`} />
+                            <div
+                              className={`absolute top-2 right-2 w-3 h-3 rounded-full ${
+                                moodColors[reaction.mood]
+                              }`}
+                            />
                           </div>
 
                           {/* Author Info */}
                           <div className="flex items-center gap-2 mb-2">
                             <Avatar className="w-6 h-6">
-                              <AvatarImage src={reaction.author.avatar} alt={reaction.author.name} />
-                              <AvatarFallback>{reaction.author.name[0]}</AvatarFallback>
+                              <AvatarImage
+                                src={reaction.author.avatar}
+                                alt={reaction.author.name}
+                              />
+                              <AvatarFallback>
+                                {reaction.author.name[0]}
+                              </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1">
-                                <span className="text-sm font-medium truncate">{reaction.author.name}</span>
-                                {reaction.author.tier === "vip" && <Crown className="w-3 h-3 text-yellow-500" />}
-                                {reaction.author.tier === "premium" && <Star className="w-3 h-3 text-purple-500" />}
+                                <span className="text-sm font-medium truncate">
+                                  {reaction.author.name}
+                                </span>
+                                {reaction.author.tier === "vip" && (
+                                  <Crown className="w-3 h-3 text-yellow-500" />
+                                )}
+                                {reaction.author.tier === "premium" && (
+                                  <Star className="w-3 h-3 text-purple-500" />
+                                )}
                               </div>
                             </div>
                           </div>
@@ -807,17 +949,25 @@ export default function LiveReactionWalls() {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleLikeReaction(reaction.id)}
-                              className={`p-1 ${reaction.isLiked ? "text-red-500" : ""}`}
+                              className={`p-1 ${
+                                reaction.isLiked ? "text-red-500" : ""
+                              }`}
                             >
-                              <Heart className={`w-4 h-4 mr-1 ${reaction.isLiked ? "fill-current" : ""}`} />
+                              <Heart
+                                className={`w-4 h-4 mr-1 ${
+                                  reaction.isLiked ? "fill-current" : ""
+                                }`}
+                              />
                               {reaction.likes}
                             </Button>
-                            
+
                             <div className="flex items-center gap-1">
                               <Button size="sm" variant="ghost" className="p-1">
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <span className="text-xs text-gray-500">{reaction.viewCount}</span>
+                              <span className="text-xs text-gray-500">
+                                {reaction.viewCount}
+                              </span>
                             </div>
                           </div>
 
@@ -836,7 +986,8 @@ export default function LiveReactionWalls() {
                       Select a Wall to View
                     </h3>
                     <p className="text-gray-500">
-                      Choose from the active walls to see live reactions and join the fun
+                      Choose from the active walls to see live reactions and
+                      join the fun
                     </p>
                   </div>
                 )}

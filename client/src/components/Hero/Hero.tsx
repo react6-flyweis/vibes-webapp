@@ -54,7 +54,7 @@ const HeroSection = () => {
             <div></div>
             {/* Gradient Overlay */}
             {/* MODIFICATION: Adjusted gradient for better look on mobile */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0C111F] from-50% md:from-40% via-[rgba(12,17,31,0.8)] to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-[#0C111F] from-50% md:from-40% via-[rgba(12,17,31,0.8)] to-transparent"></div>
 
             {/* Content */}
             {/* MODIFICATION: Changed from flex row to flex column on mobile, and back to row on md screens. Adjusted padding/margin for mobile. */}
@@ -63,7 +63,7 @@ const HeroSection = () => {
                 {/* Left Side */}
                 {/* MODIFICATION: Centered text for mobile view */}
                 <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-                    <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black px-8 py-2.5 backdrop-blur-sm">
+                    <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black px-8 py-2.5 backdrop-blur-xs">
                         <span className="text-xs font-medium">Welcome back, John!</span>
                     </div>
 
@@ -93,7 +93,7 @@ const HeroSection = () => {
                     <div className="lg:mt-48  mt-10 flex flex-col sm:flex-row items-center gap-4">
                        <Link href="/create-event" className="flex items-center justify-center gap-3 rounded-full
                                 w-[285px] h-[72px] text-black shadow-lg shadow-yellow-400/20
-                                bg-gradient-to-r from-yellow-300 to-yellow-500
+                                bg-linear-to-r from-yellow-300 to-yellow-500
                                 hover:from-purple-700 hover:via-pink-600 hover:to-orange-400
                                 transition-colors duration-300">
                             <span className="font-semibold text-md 2xl:text-[24px]">Create Event</span>
@@ -104,7 +104,7 @@ const HeroSection = () => {
 
                         <Link href="/find-events" className="flex items-center justify-center gap-3 rounded-full
                                 w-[285px] h-[72px] text-black shadow-lg shadow-yellow-400/20
-                                bg-gradient-to-r from-yellow-300 to-yellow-500
+                                bg-linear-to-r from-yellow-300 to-yellow-500
                                 hover:from-purple-700 hover:via-pink-600 hover:to-orange-400
                                 transition-colors duration-300">
                             <span className="font-semibold">Discover Events</span>
@@ -122,7 +122,7 @@ const HeroSection = () => {
                     {/* MODIFICATION: Repositioned for mobile/tablet */}
                     <button
                         onClick={prevSlide}
-                        className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-custom-gradient backdrop-blur-sm transition-transform hover:scale-110"
+                        className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-custom-gradient backdrop-blur-xs transition-transform hover:scale-110"
                     >
                         <ArrowRight className="h-6 w-6 text-black transform rotate-180" />
                     </button>
@@ -137,7 +137,7 @@ const HeroSection = () => {
                             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                         >
                             {slides.map((slide, index) => (
-                                <div key={index} className="w-full flex-shrink-0 px-2">
+                                <div key={index} className="w-full shrink-0 px-2">
                                     <div
                                         className="bg-white text-black shadow-2xl overflow-hidden rounded-[69px] lg:w-[436px]"
                                     >
@@ -145,7 +145,7 @@ const HeroSection = () => {
                                             src={slide.image}
                                             alt={slide.title}
                                             // MODIFICATION: Set an aspect ratio for better responsive images
-                                            className="w-full h-auto object-cover  rounded-t-[69px] aspect-[4/3] md:aspect-auto md:h-[397px]"
+                                            className="w-full h-auto object-cover  rounded-t-[69px] aspect-4/3 md:aspect-auto md:h-[397px]"
                                         />
                                         <div className="p-4 md:p-6">
                                             <h3 className="text-lg md:text-xl font-bold">{slide.title}</h3>
@@ -163,7 +163,7 @@ const HeroSection = () => {
                     {/* MODIFICATION: Repositioned for mobile/tablet */}
                     <button
                         onClick={nextSlide}
-                        className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-custom-gradient backdrop-blur-sm transition-transform hover:scale-110"
+                        className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-custom-gradient backdrop-blur-xs transition-transform hover:scale-110"
                     >
                         <ArrowRight className="h-6 w-6 text-black" />
                     </button>

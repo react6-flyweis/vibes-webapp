@@ -364,7 +364,7 @@ export default function EventPlanning() {
 
   if (eventLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
       </div>
     );
@@ -373,7 +373,7 @@ export default function EventPlanning() {
   const budgetSummary = getBudgetSummary();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -1168,7 +1168,7 @@ export default function EventPlanning() {
                   </div>
                   <Button
                     onClick={() => setShowAddGuest(true)}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Guest
@@ -1181,7 +1181,7 @@ export default function EventPlanning() {
                     <div key={guest.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                             <User className="w-5 h-5 text-white" />
                           </div>
                           <div>
@@ -1236,7 +1236,7 @@ export default function EventPlanning() {
                           }`}
                           onClick={() => setInvitationTemplate(template.id)}
                         >
-                          <div className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-md mb-2"></div>
+                          <div className="aspect-square bg-linear-to-br from-purple-500 to-pink-500 rounded-md mb-2"></div>
                           <p className="text-white text-sm font-medium">{template.name}</p>
                         </div>
                       ))}
@@ -1248,7 +1248,7 @@ export default function EventPlanning() {
                     <h3 className="text-white font-medium">Preview</h3>
                     <div className="bg-white/5 rounded-lg p-6 min-h-[300px] border border-white/10">
                       <div className="text-center space-y-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
+                        <div className="w-16 h-16 bg-linear-to-br from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
                           <Sparkles className="w-8 h-8 text-white" />
                         </div>
                         <h2 className="text-white text-xl font-bold">You're Invited!</h2>
@@ -1273,7 +1273,7 @@ export default function EventPlanning() {
                     <Mail className="w-4 h-4 mr-2" />
                     Send via Email
                   </Button>
-                  <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                  <Button className="bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
                     <QrCode className="w-4 h-4 mr-2" />
                     Generate QR Code
                   </Button>
@@ -1309,7 +1309,7 @@ export default function EventPlanning() {
                   </Select>
                   <Button
                     onClick={() => setShowSeatMap(true)}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    className="bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Customize Layout
@@ -1320,7 +1320,7 @@ export default function EventPlanning() {
                 <div className="bg-white/5 rounded-lg p-6 min-h-[400px] border border-white/10">
                   <div className="text-center space-y-6">
                     <div className="flex justify-center">
-                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white font-medium">
+                      <div className="bg-linear-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white font-medium">
                         DJ BOOTH / STAGE
                       </div>
                     </div>
@@ -1380,7 +1380,7 @@ export default function EventPlanning() {
                     <h3 className="text-white font-medium">Now Playing</h3>
                     <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <div className="w-16 h-16 bg-linear-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                           <Music className="w-8 h-8 text-white" />
                         </div>
                         <div className="flex-1">
@@ -1388,7 +1388,7 @@ export default function EventPlanning() {
                           <p className="text-white/60">The Weeknd</p>
                           <div className="mt-2 flex items-center gap-2">
                             <div className="flex-1 bg-white/20 rounded-full h-2">
-                              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full w-1/3"></div>
+                              <div className="bg-linear-to-r from-purple-500 to-pink-500 h-2 rounded-full w-1/3"></div>
                             </div>
                             <span className="text-white/60 text-sm">1:23 / 3:45</span>
                           </div>
@@ -1456,7 +1456,7 @@ export default function EventPlanning() {
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                     <h3 className="text-white font-medium mb-3">Party Mood</h3>
                     <div className="text-center space-y-2">
-                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto flex items-center justify-center">
+                      <div className="w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full mx-auto flex items-center justify-center">
                         <Zap className="w-8 h-8 text-white" />
                       </div>
                       <p className="text-white text-lg font-semibold">{vibesData?.mood || "Energetic"}</p>
@@ -1487,15 +1487,15 @@ export default function EventPlanning() {
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                     <h3 className="text-white font-medium mb-3">Quick Actions</h3>
                     <div className="space-y-2">
-                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                      <Button className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
                         <Camera className="w-4 h-4 mr-2" />
                         Group Photo
                       </Button>
-                      <Button className="w-full bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600">
+                      <Button className="w-full bg-linear-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600">
                         <Video className="w-4 h-4 mr-2" />
                         Live Stream
                       </Button>
-                      <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600">
+                      <Button className="w-full bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600">
                         <Mic className="w-4 h-4 mr-2" />
                         Announcement
                       </Button>
@@ -1509,7 +1509,7 @@ export default function EventPlanning() {
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {mockLiveFeed.map((item) => (
                       <div key={item.id} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                           <User className="w-4 h-4 text-white" />
                         </div>
                         <div className="flex-1">

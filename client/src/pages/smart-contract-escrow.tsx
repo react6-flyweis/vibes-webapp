@@ -180,7 +180,7 @@ export default function SmartContractEscrow() {
         {/* Header */}
         <div className="text-center mb-8">
           <Shield className="w-16 h-16 text-green-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-green-200 bg-clip-text text-transparent">
             Smart Contract Escrow
           </h1>
           <p className="text-white/90 mt-2 text-xl">Secure vendor payments with blockchain technology</p>
@@ -219,7 +219,7 @@ export default function SmartContractEscrow() {
         </Card>
 
         {/* Real Blockchain Network Status */}
-        <Card className="mb-8 bg-gradient-to-r from-green-900/90 to-blue-900/90 text-white border-0 shadow-2xl">
+        <Card className="mb-8 bg-linear-to-r from-green-900/90 to-blue-900/90 text-white border-0 shadow-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center">
               <Zap className="w-8 h-8 mr-3 text-yellow-200 animate-pulse" />
@@ -263,31 +263,31 @@ export default function SmartContractEscrow() {
         {/* Statistics Dashboard */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-party-coral">${stats.totalValue?.toLocaleString() || 0}</div>
                 <div className="text-sm text-party-gray">Total Secured</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-party-purple">{stats.activeContracts || 0}</div>
                 <div className="text-sm text-party-gray">Active Contracts</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-party-turquoise">{stats.completedContracts || 0}</div>
                 <div className="text-sm text-party-gray">Completed</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-party-yellow">{stats.disputeRate || 0}%</div>
                 <div className="text-sm text-party-gray">Dispute Rate</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-party-pink">{stats.avgResolutionTime || 0}h</div>
                 <div className="text-sm text-party-gray">Avg Resolution</div>
@@ -298,7 +298,7 @@ export default function SmartContractEscrow() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Create New Contract */}
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="text-party-dark flex items-center">
                 <Zap className="w-5 h-5 mr-2" />
@@ -393,7 +393,7 @@ export default function SmartContractEscrow() {
           </Card>
 
           {/* Active Contracts */}
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="text-party-dark flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
@@ -486,7 +486,7 @@ export default function SmartContractEscrow() {
         </div>
 
         {/* How It Works */}
-        <Card className="mt-8 bg-white/95 backdrop-blur border-2 border-white/30">
+        <Card className="mt-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
           <CardHeader>
             <CardTitle className="text-party-dark">How Smart Contract Escrow Works</CardTitle>
             <CardDescription>Understanding the blockchain-powered payment process</CardDescription>

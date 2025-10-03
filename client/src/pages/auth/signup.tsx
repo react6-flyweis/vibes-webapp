@@ -104,7 +104,7 @@ export default function Signup() {
   const passwordStrength = getPasswordStrength(form.watch("password") || "");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         
         {/* Left Side - Branding */}
@@ -119,15 +119,15 @@ export default function Signup() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-sm">
+            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-xs">
               <Calendar className="w-8 h-8 text-purple-600" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Smart Events</span>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-sm">
+            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-xs">
               <Users className="w-8 h-8 text-pink-600" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Community</span>
             </div>
-            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-sm">
+            <div className="flex flex-col items-center space-y-2 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg backdrop-blur-xs">
               <Shield className="w-8 h-8 text-orange-600" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Secure</span>
             </div>

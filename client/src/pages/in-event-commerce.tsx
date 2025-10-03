@@ -507,7 +507,7 @@ export default function InEventCommerce() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -526,7 +526,7 @@ export default function InEventCommerce() {
           <Button
             onClick={() => handleScanItem("outfit")}
             disabled={scannerActive}
-            className="h-16 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
+            className="h-16 bg-linear-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
           >
             <div className="flex flex-col items-center gap-1">
               <Camera className="h-5 w-5" />
@@ -536,7 +536,7 @@ export default function InEventCommerce() {
           
           <Button
             onClick={() => setQuickOrderActive(!quickOrderActive)}
-            className="h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+            className="h-16 bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
           >
             <div className="flex flex-col items-center gap-1">
               <ShoppingCart className="h-5 w-5" />
@@ -546,7 +546,7 @@ export default function InEventCommerce() {
           
           <Button
             onClick={() => setActiveTab("brands")}
-            className="h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+            className="h-16 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
           >
             <div className="flex flex-col items-center gap-1">
               <QrCode className="h-5 w-5" />
@@ -556,7 +556,7 @@ export default function InEventCommerce() {
           
           <Button
             onClick={() => setShowCart(true)}
-            className="h-16 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 relative"
+            className="h-16 bg-linear-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 relative"
           >
             <div className="flex flex-col items-center gap-1">
               <Wallet className="h-5 w-5" />
@@ -869,7 +869,7 @@ export default function InEventCommerce() {
                     </div>
 
                     {moment.specialOffers && (
-                      <div className="p-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg border border-purple-500/30">
+                      <div className="p-4 bg-linear-to-r from-purple-600/20 to-pink-600/20 rounded-lg border border-purple-500/30">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-white font-medium">⚡ Flash Offer: {moment.specialOffers.discount}% Off!</p>
@@ -919,7 +919,7 @@ export default function InEventCommerce() {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="p-4 bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-lg border border-green-500/30">
+                      <div className="p-4 bg-linear-to-r from-green-600/20 to-emerald-600/20 rounded-lg border border-green-500/30">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-white font-medium">🎁 Reward: {activation.rewards.value}</p>
                           <Button
@@ -934,7 +934,7 @@ export default function InEventCommerce() {
                       </div>
 
                       {activation.socialChallenge && (
-                        <div className="p-4 bg-gradient-to-r from-pink-600/20 to-purple-600/20 rounded-lg border border-pink-500/30">
+                        <div className="p-4 bg-linear-to-r from-pink-600/20 to-purple-600/20 rounded-lg border border-pink-500/30">
                           <p className="text-white font-medium mb-1">📱 Social Challenge</p>
                           <p className="text-gray-300 text-sm mb-2">{activation.socialChallenge.description}</p>
                           <div className="flex items-center justify-between">

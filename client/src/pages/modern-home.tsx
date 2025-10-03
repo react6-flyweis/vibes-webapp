@@ -251,11 +251,11 @@ export default function ModernHome() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+              <div className="w-10 h-10 bg-linear-to-r from-purple-600 via-pink-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
                 <Zap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 bg-clip-text text-transparent">Vibes</h1>
+                <h1 className="text-xl font-bold bg-linear-to-r from-purple-600 via-pink-500 to-blue-600 bg-clip-text text-transparent">Vibes</h1>
                 <p className="text-xs text-purple-500 dark:text-purple-400">Event Platform</p>
               </div>
             </div>
@@ -292,14 +292,14 @@ export default function ModernHome() {
 
       {/* Main Content */}
       {/* <main className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 shadow-2xl shadow-purple-500/25">
+        <section className="relative rounded-3xl overflow-hidden bg-linear-to-br from-purple-600 via-pink-500 to-blue-600 shadow-2xl shadow-purple-500/25">
           <div className="absolute inset-0">
             <img 
               src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&h=600&fit=crop&auto=format" 
               alt="Party hub with people dancing and celebrating"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-blue-600/10"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-purple-600/10 via-transparent to-blue-600/10"></div>
           </div>
           
           <div className="relative text-center space-y-6 px-8 py-16 md:py-24">
@@ -309,7 +309,7 @@ export default function ModernHome() {
             </div>
             <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
               <span className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">Ready to create amazing</span>
-              <span className="block text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-white bg-clip-text drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"> experiences</span><span className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">?</span>
+              <span className="block text-transparent bg-linear-to-r from-yellow-300 via-pink-300 to-white bg-clip-text drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"> experiences</span><span className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">?</span>
             </h2>
             <p className="text-xl text-white max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">
               Plan, host, and attend unforgettable events with AI-powered tools and immersive features.
@@ -323,7 +323,7 @@ export default function ModernHome() {
                 </Button>
               </Link>
               <Link href="/find-events">
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm font-semibold">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-xs font-semibold">
                   <Search className="w-5 h-5 mr-2" />
                   Discover Events
                 </Button>
@@ -334,7 +334,7 @@ export default function ModernHome() {
 
 
         <section className="">
-          <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-3xl p-8 text-white text-center shadow-2xl">
+          <div className="bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 rounded-3xl p-8 text-white text-center shadow-2xl">
             <div className="mb-6">
               <h2 className="text-4xl font-bold mb-4">🎉 Start Planning Your Dream Party!</h2>
               <p className="text-xl opacity-90 max-w-2xl mx-auto">
@@ -357,7 +357,7 @@ export default function ModernHome() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm font-bold text-lg px-8 py-4"
+                  className="border-white/30 text-white hover:bg-white/10 backdrop-blur-xs font-bold text-lg px-8 py-4"
                 >
                   <Sparkles className="w-6 h-6 mr-3" />
                   AI Party Designer
@@ -385,9 +385,9 @@ export default function ModernHome() {
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action) => (
             <Link key={action.id} href={action.path}>
-              <Card className="group hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300 cursor-pointer border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:scale-105 transform hover:bg-white dark:hover:bg-slate-700">
+              <Card className="group hover:shadow-xl hover:shadow-purple-500/25 transition-all duration-300 cursor-pointer border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs hover:scale-105 transform hover:bg-white dark:hover:bg-slate-700">
                 <CardContent className="p-6">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-xl bg-linear-to-r ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                     <action.icon className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="font-semibold text-slate-900 dark:text-white mb-2">{action.title}</h3>
@@ -407,7 +407,7 @@ export default function ModernHome() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <section className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">Featured Events</h3>
+              <h3 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">Featured Events</h3>
               <Link href="/find-events">
                 <Button variant="outline" size="sm">
                   View All
@@ -418,7 +418,7 @@ export default function ModernHome() {
             
             <div className="space-y-6">
               {featuredEvents.map((event) => (
-                <Card key={event.id} className="group hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300 border-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm overflow-hidden hover:bg-white dark:hover:bg-slate-700">
+                <Card key={event.id} className="group hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300 border-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs overflow-hidden hover:bg-white dark:hover:bg-slate-700">
                   <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
                       <img 
@@ -427,7 +427,7 @@ export default function ModernHome() {
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       {event.featured && (
-                        <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg shadow-yellow-500/25">
+                        <Badge className="absolute top-3 left-3 bg-linear-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg shadow-yellow-500/25">
                           <Star className="w-3 h-3 mr-1" />
                           Featured
                         </Badge>
@@ -492,7 +492,7 @@ export default function ModernHome() {
           </section>
 
           <section className="space-y-6">
-            <Card className="border-0 bg-white dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
+            <Card className="border-0 bg-white dark:bg-slate-800/80 backdrop-blur-xs hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center text-slate-900 dark:text-white">
                   <Clock className="w-5 h-5 mr-2 text-purple-600" />
@@ -502,7 +502,7 @@ export default function ModernHome() {
               <CardContent className="space-y-4">
                 {recentActivity.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-3">
-                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-gradient-to-r dark:from-purple-800/50 dark:to-pink-800/50 flex items-center justify-center`}>
+                    <div className={`w-8 h-8 rounded-full bg-linear-to-r from-purple-100 to-pink-100 dark:bg-linear-to-r dark:from-purple-800/50 dark:to-pink-800/50 flex items-center justify-center`}>
                       <activity.icon className={`w-4 h-4 ${activity.color}`} />
                     </div>
                     <div className="flex-1">
@@ -514,7 +514,7 @@ export default function ModernHome() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-white dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
+            <Card className="border-0 bg-white dark:bg-slate-800/80 backdrop-blur-xs hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center text-slate-900 dark:text-white">
                   <TrendingUp className="w-5 h-5 mr-2 text-emerald-600" />
@@ -528,7 +528,7 @@ export default function ModernHome() {
                       <p className="text-sm font-medium text-slate-900 dark:text-white">{feature.name}</p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">{feature.users} users</p>
                     </div>
-                    <Badge variant="secondary" className="text-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 border-emerald-200 dark:border-emerald-700">
+                    <Badge variant="secondary" className="text-emerald-700 bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 border-emerald-200 dark:border-emerald-700">
                       {feature.growth}
                     </Badge>
                   </div>
@@ -536,7 +536,7 @@ export default function ModernHome() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+            <Card className="border-0 bg-linear-to-r from-purple-600 to-pink-600 text-white">
               <CardContent className="p-6">
                 <h3 className="font-bold text-lg mb-4">Explore More Features</h3>
                 <div className="grid grid-cols-2 gap-4">

@@ -42,7 +42,7 @@ export default function EventSidebar({ event, eventId, stats }: EventSidebarProp
   return (
     <div className="space-y-6">
       {/* Event Details Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6">
         <h3 className="font-semibold party-dark mb-4">Event Details</h3>
         <div className="space-y-3">
           <div className="flex items-center space-x-3">
@@ -70,14 +70,14 @@ export default function EventSidebar({ event, eventId, stats }: EventSidebarProp
         
         <div className="space-y-2 mt-4">
           <Button 
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+            className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
             onClick={() => setLocation("/interactive-live-vibes-invite")}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             Create Interactive Invites
           </Button>
           <Button 
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+            className="w-full bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
             onClick={() => setIsBulkInviteModalOpen(true)}
           >
             <Send className="mr-2 h-4 w-4" />
@@ -91,7 +91,7 @@ export default function EventSidebar({ event, eventId, stats }: EventSidebarProp
       </div>
 
       {/* Progress Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6">
         <h3 className="font-semibold party-dark mb-4">Planning Progress</h3>
         <div className="space-y-4">
           {stats?.itemsByCategory && Object.entries(stats.itemsByCategory).map(([category, data]) => {
@@ -115,7 +115,7 @@ export default function EventSidebar({ event, eventId, stats }: EventSidebarProp
       </div>
 
       {/* Participants Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6">
         <h3 className="font-semibold party-dark mb-4">Recent Contributors</h3>
         <div className="space-y-3">
           {recentContributors.map((participant: any) => (
@@ -150,7 +150,7 @@ export default function EventSidebar({ event, eventId, stats }: EventSidebarProp
       </div>
 
       {/* Vendor Spotlight Card */}
-      <div className="bg-gradient-to-br from-party-blue to-party-turquoise rounded-xl p-6 text-white"
+      <div className="bg-linear-to-br from-party-blue to-party-turquoise rounded-xl p-6 text-white"
         style={{
           background: 'linear-gradient(90deg, #9333EA 0%, #DB2777 50%, #F97316 100%)',
         }}>

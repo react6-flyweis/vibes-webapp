@@ -160,7 +160,7 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-4xl mx-auto bg-white/10 backdrop-blur-lg border-white/20">
           <CardHeader>
@@ -910,9 +910,9 @@ export default function CreateEvent() {
                 />
 
                 {/* Interactive Live Vibes Invite Preview */}
-                <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-400/30 rounded-lg p-6 space-y-4">
+                <div className="bg-linear-to-r from-purple-600/20 to-pink-600/20 border border-purple-400/30 rounded-lg p-6 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-lg">✨</span>
                     </div>
                     <div>
@@ -941,7 +941,7 @@ export default function CreateEvent() {
                   <Button
                     type="button"
                     onClick={() => setLocation("/interactive-live-vibes-invite")}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                    className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
                   >
                     Preview Immersive Invitations →
                   </Button>
@@ -960,7 +960,7 @@ export default function CreateEvent() {
                 <Link href="/enhanced-event/1">
   <Button
     type="button" // change from submit since it’s navigation, not form submit
-    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+    className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
   >
     Create Event & Send Invites
   </Button>

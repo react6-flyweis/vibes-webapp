@@ -161,12 +161,12 @@ export default function VibeBotAssistant() {
   const completionPercentage = Math.round((progress.completedTasks / progress.totalTasks) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-green-950 dark:via-blue-950 dark:to-purple-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-green-50 via-blue-50 to-purple-50 dark:from-green-950 dark:via-blue-950 dark:to-purple-950 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Bot className="h-8 w-8 text-green-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               VibeBot Assistant
             </h1>
             <Zap className="h-8 w-8 text-blue-600" />
@@ -327,7 +327,7 @@ export default function VibeBotAssistant() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
+                  <div className="bg-linear-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
                     <div className="flex items-center gap-3 mb-2">
                       <Bot className="h-6 w-6 text-green-600" />
                       <span className="font-semibold">VibeBot</span>

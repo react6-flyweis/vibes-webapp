@@ -41,7 +41,7 @@ const cardsData = [
     ],
     buttonText: 'Start Vendor Registration',
     buttonLink: '/vendor-onboarding', // 🔗 added route
-    gradientClasses: 'bg-gradient-to-br from-purple-50 to-pink-50',
+    gradientClasses: 'bg-linear-to-br from-purple-50 to-pink-50',
     borderClass: 'border-purple-200',
     buttonClasses: 'bg-purple-600',
     iconBgClass: 'bg-purple-100',
@@ -71,7 +71,7 @@ const cardsData = [
     ],
     buttonText: 'Access Mobile Dashboard',
     buttonLink: '/mobile-dashboard', // 🔗
-    gradientClasses: 'bg-gradient-to-br from-blue-50 to-indigo-50',
+    gradientClasses: 'bg-linear-to-br from-blue-50 to-indigo-50',
     borderClass: 'border-blue-200',
     buttonClasses: 'bg-blue-600',
     iconBgClass: 'bg-blue-100',
@@ -101,7 +101,7 @@ const cardsData = [
     ],
     buttonText: 'Access Risk Engine Dashboard',
     buttonLink: '/risk-engine', // 🔗
-    gradientClasses: 'bg-gradient-to-br from-orange-50 to-red-50',
+    gradientClasses: 'bg-linear-to-br from-orange-50 to-red-50',
     borderClass: 'border-orange-200',
     buttonClasses: 'bg-orange-600',
     iconBgClass: 'bg-orange-100',
@@ -131,7 +131,7 @@ const cardsData = [
     ],
     buttonText: 'Access Admin Dashboard',
     buttonLink: '/admin-dashboard', // 🔗
-    gradientClasses: 'bg-gradient-to-br from-red-50 to-orange-50',
+    gradientClasses: 'bg-linear-to-br from-red-50 to-orange-50',
     borderClass: 'border-red-200',
     buttonClasses: 'bg-red-600',
     iconBgClass: 'bg-red-100',
@@ -161,7 +161,7 @@ const cardsData = [
     ],
     buttonText: 'Access Security Dashboard',
     buttonLink: '/security-dashboard', // 🔗
-    gradientClasses: 'bg-gradient-to-br from-indigo-50 to-purple-50',
+    gradientClasses: 'bg-linear-to-br from-indigo-50 to-purple-50',
     borderClass: 'border-indigo-200',
     buttonClasses: 'bg-indigo-600',
     iconBgClass: 'bg-indigo-100',
@@ -191,7 +191,7 @@ const cardsData = [
     ],
     buttonText: 'Explore Innovations',
     buttonLink: '/innovation-hub', // 🔗
-    gradientClasses: 'bg-gradient-to-br from-purple-50 to-pink-50',
+    gradientClasses: 'bg-linear-to-br from-purple-50 to-pink-50',
     borderClass: 'border-purple-200',
     buttonClasses: 'bg-purple-600',
     iconBgClass: 'bg-purple-100',

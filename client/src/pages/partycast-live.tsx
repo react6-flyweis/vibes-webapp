@@ -485,7 +485,7 @@ export default function PartyCastLive() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}
@@ -802,7 +802,7 @@ export default function PartyCastLive() {
                       </div>
                       
                       {/* Player Controls */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-4">
                         <div className="flex items-center justify-between text-white">
                           <div className="flex items-center space-x-4">
                             <Button size="sm" variant="ghost" className="text-white hover:bg-white/20">

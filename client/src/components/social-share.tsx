@@ -154,7 +154,7 @@ export default function SocialShare({ event, isOpen, onClose }: SocialShareProps
       name: 'Instagram', 
       key: 'instagram' as const, 
       icon: SiInstagram, 
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+      color: 'bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
       description: 'Post to stories'
     },
     { 
@@ -195,8 +195,8 @@ export default function SocialShare({ event, isOpen, onClose }: SocialShareProps
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-white/10 backdrop-blur border-white/20 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl bg-white/10 backdrop-blur-sm border-white/20 max-h-[90vh] overflow-y-auto">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -265,7 +265,7 @@ export default function SocialShare({ event, isOpen, onClose }: SocialShareProps
                     copyToClipboard();
                   });
                 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Native Share

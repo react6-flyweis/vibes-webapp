@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  SkipBack, 
-  Volume2, 
-  Users, 
-  TrendingUp, 
-  Music, 
-  Heart, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Settings, 
-  Mic, 
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import {
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
+  Volume2,
+  Users,
+  TrendingUp,
+  Music,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Settings,
+  Mic,
   Headphones,
   Radio,
   Activity,
@@ -32,8 +32,8 @@ import {
   Vote,
   Disc3,
   Music2,
-  Music3
-} from 'lucide-react';
+  Music3,
+} from "lucide-react";
 
 interface Track {
   id: string;
@@ -45,13 +45,13 @@ interface Track {
   energy: number;
   valence: number;
   danceability: number;
-  source: 'spotify' | 'soundcloud' | 'local';
+  source: "spotify" | "soundcloud" | "local";
   artwork?: string;
   previewUrl?: string;
   votes: {
     up: number;
     down: number;
-    userVote?: 'up' | 'down' | null;
+    userVote?: "up" | "down" | null;
   };
 }
 
@@ -61,13 +61,13 @@ interface GuestPreference {
   genres: string[];
   energyLevel: number;
   currentMood: string;
-  recentVotes: { trackId: string; vote: 'up' | 'down' }[];
+  recentVotes: { trackId: string; vote: "up" | "down" }[];
 }
 
 interface CrowdAnalytics {
   averageEnergy: number;
   dominantGenres: string[];
-  moodTrend: 'rising' | 'falling' | 'stable';
+  moodTrend: "rising" | "falling" | "stable";
   engagementScore: number;
   peakTimes: string[];
   requestedTracks: Track[];
@@ -75,76 +75,78 @@ interface CrowdAnalytics {
 
 const mockRequestedTracks: Track[] = [
   {
-    id: '1',
-    title: 'Levitating',
-    artist: 'Dua Lipa',
+    id: "1",
+    title: "Levitating",
+    artist: "Dua Lipa",
     duration: 203,
     bpm: 103,
     energy: 85,
     valence: 90,
     danceability: 85,
-    source: 'spotify',
-    votes: { up: 24, down: 2, userVote: null }
+    source: "spotify",
+    votes: { up: 24, down: 2, userVote: null },
   },
   {
-    id: '2',
-    title: 'Blinding Lights',
-    artist: 'The Weeknd',
+    id: "2",
+    title: "Blinding Lights",
+    artist: "The Weeknd",
     duration: 200,
     bpm: 171,
     energy: 78,
     valence: 85,
     danceability: 80,
-    source: 'spotify',
-    votes: { up: 19, down: 3, userVote: null }
-  }
+    source: "spotify",
+    votes: { up: 19, down: 3, userVote: null },
+  },
 ];
 
 export default function AIDJCompanion() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([75]);
   const [crossfade, setCrossfade] = useState([50]);
   const [autoMixEnabled, setAutoMixEnabled] = useState(true);
   const [energyTarget, setEnergyTarget] = useState([70]);
-  const [selectedPlatform, setSelectedPlatform] = useState<'spotify' | 'soundcloud' | 'local'>('spotify');
+  const [selectedPlatform, setSelectedPlatform] = useState<
+    "spotify" | "soundcloud" | "local"
+  >("spotify");
 
   // Fetch current DJ session data
   const { data: djSession, isLoading: sessionLoading } = useQuery({
-    queryKey: ['/api/dj/session'],
+    queryKey: ["/api/dj/session"],
     refetchInterval: 3000, // Real-time updates every 3 seconds
   });
 
   // Fetch AI suggestions
   const { data: aiSuggestions, isLoading: suggestionsLoading } = useQuery({
-    queryKey: ['/api/dj/ai-suggestions'],
+    queryKey: ["/api/dj/ai-suggestions"],
     refetchInterval: 5000, // Update suggestions every 5 seconds
   });
 
   // Fetch crowd analytics
   const { data: crowdAnalytics, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['/api/dj/crowd-analytics'],
+    queryKey: ["/api/dj/crowd-analytics"],
     refetchInterval: 2000, // Real-time crowd data
   });
 
   // Fetch guest preferences
   const { data: guestPreferences, isLoading: preferencesLoading } = useQuery({
-    queryKey: ['/api/dj/guest-preferences'],
+    queryKey: ["/api/dj/guest-preferences"],
     refetchInterval: 10000,
   });
 
   // Play track mutation
   const playTrackMutation = useMutation({
     mutationFn: async (track: Track) => {
-      return apiRequest('POST', '/api/dj/play-track', { track });
+      return apiRequest("POST", "/api/dj/play-track", { track });
     },
     onSuccess: (data) => {
       setCurrentTrack(data.track);
       setIsPlaying(true);
-      queryClient.invalidateQueries({ queryKey: ['/api/dj/session'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dj/session"] });
       toast({
         title: "Track Playing",
         description: `Now playing: ${data.track.title} by ${data.track.artist}`,
@@ -161,22 +163,28 @@ export default function AIDJCompanion() {
 
   // Vote on track mutation
   const voteTrackMutation = useMutation({
-    mutationFn: async ({ trackId, vote }: { trackId: string; vote: 'up' | 'down' }) => {
-      return apiRequest('POST', '/api/dj/vote-track', { trackId, vote });
+    mutationFn: async ({
+      trackId,
+      vote,
+    }: {
+      trackId: string;
+      vote: "up" | "down";
+    }) => {
+      return apiRequest("POST", "/api/dj/vote-track", { trackId, vote });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/dj/ai-suggestions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/dj/crowd-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dj/ai-suggestions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dj/crowd-analytics"] });
     },
   });
 
   // Update DJ preferences mutation
   const updatePreferencesMutation = useMutation({
     mutationFn: async (preferences: any) => {
-      return apiRequest('POST', '/api/dj/update-preferences', preferences);
+      return apiRequest("POST", "/api/dj/update-preferences", preferences);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/dj/ai-suggestions'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dj/ai-suggestions"] });
       toast({
         title: "Preferences Updated",
         description: "AI suggestions will adapt to your new settings",
@@ -188,7 +196,7 @@ export default function AIDJCompanion() {
     playTrackMutation.mutate(track);
   };
 
-  const handleVote = (trackId: string, vote: 'up' | 'down') => {
+  const handleVote = (trackId: string, vote: "up" | "down") => {
     voteTrackMutation.mutate({ trackId, vote });
   };
 
@@ -200,35 +208,38 @@ export default function AIDJCompanion() {
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-
-
   const getEnergyColor = (energy: number) => {
-    if (energy >= 80) return 'text-red-500';
-    if (energy >= 60) return 'text-orange-500';
-    if (energy >= 40) return 'text-yellow-500';
-    return 'text-green-500';
+    if (energy >= 80) return "text-red-500";
+    if (energy >= 60) return "text-orange-500";
+    if (energy >= 40) return "text-yellow-500";
+    return "text-green-500";
   };
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
-      case 'spotify': return <Music2 className="h-4 w-4 text-green-500" />;
-      case 'soundcloud': return <Music3 className="h-4 w-4 text-orange-500" />;
-      default: return <Disc3 className="h-4 w-4" />;
+      case "spotify":
+        return <Music2 className="h-4 w-4 text-green-500" />;
+      case "soundcloud":
+        return <Music3 className="h-4 w-4 text-orange-500" />;
+      default:
+        return <Disc3 className="h-4 w-4" />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-indigo-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-black to-indigo-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             VibeMix AI DJ Companion
           </h1>
-          <p className="text-gray-300">Data-driven party curation that responds to crowd mood instantly</p>
+          <p className="text-gray-300">
+            Data-driven party curation that responds to crowd mood instantly
+          </p>
         </div>
 
         {/* Current Track & Controls */}
@@ -244,42 +255,51 @@ export default function AIDJCompanion() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {currentTrack.artwork && (
-                    <img 
-                      src={currentTrack.artwork} 
+                    <img
+                      src={currentTrack.artwork}
                       alt="Album artwork"
                       className="w-16 h-16 rounded-lg"
                     />
                   )}
                   <div>
-                    <h3 className="text-xl font-semibold">{currentTrack.title}</h3>
+                    <h3 className="text-xl font-semibold">
+                      {currentTrack.title}
+                    </h3>
                     <p className="text-gray-400">{currentTrack.artist}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {getPlatformIcon(currentTrack.source)}
                       <Badge variant="outline">{currentTrack.bpm} BPM</Badge>
-                      <Badge variant="outline" className={getEnergyColor(currentTrack.energy)}>
+                      <Badge
+                        variant="outline"
+                        className={getEnergyColor(currentTrack.energy)}
+                      >
                         {currentTrack.energy}% Energy
                       </Badge>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm">
                       <SkipBack className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={handleTogglePlayback}
                     >
-                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                      {isPlaying ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
                     </Button>
                     <Button variant="outline" size="sm">
                       <SkipForward className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Volume2 className="h-4 w-4" />
                     <Slider
@@ -321,7 +341,7 @@ export default function AIDJCompanion() {
                 <CardContent>
                   {suggestionsLoading ? (
                     <div className="space-y-4">
-                      {[1, 2, 3].map(i => (
+                      {[1, 2, 3].map((i) => (
                         <div key={i} className="animate-pulse">
                           <div className="h-4 bg-gray-700 rounded mb-2"></div>
                           <div className="h-3 bg-gray-800 rounded w-3/4"></div>
@@ -331,15 +351,27 @@ export default function AIDJCompanion() {
                   ) : (
                     <div className="space-y-4">
                       {aiSuggestions?.data?.suggestions?.map((track: Track) => (
-                        <div key={track.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
+                        <div
+                          key={track.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50"
+                        >
                           <div className="flex items-center gap-3">
                             {getPlatformIcon(track.source)}
                             <div>
                               <h4 className="font-medium">{track.title}</h4>
-                              <p className="text-sm text-gray-400">{track.artist}</p>
+                              <p className="text-sm text-gray-400">
+                                {track.artist}
+                              </p>
                               <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">{track.bpm} BPM</Badge>
-                                <Badge variant="outline" className={`text-xs ${getEnergyColor(track.energy)}`}>
+                                <Badge variant="outline" className="text-xs">
+                                  {track.bpm} BPM
+                                </Badge>
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${getEnergyColor(
+                                    track.energy
+                                  )}`}
+                                >
                                   {track.energy}% Energy
                                 </Badge>
                               </div>
@@ -350,8 +382,8 @@ export default function AIDJCompanion() {
                               <ThumbsUp className="h-3 w-3" />
                               {track.votes.up}
                             </div>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               onClick={() => handlePlayTrack(track)}
                               disabled={playTrackMutation.isPending}
                             >
@@ -375,7 +407,9 @@ export default function AIDJCompanion() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium">Target Energy Level</label>
+                      <label className="text-sm font-medium">
+                        Target Energy Level
+                      </label>
                       <Slider
                         value={energyTarget}
                         onValueChange={setEnergyTarget}
@@ -390,7 +424,7 @@ export default function AIDJCompanion() {
                         <span>High Energy (100%)</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Auto-Mix Mode</span>
                       <Switch
@@ -398,9 +432,11 @@ export default function AIDJCompanion() {
                         onCheckedChange={setAutoMixEnabled}
                       />
                     </div>
-                    
+
                     <div>
-                      <label className="text-sm font-medium">Crossfade Duration</label>
+                      <label className="text-sm font-medium">
+                        Crossfade Duration
+                      </label>
                       <Slider
                         value={crossfade}
                         onValueChange={setCrossfade}
@@ -433,21 +469,32 @@ export default function AIDJCompanion() {
                   ) : (
                     <div className="space-y-4">
                       <div className="text-center">
-                        <div className={`text-3xl font-bold ${getEnergyColor(crowdAnalytics?.data?.averageEnergy || 75)}`}>
+                        <div
+                          className={`text-3xl font-bold ${getEnergyColor(
+                            crowdAnalytics?.data?.averageEnergy || 75
+                          )}`}
+                        >
                           {crowdAnalytics?.data?.averageEnergy || 75}%
                         </div>
                         <p className="text-sm text-gray-400">Average Energy</p>
                       </div>
-                      <Progress 
-                        value={crowdAnalytics?.data?.averageEnergy || 75} 
+                      <Progress
+                        value={crowdAnalytics?.data?.averageEnergy || 75}
                         className="h-2"
                       />
                       <div className="flex items-center gap-2">
-                        <TrendingUp className={`h-4 w-4 ${
-                          crowdAnalytics?.data?.moodTrend === 'rising' ? 'text-green-500' :
-                          crowdAnalytics?.data?.moodTrend === 'falling' ? 'text-red-500' : 'text-yellow-500'
-                        }`} />
-                        <span className="text-sm capitalize">{crowdAnalytics?.data?.moodTrend || 'rising'}</span>
+                        <TrendingUp
+                          className={`h-4 w-4 ${
+                            crowdAnalytics?.data?.moodTrend === "rising"
+                              ? "text-green-500"
+                              : crowdAnalytics?.data?.moodTrend === "falling"
+                              ? "text-red-500"
+                              : "text-yellow-500"
+                          }`}
+                        />
+                        <span className="text-sm capitalize">
+                          {crowdAnalytics?.data?.moodTrend || "rising"}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -492,16 +539,26 @@ export default function AIDJCompanion() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {(crowdAnalytics?.data?.dominantGenres || ['House', 'Techno', 'Hip-Hop', 'Pop', 'Electronic'])?.slice(0, 5).map((genre: string, index: number) => (
-                      <div key={genre} className="flex items-center gap-2">
-                        <div className="w-6 text-center text-sm font-bold">
-                          #{index + 1}
+                    {(
+                      crowdAnalytics?.data?.dominantGenres || [
+                        "House",
+                        "Techno",
+                        "Hip-Hop",
+                        "Pop",
+                        "Electronic",
+                      ]
+                    )
+                      ?.slice(0, 5)
+                      .map((genre: string, index: number) => (
+                        <div key={genre} className="flex items-center gap-2">
+                          <div className="w-6 text-center text-sm font-bold">
+                            #{index + 1}
+                          </div>
+                          <Badge variant="outline" className="flex-1">
+                            {genre}
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className="flex-1">
-                          {genre}
-                        </Badge>
-                      </div>
-                    )) || (
+                      )) || (
                       <div className="text-center text-gray-400">
                         <Music className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No genre data yet</p>
@@ -524,28 +581,37 @@ export default function AIDJCompanion() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {(crowdAnalytics?.data?.requestedTracks || mockRequestedTracks)?.map((track: Track) => (
-                    <div key={track.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50">
+                  {(
+                    crowdAnalytics?.data?.requestedTracks || mockRequestedTracks
+                  )?.map((track: Track) => (
+                    <div
+                      key={track.id}
+                      className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50"
+                    >
                       <div className="flex items-center gap-3">
                         {getPlatformIcon(track.source)}
                         <div>
                           <h4 className="font-medium">{track.title}</h4>
-                          <p className="text-sm text-gray-400">{track.artist}</p>
+                          <p className="text-sm text-gray-400">
+                            {track.artist}
+                          </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">{track.bpm} BPM</Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {track.bpm} BPM
+                            </Badge>
                             <Badge variant="outline" className="text-xs">
                               {formatDuration(track.duration)}
                             </Badge>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleVote(track.id, 'up')}
+                            onClick={() => handleVote(track.id, "up")}
                             className="flex items-center gap-1"
                           >
                             <ThumbsUp className="h-3 w-3" />
@@ -554,15 +620,15 @@ export default function AIDJCompanion() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleVote(track.id, 'down')}
+                            onClick={() => handleVote(track.id, "down")}
                             className="flex items-center gap-1"
                           >
                             <ThumbsDown className="h-3 w-3" />
                             {track.votes.down}
                           </Button>
                         </div>
-                        
-                        <Button 
+
+                        <Button
                           size="sm"
                           onClick={() => handlePlayTrack(track)}
                           disabled={playTrackMutation.isPending}
@@ -595,12 +661,18 @@ export default function AIDJCompanion() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium">Music Platform</label>
+                      <label className="text-sm font-medium">
+                        Music Platform
+                      </label>
                       <div className="flex gap-2 mt-2">
-                        {['spotify', 'soundcloud', 'local'].map((platform) => (
+                        {["spotify", "soundcloud", "local"].map((platform) => (
                           <Button
                             key={platform}
-                            variant={selectedPlatform === platform ? "default" : "outline"}
+                            variant={
+                              selectedPlatform === platform
+                                ? "default"
+                                : "outline"
+                            }
                             size="sm"
                             onClick={() => setSelectedPlatform(platform as any)}
                             className="flex items-center gap-2"
@@ -611,7 +683,7 @@ export default function AIDJCompanion() {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Connection Status</span>
@@ -642,7 +714,9 @@ export default function AIDJCompanion() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium">Master Volume</label>
+                      <label className="text-sm font-medium">
+                        Master Volume
+                      </label>
                       <Slider
                         value={volume}
                         onValueChange={setVolume}
@@ -650,9 +724,11 @@ export default function AIDJCompanion() {
                         className="mt-2"
                       />
                     </div>
-                    
+
                     <div>
-                      <label className="text-sm font-medium">Crossfade Time</label>
+                      <label className="text-sm font-medium">
+                        Crossfade Time
+                      </label>
                       <Slider
                         value={crossfade}
                         onValueChange={setCrossfade}
@@ -663,15 +739,17 @@ export default function AIDJCompanion() {
                         {crossfade[0]} seconds
                       </div>
                     </div>
-                    
+
                     <Button
-                      onClick={() => updatePreferencesMutation.mutate({
-                        platform: selectedPlatform,
-                        volume: volume[0],
-                        crossfade: crossfade[0],
-                        energyTarget: energyTarget[0],
-                        autoMix: autoMixEnabled
-                      })}
+                      onClick={() =>
+                        updatePreferencesMutation.mutate({
+                          platform: selectedPlatform,
+                          volume: volume[0],
+                          crossfade: crossfade[0],
+                          energyTarget: energyTarget[0],
+                          autoMix: autoMixEnabled,
+                        })
+                      }
                       disabled={updatePreferencesMutation.isPending}
                       className="w-full"
                     >

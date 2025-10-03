@@ -9,7 +9,7 @@ const Footer = () => {
   const isHome: boolean = location === "/"; // ✅ directly string compare
   return (
  <footer
-      className={`relative w-full h-auto md:h-[275px] bg-gradient-to-r from-slate-900 to-gray-900 overflow-hidden 
+      className={`relative w-full h-auto md:h-[275px] bg-linear-to-r from-slate-900 to-gray-900 overflow-hidden 
       ${isHome ? "rounded-t-[60px]" : ""}`}
     >      {/* Background blur effects */}
       <div className="absolute w-[647px] h-[639px] -right-[200px] -top-16 bg-gray-400 opacity-30 rounded-full blur-[192px]"></div>
@@ -21,7 +21,7 @@ const Footer = () => {
         {/* Left side - Brand */}
         <div className="flex flex-col items-center md:items-start">
           <h1
-            className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent mb-2"
+            className="text-4xl md:text-6xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent mb-2"
             style={{ fontFamily: "serif" }}
           >
             Vibes Studio

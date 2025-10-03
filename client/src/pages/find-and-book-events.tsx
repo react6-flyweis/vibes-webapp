@@ -148,14 +148,14 @@ export default function FindAndBookEvents() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -166,7 +166,7 @@ export default function FindAndBookEvents() {
         </div>
 
         {/* Search and Filters */}
-        <Card className="mb-8 bg-white/10 backdrop-blur border-white/20">
+        <Card className="mb-8 bg-white/10 backdrop-blur-sm border-white/20">
           <CardContent className="p-6">
             <div className="space-y-4">
               {/* Search Bar */}
@@ -276,7 +276,7 @@ export default function FindAndBookEvents() {
                 .filter((event: Event) => event.featured)
                 .slice(0, 2)
                 .map((event: Event) => (
-                  <Card key={event.id} className="bg-white/10 backdrop-blur border-white/20 overflow-hidden">
+                  <Card key={event.id} className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden">
                     <div className="relative">
                       <img 
                         src={event.image} 
@@ -353,7 +353,7 @@ export default function FindAndBookEvents() {
               const CategoryIcon = getCategoryIcon(event.category);
               
               return (
-                <Card key={event.id} className="bg-white/10 backdrop-blur border-white/20 overflow-hidden hover:bg-white/15 transition-all">
+                <Card key={event.id} className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/15 transition-all">
                   <div className="relative">
                     <img 
                       src={event.image} 
@@ -438,7 +438,7 @@ export default function FindAndBookEvents() {
 
         {/* No Results */}
         {filteredEvents.length === 0 && (
-          <Card className="bg-white/10 backdrop-blur border-white/20 text-center p-8">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-center p-8">
             <Search className="h-12 w-12 text-blue-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Events Found</h3>
             <p className="text-blue-100 mb-4">

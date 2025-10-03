@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { 
-  Brain, 
-  TrendingUp, 
-  Users, 
+import {
+  Brain,
+  TrendingUp,
+  Users,
   Music,
   Target,
   AlertTriangle,
@@ -31,7 +37,7 @@ import {
   Volume2,
   Palette,
   Heart,
-  UserCheck
+  UserCheck,
 } from "lucide-react";
 
 interface VibeModel {
@@ -55,9 +61,21 @@ interface VibeModel {
       recommendation: string;
     }>;
     preferenceAnalysis: {
-      musicGenres: Array<{ genre: string; preference: number; confidence: number }>;
-      drinkTypes: Array<{ type: string; preference: number; popularity: number }>;
-      themePreferences: Array<{ theme: string; score: number; trending: boolean }>;
+      musicGenres: Array<{
+        genre: string;
+        preference: number;
+        confidence: number;
+      }>;
+      drinkTypes: Array<{
+        type: string;
+        preference: number;
+        popularity: number;
+      }>;
+      themePreferences: Array<{
+        theme: string;
+        score: number;
+        trending: boolean;
+      }>;
     };
     realTimeAdjustments: Array<{
       category: string;
@@ -73,8 +91,8 @@ interface VibeModel {
   };
   recommendations: Array<{
     id: string;
-    type: 'enhancement' | 'warning' | 'optimization';
-    priority: 'high' | 'medium' | 'low';
+    type: "enhancement" | "warning" | "optimization";
+    priority: "high" | "medium" | "low";
     title: string;
     description: string;
     impact: string;
@@ -88,13 +106,13 @@ const categoryIcons = {
   food: Utensils,
   decor: Palette,
   entertainment: Volume2,
-  atmosphere: Heart
+  atmosphere: Heart,
 };
 
 const priorityColors = {
-  high: 'bg-red-500',
-  medium: 'bg-yellow-500',
-  low: 'bg-green-500'
+  high: "bg-red-500",
+  medium: "bg-yellow-500",
+  low: "bg-green-500",
 };
 
 export default function AIVibeModeling() {
@@ -106,28 +124,31 @@ export default function AIVibeModeling() {
 
   // Fetch vibe models
   const { data: vibeModels, isLoading } = useQuery({
-    queryKey: ['/api/ai-vibe-models', selectedEventId],
+    queryKey: ["/api/ai-vibe-models", selectedEventId],
     retry: false,
     refetchInterval: autoRefresh ? 30000 : false, // Auto-refresh every 30 seconds
   });
 
   // Fetch user events for selection
   const { data: userEvents } = useQuery({
-    queryKey: ['/api/events/user'],
+    queryKey: ["/api/events/user"],
     retry: false,
   });
 
   // Generate vibe predictions mutation
   const generatePredictionsMutation = useMutation({
     mutationFn: async (eventId: number) => {
-      return await apiRequest("POST", "/api/ai-vibe-models/generate", { eventId });
+      return await apiRequest("POST", "/api/ai-vibe-models/generate", {
+        eventId,
+      });
     },
     onSuccess: () => {
       toast({
         title: "Vibe Model Updated",
-        description: "AI has analyzed guest data and generated new predictions for your event.",
+        description:
+          "AI has analyzed guest data and generated new predictions for your event.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/ai-vibe-models'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-vibe-models"] });
     },
     onError: () => {
       toast({
@@ -141,18 +162,25 @@ export default function AIVibeModeling() {
   // Apply recommendation mutation
   const applyRecommendationMutation = useMutation({
     mutationFn: async (recommendationId: string) => {
-      return await apiRequest("POST", "/api/ai-vibe-models/apply-recommendation", { recommendationId });
+      return await apiRequest(
+        "POST",
+        "/api/ai-vibe-models/apply-recommendation",
+        { recommendationId }
+      );
     },
     onSuccess: () => {
       toast({
         title: "Recommendation Applied",
-        description: "AI suggestion has been implemented in your event settings.",
+        description:
+          "AI suggestion has been implemented in your event settings.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/ai-vibe-models'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-vibe-models"] });
     },
   });
 
-  const currentModel = vibeModels?.find((model: VibeModel) => model.eventId === selectedEventId);
+  const currentModel = vibeModels?.find(
+    (model: VibeModel) => model.eventId === selectedEventId
+  );
 
   if (isLoading) {
     return (
@@ -169,15 +197,17 @@ export default function AIVibeModeling() {
       <div className="absolute top-10 left-10 w-32 h-32 bg-party-pink rounded-full opacity-20 animate-bounce-gentle"></div>
       <div className="absolute top-40 right-20 w-24 h-24 bg-party-yellow rounded-full opacity-30 animate-party-wiggle"></div>
       <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-party-turquoise rounded-full opacity-15 animate-pulse-slow"></div>
-      
+
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <Brain className="w-16 h-16 text-purple-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-purple-200 bg-clip-text text-transparent">
             AI-Powered Vibe Modeling
           </h1>
-          <p className="text-white/90 mt-2 text-xl">Predictive analytics for hyper-personalized party experiences</p>
+          <p className="text-white/90 mt-2 text-xl">
+            Predictive analytics for hyper-personalized party experiences
+          </p>
         </div>
 
         {/* Feature Overview */}
@@ -188,30 +218,41 @@ export default function AIVibeModeling() {
               Intelligent Event Optimization
             </CardTitle>
             <CardDescription className="text-white/90 text-lg">
-              AI analyzes guest behavior and social trends to predict and enhance event experiences
+              AI analyzes guest behavior and social trends to predict and
+              enhance event experiences
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <Target className="w-12 h-12 text-party-yellow mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">Preference Prediction</h3>
-                <p className="text-white/80 text-sm">Predict guest music, food & drink preferences</p>
+                <h3 className="font-bold text-lg mb-2">
+                  Preference Prediction
+                </h3>
+                <p className="text-white/80 text-sm">
+                  Predict guest music, food & drink preferences
+                </p>
               </div>
               <div className="text-center">
                 <AlertTriangle className="w-12 h-12 text-party-turquoise mx-auto mb-3" />
                 <h3 className="font-bold text-lg mb-2">No-Show Prevention</h3>
-                <p className="text-white/80 text-sm">Identify at-risk guests and take action</p>
+                <p className="text-white/80 text-sm">
+                  Identify at-risk guests and take action
+                </p>
               </div>
               <div className="text-center">
                 <RefreshCw className="w-12 h-12 text-party-pink mx-auto mb-3" />
                 <h3 className="font-bold text-lg mb-2">Real-Time Adaptation</h3>
-                <p className="text-white/80 text-sm">Auto-adjust event elements during the party</p>
+                <p className="text-white/80 text-sm">
+                  Auto-adjust event elements during the party
+                </p>
               </div>
               <div className="text-center">
                 <TrendingUp className="w-12 h-12 text-party-green mx-auto mb-3" />
                 <h3 className="font-bold text-lg mb-2">Trend Analysis</h3>
-                <p className="text-white/80 text-sm">Leverage social media and cultural trends</p>
+                <p className="text-white/80 text-sm">
+                  Leverage social media and cultural trends
+                </p>
               </div>
             </div>
           </CardContent>
@@ -220,31 +261,39 @@ export default function AIVibeModeling() {
         {/* Model Overview */}
         {currentModel && (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Brain className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800">{currentModel.modelAccuracy}%</div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {currentModel.modelAccuracy}%
+                </div>
                 <p className="text-gray-600 text-sm">Model Accuracy</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800">{currentModel.guestInsights.analyzedGuests}</div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {currentModel.guestInsights.analyzedGuests}
+                </div>
                 <p className="text-gray-600 text-sm">Guests Analyzed</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Activity className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800">{currentModel.guestInsights.averageEngagement}%</div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {currentModel.guestInsights.averageEngagement}%
+                </div>
                 <p className="text-gray-600 text-sm">Avg Engagement</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Star className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-800">{currentModel.guestInsights.satisfactionScore}/10</div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {currentModel.guestInsights.satisfactionScore}/10
+                </div>
                 <p className="text-gray-600 text-sm">Satisfaction Score</p>
               </CardContent>
             </Card>
@@ -254,52 +303,78 @@ export default function AIVibeModeling() {
         {/* Control Panel */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex gap-4">
-            <Button 
-              onClick={() => generatePredictionsMutation.mutate(selectedEventId)}
+            <Button
+              onClick={() =>
+                generatePredictionsMutation.mutate(selectedEventId)
+              }
               disabled={generatePredictionsMutation.isPending}
               className="bg-party-gradient-2 hover:bg-party-gradient-3 text-white"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${generatePredictionsMutation.isPending ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${
+                  generatePredictionsMutation.isPending ? "animate-spin" : ""
+                }`}
+              />
               Update Predictions
             </Button>
-            <Button 
+            <Button
               onClick={() => setAutoRefresh(!autoRefresh)}
               variant={autoRefresh ? "default" : "outline"}
               className="text-white border-white"
             >
               <Activity className="w-4 h-4 mr-2" />
-              Auto-Refresh: {autoRefresh ? 'ON' : 'OFF'}
+              Auto-Refresh: {autoRefresh ? "ON" : "OFF"}
             </Button>
           </div>
           <div className="text-white/70 text-sm">
-            Last updated: {currentModel ? new Date(currentModel.lastUpdated).toLocaleTimeString() : 'Never'}
+            Last updated:{" "}
+            {currentModel
+              ? new Date(currentModel.lastUpdated).toLocaleTimeString()
+              : "Never"}
           </div>
         </div>
 
         {currentModel ? (
           <div className="space-y-8">
             {/* No-Show Risk Analysis */}
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <AlertTriangle className="w-6 h-6 mr-2 text-orange-600" />
                   No-Show Risk Analysis
                 </CardTitle>
-                <CardDescription>Guests at risk of not attending your event</CardDescription>
+                <CardDescription>
+                  Guests at risk of not attending your event
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {currentModel.predictions.noShowRisk.length > 0 ? (
                   <div className="space-y-3">
                     {currentModel.predictions.noShowRisk.map((guest, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                      >
                         <div className="flex-1">
                           <h4 className="font-medium">{guest.guestName}</h4>
-                          <p className="text-sm text-gray-600">Risk factors: {guest.factors.join(', ')}</p>
-                          <p className="text-sm text-blue-600 mt-1">{guest.recommendation}</p>
+                          <p className="text-sm text-gray-600">
+                            Risk factors: {guest.factors.join(", ")}
+                          </p>
+                          <p className="text-sm text-blue-600 mt-1">
+                            {guest.recommendation}
+                          </p>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-center">
-                            <div className={`text-lg font-bold ${guest.riskScore > 70 ? 'text-red-600' : guest.riskScore > 40 ? 'text-yellow-600' : 'text-green-600'}`}>
+                            <div
+                              className={`text-lg font-bold ${
+                                guest.riskScore > 70
+                                  ? "text-red-600"
+                                  : guest.riskScore > 40
+                                  ? "text-yellow-600"
+                                  : "text-green-600"
+                              }`}
+                            >
                               {guest.riskScore}%
                             </div>
                             <div className="text-xs text-gray-500">Risk</div>
@@ -324,7 +399,7 @@ export default function AIVibeModeling() {
             {/* Preference Analysis */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Music Preferences */}
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-lg">
                     <Music className="w-5 h-5 mr-2 text-purple-600" />
@@ -333,21 +408,25 @@ export default function AIVibeModeling() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {currentModel.predictions.preferenceAnalysis.musicGenres.map((genre, index) => (
-                      <div key={index} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{genre.genre}</span>
-                          <span className="text-gray-600">{genre.confidence}% conf.</span>
+                    {currentModel.predictions.preferenceAnalysis.musicGenres.map(
+                      (genre, index) => (
+                        <div key={index} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-medium">{genre.genre}</span>
+                            <span className="text-gray-600">
+                              {genre.confidence}% conf.
+                            </span>
+                          </div>
+                          <Progress value={genre.preference} className="h-2" />
                         </div>
-                        <Progress value={genre.preference} className="h-2" />
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Drink Preferences */}
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-lg">
                     <Coffee className="w-5 h-5 mr-2 text-brown-600" />
@@ -356,21 +435,25 @@ export default function AIVibeModeling() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {currentModel.predictions.preferenceAnalysis.drinkTypes.map((drink, index) => (
-                      <div key={index} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{drink.type}</span>
-                          <span className="text-gray-600">{drink.popularity}% pop.</span>
+                    {currentModel.predictions.preferenceAnalysis.drinkTypes.map(
+                      (drink, index) => (
+                        <div key={index} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-medium">{drink.type}</span>
+                            <span className="text-gray-600">
+                              {drink.popularity}% pop.
+                            </span>
+                          </div>
+                          <Progress value={drink.preference} className="h-2" />
                         </div>
-                        <Progress value={drink.preference} className="h-2" />
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Theme Preferences */}
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-lg">
                     <Palette className="w-5 h-5 mr-2 text-pink-600" />
@@ -379,55 +462,85 @@ export default function AIVibeModeling() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {currentModel.predictions.preferenceAnalysis.themePreferences.map((theme, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm">{theme.theme}</span>
-                            {theme.trending && (
-                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
-                                Trending
-                              </Badge>
-                            )}
+                    {currentModel.predictions.preferenceAnalysis.themePreferences.map(
+                      (theme, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">
+                                {theme.theme}
+                              </span>
+                              {theme.trending && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs bg-green-100 text-green-800"
+                                >
+                                  Trending
+                                </Badge>
+                              )}
+                            </div>
+                            <Progress
+                              value={theme.score}
+                              className="h-1 mt-1"
+                            />
                           </div>
-                          <Progress value={theme.score} className="h-1 mt-1" />
+                          <span className="text-sm text-gray-600 ml-2">
+                            {theme.score}%
+                          </span>
                         </div>
-                        <span className="text-sm text-gray-600 ml-2">{theme.score}%</span>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Real-Time Recommendations */}
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Lightbulb className="w-6 h-6 mr-2 text-yellow-600" />
                   AI Recommendations
                 </CardTitle>
-                <CardDescription>Smart suggestions to enhance your event experience</CardDescription>
+                <CardDescription>
+                  Smart suggestions to enhance your event experience
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {currentModel.recommendations.map((rec) => (
-                    <div key={rec.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div
+                      key={rec.id}
+                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${priorityColors[rec.priority]}`}></div>
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              priorityColors[rec.priority]
+                            }`}
+                          ></div>
                           <h4 className="font-medium">{rec.title}</h4>
                         </div>
                         <Badge variant="outline" className="text-xs">
                           {rec.confidence}% conf.
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
-                      <p className="text-sm text-blue-600 mb-3">Impact: {rec.impact}</p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {rec.description}
+                      </p>
+                      <p className="text-sm text-blue-600 mb-3">
+                        Impact: {rec.impact}
+                      </p>
                       <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
-                          onClick={() => applyRecommendationMutation.mutate(rec.id)}
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            applyRecommendationMutation.mutate(rec.id)
+                          }
                           disabled={applyRecommendationMutation.isPending}
                         >
                           <CheckCircle className="w-3 h-3 mr-1" />
@@ -446,7 +559,7 @@ export default function AIVibeModeling() {
 
             {/* Social Trends */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-lg">
                     <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
@@ -456,19 +569,28 @@ export default function AIVibeModeling() {
                 <CardContent>
                   <div className="space-y-2">
                     {currentModel.socialTrends.trending.map((trend, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-green-50 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-green-50 rounded"
+                      >
                         <div>
-                          <span className="font-medium text-sm">{trend.item}</span>
-                          <span className="text-xs text-gray-500 ml-2">({trend.category})</span>
+                          <span className="font-medium text-sm">
+                            {trend.item}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({trend.category})
+                          </span>
                         </div>
-                        <span className="text-green-600 font-bold">+{trend.growth}%</span>
+                        <span className="text-green-600 font-bold">
+                          +{trend.growth}%
+                        </span>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="flex items-center text-lg">
                     <TrendingUp className="w-5 h-5 mr-2 text-red-600 rotate-180" />
@@ -478,12 +600,21 @@ export default function AIVibeModeling() {
                 <CardContent>
                   <div className="space-y-2">
                     {currentModel.socialTrends.declining.map((trend, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-red-50 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-red-50 rounded"
+                      >
                         <div>
-                          <span className="font-medium text-sm">{trend.item}</span>
-                          <span className="text-xs text-gray-500 ml-2">({trend.category})</span>
+                          <span className="font-medium text-sm">
+                            {trend.item}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({trend.category})
+                          </span>
                         </div>
-                        <span className="text-red-600 font-bold">-{trend.decline}%</span>
+                        <span className="text-red-600 font-bold">
+                          -{trend.decline}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -494,10 +625,17 @@ export default function AIVibeModeling() {
         ) : (
           <div className="text-center py-12">
             <Brain className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">No Vibe Model Available</h3>
-            <p className="text-white/70 mb-6">Generate AI predictions for your event to unlock intelligent insights and recommendations.</p>
-            <Button 
-              onClick={() => generatePredictionsMutation.mutate(selectedEventId)}
+            <h3 className="text-xl font-bold text-white mb-2">
+              No Vibe Model Available
+            </h3>
+            <p className="text-white/70 mb-6">
+              Generate AI predictions for your event to unlock intelligent
+              insights and recommendations.
+            </p>
+            <Button
+              onClick={() =>
+                generatePredictionsMutation.mutate(selectedEventId)
+              }
               className="bg-party-gradient-2 hover:bg-party-gradient-3 text-white font-bold py-3 px-8 rounded-full animate-neon-glow"
             >
               <Brain className="w-5 h-5 mr-2" />

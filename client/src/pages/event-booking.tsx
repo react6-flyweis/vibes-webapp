@@ -233,7 +233,7 @@ export default function EventBooking() {
 
   if (eventLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -241,8 +241,8 @@ export default function EventBooking() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
-        <Card className="bg-white/10 backdrop-blur border-white/20 text-white">
+      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
           <CardContent className="p-8 text-center">
             <AlertTriangle className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Event Not Found</h2>
@@ -254,7 +254,7 @@ export default function EventBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Progress Steps */}
         <div className="flex justify-center mb-8">
@@ -292,7 +292,7 @@ export default function EventBooking() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Event Header */}
-            <Card className="mb-6 bg-white/10 backdrop-blur border-white/20">
+            <Card className="mb-6 bg-white/10 backdrop-blur-sm border-white/20">
               <div className="relative">
                 <img 
                   src={event.image} 
@@ -325,7 +325,7 @@ export default function EventBooking() {
 
             {/* Step Content */}
             {step === 'tickets' && (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Select Your Tickets</CardTitle>
                   <CardDescription className="text-blue-100">
@@ -407,7 +407,7 @@ export default function EventBooking() {
             )}
 
             {step === 'seats' && (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Choose Your Seats</CardTitle>
                   <CardDescription className="text-blue-100">
@@ -416,7 +416,7 @@ export default function EventBooking() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-6">
-                    <div className="bg-gradient-to-b from-purple-600 to-purple-800 p-4 rounded text-center mb-4">
+                    <div className="bg-linear-to-b from-purple-600 to-purple-800 p-4 rounded text-center mb-4">
                       <h3 className="text-white font-semibold">STAGE</h3>
                     </div>
                     
@@ -491,7 +491,7 @@ export default function EventBooking() {
             )}
 
             {step === 'checkout' && (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Checkout</CardTitle>
                   <CardDescription className="text-blue-100">
@@ -616,7 +616,7 @@ export default function EventBooking() {
             )}
 
             {step === 'confirmation' && (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-8 text-center">
                   <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
                   <h2 className="text-2xl font-bold text-white mb-2">Booking Confirmed!</h2>
@@ -641,7 +641,7 @@ export default function EventBooking() {
 
           {/* Order Summary Sidebar */}
           <div>
-            <Card className="bg-white/10 backdrop-blur border-white/20 sticky top-4">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 sticky top-4">
               <CardHeader>
                 <CardTitle className="text-white">Order Summary</CardTitle>
               </CardHeader>

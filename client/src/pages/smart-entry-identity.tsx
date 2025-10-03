@@ -644,7 +644,7 @@ export default function SmartEntryIdentity() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}
@@ -840,7 +840,7 @@ export default function SmartEntryIdentity() {
                   {/* NFT Verification Interface */}
                   {selectedMethod === 'nft' && (
                     <div className="space-y-4">
-                      <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-lg border-2 border-dashed border-purple-200">
+                      <div className="bg-linear-to-br from-purple-50 to-blue-50 p-6 rounded-lg border-2 border-dashed border-purple-200">
                         <div className="text-center">
                           <Key className="h-12 w-12 mx-auto text-purple-500 mb-4" />
                           <h3 className="text-lg font-semibold mb-2">NFT Token Pass</h3>
@@ -882,7 +882,7 @@ export default function SmartEntryIdentity() {
                   {/* Voice Authentication Interface */}
                   {selectedMethod === 'voice' && (
                     <div className="space-y-4">
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-lg border-2 border-dashed border-orange-200">
+                      <div className="bg-linear-to-br from-orange-50 to-red-50 p-6 rounded-lg border-2 border-dashed border-orange-200">
                         <div className="text-center">
                           <Mic className="h-12 w-12 mx-auto text-orange-500 mb-4" />
                           <h3 className="text-lg font-semibold mb-2">Voice Authentication</h3>
@@ -945,7 +945,7 @@ export default function SmartEntryIdentity() {
                   {/* Manual Entry Interface */}
                   {selectedMethod === 'manual' && (
                     <div className="space-y-4">
-                      <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-lg border-2 border-dashed border-gray-200">
+                      <div className="bg-linear-to-br from-gray-50 to-blue-50 p-6 rounded-lg border-2 border-dashed border-gray-200">
                         <div className="text-center">
                           <UserCheck className="h-12 w-12 mx-auto text-gray-500 mb-4" />
                           <h3 className="text-lg font-semibold mb-2">Manual Verification</h3>
@@ -1310,10 +1310,10 @@ export default function SmartEntryIdentity() {
           <TabsContent value="nft-management" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {/* Sample NFT passes would be displayed here */}
-              <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
+              <Card className="border-2 border-purple-200 bg-linear-to-br from-purple-50 to-blue-50">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <div className="bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg p-4 text-white">
+                    <div className="bg-linear-to-br from-purple-500 to-blue-500 rounded-lg p-4 text-white">
                       <Crown className="h-8 w-8 mx-auto mb-2" />
                       <h3 className="font-bold">VIP ACCESS</h3>
                       <p className="text-sm opacity-90">Premium Experience</p>
@@ -1336,10 +1336,10 @@ export default function SmartEntryIdentity() {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-gold-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+              <Card className="border-2 border-gold-200 bg-linear-to-br from-yellow-50 to-orange-50">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg p-4 text-white">
+                    <div className="bg-linear-to-br from-yellow-500 to-orange-500 rounded-lg p-4 text-white">
                       <Star className="h-8 w-8 mx-auto mb-2" />
                       <h3 className="font-bold">PREMIUM</h3>
                       <p className="text-sm opacity-90">Enhanced Access</p>
@@ -1362,10 +1362,10 @@ export default function SmartEntryIdentity() {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50">
+              <Card className="border-2 border-gray-200 bg-linear-to-br from-gray-50 to-slate-50">
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
-                    <div className="bg-gradient-to-br from-gray-500 to-slate-500 rounded-lg p-4 text-white">
+                    <div className="bg-linear-to-br from-gray-500 to-slate-500 rounded-lg p-4 text-white">
                       <Key className="h-8 w-8 mx-auto mb-2" />
                       <h3 className="font-bold">GENERAL</h3>
                       <p className="text-sm opacity-90">Standard Access</p>

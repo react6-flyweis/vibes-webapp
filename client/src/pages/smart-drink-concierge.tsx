@@ -7,9 +7,9 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Wine, 
-  Beer, 
+import {
+  Wine,
+  Beer,
   Coffee,
   Martini,
   Plus,
@@ -41,14 +41,20 @@ import {
   Sparkles,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
 } from "lucide-react";
 
 interface DrinkItem {
   id: string;
   name: string;
   description: string;
-  category: "cocktail" | "beer" | "wine" | "non-alcoholic" | "spirits" | "coffee";
+  category:
+    | "cocktail"
+    | "beer"
+    | "wine"
+    | "non-alcoholic"
+    | "spirits"
+    | "coffee";
   price: number;
   abv?: number;
   ingredients: string[];
@@ -140,7 +146,9 @@ export default function SmartDrinkConcierge() {
   const [view, setView] = useState<"guest" | "host" | "staff">("guest");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showMoodSuggestions, setShowMoodSuggestions] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState<"tab" | "card" | "points">("tab");
+  const [paymentMethod, setPaymentMethod] = useState<"tab" | "card" | "points">(
+    "tab"
+  );
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -185,12 +193,20 @@ export default function SmartDrinkConcierge() {
     },
     onSuccess: (data) => {
       setSelectedGuest(data.guestId);
-      toast({ title: "Wristband Scanned", description: `Welcome ${data.guestName}!` });
+      toast({
+        title: "Wristband Scanned",
+        description: `Welcome ${data.guestName}!`,
+      });
     },
   });
 
   const placeOrderMutation = useMutation({
-    mutationFn: async (orderData: { guestId: string; items: OrderItem[]; barLocation: string; paymentMethod: string }) => {
+    mutationFn: async (orderData: {
+      guestId: string;
+      items: OrderItem[];
+      barLocation: string;
+      paymentMethod: string;
+    }) => {
       const response = await fetch("/api/drinks/place-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -200,16 +216,20 @@ export default function SmartDrinkConcierge() {
     },
     onSuccess: (data) => {
       setCartItems([]);
-      toast({ 
-        title: "Order Placed Successfully", 
-        description: `Order #${data.orderId} - Estimated wait: ${data.estimatedWaitTime} minutes` 
+      toast({
+        title: "Order Placed Successfully",
+        description: `Order #${data.orderId} - Estimated wait: ${data.estimatedWaitTime} minutes`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/drinks/orders"] });
     },
   });
 
   const updateMoodMutation = useMutation({
-    mutationFn: async (data: { guestId: string; mood: string; context: string }) => {
+    mutationFn: async (data: {
+      guestId: string;
+      mood: string;
+      context: string;
+    }) => {
       const response = await fetch("/api/drinks/update-mood", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -218,150 +238,181 @@ export default function SmartDrinkConcierge() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/drinks/mood-analytics"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/drinks/mood-analytics"],
+      });
     },
   });
 
   // Mock data
-  const mockDrinks: DrinkItem[] = Array.isArray(drinks) ? drinks : [
-    {
-      id: "drink-mojito",
-      name: "Classic Mojito",
-      description: "Fresh mint, lime, white rum, and soda water",
-      category: "cocktail",
-      price: 12,
-      abv: 15,
-      ingredients: ["White Rum", "Fresh Mint", "Lime", "Sugar", "Soda Water"],
-      allergens: [],
-      preparationTime: 3,
-      popularity: 85,
-      moodTags: ["refreshing", "social", "energetic"],
-      temperature: "cold",
-      difficulty: "medium",
-      image: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=300",
-      nutritionalInfo: { calories: 150, sugar: 12 },
-      customizable: true,
-      availability: true,
-      barLocation: "main-bar",
-    },
-    {
-      id: "drink-espresso-martini",
-      name: "Espresso Martini",
-      description: "Premium vodka, fresh espresso, coffee liqueur",
-      category: "cocktail",
-      price: 14,
-      abv: 25,
-      ingredients: ["Vodka", "Fresh Espresso", "Coffee Liqueur", "Sugar Syrup"],
-      allergens: ["caffeine"],
-      preparationTime: 4,
-      popularity: 78,
-      moodTags: ["sophisticated", "energetic", "evening"],
-      temperature: "cold",
-      difficulty: "complex",
-      image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300",
-      nutritionalInfo: { calories: 220, sugar: 8, caffeine: 63 },
-      customizable: true,
-      availability: true,
-      barLocation: "premium-bar",
-    },
-    {
-      id: "drink-craft-ipa",
-      name: "Local Craft IPA",
-      description: "Hoppy craft beer with citrus notes",
-      category: "beer",
-      price: 8,
-      abv: 6.5,
-      ingredients: ["Hops", "Malt", "Yeast", "Water"],
-      allergens: ["gluten"],
-      preparationTime: 1,
-      popularity: 92,
-      moodTags: ["casual", "social", "relaxed"],
-      temperature: "cold",
-      difficulty: "easy",
-      image: "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300",
-      nutritionalInfo: { calories: 180, sugar: 4 },
-      customizable: false,
-      availability: true,
-      barLocation: "main-bar",
-    },
-  ];
+  const mockDrinks: DrinkItem[] = Array.isArray(drinks)
+    ? drinks
+    : [
+        {
+          id: "drink-mojito",
+          name: "Classic Mojito",
+          description: "Fresh mint, lime, white rum, and soda water",
+          category: "cocktail",
+          price: 12,
+          abv: 15,
+          ingredients: [
+            "White Rum",
+            "Fresh Mint",
+            "Lime",
+            "Sugar",
+            "Soda Water",
+          ],
+          allergens: [],
+          preparationTime: 3,
+          popularity: 85,
+          moodTags: ["refreshing", "social", "energetic"],
+          temperature: "cold",
+          difficulty: "medium",
+          image:
+            "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=300",
+          nutritionalInfo: { calories: 150, sugar: 12 },
+          customizable: true,
+          availability: true,
+          barLocation: "main-bar",
+        },
+        {
+          id: "drink-espresso-martini",
+          name: "Espresso Martini",
+          description: "Premium vodka, fresh espresso, coffee liqueur",
+          category: "cocktail",
+          price: 14,
+          abv: 25,
+          ingredients: [
+            "Vodka",
+            "Fresh Espresso",
+            "Coffee Liqueur",
+            "Sugar Syrup",
+          ],
+          allergens: ["caffeine"],
+          preparationTime: 4,
+          popularity: 78,
+          moodTags: ["sophisticated", "energetic", "evening"],
+          temperature: "cold",
+          difficulty: "complex",
+          image:
+            "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300",
+          nutritionalInfo: { calories: 220, sugar: 8, caffeine: 63 },
+          customizable: true,
+          availability: true,
+          barLocation: "premium-bar",
+        },
+        {
+          id: "drink-craft-ipa",
+          name: "Local Craft IPA",
+          description: "Hoppy craft beer with citrus notes",
+          category: "beer",
+          price: 8,
+          abv: 6.5,
+          ingredients: ["Hops", "Malt", "Yeast", "Water"],
+          allergens: ["gluten"],
+          preparationTime: 1,
+          popularity: 92,
+          moodTags: ["casual", "social", "relaxed"],
+          temperature: "cold",
+          difficulty: "easy",
+          image:
+            "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=300",
+          nutritionalInfo: { calories: 180, sugar: 4 },
+          customizable: false,
+          availability: true,
+          barLocation: "main-bar",
+        },
+      ];
 
-  const mockBars: BarLocation[] = Array.isArray(bars) ? bars : [
-    {
-      id: "main-bar",
-      name: "Main Bar",
-      location: "Center Stage",
-      currentWaitTime: 3,
-      avgWaitTime: 4,
-      capacity: 50,
-      currentOrders: 12,
-      staffCount: 3,
-      specialties: ["Cocktails", "Beer", "Basic Spirits"],
-      busyLevel: "medium",
-      coordinates: { x: 50, y: 30 },
-    },
-    {
-      id: "premium-bar",
-      name: "Premium Lounge",
-      location: "VIP Area",
-      currentWaitTime: 7,
-      avgWaitTime: 8,
-      capacity: 20,
-      currentOrders: 8,
-      staffCount: 2,
-      specialties: ["Premium Cocktails", "Wine", "Top Shelf Spirits"],
-      busyLevel: "high",
-      coordinates: { x: 80, y: 70 },
-    },
-    {
-      id: "coffee-bar",
-      name: "Coffee Corner",
-      location: "Near Entrance",
-      currentWaitTime: 2,
-      avgWaitTime: 3,
-      capacity: 30,
-      currentOrders: 5,
-      staffCount: 2,
-      specialties: ["Coffee", "Tea", "Non-Alcoholic"],
-      busyLevel: "low",
-      coordinates: { x: 20, y: 80 },
-    },
-  ];
+  const mockBars: BarLocation[] = Array.isArray(bars)
+    ? bars
+    : [
+        {
+          id: "main-bar",
+          name: "Main Bar",
+          location: "Center Stage",
+          currentWaitTime: 3,
+          avgWaitTime: 4,
+          capacity: 50,
+          currentOrders: 12,
+          staffCount: 3,
+          specialties: ["Cocktails", "Beer", "Basic Spirits"],
+          busyLevel: "medium",
+          coordinates: { x: 50, y: 30 },
+        },
+        {
+          id: "premium-bar",
+          name: "Premium Lounge",
+          location: "VIP Area",
+          currentWaitTime: 7,
+          avgWaitTime: 8,
+          capacity: 20,
+          currentOrders: 8,
+          staffCount: 2,
+          specialties: ["Premium Cocktails", "Wine", "Top Shelf Spirits"],
+          busyLevel: "high",
+          coordinates: { x: 80, y: 70 },
+        },
+        {
+          id: "coffee-bar",
+          name: "Coffee Corner",
+          location: "Near Entrance",
+          currentWaitTime: 2,
+          avgWaitTime: 3,
+          capacity: 30,
+          currentOrders: 5,
+          staffCount: 2,
+          specialties: ["Coffee", "Tea", "Non-Alcoholic"],
+          busyLevel: "low",
+          coordinates: { x: 20, y: 80 },
+        },
+      ];
 
-  const mockGuests: Guest[] = Array.isArray(guests) ? guests : [
-    {
-      id: "guest-1",
-      name: "Alex Chen",
-      wristbandId: "NFC-001",
-      currentMood: "social",
-      preferences: {
-        alcoholic: true,
-        sweetness: 3,
-        strength: 2,
-        temperature: "cold",
-        allergens: [],
-      },
-      orderHistory: ["drink-mojito", "drink-craft-ipa"],
-      currentTab: 28,
-      loyaltyPoints: 150,
-      spendingLimit: 100,
-    },
-  ];
+  const mockGuests: Guest[] = Array.isArray(guests)
+    ? guests
+    : [
+        {
+          id: "guest-1",
+          name: "Alex Chen",
+          wristbandId: "NFC-001",
+          currentMood: "social",
+          preferences: {
+            alcoholic: true,
+            sweetness: 3,
+            strength: 2,
+            temperature: "cold",
+            allergens: [],
+          },
+          orderHistory: ["drink-mojito", "drink-craft-ipa"],
+          currentTab: 28,
+          loyaltyPoints: 150,
+          spendingLimit: 100,
+        },
+      ];
 
-  const mockOrders: Order[] = Array.isArray(orders) ? orders : [
-    {
-      id: "order-001",
-      guestId: "guest-1",
-      items: [{ drinkId: "drink-mojito", quantity: 2, customizations: ["extra mint"], specialInstructions: "light on sugar" }],
-      barLocation: "main-bar",
-      status: "preparing",
-      orderTime: "2025-01-01T10:30:00Z",
-      estimatedReadyTime: "2025-01-01T10:35:00Z",
-      totalAmount: 24,
-      paymentStatus: "paid",
-      queuePosition: 3,
-    },
-  ];
+  const mockOrders: Order[] = Array.isArray(orders)
+    ? orders
+    : [
+        {
+          id: "order-001",
+          guestId: "guest-1",
+          items: [
+            {
+              drinkId: "drink-mojito",
+              quantity: 2,
+              customizations: ["extra mint"],
+              specialInstructions: "light on sugar",
+            },
+          ],
+          barLocation: "main-bar",
+          status: "preparing",
+          orderTime: "2025-01-01T10:30:00Z",
+          estimatedReadyTime: "2025-01-01T10:35:00Z",
+          totalAmount: 24,
+          paymentStatus: "paid",
+          queuePosition: 3,
+        },
+      ];
 
   const mockMoodAnalytics: MoodAnalytics = (moodAnalytics as MoodAnalytics) || {
     currentMood: "social",
@@ -374,63 +425,72 @@ export default function SmartDrinkConcierge() {
   };
 
   const addToCart = (drinkId: string) => {
-    const existingItem = cartItems.find(item => item.drinkId === drinkId);
+    const existingItem = cartItems.find((item) => item.drinkId === drinkId);
     if (existingItem) {
-      setCartItems(cartItems.map(item => 
-        item.drinkId === drinkId 
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
+      setCartItems(
+        cartItems.map((item) =>
+          item.drinkId === drinkId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
     } else {
-      setCartItems([...cartItems, { 
-        drinkId, 
-        quantity: 1, 
-        customizations: [], 
-        specialInstructions: "" 
-      }]);
+      setCartItems([
+        ...cartItems,
+        {
+          drinkId,
+          quantity: 1,
+          customizations: [],
+          specialInstructions: "",
+        },
+      ]);
     }
   };
 
   const removeFromCart = (drinkId: string) => {
-    const existingItem = cartItems.find(item => item.drinkId === drinkId);
+    const existingItem = cartItems.find((item) => item.drinkId === drinkId);
     if (existingItem && existingItem.quantity > 1) {
-      setCartItems(cartItems.map(item => 
-        item.drinkId === drinkId 
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      ));
+      setCartItems(
+        cartItems.map((item) =>
+          item.drinkId === drinkId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+      );
     } else {
-      setCartItems(cartItems.filter(item => item.drinkId !== drinkId));
+      setCartItems(cartItems.filter((item) => item.drinkId !== drinkId));
     }
   };
 
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => {
-      const drink = mockDrinks.find(d => d.id === item.drinkId);
+      const drink = mockDrinks.find((d) => d.id === item.drinkId);
       return total + (drink?.price || 0) * item.quantity;
     }, 0);
   };
 
-  const getCurrentGuest = () => mockGuests.find(g => g.id === selectedGuest);
-  const getCurrentBar = () => mockBars.find(b => b.id === selectedBar);
+  const getCurrentGuest = () => mockGuests.find((g) => g.id === selectedGuest);
+  const getCurrentBar = () => mockBars.find((b) => b.id === selectedBar);
 
   const getFilteredDrinks = () => {
     let filtered = mockDrinks;
-    
+
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(drink => drink.category === selectedCategory);
+      filtered = filtered.filter(
+        (drink) => drink.category === selectedCategory
+      );
     }
-    
+
     if (showMoodSuggestions && mockMoodAnalytics.suggestedDrinks.length > 0) {
-      const suggested = filtered.filter(drink => 
+      const suggested = filtered.filter((drink) =>
         mockMoodAnalytics.suggestedDrinks.includes(drink.id)
       );
-      const others = filtered.filter(drink => 
-        !mockMoodAnalytics.suggestedDrinks.includes(drink.id)
+      const others = filtered.filter(
+        (drink) => !mockMoodAnalytics.suggestedDrinks.includes(drink.id)
       );
       return [...suggested, ...others];
     }
-    
+
     return filtered;
   };
 
@@ -447,10 +507,14 @@ export default function SmartDrinkConcierge() {
 
   const getBusyLevelColor = (level: string) => {
     switch (level) {
-      case "low": return "text-green-500";
-      case "medium": return "text-yellow-500";
-      case "high": return "text-red-500";
-      default: return "text-gray-500";
+      case "low":
+        return "text-green-500";
+      case "medium":
+        return "text-yellow-500";
+      case "high":
+        return "text-red-500";
+      default:
+        return "text-gray-500";
     }
   };
 
@@ -458,10 +522,12 @@ export default function SmartDrinkConcierge() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Smart Drink Concierge
           </h1>
-          <p className="text-gray-600 mt-2">Seamless drink ordering with mood intelligence</p>
+          <p className="text-gray-600 mt-2">
+            Seamless drink ordering with mood intelligence
+          </p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -508,13 +574,17 @@ export default function SmartDrinkConcierge() {
                     <QrCode className="h-8 w-8 text-blue-500" />
                     <Nfc className="h-8 w-8 text-purple-500" />
                   </div>
-                  <p className="text-sm text-gray-600">Scan QR code or tap NFC wristband</p>
-                  <Button 
+                  <p className="text-sm text-gray-600">
+                    Scan QR code or tap NFC wristband
+                  </p>
+                  <Button
                     onClick={() => scanWristbandMutation.mutate("NFC-001")}
                     disabled={scanWristbandMutation.isPending}
                     className="mt-2"
                   >
-                    {scanWristbandMutation.isPending ? "Scanning..." : "Simulate Scan"}
+                    {scanWristbandMutation.isPending
+                      ? "Scanning..."
+                      : "Simulate Scan"}
                   </Button>
                 </div>
               </div>
@@ -522,26 +592,40 @@ export default function SmartDrinkConcierge() {
               {getCurrentGuest() && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{getCurrentGuest()?.name}</span>
-                    <Badge variant="secondary">{getCurrentGuest()?.wristbandId}</Badge>
+                    <span className="font-medium">
+                      {getCurrentGuest()?.name}
+                    </span>
+                    <Badge variant="secondary">
+                      {getCurrentGuest()?.wristbandId}
+                    </Badge>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                    {React.createElement(getMoodIcon(getCurrentGuest()?.currentMood || ""), { className: "h-4 w-4" })}
-                    <span className="text-sm">Mood: {getCurrentGuest()?.currentMood}</span>
+                    {React.createElement(
+                      getMoodIcon(getCurrentGuest()?.currentMood || ""),
+                      { className: "h-4 w-4" }
+                    )}
+                    <span className="text-sm">
+                      Mood: {getCurrentGuest()?.currentMood}
+                    </span>
                     <Badge variant="outline" className="text-xs">
-                      {Math.round(mockMoodAnalytics.confidence * 100)}% confident
+                      {Math.round(mockMoodAnalytics.confidence * 100)}%
+                      confident
                     </Badge>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <span className="text-gray-600">Current Tab:</span>
-                      <span className="font-medium ml-1">${getCurrentGuest()?.currentTab}</span>
+                      <span className="font-medium ml-1">
+                        ${getCurrentGuest()?.currentTab}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-600">Loyalty Points:</span>
-                      <span className="font-medium ml-1">{getCurrentGuest()?.loyaltyPoints}</span>
+                      <span className="font-medium ml-1">
+                        {getCurrentGuest()?.loyaltyPoints}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -558,37 +642,56 @@ export default function SmartDrinkConcierge() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {showMoodSuggestions && mockMoodAnalytics.suggestedDrinks.length > 0 && (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-blue-800">Based on your {mockMoodAnalytics.currentMood} mood</span>
+              {showMoodSuggestions &&
+                mockMoodAnalytics.suggestedDrinks.length > 0 && (
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-800">
+                        Based on your {mockMoodAnalytics.currentMood} mood
+                      </span>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {mockMoodAnalytics.suggestedDrinks
+                        .slice(0, 3)
+                        .map((drinkId) => {
+                          const drink = mockDrinks.find(
+                            (d) => d.id === drinkId
+                          );
+                          return drink ? (
+                            <Badge
+                              key={drinkId}
+                              variant="secondary"
+                              className="bg-blue-100 text-blue-800"
+                            >
+                              {drink.name}
+                            </Badge>
+                          ) : null;
+                        })}
+                    </div>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {mockMoodAnalytics.suggestedDrinks.slice(0, 3).map(drinkId => {
-                      const drink = mockDrinks.find(d => d.id === drinkId);
-                      return drink ? (
-                        <Badge key={drinkId} variant="secondary" className="bg-blue-100 text-blue-800">
-                          {drink.name}
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
+                )}
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {mockBars.map(bar => (
-                  <Card 
-                    key={bar.id} 
-                    className={`cursor-pointer transition-all ${selectedBar === bar.id ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'}`}
+                {mockBars.map((bar) => (
+                  <Card
+                    key={bar.id}
+                    className={`cursor-pointer transition-all ${
+                      selectedBar === bar.id
+                        ? "ring-2 ring-blue-500 bg-blue-50"
+                        : "hover:bg-gray-50"
+                    }`}
                     onClick={() => setSelectedBar(bar.id)}
                   >
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <h3 className="font-medium">{bar.name}</h3>
-                          <div className={`flex items-center gap-1 ${getBusyLevelColor(bar.busyLevel)}`}>
+                          <div
+                            className={`flex items-center gap-1 ${getBusyLevelColor(
+                              bar.busyLevel
+                            )}`}
+                          >
                             <Users className="h-3 w-3" />
                             <span className="text-xs">{bar.busyLevel}</span>
                           </div>
@@ -601,12 +704,18 @@ export default function SmartDrinkConcierge() {
                           </div>
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            <span>{bar.currentOrders}/{bar.capacity}</span>
+                            <span>
+                              {bar.currentOrders}/{bar.capacity}
+                            </span>
                           </div>
                         </div>
                         <div className="flex gap-1 flex-wrap">
-                          {bar.specialties.slice(0, 2).map(specialty => (
-                            <Badge key={specialty} variant="outline" className="text-xs px-1 py-0">
+                          {bar.specialties.slice(0, 2).map((specialty) => (
+                            <Badge
+                              key={specialty}
+                              variant="outline"
+                              className="text-xs px-1 py-0"
+                            >
                               {specialty}
                             </Badge>
                           ))}
@@ -635,7 +744,9 @@ export default function SmartDrinkConcierge() {
                   All
                 </Button>
                 <Button
-                  variant={selectedCategory === "cocktail" ? "default" : "outline"}
+                  variant={
+                    selectedCategory === "cocktail" ? "default" : "outline"
+                  }
                   size="sm"
                   onClick={() => setSelectedCategory("cocktail")}
                   className="flex items-center gap-1"
@@ -653,7 +764,9 @@ export default function SmartDrinkConcierge() {
                   Beer
                 </Button>
                 <Button
-                  variant={selectedCategory === "coffee" ? "default" : "outline"}
+                  variant={
+                    selectedCategory === "coffee" ? "default" : "outline"
+                  }
                   size="sm"
                   onClick={() => setSelectedCategory("coffee")}
                   className="flex items-center gap-1"
@@ -666,16 +779,24 @@ export default function SmartDrinkConcierge() {
             <CardContent>
               <ScrollArea className="h-96">
                 <div className="grid gap-4">
-                  {getFilteredDrinks().map(drink => {
-                    const cartItem = cartItems.find(item => item.drinkId === drink.id);
-                    const isSuggested = mockMoodAnalytics.suggestedDrinks.includes(drink.id);
-                    
+                  {getFilteredDrinks().map((drink) => {
+                    const cartItem = cartItems.find(
+                      (item) => item.drinkId === drink.id
+                    );
+                    const isSuggested =
+                      mockMoodAnalytics.suggestedDrinks.includes(drink.id);
+
                     return (
-                      <Card key={drink.id} className={`${isSuggested ? 'ring-1 ring-blue-300 bg-blue-50' : ''}`}>
+                      <Card
+                        key={drink.id}
+                        className={`${
+                          isSuggested ? "ring-1 ring-blue-300 bg-blue-50" : ""
+                        }`}
+                      >
                         <CardContent className="p-4">
                           <div className="flex gap-4">
-                            <img 
-                              src={drink.image} 
+                            <img
+                              src={drink.image}
                               alt={drink.name}
                               className="w-20 h-20 object-cover rounded-lg"
                             />
@@ -684,18 +805,26 @@ export default function SmartDrinkConcierge() {
                                 <div>
                                   <h3 className="font-medium flex items-center gap-2">
                                     {drink.name}
-                                    {isSuggested && <Sparkles className="h-3 w-3 text-blue-500" />}
+                                    {isSuggested && (
+                                      <Sparkles className="h-3 w-3 text-blue-500" />
+                                    )}
                                   </h3>
-                                  <p className="text-sm text-gray-600">{drink.description}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {drink.description}
+                                  </p>
                                 </div>
                                 <div className="text-right">
-                                  <span className="text-lg font-bold">${drink.price}</span>
+                                  <span className="text-lg font-bold">
+                                    ${drink.price}
+                                  </span>
                                   {drink.abv && (
-                                    <p className="text-xs text-gray-500">{drink.abv}% ABV</p>
+                                    <p className="text-xs text-gray-500">
+                                      {drink.abv}% ABV
+                                    </p>
                                   )}
                                 </div>
                               </div>
-                              
+
                               <div className="flex items-center gap-2 text-xs">
                                 <div className="flex items-center gap-1">
                                   <Timer className="h-3 w-3" />
@@ -718,13 +847,17 @@ export default function SmartDrinkConcierge() {
 
                               <div className="flex items-center justify-between">
                                 <div className="flex gap-1 flex-wrap">
-                                  {drink.moodTags.slice(0, 3).map(tag => (
-                                    <Badge key={tag} variant="outline" className="text-xs px-1 py-0">
+                                  {drink.moodTags.slice(0, 3).map((tag) => (
+                                    <Badge
+                                      key={tag}
+                                      variant="outline"
+                                      className="text-xs px-1 py-0"
+                                    >
                                       {tag}
                                     </Badge>
                                   ))}
                                 </div>
-                                
+
                                 <div className="flex items-center gap-2">
                                   {cartItem && (
                                     <Button
@@ -771,22 +904,31 @@ export default function SmartDrinkConcierge() {
             </CardHeader>
             <CardContent className="space-y-4">
               {cartItems.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No items in cart</p>
+                <p className="text-gray-500 text-center py-8">
+                  No items in cart
+                </p>
               ) : (
                 <div className="space-y-3">
-                  {cartItems.map(item => {
-                    const drink = mockDrinks.find(d => d.id === item.drinkId);
+                  {cartItems.map((item) => {
+                    const drink = mockDrinks.find((d) => d.id === item.drinkId);
                     return drink ? (
-                      <div key={item.drinkId} className="flex items-center justify-between">
+                      <div
+                        key={item.drinkId}
+                        className="flex items-center justify-between"
+                      >
                         <div>
                           <p className="font-medium text-sm">{drink.name}</p>
-                          <p className="text-xs text-gray-500">x{item.quantity}</p>
+                          <p className="text-xs text-gray-500">
+                            x{item.quantity}
+                          </p>
                         </div>
-                        <span className="font-medium">${(drink.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">
+                          ${(drink.price * item.quantity).toFixed(2)}
+                        </span>
                       </div>
                     ) : null;
                   })}
-                  
+
                   <div className="border-t pt-3">
                     <div className="flex items-center justify-between font-bold">
                       <span>Total:</span>
@@ -798,7 +940,9 @@ export default function SmartDrinkConcierge() {
                     <p className="text-sm font-medium">Payment Method:</p>
                     <div className="grid grid-cols-1 gap-2">
                       <Button
-                        variant={paymentMethod === "tab" ? "default" : "outline"}
+                        variant={
+                          paymentMethod === "tab" ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setPaymentMethod("tab")}
                         className="justify-start"
@@ -807,11 +951,16 @@ export default function SmartDrinkConcierge() {
                         Add to Tab
                       </Button>
                       <Button
-                        variant={paymentMethod === "points" ? "default" : "outline"}
+                        variant={
+                          paymentMethod === "points" ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setPaymentMethod("points")}
                         className="justify-start"
-                        disabled={(getCurrentGuest()?.loyaltyPoints || 0) < getTotalPrice() * 10}
+                        disabled={
+                          (getCurrentGuest()?.loyaltyPoints || 0) <
+                          getTotalPrice() * 10
+                        }
                       >
                         <Star className="h-3 w-3 mr-2" />
                         Use Points ({getTotalPrice() * 10})
@@ -822,25 +971,33 @@ export default function SmartDrinkConcierge() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span>Estimated Wait:</span>
-                      <span className="font-medium">{getCurrentBar()?.currentWaitTime}min</span>
+                      <span className="font-medium">
+                        {getCurrentBar()?.currentWaitTime}min
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span>Pickup Location:</span>
-                      <span className="font-medium">{getCurrentBar()?.name}</span>
+                      <span className="font-medium">
+                        {getCurrentBar()?.name}
+                      </span>
                     </div>
                   </div>
 
                   <Button
                     className="w-full"
-                    onClick={() => placeOrderMutation.mutate({
-                      guestId: selectedGuest,
-                      items: cartItems,
-                      barLocation: selectedBar,
-                      paymentMethod
-                    })}
+                    onClick={() =>
+                      placeOrderMutation.mutate({
+                        guestId: selectedGuest,
+                        items: cartItems,
+                        barLocation: selectedBar,
+                        paymentMethod,
+                      })
+                    }
                     disabled={placeOrderMutation.isPending}
                   >
-                    {placeOrderMutation.isPending ? "Placing Order..." : "Place Order"}
+                    {placeOrderMutation.isPending
+                      ? "Placing Order..."
+                      : "Place Order"}
                   </Button>
                 </div>
               )}
@@ -866,11 +1023,15 @@ export default function SmartDrinkConcierge() {
                   <div className="text-sm text-gray-600">Active Orders</div>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">$1,847</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    $1,847
+                  </div>
                   <div className="text-sm text-gray-600">Revenue Today</div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">4.2min</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    4.2min
+                  </div>
                   <div className="text-sm text-gray-600">Avg Wait Time</div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded-lg">
@@ -891,29 +1052,46 @@ export default function SmartDrinkConcierge() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockBars.map(bar => (
+                {mockBars.map((bar) => (
                   <div key={bar.id} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{bar.name}</span>
-                      <Badge variant={bar.busyLevel === "high" ? "destructive" : bar.busyLevel === "medium" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          bar.busyLevel === "high"
+                            ? "destructive"
+                            : bar.busyLevel === "medium"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {bar.busyLevel}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div>
                         <span className="text-gray-600">Wait:</span>
-                        <span className="font-medium ml-1">{bar.currentWaitTime}min</span>
+                        <span className="font-medium ml-1">
+                          {bar.currentWaitTime}min
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Orders:</span>
-                        <span className="font-medium ml-1">{bar.currentOrders}</span>
+                        <span className="font-medium ml-1">
+                          {bar.currentOrders}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Staff:</span>
-                        <span className="font-medium ml-1">{bar.staffCount}</span>
+                        <span className="font-medium ml-1">
+                          {bar.staffCount}
+                        </span>
                       </div>
                     </div>
-                    <Progress value={(bar.currentOrders / bar.capacity) * 100} className="h-2" />
+                    <Progress
+                      value={(bar.currentOrders / bar.capacity) * 100}
+                      className="h-2"
+                    />
                   </div>
                 ))}
               </div>
@@ -935,15 +1113,23 @@ export default function SmartDrinkConcierge() {
                   .slice(0, 5)
                   .map((drink, index) => (
                     <div key={drink.id} className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                      <div className="w-6 h-6 rounded-full bg-linear-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
                         {index + 1}
                       </div>
-                      <img src={drink.image} alt={drink.name} className="w-10 h-10 object-cover rounded" />
+                      <img
+                        src={drink.image}
+                        alt={drink.name}
+                        className="w-10 h-10 object-cover rounded"
+                      />
                       <div className="flex-1">
                         <p className="font-medium text-sm">{drink.name}</p>
-                        <p className="text-xs text-gray-500">{drink.popularity}% popularity</p>
+                        <p className="text-xs text-gray-500">
+                          {drink.popularity}% popularity
+                        </p>
                       </div>
-                      <span className="text-sm font-medium">${drink.price}</span>
+                      <span className="text-sm font-medium">
+                        ${drink.price}
+                      </span>
                     </div>
                   ))}
               </div>
@@ -964,8 +1150,8 @@ export default function SmartDrinkConcierge() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {mockOrders.map(order => {
-                  const guest = mockGuests.find(g => g.id === order.guestId);
+                {mockOrders.map((order) => {
+                  const guest = mockGuests.find((g) => g.id === order.guestId);
                   const statusColor = {
                     pending: "bg-yellow-100 text-yellow-800",
                     preparing: "bg-blue-100 text-blue-800",
@@ -979,20 +1165,31 @@ export default function SmartDrinkConcierge() {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <span className="font-medium">Order #{order.id.slice(-3)}</span>
-                            <span className="text-gray-500 ml-2">{guest?.name}</span>
+                            <span className="font-medium">
+                              Order #{order.id.slice(-3)}
+                            </span>
+                            <span className="text-gray-500 ml-2">
+                              {guest?.name}
+                            </span>
                           </div>
                           <Badge className={statusColor[order.status]}>
                             {order.status}
                           </Badge>
                         </div>
-                        
+
                         <div className="space-y-2">
                           {order.items.map((item, index) => {
-                            const drink = mockDrinks.find(d => d.id === item.drinkId);
+                            const drink = mockDrinks.find(
+                              (d) => d.id === item.drinkId
+                            );
                             return drink ? (
-                              <div key={index} className="flex items-center justify-between text-sm">
-                                <span>{item.quantity}x {drink.name}</span>
+                              <div
+                                key={index}
+                                className="flex items-center justify-between text-sm"
+                              >
+                                <span>
+                                  {item.quantity}x {drink.name}
+                                </span>
                                 <span>{drink.preparationTime}min</span>
                               </div>
                             ) : null;

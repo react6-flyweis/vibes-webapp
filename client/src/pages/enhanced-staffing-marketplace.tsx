@@ -151,7 +151,7 @@ export default function EnhancedStaffingMarketplace() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
         </div>
@@ -160,7 +160,7 @@ export default function EnhancedStaffingMarketplace() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -174,7 +174,7 @@ export default function EnhancedStaffingMarketplace() {
 
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Search className="h-5 w-5" />
@@ -191,7 +191,7 @@ export default function EnhancedStaffingMarketplace() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Category</CardTitle>
             </CardHeader>
@@ -212,7 +212,7 @@ export default function EnhancedStaffingMarketplace() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Results</CardTitle>
             </CardHeader>
@@ -226,11 +226,11 @@ export default function EnhancedStaffingMarketplace() {
         {/* Staff Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {filteredStaff.map((staff: StaffMember) => (
-            <Card key={staff.id} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-all">
+            <Card key={staff.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
                       {staff.name.charAt(0)}
                     </div>
                     <div>
@@ -286,7 +286,7 @@ export default function EnhancedStaffingMarketplace() {
                       <DialogTrigger asChild>
                         <Button 
                           onClick={() => handleDirectBooking(staff)}
-                          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                          className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                         >
                           <CalendarIcon className="h-4 w-4 mr-2" />
                           Book Now
@@ -397,7 +397,7 @@ export default function EnhancedStaffingMarketplace() {
                             </div>
                             
                             <Button 
-                              className="w-full bg-gradient-to-r from-purple-600 to-blue-600"
+                              className="w-full bg-linear-to-r from-purple-600 to-blue-600"
                               onClick={confirmBooking}
                               disabled={!selectedDate || !bookingDetails.duration || bookingMutation.isPending}
                             >

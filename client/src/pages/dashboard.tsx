@@ -214,7 +214,7 @@ export default function Dashboard() {
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Welcome back, Vibe Creator!
           </h1>
           <p className="text-muted-foreground">
@@ -228,7 +228,7 @@ export default function Dashboard() {
               Create Event
             </Link>
           </Button>
-          <Button asChild className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+          <Button asChild className="bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
             <Link href="/event-planning/1">
               <Calendar className="w-4 h-4 mr-2" />
               Event Planning
@@ -346,7 +346,7 @@ export default function Dashboard() {
             </Card>
 
             {/* Upgrade Prompt */}
-            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200 dark:border-purple-800">
+            <Card className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200 dark:border-purple-800">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Crown className="w-5 h-5 text-purple-600" />
@@ -371,7 +371,7 @@ export default function Dashboard() {
                     <span>Priority support</span>
                   </div>
                 </div>
-                <Button asChild className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                <Button asChild className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                   <Link href="/premium">
                     Upgrade Now
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -396,7 +396,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentEvents.map((event) => (
               <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center">
+                <div className="aspect-video bg-linear-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center">
                   <Calendar className="w-12 h-12 text-purple-600" />
                 </div>
                 <CardHeader>
@@ -444,7 +444,7 @@ export default function Dashboard() {
               <Card key={feature.name} className="overflow-hidden hover:shadow-lg transition-shadow group">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className={`p-3 rounded-lg bg-gradient-to-r ${feature.color}`}>
+                    <div className={`p-3 rounded-lg bg-linear-to-r ${feature.color}`}>
                       <feature.icon className="w-6 h-6 text-white" />
                     </div>
                     <Badge variant="secondary">{feature.badge}</Badge>

@@ -4,19 +4,52 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Palette, Users, TrendingUp, Award, Settings, 
-  BarChart3, Calendar, Target, Sparkles, Crown,
-  Building2, Zap, Globe, DollarSign, ChevronRight,
-  Eye, Download, Share2, Filter, Search, Plus, Shield,
-  Music, Play, Pause, Volume2, Shuffle
+import {
+  Palette,
+  Users,
+  TrendingUp,
+  Award,
+  Settings,
+  BarChart3,
+  Calendar,
+  Target,
+  Sparkles,
+  Crown,
+  Building2,
+  Zap,
+  Globe,
+  DollarSign,
+  ChevronRight,
+  Eye,
+  Download,
+  Share2,
+  Filter,
+  Search,
+  Plus,
+  Shield,
+  Music,
+  Play,
+  Pause,
+  Volume2,
+  Shuffle,
 } from "lucide-react";
 
 export default function ProfessionalTools() {
@@ -52,9 +85,10 @@ export default function ProfessionalTools() {
     queryKey: ["/api/professional/loyalty"],
   });
 
-  const { data: whitelabelTemplates = [], isLoading: templatesLoading } = useQuery({
-    queryKey: ["/api/professional/whitelabel-templates"],
-  });
+  const { data: whitelabelTemplates = [], isLoading: templatesLoading } =
+    useQuery({
+      queryKey: ["/api/professional/whitelabel-templates"],
+    });
 
   const upgradeMutation = useMutation({
     mutationFn: async (planData: any) => {
@@ -62,24 +96,43 @@ export default function ProfessionalTools() {
     },
     onSuccess: () => {
       toast({ title: "Success", description: "Plan upgraded successfully!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/professional/dashboard"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/professional/dashboard"],
+      });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to upgrade plan", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to upgrade plan",
+        variant: "destructive",
+      });
     },
   });
 
   const createWhitelabelMutation = useMutation({
     mutationFn: async (templateData: any) => {
-      return await apiRequest("POST", "/api/professional/whitelabel", templateData);
+      return await apiRequest(
+        "POST",
+        "/api/professional/whitelabel",
+        templateData
+      );
     },
     onSuccess: () => {
-      toast({ title: "Success", description: "White-label dashboard created!" });
+      toast({
+        title: "Success",
+        description: "White-label dashboard created!",
+      });
       setWhitelabelModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/professional/whitelabel-templates"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/professional/whitelabel-templates"],
+      });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create dashboard", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to create dashboard",
+        variant: "destructive",
+      });
     },
   });
 
@@ -95,31 +148,31 @@ export default function ProfessionalTools() {
         "Basic guest analytics",
         "Standard white-label dashboard",
         "Email support",
-        "5% booking commission"
+        "5% booking commission",
       ],
-      popular: false
+      popular: false,
     },
     {
       id: "professional",
       name: "Professional",
-      price: "$299", 
+      price: "$299",
       period: "/month",
       description: "For established event planning companies",
       features: [
         "Up to 50 events per month",
-        "Advanced AI guest analytics", 
+        "Advanced AI guest analytics",
         "Custom white-label branding",
         "NFT loyalty program access",
         "Priority support",
-        "3% booking commission"
+        "3% booking commission",
       ],
-      popular: true
+      popular: true,
     },
     {
       id: "enterprise",
       name: "Enterprise",
       price: "$999",
-      period: "/month", 
+      period: "/month",
       description: "For large venues and corporate hosts",
       features: [
         "Unlimited events",
@@ -127,10 +180,10 @@ export default function ProfessionalTools() {
         "Complete white-label customization",
         "Advanced NFT loyalty features",
         "Dedicated account manager",
-        "1% booking commission"
+        "1% booking commission",
       ],
-      popular: false
-    }
+      popular: false,
+    },
   ];
 
   const analyticsMetrics = [
@@ -139,46 +192,47 @@ export default function ProfessionalTools() {
       value: dashboardData.totalEvents || "247",
       change: "+12%",
       icon: Calendar,
-      color: "text-blue-600"
+      color: "text-blue-600",
     },
     {
       title: "Guest Engagement Score",
       value: dashboardData.engagementScore || "8.7",
       change: "+0.3",
       icon: Users,
-      color: "text-green-600"
+      color: "text-green-600",
     },
     {
       title: "Revenue Generated",
       value: dashboardData.revenue || "$124,560",
       change: "+18%",
       icon: DollarSign,
-      color: "text-purple-600"
+      color: "text-purple-600",
     },
     {
       title: "NFT Loyalty Members",
       value: dashboardData.nftMembers || "1,834",
       change: "+25%",
       icon: Crown,
-      color: "text-amber-600"
-    }
+      color: "text-amber-600",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-blue-900/20">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50 to-blue-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-blue-900/20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
+            <div className="p-3 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl">
               <Building2 className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Event Professional Tools
             </h1>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Advanced SaaS platform for professional event planners, venues, and corporate hosts with AI-driven analytics and white-label solutions
+            Advanced SaaS platform for professional event planners, venues, and
+            corporate hosts with AI-driven analytics and white-label solutions
           </p>
         </div>
 
@@ -192,7 +246,10 @@ export default function ProfessionalTools() {
               <TrendingUp className="h-4 w-4" />
               AI Analytics
             </TabsTrigger>
-            <TabsTrigger value="soundtracks" className="flex items-center gap-2">
+            <TabsTrigger
+              value="soundtracks"
+              className="flex items-center gap-2"
+            >
               <Music className="h-4 w-4" />
               Soundtracks
             </TabsTrigger>
@@ -214,7 +271,10 @@ export default function ProfessionalTools() {
           <TabsContent value="dashboard" className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {analyticsMetrics.map((metric, index) => (
-                <Card key={index} className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                <Card
+                  key={index}
+                  className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs"
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -228,7 +288,9 @@ export default function ProfessionalTools() {
                           {metric.change} from last month
                         </p>
                       </div>
-                      <div className={`p-3 rounded-lg bg-gray-100 dark:bg-slate-700 ${metric.color}`}>
+                      <div
+                        className={`p-3 rounded-lg bg-gray-100 dark:bg-slate-700 ${metric.color}`}
+                      >
                         <metric.icon className="h-6 w-6" />
                       </div>
                     </div>
@@ -238,7 +300,7 @@ export default function ProfessionalTools() {
             </div>
 
             {/* Recent Activity */}
-            <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
@@ -248,24 +310,61 @@ export default function ProfessionalTools() {
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { event: "Corporate Gala 2025", client: "TechCorp Inc.", status: "completed", revenue: "$45,000" },
-                    { event: "Wedding Reception", client: "Sarah & John", status: "in-progress", revenue: "$28,500" },
-                    { event: "Product Launch", client: "StartupXYZ", status: "planning", revenue: "$62,000" },
-                    { event: "Charity Fundraiser", client: "Hope Foundation", status: "completed", revenue: "$38,200" }
+                    {
+                      event: "Corporate Gala 2025",
+                      client: "TechCorp Inc.",
+                      status: "completed",
+                      revenue: "$45,000",
+                    },
+                    {
+                      event: "Wedding Reception",
+                      client: "Sarah & John",
+                      status: "in-progress",
+                      revenue: "$28,500",
+                    },
+                    {
+                      event: "Product Launch",
+                      client: "StartupXYZ",
+                      status: "planning",
+                      revenue: "$62,000",
+                    },
+                    {
+                      event: "Charity Fundraiser",
+                      client: "Hope Foundation",
+                      status: "completed",
+                      revenue: "$38,200",
+                    },
                   ].map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-slate-700/50">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-slate-700/50"
+                    >
                       <div className="flex items-center gap-4">
                         <div className="w-2 h-2 rounded-full bg-purple-600"></div>
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">{activity.event}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{activity.client}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {activity.event}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {activity.client}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <Badge variant={activity.status === 'completed' ? 'default' : activity.status === 'in-progress' ? 'secondary' : 'outline'}>
+                        <Badge
+                          variant={
+                            activity.status === "completed"
+                              ? "default"
+                              : activity.status === "in-progress"
+                              ? "secondary"
+                              : "outline"
+                          }
+                        >
                           {activity.status}
                         </Badge>
-                        <span className="font-semibold text-green-600">{activity.revenue}</span>
+                        <span className="font-semibold text-green-600">
+                          {activity.revenue}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -277,9 +376,14 @@ export default function ProfessionalTools() {
           {/* AI Analytics Tab */}
           <TabsContent value="analytics" className="space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">AI-Driven Guest Analytics</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                AI-Driven Guest Analytics
+              </h2>
               <div className="flex items-center gap-4">
-                <Select value={analyticsFilter} onValueChange={setAnalyticsFilter}>
+                <Select
+                  value={analyticsFilter}
+                  onValueChange={setAnalyticsFilter}
+                >
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
@@ -299,7 +403,7 @@ export default function ProfessionalTools() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Guest Behavior Analysis */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
@@ -309,38 +413,59 @@ export default function ProfessionalTools() {
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Peak Engagement Time</span>
-                      <span className="text-sm text-purple-600 font-semibold">8:30 PM - 10:30 PM</span>
+                      <span className="text-sm font-medium">
+                        Peak Engagement Time
+                      </span>
+                      <span className="text-sm text-purple-600 font-semibold">
+                        8:30 PM - 10:30 PM
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Social Media Sharing Rate</span>
-                      <span className="text-sm text-green-600 font-semibold">68% (+12%)</span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full" style={{ width: '68%' }}></div>
+                      <div
+                        className="bg-linear-to-r from-purple-600 to-blue-600 h-2 rounded-full"
+                        style={{ width: "75%" }}
+                      ></div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Return Guest Rate</span>
-                      <span className="text-sm text-amber-600 font-semibold">42% (+8%)</span>
+                      <span className="text-sm font-medium">
+                        Social Media Sharing Rate
+                      </span>
+                      <span className="text-sm text-green-600 font-semibold">
+                        68% (+12%)
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-amber-500 to-orange-600 h-2 rounded-full" style={{ width: '42%' }}></div>
+                      <div
+                        className="bg-linear-to-r from-green-500 to-emerald-600 h-2 rounded-full"
+                        style={{ width: "68%" }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">
+                        Return Guest Rate
+                      </span>
+                      <span className="text-sm text-amber-600 font-semibold">
+                        42% (+8%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                      <div
+                        className="bg-linear-to-r from-amber-500 to-orange-600 h-2 rounded-full"
+                        style={{ width: "42%" }}
+                      ></div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Predictive Analytics */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5" />
@@ -351,35 +476,52 @@ export default function ProfessionalTools() {
                   {[
                     {
                       type: "High Priority",
-                      message: "Optimal guest capacity for next event: 180-220 people",
+                      message:
+                        "Optimal guest capacity for next event: 180-220 people",
                       confidence: "94%",
-                      color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                      color:
+                        "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
                     },
                     {
-                      type: "Revenue Opportunity", 
-                      message: "VIP upgrade potential: $12,500 additional revenue",
+                      type: "Revenue Opportunity",
+                      message:
+                        "VIP upgrade potential: $12,500 additional revenue",
                       confidence: "87%",
-                      color: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                      color:
+                        "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
                     },
                     {
                       type: "Engagement Boost",
-                      message: "Add live music between 9-10 PM for 23% higher satisfaction",
+                      message:
+                        "Add live music between 9-10 PM for 23% higher satisfaction",
                       confidence: "91%",
-                      color: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                      color:
+                        "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
                     },
                     {
                       type: "Cost Optimization",
-                      message: "Reduce catering by 15% without impacting guest experience",
+                      message:
+                        "Reduce catering by 15% without impacting guest experience",
                       confidence: "76%",
-                      color: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400"
-                    }
+                      color:
+                        "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
+                    },
                   ].map((prediction, index) => (
-                    <div key={index} className="p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <div
+                      key={index}
+                      className="p-4 rounded-lg border border-gray-200 dark:border-slate-700"
+                    >
                       <div className="flex items-center justify-between mb-2">
-                        <Badge className={prediction.color}>{prediction.type}</Badge>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{prediction.confidence} confidence</span>
+                        <Badge className={prediction.color}>
+                          {prediction.type}
+                        </Badge>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {prediction.confidence} confidence
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-700 dark:text-gray-300">{prediction.message}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {prediction.message}
+                      </p>
                     </div>
                   ))}
                 </CardContent>
@@ -390,13 +532,21 @@ export default function ProfessionalTools() {
           {/* AI Soundtrack & Playlists Tab */}
           <TabsContent value="soundtracks" className="space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">AI Soundtrack Generator & Playlists</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                AI Soundtrack Generator & Playlists
+              </h2>
               <div className="flex gap-3">
-                <Button onClick={() => setSoundtrackModalOpen(true)} className="bg-gradient-to-r from-purple-600 to-blue-600">
+                <Button
+                  onClick={() => setSoundtrackModalOpen(true)}
+                  className="bg-linear-to-r from-purple-600 to-blue-600"
+                >
                   <Music className="h-4 w-4 mr-2" />
                   Generate Soundtrack
                 </Button>
-                <Button onClick={() => setPlaylistModalOpen(true)} variant="outline">
+                <Button
+                  onClick={() => setPlaylistModalOpen(true)}
+                  variant="outline"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Playlist
                 </Button>
@@ -405,7 +555,7 @@ export default function ProfessionalTools() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Generated Soundtracks */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-purple-500" />
@@ -413,36 +563,46 @@ export default function ProfessionalTools() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Array.isArray(soundtracksData) && soundtracksData.slice(0, 3).map((soundtrack: any, index: number) => (
-                    <div key={index} className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{soundtrack.title}</h4>
-                        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
-                          {soundtrack.tracks} tracks
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{soundtrack.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                          <Music className="h-4 w-4" />
-                          {soundtrack.genre} • {soundtrack.duration}
+                  {Array.isArray(soundtracksData) &&
+                    soundtracksData
+                      .slice(0, 3)
+                      .map((soundtrack: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                              {soundtrack.title}
+                            </h4>
+                            <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                              {soundtrack.tracks} tracks
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {soundtrack.description}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                              <Music className="h-4 w-4" />
+                              {soundtrack.genre} • {soundtrack.duration}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline">
+                                <Play className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline">
+                                <Share2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Play className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Share2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      ))}
                 </CardContent>
               </Card>
 
               {/* User Playlists */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Volume2 className="h-5 w-5 text-blue-500" />
@@ -457,33 +617,40 @@ export default function ProfessionalTools() {
                       tracks: 24,
                       duration: "2h 15m",
                       source: "Custom",
-                      lastModified: "2 hours ago"
+                      lastModified: "2 hours ago",
                     },
                     {
-                      id: "playlist_002", 
+                      id: "playlist_002",
                       name: "Birthday Party Hits",
                       tracks: 18,
                       duration: "1h 42m",
                       source: "AI Generated",
-                      lastModified: "1 day ago"
+                      lastModified: "1 day ago",
                     },
                     {
                       id: "playlist_003",
                       name: "Wedding Reception",
                       tracks: 32,
-                      duration: "3h 8m", 
+                      duration: "3h 8m",
                       source: "Spotify Import",
-                      lastModified: "3 days ago"
-                    }
+                      lastModified: "3 days ago",
+                    },
                   ].map((playlist, index) => (
-                    <div key={index} className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
-                         onClick={() => setCurrentPlaylist(playlist)}>
+                    <div
+                      key={index}
+                      className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                      onClick={() => setCurrentPlaylist(playlist)}
+                    >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{playlist.name}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                          {playlist.name}
+                        </h4>
                         <Badge variant="outline">{playlist.source}</Badge>
                       </div>
                       <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                        <span>{playlist.tracks} tracks • {playlist.duration}</span>
+                        <span>
+                          {playlist.tracks} tracks • {playlist.duration}
+                        </span>
                         <span>Modified {playlist.lastModified}</span>
                       </div>
                     </div>
@@ -493,7 +660,7 @@ export default function ProfessionalTools() {
             </div>
 
             {/* DJ Booth Integration */}
-            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 dark:from-purple-500/5 dark:to-blue-500/5">
+            <Card className="border-0 shadow-lg bg-linear-to-r from-purple-500/10 to-blue-500/10 dark:from-purple-500/5 dark:to-blue-500/5">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shuffle className="h-5 w-5 text-indigo-500" />
@@ -506,22 +673,37 @@ export default function ProfessionalTools() {
                     <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Music className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Share Playlists</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Share your curated playlists directly with DJs for seamless event execution</p>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      Share Playlists
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Share your curated playlists directly with DJs for
+                      seamless event execution
+                    </p>
                   </div>
                   <div className="text-center p-4">
                     <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Play className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Live Control</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Control playlist playback and track selection during live events</p>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      Live Control
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Control playlist playback and track selection during live
+                      events
+                    </p>
                   </div>
                   <div className="text-center p-4">
                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <Share2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Multi-Source</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Import from Spotify, Apple Music, or create custom playlists from any source</p>
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      Multi-Source
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Import from Spotify, Apple Music, or create custom
+                      playlists from any source
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -531,8 +713,13 @@ export default function ProfessionalTools() {
           {/* White-Label Tab */}
           <TabsContent value="whitelabel" className="space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">White-Label Dashboards</h2>
-              <Button onClick={() => setWhitelabelModalOpen(true)} className="bg-gradient-to-r from-purple-600 to-blue-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                White-Label Dashboards
+              </h2>
+              <Button
+                onClick={() => setWhitelabelModalOpen(true)}
+                className="bg-linear-to-r from-purple-600 to-blue-600"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Create New Dashboard
               </Button>
@@ -546,15 +733,15 @@ export default function ProfessionalTools() {
                   theme: "Gold & Black",
                   status: "Active",
                   views: "2,847",
-                  lastUpdated: "2 hours ago"
+                  lastUpdated: "2 hours ago",
                 },
                 {
                   name: "Corporate Solutions Hub",
                   client: "Business Events Pro",
-                  theme: "Blue & White", 
+                  theme: "Blue & White",
                   status: "Active",
                   views: "1,923",
-                  lastUpdated: "1 day ago"
+                  lastUpdated: "1 day ago",
                 },
                 {
                   name: "Wedding Planner Portal",
@@ -562,31 +749,52 @@ export default function ProfessionalTools() {
                   theme: "Rose & Cream",
                   status: "Draft",
                   views: "456",
-                  lastUpdated: "3 days ago"
-                }
+                  lastUpdated: "3 days ago",
+                },
               ].map((dashboard, index) => (
-                <Card key={index} className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl transition-shadow">
+                <Card
+                  key={index}
+                  className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs hover:shadow-xl transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{dashboard.name}</CardTitle>
-                      <Badge variant={dashboard.status === 'Active' ? 'default' : 'secondary'}>
+                      <CardTitle className="text-lg">
+                        {dashboard.name}
+                      </CardTitle>
+                      <Badge
+                        variant={
+                          dashboard.status === "Active"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {dashboard.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{dashboard.client}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {dashboard.client}
+                    </p>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Theme:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Theme:
+                      </span>
                       <span className="font-medium">{dashboard.theme}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Views:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Views:
+                      </span>
                       <span className="font-medium">{dashboard.views}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Last Updated:</span>
-                      <span className="font-medium">{dashboard.lastUpdated}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Last Updated:
+                      </span>
+                      <span className="font-medium">
+                        {dashboard.lastUpdated}
+                      </span>
                     </div>
                     <div className="flex gap-2 pt-2">
                       <Button variant="outline" size="sm" className="flex-1">
@@ -607,13 +815,18 @@ export default function ProfessionalTools() {
           {/* NFT Loyalty Tab */}
           <TabsContent value="loyalty" className="space-y-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">NFT-Based Loyalty Programs</h2>
-              <p className="text-gray-600 dark:text-gray-400">Create exclusive VIP experiences with blockchain-verified loyalty rewards</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                NFT-Based Loyalty Programs
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Create exclusive VIP experiences with blockchain-verified
+                loyalty rewards
+              </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Loyalty Program Overview */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Crown className="h-5 w-5 text-amber-500" />
@@ -622,31 +835,62 @@ export default function ProfessionalTools() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10">
+                    <div className="text-center p-4 rounded-lg bg-linear-to-r from-amber-500/10 to-yellow-500/10">
                       <p className="text-2xl font-bold text-amber-600">1,834</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">NFT Members</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        NFT Members
+                      </p>
                     </div>
-                    <div className="text-center p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10">
-                      <p className="text-2xl font-bold text-purple-600">$284K</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">VIP Revenue</p>
+                    <div className="text-center p-4 rounded-lg bg-linear-to-r from-purple-500/10 to-pink-500/10">
+                      <p className="text-2xl font-bold text-purple-600">
+                        $284K
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        VIP Revenue
+                      </p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <h4 className="font-semibold">Tier Distribution</h4>
                     {[
-                      { tier: "Diamond VIP", members: 127, percentage: 7, color: "bg-blue-500" },
-                      { tier: "Gold VIP", members: 381, percentage: 21, color: "bg-amber-500" },
-                      { tier: "Silver VIP", members: 724, percentage: 39, color: "bg-gray-400" },
-                      { tier: "Bronze VIP", members: 602, percentage: 33, color: "bg-orange-500" }
+                      {
+                        tier: "Diamond VIP",
+                        members: 127,
+                        percentage: 7,
+                        color: "bg-blue-500",
+                      },
+                      {
+                        tier: "Gold VIP",
+                        members: 381,
+                        percentage: 21,
+                        color: "bg-amber-500",
+                      },
+                      {
+                        tier: "Silver VIP",
+                        members: 724,
+                        percentage: 39,
+                        color: "bg-gray-400",
+                      },
+                      {
+                        tier: "Bronze VIP",
+                        members: 602,
+                        percentage: 33,
+                        color: "bg-orange-500",
+                      },
                     ].map((tier, index) => (
                       <div key={index} className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-medium">{tier.tier}</span>
-                          <span className="text-gray-600 dark:text-gray-400">{tier.members} members</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {tier.members} members
+                          </span>
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                          <div className={`${tier.color} h-2 rounded-full`} style={{ width: `${tier.percentage}%` }}></div>
+                          <div
+                            className={`${tier.color} h-2 rounded-full`}
+                            style={{ width: `${tier.percentage}%` }}
+                          ></div>
                         </div>
                       </div>
                     ))}
@@ -655,7 +899,7 @@ export default function ProfessionalTools() {
               </Card>
 
               {/* NFT Collection */}
-              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-purple-500" />
@@ -666,37 +910,57 @@ export default function ProfessionalTools() {
                   {[
                     {
                       name: "VIP Access Pass",
-                      description: "Grants access to exclusive events and perks",
+                      description:
+                        "Grants access to exclusive events and perks",
                       holders: 1834,
                       value: "0.5 ETH",
-                      rarity: "Common"
+                      rarity: "Common",
                     },
                     {
                       name: "Event Creator Badge",
                       description: "Recognition for hosting successful events",
                       holders: 127,
                       value: "1.2 ETH",
-                      rarity: "Rare"
+                      rarity: "Rare",
                     },
                     {
                       name: "Legendary Host Crown",
                       description: "Ultra-rare recognition for top performers",
                       holders: 12,
                       value: "5.0 ETH",
-                      rarity: "Legendary"
-                    }
+                      rarity: "Legendary",
+                    },
                   ].map((nft, index) => (
-                    <div key={index} className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <div
+                      key={index}
+                      className="p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                    >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{nft.name}</h4>
-                        <Badge variant={nft.rarity === 'Legendary' ? 'default' : nft.rarity === 'Rare' ? 'secondary' : 'outline'}>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                          {nft.name}
+                        </h4>
+                        <Badge
+                          variant={
+                            nft.rarity === "Legendary"
+                              ? "default"
+                              : nft.rarity === "Rare"
+                              ? "secondary"
+                              : "outline"
+                          }
+                        >
                           {nft.rarity}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{nft.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {nft.description}
+                      </p>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">{nft.holders} holders</span>
-                        <span className="font-semibold text-purple-600">{nft.value}</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {nft.holders} holders
+                        </span>
+                        <span className="font-semibold text-purple-600">
+                          {nft.value}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -708,27 +972,46 @@ export default function ProfessionalTools() {
           {/* Pricing Tab */}
           <TabsContent value="pricing" className="space-y-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Professional Pricing Plans</h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">Choose the perfect plan for your event business</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Professional Pricing Plans
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Choose the perfect plan for your event business
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {pricingPlans.map((plan) => (
-                <Card key={plan.id} className={`border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm relative ${plan.popular ? 'ring-2 ring-purple-500 transform scale-105' : ''}`}>
+                <Card
+                  key={plan.id}
+                  className={`border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs relative ${
+                    plan.popular
+                      ? "ring-2 ring-purple-500 transform scale-105"
+                      : ""
+                  }`}
+                >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1">
+                      <Badge className="bg-linear-to-r from-purple-600 to-blue-600 text-white px-4 py-1">
                         Most Popular
                       </Badge>
                     </div>
                   )}
                   <CardHeader className="text-center pb-4">
-                    <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">{plan.name}</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {plan.name}
+                    </CardTitle>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                      <span className="text-gray-600 dark:text-gray-400">{plan.period}</span>
+                      <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                        {plan.price}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {plan.period}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{plan.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      {plan.description}
+                    </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <ul className="space-y-3">
@@ -737,20 +1020,31 @@ export default function ProfessionalTools() {
                           <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
                             <div className="w-2 h-2 rounded-full bg-green-600"></div>
                           </div>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
-                    <Button 
-                      className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' : ''}`}
-                      variant={plan.popular ? 'default' : 'outline'}
+                    <Button
+                      className={`w-full ${
+                        plan.popular
+                          ? "bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                          : ""
+                      }`}
+                      variant={plan.popular ? "default" : "outline"}
                       onClick={() => {
                         setSelectedPlan(plan.id);
-                        upgradeMutation.mutate({ planId: plan.id, planName: plan.name });
+                        upgradeMutation.mutate({
+                          planId: plan.id,
+                          planName: plan.name,
+                        });
                       }}
                       disabled={upgradeMutation.isPending}
                     >
-                      {upgradeMutation.isPending ? "Processing..." : `Choose ${plan.name}`}
+                      {upgradeMutation.isPending
+                        ? "Processing..."
+                        : `Choose ${plan.name}`}
                     </Button>
                   </CardContent>
                 </Card>
@@ -758,25 +1052,50 @@ export default function ProfessionalTools() {
             </div>
 
             {/* Enterprise Features */}
-            <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-900/10 to-blue-900/10 dark:from-purple-900/20 dark:to-blue-900/20">
+            <Card className="border-0 shadow-lg bg-linear-to-r from-purple-900/10 to-blue-900/10 dark:from-purple-900/20 dark:to-blue-900/20">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Enterprise Features</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Advanced capabilities for large-scale operations</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Enterprise Features
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Advanced capabilities for large-scale operations
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
-                    { icon: Globe, title: "Multi-Location Support", description: "Manage venues across multiple cities" },
-                    { icon: Zap, title: "API Integration", description: "Custom integrations with your existing systems" },
-                    { icon: Shield, title: "Advanced Security", description: "Enterprise-grade security and compliance" },
-                    { icon: Target, title: "Custom Analytics", description: "Tailored reporting and insights dashboard" }
+                    {
+                      icon: Globe,
+                      title: "Multi-Location Support",
+                      description: "Manage venues across multiple cities",
+                    },
+                    {
+                      icon: Zap,
+                      title: "API Integration",
+                      description:
+                        "Custom integrations with your existing systems",
+                    },
+                    {
+                      icon: Shield,
+                      title: "Advanced Security",
+                      description: "Enterprise-grade security and compliance",
+                    },
+                    {
+                      icon: Target,
+                      title: "Custom Analytics",
+                      description: "Tailored reporting and insights dashboard",
+                    },
                   ].map((feature, index) => (
                     <div key={index} className="text-center">
-                      <div className="mx-auto mb-4 w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                      <div className="mx-auto mb-4 w-12 h-12 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
                         <feature.icon className="h-6 w-6 text-white" />
                       </div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                        {feature.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {feature.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -786,7 +1105,10 @@ export default function ProfessionalTools() {
         </Tabs>
 
         {/* White-label Creation Modal */}
-        <Dialog open={whitelabelModalOpen} onOpenChange={setWhitelabelModalOpen}>
+        <Dialog
+          open={whitelabelModalOpen}
+          onOpenChange={setWhitelabelModalOpen}
+        >
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Create White-Label Dashboard</DialogTitle>
@@ -807,23 +1129,36 @@ export default function ProfessionalTools() {
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="luxury">Luxury (Gold & Black)</SelectItem>
-                    <SelectItem value="corporate">Corporate (Blue & White)</SelectItem>
-                    <SelectItem value="wedding">Wedding (Rose & Cream)</SelectItem>
-                    <SelectItem value="modern">Modern (Purple & Gray)</SelectItem>
+                    <SelectItem value="luxury">
+                      Luxury (Gold & Black)
+                    </SelectItem>
+                    <SelectItem value="corporate">
+                      Corporate (Blue & White)
+                    </SelectItem>
+                    <SelectItem value="wedding">
+                      Wedding (Rose & Cream)
+                    </SelectItem>
+                    <SelectItem value="modern">
+                      Modern (Purple & Gray)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="features">Features</Label>
-                <Textarea id="features" placeholder="Describe custom features needed" />
+                <Textarea
+                  id="features"
+                  placeholder="Describe custom features needed"
+                />
               </div>
-              <Button 
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600"
+              <Button
+                className="w-full bg-linear-to-r from-purple-600 to-blue-600"
                 onClick={() => createWhitelabelMutation.mutate({})}
                 disabled={createWhitelabelMutation.isPending}
               >
-                {createWhitelabelMutation.isPending ? "Creating..." : "Create Dashboard"}
+                {createWhitelabelMutation.isPending
+                  ? "Creating..."
+                  : "Create Dashboard"}
               </Button>
             </div>
           </DialogContent>

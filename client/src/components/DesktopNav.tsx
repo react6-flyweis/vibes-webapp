@@ -20,7 +20,7 @@ export default function DesktopNav({ categories }: DesktopNavProps) {
   const [, setLocation] = useLocation();
 
   return (
-    <NavigationMenu className="hidden lg:flex flex-grow justify-center mx-4 min-w-0">
+    <NavigationMenu className="hidden lg:flex grow justify-center mx-4 min-w-0">
       <Swiper slidesPerView={"auto"} spaceBetween={10} className="w-full">
         {categories.map((category) => (
           <SwiperSlide key={category.title} style={{ width: "auto" }}>
@@ -38,7 +38,7 @@ export default function DesktopNav({ categories }: DesktopNavProps) {
                           setLocation(item.href);
                         }}
                         href={item.href}
-                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
                         <div className="flex items-center space-x-2">
                           {/* icon omitted on purpose; components can add icons if needed */}

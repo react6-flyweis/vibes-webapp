@@ -158,7 +158,7 @@ export default function VibeControl() {
 
   if (votesLoading || tokensLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center text-white">
             <div className="animate-spin w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full mx-auto mb-4" />
@@ -170,13 +170,13 @@ export default function VibeControl() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center text-white space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <Zap className="w-10 h-10 text-yellow-400" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-yellow-400 to-purple-400 bg-clip-text text-transparent">
               VibeControl
             </h1>
           </div>
@@ -198,7 +198,7 @@ export default function VibeControl() {
         </div>
 
         {/* Vibe Tokens Display */}
-        <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+        <Card className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -244,7 +244,7 @@ export default function VibeControl() {
           <TabsContent value="live-votes" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {liveVotes.map((vote: VibeVote) => (
-                <Card key={vote.id} className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+                <Card key={vote.id} className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between text-white">
                       <div className="flex items-center space-x-3">
@@ -304,7 +304,7 @@ export default function VibeControl() {
           <TabsContent value="dj-booth" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Now Playing */}
-              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-white">
                     <Headphones className="w-6 h-6" />
@@ -313,7 +313,7 @@ export default function VibeControl() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <div className="w-20 h-20 bg-linear-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                       <Music className="w-8 h-8 text-white" />
                     </div>
                     <div className="flex-1">
@@ -340,7 +340,7 @@ export default function VibeControl() {
               </Card>
 
               {/* Live Requests */}
-              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-white">
                     <Mic className="w-6 h-6" />
@@ -401,7 +401,7 @@ export default function VibeControl() {
                   timeLeft: 120
                 }
               ].map((poll, index) => (
-                <Card key={index} className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+                <Card key={index} className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-3 text-white">
                       <Wine className="w-5 h-5" />
@@ -443,7 +443,7 @@ export default function VibeControl() {
           <TabsContent value="leaderboard" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Top Contributors */}
-              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-white">
                     <Trophy className="w-6 h-6 text-yellow-400" />
@@ -483,7 +483,7 @@ export default function VibeControl() {
               </Card>
 
               {/* Live Activity */}
-              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+              <Card className="bg-black/40 border-purple-500/30 backdrop-blur-xs">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-white">
                     <Zap className="w-6 h-6 text-purple-400" />

@@ -212,18 +212,18 @@ export default function VenueIntegration() {
 
   if (venuesLoading || bookingsLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-900 to-blue-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-green-900 to-blue-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-blue-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-green-900 to-blue-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
             Venue Integration Hub
           </h1>
           <p className="text-green-100 text-lg max-w-2xl mx-auto">
@@ -233,7 +233,7 @@ export default function VenueIntegration() {
 
         {/* Venue Platform Stats */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <Building2 className="h-5 w-5 text-green-400" />
@@ -248,7 +248,7 @@ export default function VenueIntegration() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <Calendar className="h-5 w-5 text-blue-400" />
@@ -263,7 +263,7 @@ export default function VenueIntegration() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <DollarSign className="h-5 w-5 text-yellow-400" />
@@ -278,7 +278,7 @@ export default function VenueIntegration() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-white">
                 <TrendingUp className="h-5 w-5 text-purple-400" />
@@ -297,7 +297,7 @@ export default function VenueIntegration() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Partner Venues */}
           <div className="lg:col-span-2">
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Building2 className="h-6 w-6 text-green-400" />
@@ -428,7 +428,7 @@ export default function VenueIntegration() {
           <div className="space-y-6">
             {/* Quick Booking */}
             {selectedVenue && (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-white">
                     <Calendar className="h-6 w-6 text-green-400" />
@@ -499,7 +499,7 @@ export default function VenueIntegration() {
             )}
 
             {/* My Venue Bookings */}
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Clock className="h-6 w-6 text-blue-400" />
@@ -571,7 +571,7 @@ export default function VenueIntegration() {
         </div>
 
         {/* Integration Benefits */}
-        <Card className="mt-8 bg-white/10 backdrop-blur border-white/20">
+        <Card className="mt-8 bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Zap className="h-6 w-6 text-yellow-400" />

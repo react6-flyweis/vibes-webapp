@@ -99,11 +99,11 @@ const VibesWeddingUI = () => {
           {cardData.map(({ id, title, description, icon: Icon, gradient }) => (
             <div
               key={id}
-              className="bg-white/95 backdrop-blur-sm rounded-lg p-8 shadow-xl hover:shadow-2xl transform transition-all duration-500 border border-white/20"
+              className="bg-white/95 backdrop-blur-xs rounded-lg p-8 shadow-xl hover:shadow-2xl transform transition-all duration-500 border border-white/20"
             >
               <div className="mb-6 flex flex-col items-center text-center">
                 <div
-                  className={`w-16 h-16 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center mb-4`}
+                  className={`w-16 h-16 bg-linear-to-br ${gradient} rounded-xl flex items-center justify-center mb-4`}
                 >
                   <Icon className="w-8 h-8 text-white" />
                 </div>

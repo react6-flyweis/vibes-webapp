@@ -462,7 +462,7 @@ export default function AIPartyDesigner() {
             <Button 
               onClick={handleGenerate} 
               disabled={isGenerating}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               size="lg"
             >
               {isGenerating ? (
@@ -482,7 +482,7 @@ export default function AIPartyDesigner() {
       ) : (
         <div className="space-y-8">
           {/* Blueprint Header */}
-          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900">
+          <Card className="bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900">
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>

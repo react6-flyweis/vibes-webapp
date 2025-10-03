@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   Music,
   MapPin,
   Users,
@@ -41,7 +53,7 @@ import {
   ShoppingBag,
   CheckCircle,
   AlertCircle,
-  Timer
+  Timer,
 } from "lucide-react";
 
 interface NightclubVenue {
@@ -71,7 +83,7 @@ interface LiveMoment {
   userPhoto: string;
   content: string;
   mediaUrl?: string;
-  mediaType: 'photo' | 'video';
+  mediaType: "photo" | "video";
   timestamp: Date;
   reactions: Array<{ emoji: string; count: number }>;
   location: string;
@@ -93,7 +105,13 @@ interface DrinkItem {
   id: string;
   name: string;
   description: string;
-  category: "cocktail" | "beer" | "wine" | "non-alcoholic" | "spirits" | "coffee";
+  category:
+    | "cocktail"
+    | "beer"
+    | "wine"
+    | "non-alcoholic"
+    | "spirits"
+    | "coffee";
   price: number;
   abv?: number;
   ingredients: string[];
@@ -144,13 +162,17 @@ interface ClubStats {
 export default function NightclubExperience() {
   const [selectedVenue, setSelectedVenue] = useState<string>("");
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [currentMode, setCurrentMode] = useState<'discover' | 'checkedin' | 'live'>('discover');
+  const [currentMode, setCurrentMode] = useState<
+    "discover" | "checkedin" | "live"
+  >("discover");
   const [newMomentText, setNewMomentText] = useState("");
   const [vibeStatus, setVibeStatus] = useState("Ready to party! 🎉");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [cartItems, setCartItems] = useState<Array<{drinkId: string; quantity: number}>>([]);
+  const [cartItems, setCartItems] = useState<
+    Array<{ drinkId: string; quantity: number }>
+  >([]);
   const [activeTab, setActiveTab] = useState("discover");
-  
+
   const [nightclubs] = useState<NightclubVenue[]>([
     {
       id: "club1",
@@ -161,18 +183,40 @@ export default function NightclubExperience() {
       vibeScore: 94,
       coverCharge: 25,
       lineup: [
-        { djName: "DJ Phoenix", genre: "Progressive House", startTime: "10:00 PM", isHeadliner: true },
-        { djName: "Neon Beats", genre: "Tech House", startTime: "12:00 AM", isHeadliner: false },
-        { djName: "Void", genre: "Techno", startTime: "2:00 AM", isHeadliner: false }
+        {
+          djName: "DJ Phoenix",
+          genre: "Progressive House",
+          startTime: "10:00 PM",
+          isHeadliner: true,
+        },
+        {
+          djName: "Neon Beats",
+          genre: "Tech House",
+          startTime: "12:00 AM",
+          isHeadliner: false,
+        },
+        {
+          djName: "Void",
+          genre: "Techno",
+          startTime: "2:00 AM",
+          isHeadliner: false,
+        },
       ],
-      amenities: ["VIP Tables", "Bottle Service", "LED Dance Floor", "Rooftop Terrace"],
+      amenities: [
+        "VIP Tables",
+        "Bottle Service",
+        "LED Dance Floor",
+        "Rooftop Terrace",
+      ],
       rating: 4.8,
-      photos: ["https://via.placeholder.com/300x200/8B5CF6/ffffff?text=Pulse+Main+Floor"],
+      photos: [
+        "https://via.placeholder.com/300x200/8B5CF6/ffffff?text=Pulse+Main+Floor",
+      ],
       theme: "Neon Nights",
-      specialOffers: ["Free entry before 11 PM", "$5 drinks until midnight"]
+      specialOffers: ["Free entry before 11 PM", "$5 drinks until midnight"],
     },
     {
-      id: "club2", 
+      id: "club2",
       name: "Voltage Underground",
       location: "Industrial Quarter",
       capacity: 300,
@@ -180,14 +224,26 @@ export default function NightclubExperience() {
       vibeScore: 89,
       coverCharge: 20,
       lineup: [
-        { djName: "Bass Guru", genre: "Drum & Bass", startTime: "9:30 PM", isHeadliner: true },
-        { djName: "Deep Sync", genre: "Deep House", startTime: "11:30 PM", isHeadliner: false }
+        {
+          djName: "Bass Guru",
+          genre: "Drum & Bass",
+          startTime: "9:30 PM",
+          isHeadliner: true,
+        },
+        {
+          djName: "Deep Sync",
+          genre: "Deep House",
+          startTime: "11:30 PM",
+          isHeadliner: false,
+        },
       ],
       amenities: ["Underground Vibe", "Sound System", "Industrial Decor"],
       rating: 4.6,
-      photos: ["https://via.placeholder.com/300x200/EF4444/ffffff?text=Voltage+Underground"],
-      specialOffers: ["Student discount available"]
-    }
+      photos: [
+        "https://via.placeholder.com/300x200/EF4444/ffffff?text=Voltage+Underground",
+      ],
+      specialOffers: ["Student discount available"],
+    },
   ]);
 
   const [liveMoments, setLiveMoments] = useState<LiveMoment[]>([
@@ -196,16 +252,17 @@ export default function NightclubExperience() {
       userName: "Sarah M.",
       userPhoto: "https://via.placeholder.com/40x40/3B82F6/ffffff?text=S",
       content: "This drop is INSANE! 🔥",
-      mediaUrl: "https://via.placeholder.com/200x200/8B5CF6/ffffff?text=Dance+Floor",
+      mediaUrl:
+        "https://via.placeholder.com/200x200/8B5CF6/ffffff?text=Dance+Floor",
       mediaType: "photo",
       timestamp: new Date(Date.now() - 2 * 60 * 1000),
       reactions: [
         { emoji: "🔥", count: 23 },
         { emoji: "💃", count: 15 },
-        { emoji: "🎉", count: 8 }
+        { emoji: "🎉", count: 8 },
       ],
       location: "Main Floor",
-      tags: ["dancefloor", "djphoenix"]
+      tags: ["dancefloor", "djphoenix"],
     },
     {
       id: "moment2",
@@ -216,11 +273,11 @@ export default function NightclubExperience() {
       timestamp: new Date(Date.now() - 5 * 60 * 1000),
       reactions: [
         { emoji: "👑", count: 12 },
-        { emoji: "🥂", count: 8 }
+        { emoji: "🥂", count: 8 },
       ],
       location: "VIP Lounge",
-      tags: ["vip", "luxury"]
-    }
+      tags: ["vip", "luxury"],
+    },
   ]);
 
   const [vibeConnections, setVibeConnections] = useState<VibeConnection[]>([
@@ -232,7 +289,7 @@ export default function NightclubExperience() {
       currentMood: "Dancing Queen",
       matchScore: 92,
       isOnline: true,
-      location: "Dance Floor"
+      location: "Dance Floor",
     },
     {
       id: "conn2",
@@ -242,8 +299,8 @@ export default function NightclubExperience() {
       currentMood: "Vibing Hard",
       matchScore: 87,
       isOnline: true,
-      location: "Lounge Area"
-    }
+      location: "Lounge Area",
+    },
   ]);
 
   const [clubStats, setClubStats] = useState<ClubStats>({
@@ -252,7 +309,7 @@ export default function NightclubExperience() {
     photosShared: 89,
     songsRequested: 156,
     connectionsKade: 12,
-    currentDjRating: 4.7
+    currentDjRating: 4.7,
   });
 
   const { toast } = useToast();
@@ -261,24 +318,24 @@ export default function NightclubExperience() {
   // Drink ordering queries
   const { data: drinksMenu = [] } = useQuery({
     queryKey: ["/api/drinks/menu"],
-    enabled: isCheckedIn
+    enabled: isCheckedIn,
   });
 
   const { data: barLocations = [] } = useQuery({
     queryKey: ["/api/drinks/bars"],
-    enabled: isCheckedIn
+    enabled: isCheckedIn,
   });
 
   const { data: currentOrders = [] } = useQuery({
     queryKey: ["/api/drinks/orders"],
     enabled: isCheckedIn,
-    refetchInterval: 3000
+    refetchInterval: 3000,
   });
 
   const { data: drinkStats = {} } = useQuery({
     queryKey: ["/api/drinks/real-time-stats"],
     enabled: isCheckedIn,
-    refetchInterval: 2000
+    refetchInterval: 2000,
   });
 
   // Simulate real-time updates
@@ -289,11 +346,11 @@ export default function NightclubExperience() {
         // For demo purposes, simulating live data updates
 
         // Update stats
-        setClubStats(prev => ({
+        setClubStats((prev) => ({
           ...prev,
           totalCheckedIn: prev.totalCheckedIn + Math.floor(Math.random() * 3),
           photosShared: prev.photosShared + Math.floor(Math.random() * 2),
-          songsRequested: prev.songsRequested + Math.floor(Math.random() * 2)
+          songsRequested: prev.songsRequested + Math.floor(Math.random() * 2),
         }));
       }, 5000);
 
@@ -304,8 +361,8 @@ export default function NightclubExperience() {
   const checkInToVenue = (venueId: string) => {
     setSelectedVenue(venueId);
     setIsCheckedIn(true);
-    setCurrentMode('live');
-    
+    setCurrentMode("live");
+
     toast({
       title: "Welcome to the party!",
       description: "You're now checked in. Start exploring and connecting!",
@@ -317,7 +374,7 @@ export default function NightclubExperience() {
       toast({
         title: "Add your vibe",
         description: "Write something about your club experience!",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -331,13 +388,17 @@ export default function NightclubExperience() {
       timestamp: new Date(),
       reactions: [],
       location: "Dance Floor",
-      tags: ["live", "vibes"]
+      tags: ["live", "vibes"],
     };
 
-    setLiveMoments(prev => [newMoment, ...prev]);
+    setLiveMoments((prev) => [newMoment, ...prev]);
     setNewMomentText("");
-    setClubStats(prev => ({ ...prev, photosShared: prev.photosShared + 1, vibePoints: prev.vibePoints + 50 }));
-    
+    setClubStats((prev) => ({
+      ...prev,
+      photosShared: prev.photosShared + 1,
+      vibePoints: prev.vibePoints + 50,
+    }));
+
     toast({
       title: "Moment shared!",
       description: "Your vibe is now part of the live feed. +50 Vibe Points!",
@@ -345,24 +406,34 @@ export default function NightclubExperience() {
   };
 
   const addReaction = (momentId: string, emoji: string) => {
-    setLiveMoments(prev => prev.map(moment => 
-      moment.id === momentId 
-        ? {
-            ...moment,
-            reactions: moment.reactions.map(r => 
-              r.emoji === emoji 
-                ? { ...r, count: r.count + 1 }
-                : r
-            ).concat(moment.reactions.find(r => r.emoji === emoji) ? [] : [{ emoji, count: 1 }])
-          }
-        : moment
-    ));
+    setLiveMoments((prev) =>
+      prev.map((moment) =>
+        moment.id === momentId
+          ? {
+              ...moment,
+              reactions: moment.reactions
+                .map((r) =>
+                  r.emoji === emoji ? { ...r, count: r.count + 1 } : r
+                )
+                .concat(
+                  moment.reactions.find((r) => r.emoji === emoji)
+                    ? []
+                    : [{ emoji, count: 1 }]
+                ),
+            }
+          : moment
+      )
+    );
   };
 
   const connectWithUser = (connectionId: string) => {
-    const connection = vibeConnections.find(c => c.id === connectionId);
+    const connection = vibeConnections.find((c) => c.id === connectionId);
     if (connection) {
-      setClubStats(prev => ({ ...prev, connectionsKade: prev.connectionsKade + 1, vibePoints: prev.vibePoints + 100 }));
+      setClubStats((prev) => ({
+        ...prev,
+        connectionsKade: prev.connectionsKade + 1,
+        vibePoints: prev.vibePoints + 100,
+      }));
       toast({
         title: "Vibe connection made!",
         description: `You're now connected with ${connection.userName}. +100 Vibe Points!`,
@@ -379,11 +450,11 @@ export default function NightclubExperience() {
 
   // Drink ordering functions
   const addToCart = (drinkId: string) => {
-    setCartItems(prev => {
-      const existing = prev.find(item => item.drinkId === drinkId);
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.drinkId === drinkId);
       if (existing) {
-        return prev.map(item => 
-          item.drinkId === drinkId 
+        return prev.map((item) =>
+          item.drinkId === drinkId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -397,7 +468,7 @@ export default function NightclubExperience() {
   };
 
   const removeFromCart = (drinkId: string) => {
-    setCartItems(prev => prev.filter(item => item.drinkId !== drinkId));
+    setCartItems((prev) => prev.filter((item) => item.drinkId !== drinkId));
   };
 
   const updateCartQuantity = (drinkId: string, quantity: number) => {
@@ -405,29 +476,36 @@ export default function NightclubExperience() {
       removeFromCart(drinkId);
       return;
     }
-    setCartItems(prev => 
-      prev.map(item => 
-        item.drinkId === drinkId 
-          ? { ...item, quantity }
-          : item
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.drinkId === drinkId ? { ...item, quantity } : item
       )
     );
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "cocktail": return Martini;
-      case "beer": return Beer;
-      case "wine": return Wine;
-      case "coffee": return Coffee;
-      default: return Wine;
+      case "cocktail":
+        return Martini;
+      case "beer":
+        return Beer;
+      case "wine":
+        return Wine;
+      case "coffee":
+        return Coffee;
+      default:
+        return Wine;
     }
   };
 
   // Payment mutation
   const paymentMutation = useMutation({
     mutationFn: async (orderData: any) => {
-      const response = await apiRequest("POST", "/api/drinks/process-payment", orderData);
+      const response = await apiRequest(
+        "POST",
+        "/api/drinks/process-payment",
+        orderData
+      );
       return response.json();
     },
     onSuccess: (data) => {
@@ -439,12 +517,15 @@ export default function NightclubExperience() {
       setCartItems([]);
       // Refresh orders
       queryClient.invalidateQueries({ queryKey: ["/api/drinks/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/drinks/real-time-stats"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/drinks/real-time-stats"],
+      });
     },
     onError: (error) => {
       toast({
         title: "Payment Failed",
-        description: "There was an issue processing your payment. Please try again.",
+        description:
+          "There was an issue processing your payment. Please try again.",
         variant: "destructive",
       });
     },
@@ -469,13 +550,15 @@ export default function NightclubExperience() {
       items: cartItems,
       totalAmount: totalAmount,
       barLocation: "Main Bar",
-      guestId: "current-user"
+      guestId: "current-user",
     };
 
     paymentMutation.mutate(orderData);
   };
 
-  const selectedVenueData = nightclubs.find(club => club.id === selectedVenue);
+  const selectedVenueData = nightclubs.find(
+    (club) => club.id === selectedVenue
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -485,8 +568,9 @@ export default function NightclubExperience() {
           Nightclub Experience
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Transform your nightlife with real-time club discovery, live social feeds, 
-          DJ interactions, and personalized connections that make every night unforgettable.
+          Transform your nightlife with real-time club discovery, live social
+          feeds, DJ interactions, and personalized connections that make every
+          night unforgettable.
         </p>
       </div>
 
@@ -495,10 +579,13 @@ export default function NightclubExperience() {
           {/* Club Discovery */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {nightclubs.map((club) => (
-              <Card key={club.id} className="overflow-hidden hover:shadow-xl transition-shadow">
+              <Card
+                key={club.id}
+                className="overflow-hidden hover:shadow-xl transition-shadow"
+              >
                 <div className="relative">
-                  <img 
-                    src={club.photos[0]} 
+                  <img
+                    src={club.photos[0]}
                     alt={club.name}
                     className="w-full h-48 object-cover"
                   />
@@ -508,12 +595,20 @@ export default function NightclubExperience() {
                     </Badge>
                   </div>
                   <div className="absolute top-4 right-4">
-                    <Badge className={`${getOccupancyColor(club.currentOccupancy, club.capacity)}`}>
-                      {Math.round((club.currentOccupancy / club.capacity) * 100)}% Full
+                    <Badge
+                      className={`${getOccupancyColor(
+                        club.currentOccupancy,
+                        club.capacity
+                      )}`}
+                    >
+                      {Math.round(
+                        (club.currentOccupancy / club.capacity) * 100
+                      )}
+                      % Full
                     </Badge>
                   </div>
                 </div>
-                
+
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
@@ -548,13 +643,22 @@ export default function NightclubExperience() {
                     <h4 className="font-semibold mb-2">Tonight's Lineup</h4>
                     <div className="space-y-2">
                       {club.lineup.map((dj, idx) => (
-                        <div key={idx} className="flex justify-between items-center text-sm">
+                        <div
+                          key={idx}
+                          className="flex justify-between items-center text-sm"
+                        >
                           <div className="flex items-center gap-2">
                             <Music className="h-4 w-4" />
-                            <span className={dj.isHeadliner ? "font-semibold" : ""}>
+                            <span
+                              className={dj.isHeadliner ? "font-semibold" : ""}
+                            >
                               {dj.djName}
                             </span>
-                            {dj.isHeadliner && <Badge className="bg-yellow-500 text-white text-xs">Headliner</Badge>}
+                            {dj.isHeadliner && (
+                              <Badge className="bg-yellow-500 text-white text-xs">
+                                Headliner
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-gray-600 dark:text-gray-300">
                             {dj.startTime} • {dj.genre}
@@ -577,7 +681,9 @@ export default function NightclubExperience() {
 
                   {club.specialOffers.length > 0 && (
                     <div>
-                      <h4 className="font-semibold mb-2 text-green-600">Special Offers</h4>
+                      <h4 className="font-semibold mb-2 text-green-600">
+                        Special Offers
+                      </h4>
                       <ul className="text-sm space-y-1">
                         {club.specialOffers.map((offer, idx) => (
                           <li key={idx} className="flex items-start gap-2">
@@ -592,19 +698,25 @@ export default function NightclubExperience() {
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div className="text-center">
                       <Users className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-                      <div className="text-sm font-semibold">{club.currentOccupancy}/{club.capacity}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-300">Current crowd</div>
+                      <div className="text-sm font-semibold">
+                        {club.currentOccupancy}/{club.capacity}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">
+                        Current crowd
+                      </div>
                     </div>
                     <div className="text-center">
                       <Clock className="h-5 w-5 mx-auto mb-1 text-purple-600" />
                       <div className="text-sm font-semibold">Open Now</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-300">Until 4:00 AM</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">
+                        Until 4:00 AM
+                      </div>
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={() => checkInToVenue(club.id)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   >
                     <QrCode className="mr-2 h-4 w-4" />
                     Check In & Enter
@@ -617,38 +729,62 @@ export default function NightclubExperience() {
       ) : (
         <>
           {/* Live Club Experience */}
-          <Card className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+          <Card className="mb-8 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold">Welcome to {selectedVenueData?.name}!</h2>
-                  <p className="text-gray-600 dark:text-gray-300">You're now part of the live experience</p>
+                  <h2 className="text-2xl font-bold">
+                    Welcome to {selectedVenueData?.name}!
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    You're now part of the live experience
+                  </p>
                 </div>
                 <Badge className="bg-green-500 text-white animate-pulse">
                   LIVE
                 </Badge>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-purple-600">{clubStats.vibePoints}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Vibe Points</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {clubStats.vibePoints}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    Vibe Points
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">{clubStats.totalCheckedIn}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">People Here</div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    {clubStats.totalCheckedIn}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    People Here
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-600">{clubStats.photosShared}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Moments Shared</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {clubStats.photosShared}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    Moments Shared
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-yellow-600">{clubStats.connectionsKade}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Connections</div>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {clubStats.connectionsKade}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    Connections
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-pink-600">{clubStats.currentDjRating}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">DJ Rating</div>
+                  <div className="text-2xl font-bold text-pink-600">
+                    {clubStats.currentDjRating}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    DJ Rating
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -708,11 +844,15 @@ export default function NightclubExperience() {
                           <div className="flex items-start gap-3">
                             <Avatar>
                               <AvatarImage src={moment.userPhoto} />
-                              <AvatarFallback>{moment.userName[0]}</AvatarFallback>
+                              <AvatarFallback>
+                                {moment.userName[0]}
+                              </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
-                                <span className="font-semibold">{moment.userName}</span>
+                                <span className="font-semibold">
+                                  {moment.userName}
+                                </span>
                                 <Badge variant="outline" className="text-xs">
                                   {moment.location}
                                 </Badge>
@@ -720,13 +860,13 @@ export default function NightclubExperience() {
                                   {moment.timestamp.toLocaleTimeString()}
                                 </span>
                               </div>
-                              
+
                               <p className="mb-3">{moment.content}</p>
-                              
+
                               {moment.mediaUrl && (
-                                <img 
-                                  src={moment.mediaUrl} 
-                                  alt="Moment" 
+                                <img
+                                  src={moment.mediaUrl}
+                                  alt="Moment"
                                   className="w-full max-w-sm rounded-lg mb-3"
                                 />
                               )}
@@ -737,12 +877,16 @@ export default function NightclubExperience() {
                                     key={emoji}
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => addReaction(moment.id, emoji)}
+                                    onClick={() =>
+                                      addReaction(moment.id, emoji)
+                                    }
                                     className="text-lg p-1 h-8"
                                   >
                                     {emoji}
                                     <span className="ml-1 text-sm">
-                                      {moment.reactions.find(r => r.emoji === emoji)?.count || 0}
+                                      {moment.reactions.find(
+                                        (r) => r.emoji === emoji
+                                      )?.count || 0}
                                     </span>
                                   </Button>
                                 ))}
@@ -771,7 +915,9 @@ export default function NightclubExperience() {
                         </div>
                         <div>
                           <div className="font-semibold">DJ Phoenix</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-300">Progressive House</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
+                            Progressive House
+                          </div>
                         </div>
                         <div className="flex items-center justify-center gap-2">
                           <Star className="h-4 w-4 text-yellow-500 fill-current" />
@@ -788,7 +934,9 @@ export default function NightclubExperience() {
                   {/* Quick Stats */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Your Night Stats</CardTitle>
+                      <CardTitle className="text-lg">
+                        Your Night Stats
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between">
@@ -797,15 +945,21 @@ export default function NightclubExperience() {
                       </div>
                       <div className="flex justify-between">
                         <span>Vibe points earned:</span>
-                        <span className="font-semibold text-purple-600">+{clubStats.vibePoints}</span>
+                        <span className="font-semibold text-purple-600">
+                          +{clubStats.vibePoints}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Moments shared:</span>
-                        <span className="font-semibold">{clubStats.photosShared}</span>
+                        <span className="font-semibold">
+                          {clubStats.photosShared}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>New connections:</span>
-                        <span className="font-semibold">{clubStats.connectionsKade}</span>
+                        <span className="font-semibold">
+                          {clubStats.connectionsKade}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -827,13 +981,18 @@ export default function NightclubExperience() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {vibeConnections.map((connection) => (
-                      <Card key={connection.id} className="border-2 hover:border-purple-500 transition-colors">
+                      <Card
+                        key={connection.id}
+                        className="border-2 hover:border-purple-500 transition-colors"
+                      >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
                             <div className="relative">
                               <Avatar>
                                 <AvatarImage src={connection.userPhoto} />
-                                <AvatarFallback>{connection.userName[0]}</AvatarFallback>
+                                <AvatarFallback>
+                                  {connection.userName[0]}
+                                </AvatarFallback>
                               </Avatar>
                               {connection.isOnline && (
                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -841,7 +1000,9 @@ export default function NightclubExperience() {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-semibold">{connection.userName}</span>
+                                <span className="font-semibold">
+                                  {connection.userName}
+                                </span>
                                 <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
                                   {connection.matchScore}% match
                                 </Badge>
@@ -851,7 +1012,11 @@ export default function NightclubExperience() {
                               </p>
                               <div className="flex flex-wrap gap-1 mb-3">
                                 {connection.musicTaste.map((genre, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="text-xs"
+                                  >
                                     {genre}
                                   </Badge>
                                 ))}
@@ -861,8 +1026,8 @@ export default function NightclubExperience() {
                                   <MapPin className="h-3 w-3 inline mr-1" />
                                   {connection.location}
                                 </span>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   onClick={() => connectWithUser(connection.id)}
                                 >
                                   Vibe Connect
@@ -892,13 +1057,15 @@ export default function NightclubExperience() {
                 <CardContent className="space-y-4">
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <div className="text-center">
-                      <h3 className="font-semibold mb-2">Current DJ: Phoenix</h3>
+                      <h3 className="font-semibold mb-2">
+                        Current DJ: Phoenix
+                      </h3>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <span>Set Rating:</span>
                         <div className="flex">
-                          {[1,2,3,4,5].map((star) => (
-                            <Star 
-                              key={star} 
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
                               className="h-5 w-5 text-yellow-500 fill-current cursor-pointer hover:scale-110 transition-transform"
                             />
                           ))}
@@ -917,15 +1084,23 @@ export default function NightclubExperience() {
                       <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <span>Energy Level</span>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">🔥 High</Button>
-                          <Button size="sm" variant="outline">😎 Chill</Button>
+                          <Button size="sm" variant="outline">
+                            🔥 High
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            😎 Chill
+                          </Button>
                         </div>
                       </div>
                       <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <span>Current Track</span>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">❤️ Love it</Button>
-                          <Button size="sm" variant="outline">⏭️ Next</Button>
+                          <Button size="sm" variant="outline">
+                            ❤️ Love it
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            ⏭️ Next
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -947,8 +1122,12 @@ export default function NightclubExperience() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-purple-600 mb-2">{clubStats.vibePoints}</div>
-                    <div className="text-gray-600 dark:text-gray-300">Total Vibe Points Tonight</div>
+                    <div className="text-4xl font-bold text-purple-600 mb-2">
+                      {clubStats.vibePoints}
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300">
+                      Total Vibe Points Tonight
+                    </div>
                     <Progress value={75} className="mt-4" />
                     <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                       750 more points until next reward tier
@@ -960,8 +1139,12 @@ export default function NightclubExperience() {
                       <CardContent className="p-4 text-center">
                         <Gift className="h-8 w-8 mx-auto mb-2 text-green-600" />
                         <h4 className="font-semibold">Free Drink</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">500 Points</p>
-                        <Button size="sm" className="w-full">Redeem</Button>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                          500 Points
+                        </p>
+                        <Button size="sm" className="w-full">
+                          Redeem
+                        </Button>
                       </CardContent>
                     </Card>
 
@@ -969,9 +1152,13 @@ export default function NightclubExperience() {
                       <CardContent className="p-4 text-center">
                         <Crown className="h-8 w-8 mx-auto mb-2 text-purple-600" />
                         <h4 className="font-semibold">VIP Upgrade</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">1000 Points</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                          1000 Points
+                        </p>
                         <Button size="sm" className="w-full" disabled>
-                          {clubStats.vibePoints >= 1000 ? "Redeem" : "Need more points"}
+                          {clubStats.vibePoints >= 1000
+                            ? "Redeem"
+                            : "Need more points"}
                         </Button>
                       </CardContent>
                     </Card>
@@ -1017,60 +1204,92 @@ export default function NightclubExperience() {
                   {/* Drink Stats */}
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-blue-600">{drinkStats.totalOrders || 0}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Total Orders</div>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {drinkStats.totalOrders || 0}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                        Total Orders
+                      </div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-green-600">${drinkStats.revenue || 0}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Revenue</div>
+                      <div className="text-2xl font-bold text-green-600">
+                        ${drinkStats.revenue || 0}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                        Revenue
+                      </div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-600">{cartItems.length}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Cart Items</div>
+                      <div className="text-2xl font-bold text-purple-600">
+                        {cartItems.length}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
+                        Cart Items
+                      </div>
                     </div>
                   </div>
 
                   {/* Category Filter */}
                   <div className="flex gap-2 flex-wrap">
                     <Button
-                      variant={selectedCategory === "all" ? "default" : "outline"}
+                      variant={
+                        selectedCategory === "all" ? "default" : "outline"
+                      }
                       size="sm"
                       onClick={() => setSelectedCategory("all")}
                     >
                       All Drinks
                     </Button>
-                    {["cocktail", "beer", "wine", "non-alcoholic"].map(category => (
-                      <Button
-                        key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCategory(category)}
-                      >
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </Button>
-                    ))}
+                    {["cocktail", "beer", "wine", "non-alcoholic"].map(
+                      (category) => (
+                        <Button
+                          key={category}
+                          variant={
+                            selectedCategory === category
+                              ? "default"
+                              : "outline"
+                          }
+                          size="sm"
+                          onClick={() => setSelectedCategory(category)}
+                        >
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </Button>
+                      )
+                    )}
                   </div>
 
                   {/* Drinks Menu */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {drinksMenu
-                      .filter((drink: any) => selectedCategory === "all" || drink.category === selectedCategory)
+                      .filter(
+                        (drink: any) =>
+                          selectedCategory === "all" ||
+                          drink.category === selectedCategory
+                      )
                       .map((drink: any) => {
                         const Icon = getCategoryIcon(drink.category);
-                        const cartItem = cartItems.find(item => item.drinkId === drink.id);
+                        const cartItem = cartItems.find(
+                          (item) => item.drinkId === drink.id
+                        );
                         return (
                           <Card key={drink.id} className="relative">
                             <CardContent className="p-4">
                               <div className="flex items-start justify-between mb-2">
                                 <div>
-                                  <h4 className="font-semibold">{drink.name}</h4>
-                                  <p className="text-sm text-gray-600 dark:text-gray-300">${drink.price}</p>
+                                  <h4 className="font-semibold">
+                                    {drink.name}
+                                  </h4>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    ${drink.price}
+                                  </p>
                                 </div>
                                 <Icon className="h-6 w-6 text-purple-600" />
                               </div>
-                              
-                              <p className="text-sm text-gray-500 mb-3">{drink.description}</p>
-                              
+
+                              <p className="text-sm text-gray-500 mb-3">
+                                {drink.description}
+                              </p>
+
                               <div className="flex items-center gap-2 mb-3">
                                 <Badge variant="outline" className="text-xs">
                                   {drink.preparationTime}min
@@ -1080,11 +1299,17 @@ export default function NightclubExperience() {
                                     {drink.abv}% ABV
                                   </Badge>
                                 )}
-                                <Badge 
-                                  variant={drink.availability ? "default" : "destructive"} 
+                                <Badge
+                                  variant={
+                                    drink.availability
+                                      ? "default"
+                                      : "destructive"
+                                  }
                                   className="text-xs"
                                 >
-                                  {drink.availability ? "Available" : "Out of Stock"}
+                                  {drink.availability
+                                    ? "Available"
+                                    : "Out of Stock"}
                                 </Badge>
                               </div>
 
@@ -1093,15 +1318,27 @@ export default function NightclubExperience() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => updateCartQuantity(drink.id, cartItem.quantity - 1)}
+                                    onClick={() =>
+                                      updateCartQuantity(
+                                        drink.id,
+                                        cartItem.quantity - 1
+                                      )
+                                    }
                                   >
                                     -
                                   </Button>
-                                  <span className="font-semibold">{cartItem.quantity}</span>
+                                  <span className="font-semibold">
+                                    {cartItem.quantity}
+                                  </span>
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => updateCartQuantity(drink.id, cartItem.quantity + 1)}
+                                    onClick={() =>
+                                      updateCartQuantity(
+                                        drink.id,
+                                        cartItem.quantity + 1
+                                      )
+                                    }
                                   >
                                     +
                                   </Button>
@@ -1134,33 +1371,49 @@ export default function NightclubExperience() {
                   {/* Current Orders */}
                   {currentOrders.length > 0 && (
                     <div>
-                      <h3 className="text-lg font-semibold mb-4">Your Orders</h3>
+                      <h3 className="text-lg font-semibold mb-4">
+                        Your Orders
+                      </h3>
                       <div className="space-y-3">
                         {currentOrders.map((order: any) => (
                           <Card key={order.id}>
                             <CardContent className="p-4">
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <div className="font-semibold">Order #{order.id.slice(-4)}</div>
+                                  <div className="font-semibold">
+                                    Order #{order.id.slice(-4)}
+                                  </div>
                                   <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    {order.items.length} items • ${order.totalAmount}
+                                    {order.items.length} items • $
+                                    {order.totalAmount}
                                   </div>
                                   <div className="text-sm text-gray-500">
                                     Bar: {order.barLocation}
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <Badge 
+                                  <Badge
                                     variant={
-                                      order.status === "ready" ? "default" :
-                                      order.status === "preparing" ? "secondary" :
-                                      order.status === "pending" ? "outline" : "destructive"
+                                      order.status === "ready"
+                                        ? "default"
+                                        : order.status === "preparing"
+                                        ? "secondary"
+                                        : order.status === "pending"
+                                        ? "outline"
+                                        : "destructive"
                                     }
                                   >
-                                    {order.status === "ready" && <CheckCircle className="h-3 w-3 mr-1" />}
-                                    {order.status === "preparing" && <Timer className="h-3 w-3 mr-1" />}
-                                    {order.status === "pending" && <AlertCircle className="h-3 w-3 mr-1" />}
-                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                    {order.status === "ready" && (
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                    )}
+                                    {order.status === "preparing" && (
+                                      <Timer className="h-3 w-3 mr-1" />
+                                    )}
+                                    {order.status === "pending" && (
+                                      <AlertCircle className="h-3 w-3 mr-1" />
+                                    )}
+                                    {order.status.charAt(0).toUpperCase() +
+                                      order.status.slice(1)}
                                   </Badge>
                                   {order.queuePosition > 0 && (
                                     <div className="text-xs text-gray-500 mt-1">
@@ -1182,12 +1435,21 @@ export default function NightclubExperience() {
                       <CardContent className="p-4">
                         <h3 className="font-semibold mb-3">Cart Summary</h3>
                         <div className="space-y-2">
-                          {cartItems.map(item => {
-                            const drink = drinksMenu.find((d: any) => d.id === item.drinkId);
+                          {cartItems.map((item) => {
+                            const drink = drinksMenu.find(
+                              (d: any) => d.id === item.drinkId
+                            );
                             return drink ? (
-                              <div key={item.drinkId} className="flex justify-between text-sm">
-                                <span>{drink.name} x{item.quantity}</span>
-                                <span>${(drink.price * item.quantity).toFixed(2)}</span>
+                              <div
+                                key={item.drinkId}
+                                className="flex justify-between text-sm"
+                              >
+                                <span>
+                                  {drink.name} x{item.quantity}
+                                </span>
+                                <span>
+                                  ${(drink.price * item.quantity).toFixed(2)}
+                                </span>
                               </div>
                             ) : null;
                           })}
@@ -1196,20 +1458,30 @@ export default function NightclubExperience() {
                           <div className="flex justify-between font-semibold">
                             <span>Total:</span>
                             <span>
-                              ${cartItems.reduce((total, item) => {
-                                const drink = drinksMenu.find((d: any) => d.id === item.drinkId);
-                                return total + (drink ? drink.price * item.quantity : 0);
-                              }, 0).toFixed(2)}
+                              $
+                              {cartItems
+                                .reduce((total, item) => {
+                                  const drink = drinksMenu.find(
+                                    (d: any) => d.id === item.drinkId
+                                  );
+                                  return (
+                                    total +
+                                    (drink ? drink.price * item.quantity : 0)
+                                  );
+                                }, 0)
+                                .toFixed(2)}
                             </span>
                           </div>
                         </div>
-                        <Button 
-                          className="w-full mt-3" 
+                        <Button
+                          className="w-full mt-3"
                           onClick={handlePayment}
                           disabled={paymentMutation.isPending}
                         >
                           <QrCode className="h-4 w-4 mr-2" />
-                          {paymentMutation.isPending ? "Processing..." : "Order & Pay with QR/NFC"}
+                          {paymentMutation.isPending
+                            ? "Processing..."
+                            : "Order & Pay with QR/NFC"}
                         </Button>
                       </CardContent>
                     </Card>

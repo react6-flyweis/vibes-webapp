@@ -134,14 +134,14 @@ export default function CateringMarketplace() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-900 via-red-900 to-pink-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-orange-900 via-red-900 to-pink-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-900 via-red-900 to-pink-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-orange-900 via-red-900 to-pink-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -153,7 +153,7 @@ export default function CateringMarketplace() {
 
         {/* Search and Filters */}
         <div className="mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
@@ -208,7 +208,7 @@ export default function CateringMarketplace() {
                 .filter((menu: CateringMenu) => menu.featured)
                 .slice(0, 3)
                 .map((menu: CateringMenu) => (
-                  <Card key={menu.id} className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur border-yellow-300/30">
+                  <Card key={menu.id} className="bg-linear-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border-yellow-300/30">
                     <CardHeader className="pb-3">
                       <Badge className="w-fit bg-yellow-500/20 text-yellow-200 border-yellow-300">
                         Featured
@@ -261,7 +261,7 @@ export default function CateringMarketplace() {
           <h2 className="text-2xl font-bold text-white mb-4">All Catering Menus</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMenus.map((menu: CateringMenu) => (
-              <Card key={menu.id} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-all">
+              <Card key={menu.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div>
@@ -329,7 +329,7 @@ export default function CateringMarketplace() {
         {/* Order Modal */}
         {selectedMenu && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="bg-white/10 backdrop-blur border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <CardHeader>
                 <CardTitle className="text-white text-xl">
                   Order {selectedMenu.name}

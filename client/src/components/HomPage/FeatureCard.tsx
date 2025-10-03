@@ -47,7 +47,7 @@ const FeatureCard: FC<FeatureCardProps> = ({
     >
       {/* Card Header */}
       <div className="flex items-start justify-between">
-        <div className="flex-shrink-0">{icon}</div>
+        <div className="shrink-0">{icon}</div>
         <span
           className={`rounded-full px-3 py-1 text-xs font-bold ${tag.bgColor} ${tag.textColor}`}
         >
@@ -66,7 +66,7 @@ const FeatureCard: FC<FeatureCardProps> = ({
         {features.map((feature, index) => (
           <li key={index} className="flex items-start">
             <div
-              className={`mr-4 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${iconBgClass}`}
+              className={`mr-4 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${iconBgClass}`}
             >
               {feature.icon}
             </div>

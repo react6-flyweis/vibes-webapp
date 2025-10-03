@@ -375,13 +375,13 @@ export default function InteractiveDesignGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Wand2 className="h-8 w-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Interactive Design Generator
             </h1>
             <Sparkles className="h-8 w-8 text-pink-600" />
@@ -644,7 +644,7 @@ export default function InteractiveDesignGenerator() {
                   ) : (
                     collaborators.map((collaborator, index) => (
                       <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                           {collaborator.avatar}
                         </div>
                         <div className="flex-1">
@@ -666,7 +666,7 @@ export default function InteractiveDesignGenerator() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg">
+                  <div className="p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg">
                     <h4 className="font-semibold mb-2">Collaboration Features</h4>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center gap-2">
@@ -696,7 +696,7 @@ export default function InteractiveDesignGenerator() {
                         Array.from({ length: 10 }).forEach((_, i) => {
                           setTimeout(() => {
                             const sparkle = document.createElement('div');
-                            sparkle.className = 'fixed pointer-events-none z-50 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-ping';
+                            sparkle.className = 'fixed pointer-events-none z-50 w-3 h-3 bg-linear-to-r from-blue-400 to-purple-500 rounded-full animate-ping';
                             sparkle.style.left = `${Math.random() * 100}%`;
                             sparkle.style.top = `${Math.random() * 100}%`;
                             document.body.appendChild(sparkle);
@@ -775,7 +775,7 @@ export default function InteractiveDesignGenerator() {
                 <CardContent>
                   {generatedStory ? (
                     <div className="space-y-4">
-                      <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg">
+                      <div className="p-4 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg">
                         <p className="text-sm leading-relaxed">{generatedStory}</p>
                       </div>
                       <div className="flex gap-2">
@@ -813,7 +813,7 @@ export default function InteractiveDesignGenerator() {
                   key={achievement.id}
                   className={`transition-all ${
                     achievement.unlocked 
-                      ? 'bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800' 
+                      ? 'bg-linear-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-200 dark:border-yellow-800' 
                       : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
                   } ${
                     animationTriggers.has(achievement.id) 
@@ -910,7 +910,7 @@ export default function InteractiveDesignGenerator() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg">
+                  <div className="p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg">
                     <h4 className="font-semibold mb-2">Connected Features</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2">
@@ -937,7 +937,7 @@ export default function InteractiveDesignGenerator() {
                     <div className="max-h-32 overflow-y-auto space-y-2">
                       {groupMembers.slice(0, 5).map((member, index) => (
                         <div key={index} className="flex items-center gap-3 p-2 border rounded-lg">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                          <div className="w-8 h-8 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                             {member.name?.charAt(0) || 'G'}
                           </div>
                           <div className="flex-1">
@@ -987,7 +987,7 @@ export default function InteractiveDesignGenerator() {
                       </div>
                     ) : (
                       sharedContent.map((content, index) => (
-                        <div key={index} className="p-3 border rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-blue-900/20">
+                        <div key={index} className="p-3 border rounded-lg bg-linear-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-blue-900/20">
                           <div className="flex items-center gap-2 mb-2">
                             {content.type === 'story' ? <BookOpen className="h-4 w-4" /> : <Palette className="h-4 w-4" />}
                             <span className="font-medium text-sm capitalize">{content.type}</span>

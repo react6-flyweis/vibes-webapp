@@ -49,7 +49,7 @@ type FeatureItemProps = {
 
 const FeatureItem: React.FC<FeatureItemProps> = ({ title, description }) => (
     <div className="flex items-start space-x-4">
-        <div className="flex-shrink-0 bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center">
+        <div className="shrink-0 bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center">
             <Check className="w-5 h-5 text-purple-700" />
         </div>
         <div>
@@ -74,7 +74,7 @@ export const WebScrapingSection: React.FC = () => {
 
   return (
     <div className="font-sans antialiased text-gray-800 p-4 sm:p-8">
-      <div className="container mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-blue-100 to-indigo-100">
+      <div className="container mx-auto p-6 sm:p-8 rounded-2xl bg-linear-to-r from-blue-100 to-indigo-100">
         
         {/* Top Stats Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
@@ -89,7 +89,7 @@ export const WebScrapingSection: React.FC = () => {
           {/* Left Column: Tools */}
           <div className="lg:col-span-2">
             <h2 className="text-3xl font-bold">
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+              <span className="bg-linear-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
                 🤖 Web Scraping & Automation
               </span>
             </h2>
@@ -104,7 +104,7 @@ export const WebScrapingSection: React.FC = () => {
           </div>
           
           {/* Right Column: Smart Web Automation Card */}
-          <div className="p-6 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50 to-pink-100 shadow-sm flex flex-col space-y-6">
+          <div className="p-6 rounded-lg border border-purple-200 bg-linear-to-br from-purple-50 to-pink-100 shadow-xs flex flex-col space-y-6">
             <div className="flex items-center space-x-4">
               <div className="bg-purple-600 rounded-full w-12 h-12 flex items-center justify-center">
                 <Bot className="w-6 h-6 text-white" />
@@ -129,7 +129,7 @@ export const WebScrapingSection: React.FC = () => {
         </div>
 
         {/* Bottom Stats Section */}
-        <div className="mt-8 p-8 rounded-2xl bg-gradient-to-r from-purple-100 to-pink-100">
+        <div className="mt-8 p-8 rounded-2xl bg-linear-to-r from-purple-100 to-pink-100">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <StatItem value="47" label="Scraping Targets" valueColor="text-purple-700" />
             <StatItem value="8,247" label="Events Extracted" valueColor="text-pink-600" />

@@ -252,12 +252,12 @@ export default function HostAchievements() {
       </div>
 
       {/* Host Level & Stats */}
-      <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+      <Card className="mb-8 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
             <div className="text-center">
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
+                <div className="w-20 h-20 bg-linear-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
                   {hostStats.level}
                 </div>
                 <Crown className="absolute -top-2 -right-2 h-6 w-6 text-yellow-500" />
@@ -326,7 +326,7 @@ export default function HostAchievements() {
                 }`}
               >
                 {achievement.isUnlocked && (
-                  <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br ${getRarityColor(achievement.rarity)} transform rotate-45 translate-x-8 -translate-y-8`}></div>
+                  <div className={`absolute top-0 right-0 w-16 h-16 bg-linear-to-br ${getRarityColor(achievement.rarity)} transform rotate-45 translate-x-8 -translate-y-8`}></div>
                 )}
                 
                 <CardHeader className="pb-3">
@@ -353,7 +353,7 @@ export default function HostAchievements() {
                     
                     <div className="flex justify-between items-center">
                       <Badge 
-                        className={`bg-gradient-to-r ${getRarityColor(achievement.rarity)} text-white border-0`}
+                        className={`bg-linear-to-r ${getRarityColor(achievement.rarity)} text-white border-0`}
                       >
                         {achievement.rarity}
                       </Badge>

@@ -17,7 +17,7 @@ const RateLimitingAndAutomation: React.FC = () => {
         {/* 2 Cards Centered */}
         <div className="grid md:grid-cols-2 gap-6 justify-center">
           {/* Rate Limiting Strategies */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 shadow-md rounded-lg p-6">
+          <div className="bg-linear-to-br from-blue-50 to-indigo-100 border border-blue-200 shadow-md rounded-lg p-6">
             <h3 className="text-2xl font-bold text-blue-900 text-center">
               Rate Limiting Strategies
             </h3>
@@ -80,7 +80,7 @@ const RateLimitingAndAutomation: React.FC = () => {
           </div>
 
           {/* Automation & Scheduling */}
-          <div className="bg-gradient-to-br from-green-50 to-teal-100 border border-green-200 shadow-md rounded-lg p-6">
+          <div className="bg-linear-to-br from-green-50 to-teal-100 border border-green-200 shadow-md rounded-lg p-6">
             <h3 className="text-2xl font-bold text-green-800 text-center">
               Automation & Scheduling
             </h3>
@@ -145,7 +145,7 @@ const RateLimitingAndAutomation: React.FC = () => {
         </div>
 
         {/* Stats Section */}
-       <div className="mt-8 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl p-6 flex flex-wrap justify-between text-center">
+       <div className="mt-8 bg-linear-to-r from-blue-100 to-indigo-100 rounded-xl p-6 flex flex-wrap justify-between text-center">
   <div>
     <p className="text-3xl font-bold text-blue-700">6</p>
     <p className="text-sm text-gray-600">API Sources</p>

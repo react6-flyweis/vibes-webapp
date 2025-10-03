@@ -189,7 +189,7 @@ export default function NFTGuestPasses() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       {/* Animated blockchain network background */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
@@ -212,17 +212,17 @@ export default function NFTGuestPasses() {
         {/* Enhanced Header with Blockchain Theme */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
               <Diamond className="w-12 h-12 text-white" />
             </div>
-            <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl">
               <Shield className="w-12 h-12 text-white" />
             </div>
-            <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl">
               <Sparkles className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-bold bg-linear-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-4">
             Dynamic NFT Guest Passes
           </h1>
           <p className="text-xl text-blue-200 max-w-4xl mx-auto leading-relaxed">
@@ -288,28 +288,28 @@ export default function NFTGuestPasses() {
         {/* Marketplace Stats */}
         {marketplaceStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Sparkles className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{(marketplaceStats as any).totalPasses || '1,247'}</div>
                 <p className="text-gray-600 text-sm">Active Passes</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{(marketplaceStats as any).activeUsers || '892'}</div>
                 <p className="text-gray-600 text-sm">Active Users</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{(marketplaceStats as any).averageLevel || '4.2'}</div>
                 <p className="text-gray-600 text-sm">Avg Level</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Crown className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{(marketplaceStats as any).totalValue || '45.8 ETH'}</div>
@@ -340,10 +340,10 @@ export default function NFTGuestPasses() {
               const nextLevelXP = pass.level * 100;
               
               return (
-                <Card key={pass.id} className="bg-white/95 backdrop-blur border-2 border-white/30 hover:scale-105 transition-all duration-300 cursor-pointer"
+                <Card key={pass.id} className="bg-white/95 backdrop-blur-sm border-2 border-white/30 hover:scale-105 transition-all duration-300 cursor-pointer"
                       onClick={() => setSelectedPass(pass.id)}>
                   <CardHeader className="pb-2">
-                    <div className={`w-full h-48 bg-gradient-to-br ${tierGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
+                    <div className={`w-full h-48 bg-linear-to-br ${tierGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
                       <TierIcon className="w-20 h-20 text-white/80" />
                       <div className="absolute top-2 left-2">
                         <Badge className={`bg-black/50 text-white`}>
@@ -442,7 +442,7 @@ export default function NFTGuestPasses() {
 
         {/* Available Achievements Section */}
         {achievements && achievements.length > 0 && (
-          <Card className="mt-8 bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="mt-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="text-xl flex items-center">
                 <Target className="w-6 h-6 mr-2 text-orange-600" />
@@ -457,7 +457,7 @@ export default function NFTGuestPasses() {
                   
                   return (
                     <div key={achievement.id} className="flex items-center p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-shrink-0 mr-3">
+                      <div className="shrink-0 mr-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${achievement.completed ? 'bg-green-100' : 'bg-gray-100'}`}>
                           <AchievementIcon className={`w-5 h-5 ${achievement.completed ? 'text-green-600' : 'text-gray-400'}`} />
                         </div>
@@ -471,7 +471,7 @@ export default function NFTGuestPasses() {
                         </div>
                       </div>
                       {achievement.completed && (
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <Badge className="bg-green-100 text-green-800">Completed</Badge>
                         </div>
                       )}

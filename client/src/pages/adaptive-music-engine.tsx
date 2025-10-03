@@ -285,7 +285,7 @@ export default function AdaptiveMusicEngine() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-linear-to-r from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
                           <Music className="h-6 w-6 text-primary" />
                         </div>
                         <div>

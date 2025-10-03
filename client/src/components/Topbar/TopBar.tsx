@@ -7,7 +7,7 @@ const Topbar: React.FC = () => {
       <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-linear-to-r from-purple-600 to-pink-600 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-white"
@@ -23,14 +23,14 @@ const Topbar: React.FC = () => {
               />
             </svg>
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Vibes
           </span>
         </div>
 
         <div className="flex gap-5">
           <Button variant="outline">Login</Button>
-          <Button>Sign Up</Button>
+          <Button className="bg-gradient-cta">Sign Up</Button>
         </div>
 
         {/* <UserMenu /> */}

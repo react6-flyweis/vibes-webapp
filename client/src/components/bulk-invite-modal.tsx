@@ -480,7 +480,7 @@ export default function BulkInviteModal({ isOpen, onClose, eventId, event }: Bul
           <Button 
             onClick={sendBulkInvites}
             disabled={recipients.length === 0 || bulkInviteMutation.isPending}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            className="bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
           >
             {bulkInviteMutation.isPending ? (
               <>

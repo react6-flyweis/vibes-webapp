@@ -26,7 +26,7 @@ interface CardWrapperProps {
 }
 
 const CardWrapper: React.FC<CardWrapperProps> = ({ title, icon, children, onEdit }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 w-full">
+  <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6 mb-8 w-full">
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center">
         {icon}
@@ -179,7 +179,7 @@ export const YourInvitationCard: React.FC<CardComponentProps> = ({ setCurrentSte
     onEdit={() => setCurrentStep('customize')} // Navigate to the 'customize' step on edit
   >
     <div className="flex justify-start">
-      <div className="bg-gradient-to-br from-indigo-400 to-purple-700 text-white rounded-2xl p-8 w-80 shadow-lg">
+      <div className="bg-linear-to-br from-indigo-400 to-purple-700 text-white rounded-2xl p-8 w-80 shadow-lg">
         <h3 className="text-3xl font-bold mb-2">Your Event</h3>
         <p className="text-indigo-100 mb-6">Event description here...</p>
         <div className="space-y-4 mb-8">

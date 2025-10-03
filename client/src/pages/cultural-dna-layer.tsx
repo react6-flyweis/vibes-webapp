@@ -434,7 +434,7 @@ export default function CulturalDNALayer() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-orange-500 to-pink-500 rounded-lg">
+          <div className="p-2 bg-linear-to-br from-orange-500 to-pink-500 rounded-lg">
             <Globe className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -517,7 +517,7 @@ export default function CulturalDNALayer() {
                       {tag.elements.colors.slice(0, 4).map((color, index) => (
                         <div
                           key={index}
-                          className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                          className="w-6 h-6 rounded-full border-2 border-white shadow-xs"
                           style={{ backgroundColor: color }}
                         />
                       ))}
@@ -921,7 +921,7 @@ export default function CulturalDNALayer() {
                       { item: "Kaftan", culture: "Arabic" }
                     ].map((fashion, index) => (
                       <div key={index} className="text-center p-4 border rounded-lg">
-                        <div className="w-16 h-16 mx-auto mb-2 bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-2 bg-linear-to-br from-pink-400 to-purple-500 rounded-lg flex items-center justify-center">
                           <Shirt className="h-8 w-8 text-white" />
                         </div>
                         <h4 className="font-medium text-sm">{fashion.item}</h4>

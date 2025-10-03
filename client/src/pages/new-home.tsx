@@ -8,12 +8,12 @@ export default function NewHomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
+      <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
         <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
               <span className="block">Plan Perfect Events</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              <span className="block text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">
                 Together with AI
               </span>
             </h1>
@@ -22,7 +22,7 @@ export default function NewHomePage() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/events/1">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
+                <Button size="lg" className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
                   <Calendar className="mr-2 h-5 w-5" />
                   Start Planning
                 </Button>
@@ -55,7 +55,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-blue-500 to-purple-500 rounded-lg">
                     <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -81,7 +81,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-lg">
                     <Sparkles className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
@@ -107,7 +107,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-green-500 to-teal-500 rounded-lg">
                     <Users className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -133,7 +133,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-indigo-500 to-blue-500 rounded-lg">
                     <Building2 className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
@@ -159,7 +159,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-pink-500 to-red-500 rounded-lg">
                     <Heart className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300">
@@ -185,7 +185,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-teal-500 to-green-500 rounded-lg">
                     <Calendar className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300">
@@ -211,7 +211,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-green-600 to-emerald-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-green-600 to-emerald-500 rounded-lg">
                     <Heart className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -237,7 +237,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-yellow-500 to-orange-500 rounded-lg">
                     <Trophy className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
@@ -263,7 +263,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-red-500 to-pink-500 rounded-lg">
                     <Zap className="h-6 w-6 text-white" />
                   </div>
                   <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
@@ -289,7 +289,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-blue-600 to-indigo-500 rounded-lg">
                     <Calendar className="h-6 w-6 text-white" />
                   </div>
                   <Badge variant="outline">Essential</Badge>
@@ -313,7 +313,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-orange-500 to-red-500 rounded-lg">
                     <Store className="h-6 w-6 text-white" />
                   </div>
                   <Badge variant="outline">Marketplace</Badge>
@@ -337,7 +337,7 @@ export default function NewHomePage() {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+      <div className="bg-linear-to-r from-blue-600 to-purple-600 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-white">
@@ -381,7 +381,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-green-500 to-teal-500 rounded-lg">
                     <Building2 className="h-6 w-6 text-white" />
                   </div>
                   <CardTitle>Join as Vendor</CardTitle>
@@ -403,7 +403,7 @@ export default function NewHomePage() {
             <Card className="group hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
+                  <div className="p-3 bg-linear-to-r from-blue-500 to-indigo-500 rounded-lg">
                     <Zap className="h-6 w-6 text-white" />
                   </div>
                   <CardTitle>Advertise Your Business</CardTitle>
@@ -436,7 +436,7 @@ export default function NewHomePage() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/events/1">
-              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
+              <Button size="lg" className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
                 <Star className="mr-2 h-5 w-5" />
                 Start Free Today
               </Button>

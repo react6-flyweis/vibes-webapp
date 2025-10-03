@@ -49,7 +49,7 @@ export default function PremiumPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
       <Navigation />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -64,7 +64,7 @@ export default function PremiumPage() {
           <p className="text-xl text-gray-600 mb-6">
             Your payment was successful. You now have access to all premium features.
           </p>
-          <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2">
+          <Badge variant="secondary" className="bg-linear-to-r from-blue-500 to-purple-600 text-white px-4 py-2">
             <Crown className="w-4 h-4 mr-2" />
             Premium Member
           </Badge>
@@ -121,7 +121,7 @@ export default function PremiumPage() {
         </div>
 
         {/* Next Steps */}
-        <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+        <Card className="bg-linear-to-r from-blue-500 to-purple-600 text-white">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl mb-4">Ready to Get Started?</CardTitle>
             <CardDescription className="text-blue-100 mb-6">

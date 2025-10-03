@@ -5,7 +5,15 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, Box, ShoppingCart, Star, Eye, Smartphone, Zap } from "lucide-react";
+import {
+  Camera,
+  Box,
+  ShoppingCart,
+  Star,
+  Eye,
+  Smartphone,
+  Zap,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -33,9 +41,10 @@ const mockARItems: ARItem[] = [
     rating: 4.8,
     arModelUrl: "/ar-models/led-canopy.glb",
     purchaseLink: "https://amazon.com/led-string-lights",
-    description: "Transform your space with warm, twinkling overhead lighting that creates magical ambiance",
+    description:
+      "Transform your space with warm, twinkling overhead lighting that creates magical ambiance",
     inStock: true,
-    previewImage: "🌟"
+    previewImage: "🌟",
   },
   {
     id: 2,
@@ -46,9 +55,10 @@ const mockARItems: ARItem[] = [
     rating: 4.9,
     arModelUrl: "/ar-models/cocktail-bar.glb",
     purchaseLink: "https://eventrentals.com/cocktail-bar",
-    description: "Complete mobile bar unit with brass fixtures and vintage styling",
+    description:
+      "Complete mobile bar unit with brass fixtures and vintage styling",
     inStock: true,
-    previewImage: "🍸"
+    previewImage: "🍸",
   },
   {
     id: 3,
@@ -59,9 +69,10 @@ const mockARItems: ARItem[] = [
     rating: 4.7,
     arModelUrl: "/ar-models/boho-seating.glb",
     purchaseLink: "https://bohostyle.com/lounge-set",
-    description: "Low-profile seating with colorful cushions and natural textures",
+    description:
+      "Low-profile seating with colorful cushions and natural textures",
     inStock: true,
-    previewImage: "🪑"
+    previewImage: "🪑",
   },
   {
     id: 4,
@@ -74,7 +85,7 @@ const mockARItems: ARItem[] = [
     purchaseLink: "https://customneon.com/party-signs",
     description: "Personalized LED neon sign with custom text and colors",
     inStock: false,
-    previewImage: "✨"
+    previewImage: "✨",
   },
   {
     id: 5,
@@ -87,7 +98,7 @@ const mockARItems: ARItem[] = [
     purchaseLink: "https://flowerwall.com/backdrops",
     description: "Stunning 8x8 artificial flower wall perfect for photos",
     inStock: true,
-    previewImage: "🌸"
+    previewImage: "🌸",
   },
   {
     id: 6,
@@ -98,10 +109,11 @@ const mockARItems: ARItem[] = [
     rating: 4.8,
     arModelUrl: "/ar-models/dj-booth.glb",
     purchaseLink: "https://djequipment.com/led-booth",
-    description: "Professional DJ setup with reactive LED panels and sound system",
+    description:
+      "Professional DJ setup with reactive LED panels and sound system",
     inStock: true,
-    previewImage: "🎧"
-  }
+    previewImage: "🎧",
+  },
 ];
 
 export default function ARPreview() {
@@ -118,7 +130,7 @@ export default function ARPreview() {
     setIsARActive(true);
     toast({
       title: "📱 AR Camera Activated!",
-      description: "Point your camera around to place items in your space!"
+      description: "Point your camera around to place items in your space!",
     });
   };
 
@@ -126,15 +138,15 @@ export default function ARPreview() {
     setPlacedItems([...placedItems, item]);
     toast({
       title: `📍 ${item.name} Placed!`,
-      description: "Item positioned in your space. Tap to adjust placement."
+      description: "Item positioned in your space. Tap to adjust placement.",
     });
   };
 
   const removeItem = (itemId: number) => {
-    setPlacedItems(placedItems.filter(item => item.id !== itemId));
+    setPlacedItems(placedItems.filter((item) => item.id !== itemId));
     toast({
       title: "🗑️ Item Removed",
-      description: "Item removed from your AR space."
+      description: "Item removed from your AR space.",
     });
   };
 
@@ -144,29 +156,30 @@ export default function ARPreview() {
         method: "POST",
         body: JSON.stringify({
           eventId: 1,
-          placedItems: placedItems.map(item => ({
+          placedItems: placedItems.map((item) => ({
             itemName: item.name,
             category: item.category,
             arModelUrl: item.arModelUrl,
             purchaseLink: item.purchaseLink,
             price: parseInt(item.price.replace(/[^0-9]/g, "")),
             vendor: item.vendor,
-            placementData: JSON.stringify({ x: 0, y: 0, z: 0, rotation: 0 })
-          }))
-        })
+            placementData: JSON.stringify({ x: 0, y: 0, z: 0, rotation: 0 }),
+          })),
+        }),
       });
     },
     onSuccess: () => {
       toast({
         title: "💾 Configuration Saved!",
-        description: "Your AR room setup has been saved to your event plan!"
+        description: "Your AR room setup has been saved to your event plan!",
       });
-    }
+    },
   });
 
-  const filteredItems = selectedCategory === "all" 
-    ? arItems 
-    : arItems.filter(item => item.category === selectedCategory);
+  const filteredItems =
+    selectedCategory === "all"
+      ? arItems
+      : arItems.filter((item) => item.category === selectedCategory);
 
   const getTotalPrice = () => {
     return placedItems.reduce((total, item) => {
@@ -175,18 +188,19 @@ export default function ARPreview() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Camera className="h-8 w-8 text-blue-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               AR Space Preview
             </h1>
             <Box className="h-8 w-8 text-purple-600" />
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Visualize decorations and furniture in your real space using augmented reality before you buy or rent!
+            Visualize decorations and furniture in your real space using
+            augmented reality before you buy or rent!
           </p>
         </div>
 
@@ -210,7 +224,9 @@ export default function ARPreview() {
                   {categories.map((category) => (
                     <Button
                       key={category}
-                      variant={selectedCategory === category ? "default" : "outline"}
+                      variant={
+                        selectedCategory === category ? "default" : "outline"
+                      }
                       onClick={() => setSelectedCategory(category)}
                       className="capitalize"
                     >
@@ -221,30 +237,43 @@ export default function ARPreview() {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredItems.map((item) => (
-                    <Card key={item.id} className={`${!item.inStock ? "opacity-60" : ""}`}>
+                    <Card
+                      key={item.id}
+                      className={`${!item.inStock ? "opacity-60" : ""}`}
+                    >
                       <CardContent className="p-4">
                         <div className="text-center mb-4">
-                          <div className="text-6xl mb-2">{item.previewImage}</div>
+                          <div className="text-6xl mb-2">
+                            {item.previewImage}
+                          </div>
                           <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{item.description}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            {item.description}
+                          </p>
                         </div>
 
                         <div className="space-y-2 mb-4">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-lg text-green-600">{item.price}</span>
+                            <span className="font-bold text-lg text-green-600">
+                              {item.price}
+                            </span>
                             <div className="flex items-center gap-1">
                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
                               <span className="text-sm">{item.rating}</span>
                             </div>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">by {item.vendor}</p>
-                          <Badge variant={item.inStock ? "default" : "secondary"}>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            by {item.vendor}
+                          </p>
+                          <Badge
+                            variant={item.inStock ? "default" : "secondary"}
+                          >
                             {item.inStock ? "In Stock" : "Pre-order"}
                           </Badge>
                         </div>
 
                         <div className="space-y-2">
-                          <Button 
+                          <Button
                             onClick={() => placeItem(item)}
                             disabled={!item.inStock}
                             className="w-full bg-blue-600 hover:bg-blue-700"
@@ -252,12 +281,12 @@ export default function ARPreview() {
                             <Box className="h-4 w-4 mr-2" />
                             Preview in AR
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full"
-                            asChild
-                          >
-                            <a href={item.purchaseLink} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" className="w-full" asChild>
+                            <a
+                              href={item.purchaseLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <ShoppingCart className="h-4 w-4 mr-2" />
                               View Details
                             </a>
@@ -281,7 +310,11 @@ export default function ARPreview() {
                   </span>
                   <Button
                     onClick={startARPreview}
-                    className={`${isARActive ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"}`}
+                    className={`${
+                      isARActive
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
                   >
                     {isARActive ? (
                       <>
@@ -301,9 +334,12 @@ export default function ARPreview() {
                 {!isARActive ? (
                   <div className="text-center py-12">
                     <Camera className="h-24 w-24 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Ready for AR Preview</h3>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Ready for AR Preview
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      Click "Start AR Camera" to begin visualizing items in your space
+                      Click "Start AR Camera" to begin visualizing items in your
+                      space
                     </p>
                     <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg max-w-md mx-auto">
                       <h4 className="font-semibold mb-2">How it works:</h4>
@@ -317,10 +353,11 @@ export default function ARPreview() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
+                    <div className="bg-linear-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
                       <h3 className="font-semibold mb-2">AR Camera Active</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Your camera is now detecting surfaces. Select items from the catalog to place them in your space.
+                        Your camera is now detecting surfaces. Select items from
+                        the catalog to place them in your space.
                       </p>
                     </div>
 
@@ -329,7 +366,8 @@ export default function ARPreview() {
                         <div className="text-6xl mb-4">📱</div>
                         <p className="text-lg font-semibold">AR Camera View</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          In production, this would show your live camera feed with 3D items overlaid
+                          In production, this would show your live camera feed
+                          with 3D items overlaid
                         </p>
                       </div>
                     </div>
@@ -339,12 +377,19 @@ export default function ARPreview() {
                         <h4 className="font-semibold mb-2">Placed Items:</h4>
                         <div className="grid gap-2">
                           {placedItems.map((item, index) => (
-                            <div key={`${item.id}-${index}`} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
+                            <div
+                              key={`${item.id}-${index}`}
+                              className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg"
+                            >
                               <div className="flex items-center gap-3">
-                                <span className="text-2xl">{item.previewImage}</span>
+                                <span className="text-2xl">
+                                  {item.previewImage}
+                                </span>
                                 <div>
                                   <p className="font-medium">{item.name}</p>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">{item.price}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {item.price}
+                                  </p>
                                 </div>
                               </div>
                               <Button
@@ -375,7 +420,9 @@ export default function ARPreview() {
                   </span>
                   <Button
                     onClick={() => saveConfiguration.mutate()}
-                    disabled={placedItems.length === 0 || saveConfiguration.isPending}
+                    disabled={
+                      placedItems.length === 0 || saveConfiguration.isPending
+                    }
                     className="bg-green-600 hover:bg-green-700"
                   >
                     Save Configuration
@@ -386,17 +433,22 @@ export default function ARPreview() {
                 {placedItems.length === 0 ? (
                   <div className="text-center py-8">
                     <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No items selected yet</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      No items selected yet
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-400">
-                      Use AR preview to place items in your space, then they'll appear here!
+                      Use AR preview to place items in your space, then they'll
+                      appear here!
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
+                    <div className="bg-linear-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 p-4 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold">Total Estimated Cost</h3>
+                          <h3 className="font-semibold">
+                            Total Estimated Cost
+                          </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {placedItems.length} items selected
                           </p>
@@ -415,19 +467,29 @@ export default function ARPreview() {
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <span className="text-3xl">{item.previewImage}</span>
+                                <span className="text-3xl">
+                                  {item.previewImage}
+                                </span>
                                 <div>
                                   <h4 className="font-semibold">{item.name}</h4>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">{item.vendor}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {item.vendor}
+                                  </p>
                                   <Badge variant="outline" className="mt-1">
                                     {item.category}
                                   </Badge>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="font-bold text-lg">{item.price}</p>
+                                <p className="font-bold text-lg">
+                                  {item.price}
+                                </p>
                                 <Button size="sm" variant="outline" asChild>
-                                  <a href={item.purchaseLink} target="_blank" rel="noopener noreferrer">
+                                  <a
+                                    href={item.purchaseLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     Purchase
                                   </a>
                                 </Button>

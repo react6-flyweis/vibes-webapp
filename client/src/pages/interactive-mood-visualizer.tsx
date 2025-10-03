@@ -217,29 +217,29 @@ export default function InteractiveMoodVisualizer() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl shadow-2xl">
               <Activity className="w-12 h-12 text-white" />
             </div>
-            <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl">
               <BarChart3 className="w-12 h-12 text-white" />
             </div>
-            <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl">
+            <div className="p-4 bg-linear-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-2xl">
               <Palette className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
             Interactive Mood Visualizer
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto leading-relaxed">
@@ -415,7 +415,7 @@ export default function InteractiveMoodVisualizer() {
                       { time: "10:00 PM", mood: "Happiness", value: 87 },
                       { time: "8:00 PM", mood: "Engagement", value: 85 }
                     ].map((peak, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-3 bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg">
                         <div className="flex items-center gap-3">
                           <Clock className="w-4 h-4 text-blue-600" />
                           <div>

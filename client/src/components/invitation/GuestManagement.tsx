@@ -8,7 +8,7 @@ const GuestManagement: React.FC = () => {
   );
 
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 max-w-6xl mx-auto mt-20">
+    <div className="bg-white border border-gray-200 shadow-xs rounded-xl p-6 max-w-6xl mx-auto mt-20">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -18,11 +18,11 @@ const GuestManagement: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700">
             <UserPlus size={18} />
             Invite Guests
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700">
             <Contact size={18} />
             Sync Contacts
           </button>
@@ -79,7 +79,7 @@ const GuestManagement: React.FC = () => {
             <input
               type="text"
               placeholder="Search guests..."
-              className="w-full p-2 outline-none text-gray-700"
+              className="w-full p-2 outline-hidden text-gray-700"
             />
           </div>
 

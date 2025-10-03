@@ -49,7 +49,7 @@ const socialPlatforms = [
     id: "instagram",
     name: "Instagram",
     icon: Instagram,
-    color: "bg-gradient-to-r from-purple-500 to-pink-500",
+    color: "bg-linear-to-r from-purple-500 to-pink-500",
     description: "Create a story or post with event details"
   },
   {
@@ -253,7 +253,7 @@ Join us for an unforgettable experience!`;
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Event Preview */}
           <div className="space-y-4">
-            <div className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border">
+            <div className="p-6 bg-linear-to-br from-blue-50 to-purple-50 rounded-xl border">
               <h3 className="text-xl font-bold text-gray-800 mb-2">{event.title || "Your Event"}</h3>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ Join us for an unforgettable experience!`;
             <div className="space-y-3">
               <Button 
                 onClick={handleBulkShare} 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 disabled={selectedPlatforms.length === 0}
               >
                 <Sparkles className="h-4 w-4 mr-2" />

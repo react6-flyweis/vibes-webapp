@@ -75,12 +75,12 @@ export default function GuestMatchmaking() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Heart className="h-8 w-8 text-pink-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
               AI Guest Matchmaking
             </h1>
             <Sparkles className="h-8 w-8 text-purple-600" />
@@ -141,7 +141,7 @@ export default function GuestMatchmaking() {
               <Button 
                 onClick={handleGenerateMatches}
                 disabled={isGenerating || guests.length < 2}
-                className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
+                className="flex-1 bg-linear-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
               >
                 {isGenerating ? (
                   <>
@@ -171,7 +171,7 @@ export default function GuestMatchmaking() {
             <CardContent>
               <div className="grid gap-4">
                 {matches.map((match, index) => (
-                  <div key={index} className="p-4 border rounded-lg bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
+                  <div key={index} className="p-4 border rounded-lg bg-linear-to-r from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-lg">
                         {match.guest1} ↔ {match.guest2}
@@ -191,7 +191,7 @@ export default function GuestMatchmaking() {
         )}
 
         {/* Instructions */}
-        <Card className="mt-8 bg-gradient-to-r from-violet-600 to-purple-600 text-white">
+        <Card className="mt-8 bg-linear-to-r from-violet-600 to-purple-600 text-white">
           <CardContent className="py-8">
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4">How AI Matchmaking Works</h2>

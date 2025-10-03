@@ -15,7 +15,7 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative h-8 w-8 rounded-full bg-transparent focus:outline-none">
+        <button className="relative h-8 w-8 rounded-full bg-transparent focus:outline-hidden">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/avatars/01.png" alt="User" />
             <AvatarFallback>VU</AvatarFallback>

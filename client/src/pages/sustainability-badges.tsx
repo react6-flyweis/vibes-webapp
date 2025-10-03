@@ -222,7 +222,7 @@ export default function SustainabilityBadges() {
         {/* Header */}
         <div className="text-center mb-8">
           <Leaf className="w-16 h-16 text-green-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-green-200 bg-clip-text text-transparent">
             Blockchain Sustainability Badges
           </h1>
           <p className="text-white/90 mt-2 text-xl">Earn verified green credentials for eco-conscious event choices</p>
@@ -267,28 +267,28 @@ export default function SustainabilityBadges() {
 
         {/* Sustainability Impact Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardContent className="p-4 text-center">
               <Wind className="w-8 h-8 text-green-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-800">{totalImpact.carbon}kg</div>
               <p className="text-gray-600 text-sm">CO2 Saved</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardContent className="p-4 text-center">
               <Recycle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-800">{totalImpact.waste}kg</div>
               <p className="text-gray-600 text-sm">Waste Reduced</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardContent className="p-4 text-center">
               <Droplets className="w-8 h-8 text-cyan-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-800">{totalImpact.water}L</div>
               <p className="text-gray-600 text-sm">Water Saved</p>
             </CardContent>
           </Card>
-          <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardContent className="p-4 text-center">
               <Award className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-800">{sustainabilityBadges?.length || 0}</div>
@@ -299,7 +299,7 @@ export default function SustainabilityBadges() {
 
         {/* Global Sustainability Stats */}
         {sustainabilityStats && (
-          <Card className="mb-8 bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="mb-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <BarChart3 className="w-6 h-6 mr-2 text-green-600" />
@@ -365,9 +365,9 @@ export default function SustainabilityBadges() {
               const badgeGradient = badgeTypeColors[badge.badgeType as keyof typeof badgeTypeColors] || 'from-green-400 to-emerald-500';
               
               return (
-                <Card key={badge.id} className="bg-white/95 backdrop-blur border-2 border-white/30 hover:scale-105 transition-all duration-300">
+                <Card key={badge.id} className="bg-white/95 backdrop-blur-sm border-2 border-white/30 hover:scale-105 transition-all duration-300">
                   <CardHeader className="pb-2">
-                    <div className={`w-full h-48 bg-gradient-to-br ${badgeGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
+                    <div className={`w-full h-48 bg-linear-to-br ${badgeGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
                       <BadgeIcon className="w-20 h-20 text-white/80" />
                       <div className="absolute top-2 left-2">
                         <Badge className={`${badge.verificationStatus === 'verified' ? 'bg-green-500' : badge.verificationStatus === 'pending' ? 'bg-yellow-500' : 'bg-red-500'} text-white`}>
@@ -475,7 +475,7 @@ export default function SustainabilityBadges() {
         </div>
 
         {/* Sustainable Vendors Section */}
-        <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+        <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Globe className="w-6 h-6 mr-2 text-green-600" />

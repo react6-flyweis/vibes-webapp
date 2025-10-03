@@ -7,11 +7,29 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Search, MapPin, Calendar, Users, Star, Heart, 
-  Shuffle, Filter, Sparkles, Zap, Music, Camera,
-  PartyPopper, Gift, Palette, Volume2, Share2,
-  DollarSign, Bot, Smile, Eye, Download
+import {
+  Search,
+  MapPin,
+  Calendar,
+  Users,
+  Star,
+  Heart,
+  Shuffle,
+  Filter,
+  Sparkles,
+  Zap,
+  Music,
+  Camera,
+  PartyPopper,
+  Gift,
+  Palette,
+  Volume2,
+  Share2,
+  DollarSign,
+  Bot,
+  Smile,
+  Eye,
+  Download,
 } from "lucide-react";
 
 export default function PlayfulEventDiscovery() {
@@ -26,7 +44,9 @@ export default function PlayfulEventDiscovery() {
   const [budgetRange, setBudgetRange] = useState([500]);
   const [showSharePreview, setShowSharePreview] = useState(false);
   const [selectedEventForShare, setSelectedEventForShare] = useState(null);
-  const [mascotMessage, setMascotMessage] = useState("Hey! I'm Vibe Bot 🎉 Let me help you find the perfect event!");
+  const [mascotMessage, setMascotMessage] = useState(
+    "Hey! I'm Vibe Bot 🎉 Let me help you find the perfect event!"
+  );
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["/api/events/discover"],
@@ -39,7 +59,7 @@ export default function PlayfulEventDiscovery() {
     { id: "yacht", name: "Yacht", icon: Star, color: "bg-indigo-500" },
     { id: "rooftop", name: "Rooftop", icon: Zap, color: "bg-amber-500" },
     { id: "warehouse", name: "Warehouse", icon: Volume2, color: "bg-red-500" },
-    { id: "beach", name: "Beach", icon: PartyPopper, color: "bg-orange-500" }
+    { id: "beach", name: "Beach", icon: PartyPopper, color: "bg-orange-500" },
   ];
 
   const animationModes = [
@@ -47,7 +67,7 @@ export default function PlayfulEventDiscovery() {
     { id: "slide", name: "Slide", icon: Zap },
     { id: "fade", name: "Fade", icon: Sparkles },
     { id: "flip", name: "Flip", icon: Gift },
-    { id: "scale", name: "Scale", icon: Camera }
+    { id: "scale", name: "Scale", icon: Camera },
   ];
 
   const moodColors = [
@@ -58,20 +78,22 @@ export default function PlayfulEventDiscovery() {
     { name: "Electric Green", color: "#22c55e", mood: "Fresh & Vibrant" },
     { name: "Golden Yellow", color: "#eab308", mood: "Bright & Happy" },
     { name: "Midnight Black", color: "#1f2937", mood: "Elegant & Chic" },
-    { name: "Fire Red", color: "#ef4444", mood: "Bold & Passionate" }
+    { name: "Fire Red", color: "#ef4444", mood: "Bold & Passionate" },
   ];
 
   const filteredEvents = events.filter((event: any) => {
-    const matchesSearch = event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || event.category === selectedCategory;
+    const matchesSearch =
+      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   const toggleLike = (eventId: string) => {
-    setLikedEvents(prev => 
-      prev.includes(eventId) 
-        ? prev.filter(id => id !== eventId)
+    setLikedEvents((prev) =>
+      prev.includes(eventId)
+        ? prev.filter((id) => id !== eventId)
         : [...prev, eventId]
     );
     setShowConfetti(true);
@@ -88,34 +110,47 @@ export default function PlayfulEventDiscovery() {
       bounce: {
         initial: { scale: 0, rotate: -180 },
         animate: { scale: 1, rotate: 0 },
-        transition: { delay: index * 0.1, type: "spring", stiffness: 260, damping: 20 }
+        transition: {
+          delay: index * 0.1,
+          type: "spring",
+          stiffness: 260,
+          damping: 20,
+        },
       },
       slide: {
         initial: { x: -100, opacity: 0 },
         animate: { x: 0, opacity: 1 },
-        transition: { delay: index * 0.1, duration: 0.5 }
+        transition: { delay: index * 0.1, duration: 0.5 },
       },
       fade: {
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
-        transition: { delay: index * 0.15, duration: 0.6 }
+        transition: { delay: index * 0.15, duration: 0.6 },
       },
       flip: {
         initial: { rotateY: -90, opacity: 0 },
         animate: { rotateY: 0, opacity: 1 },
-        transition: { delay: index * 0.1, duration: 0.8 }
+        transition: { delay: index * 0.1, duration: 0.8 },
       },
       scale: {
         initial: { scale: 0.3, opacity: 0 },
         animate: { scale: 1, opacity: 1 },
-        transition: { delay: index * 0.1, type: "spring", stiffness: 300, damping: 15 }
+        transition: {
+          delay: index * 0.1,
+          type: "spring",
+          stiffness: 300,
+          damping: 15,
+        },
       },
       shuffle: {
         animate: { rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] },
-        transition: { duration: 0.5 }
-      }
+        transition: { duration: 0.5 },
+      },
     };
-    return animations[currentAnimation as keyof typeof animations] || animations.bounce;
+    return (
+      animations[currentAnimation as keyof typeof animations] ||
+      animations.bounce
+    );
   };
 
   const getRandomEmoji = () => {
@@ -134,33 +169,39 @@ export default function PlayfulEventDiscovery() {
       "Try adjusting your budget to discover more options! 💰",
       "That color choice gives me great vibes! ✨",
       "Don't forget to check out those highly rated events! ⭐",
-      "Ready to party? Let's find your perfect event! 🎉"
+      "Ready to party? Let's find your perfect event! 🎉",
     ];
     setMascotMessage(messages[Math.floor(Math.random() * messages.length)]);
   };
 
   const getBudgetForecast = (budget: number) => {
     const eventCount = filteredEvents.filter((event: any) => {
-      const price = typeof event.price === 'object' ? event.price.min : event.price;
+      const price =
+        typeof event.price === "object" ? event.price.min : event.price;
       return price <= budget;
     }).length;
-    
+
     return {
       availableEvents: eventCount,
-      recommendation: budget < 300 ? "Consider increasing budget for more options" :
-                    budget > 1000 ? "You have access to premium events!" :
-                    "Great budget range for quality events",
-      mood: budget < 300 ? "limited" : budget > 1000 ? "premium" : "balanced"
+      recommendation:
+        budget < 300
+          ? "Consider increasing budget for more options"
+          : budget > 1000
+          ? "You have access to premium events!"
+          : "Great budget range for quality events",
+      mood: budget < 300 ? "limited" : budget > 1000 ? "premium" : "balanced",
     };
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (Math.random() > 0.7) {
-        const randomCard = document.querySelector('.event-card:nth-child(' + (Math.floor(Math.random() * 6) + 1) + ')');
+        const randomCard = document.querySelector(
+          ".event-card:nth-child(" + (Math.floor(Math.random() * 6) + 1) + ")"
+        );
         if (randomCard) {
-          randomCard.classList.add('pulse-glow');
-          setTimeout(() => randomCard.classList.remove('pulse-glow'), 2000);
+          randomCard.classList.add("pulse-glow");
+          setTimeout(() => randomCard.classList.remove("pulse-glow"), 2000);
         }
       }
     }, 3000);
@@ -169,7 +210,7 @@ export default function PlayfulEventDiscovery() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-blue-900/20 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-blue-900/20 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -177,17 +218,23 @@ export default function PlayfulEventDiscovery() {
             key={i}
             className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-30"
             animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              x: [
+                Math.random() * window.innerWidth,
+                Math.random() * window.innerWidth,
+              ],
+              y: [
+                Math.random() * window.innerHeight,
+                Math.random() * window.innerHeight,
+              ],
             }}
             transition={{
               duration: Math.random() * 20 + 10,
               repeat: Infinity,
-              repeatType: "reverse"
+              repeatType: "reverse",
             }}
             style={{
               left: Math.random() * 100 + "%",
-              top: Math.random() * 100 + "%"
+              top: Math.random() * 100 + "%",
             }}
           />
         ))}
@@ -201,21 +248,21 @@ export default function PlayfulEventDiscovery() {
               <motion.div
                 key={i}
                 className="absolute text-2xl"
-                initial={{ 
-                  x: window.innerWidth / 2, 
+                initial={{
+                  x: window.innerWidth / 2,
                   y: window.innerHeight / 2,
                   scale: 0,
-                  rotate: 0
+                  rotate: 0,
                 }}
-                animate={{ 
+                animate={{
                   x: Math.random() * window.innerWidth,
                   y: window.innerHeight + 100,
                   scale: [0, 1, 0],
-                  rotate: 360
+                  rotate: 360,
                 }}
-                transition={{ 
+                transition={{
                   duration: 2,
-                  ease: "easeOut"
+                  ease: "easeOut",
                 }}
               >
                 {getRandomEmoji()}
@@ -227,29 +274,29 @@ export default function PlayfulEventDiscovery() {
 
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, type: "spring" }}
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <motion.div 
-              className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
+            <motion.div
+              className="p-3 bg-linear-to-r from-purple-600 to-pink-600 rounded-xl"
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             >
               <Sparkles className="h-8 w-8 text-white" />
             </motion.div>
-            <motion.h1 
-              className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
+            <motion.h1
+              className="text-5xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent"
               animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
               Discover Amazing Events
             </motion.h1>
           </div>
-          <motion.p 
+          <motion.p
             className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -260,7 +307,7 @@ export default function PlayfulEventDiscovery() {
         </motion.div>
 
         {/* Enhanced Controls */}
-        <motion.div 
+        <motion.div
           className="space-y-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -287,7 +334,9 @@ export default function PlayfulEventDiscovery() {
                   variant={currentAnimation === mode.id ? "default" : "outline"}
                   size="sm"
                   onClick={() => setCurrentAnimation(mode.id)}
-                  className={`${currentAnimation === mode.id ? 'bg-purple-600' : ''} rounded-xl`}
+                  className={`${
+                    currentAnimation === mode.id ? "bg-purple-600" : ""
+                  } rounded-xl`}
                 >
                   <mode.icon className="h-4 w-4 mr-1" />
                   {mode.name}
@@ -298,7 +347,7 @@ export default function PlayfulEventDiscovery() {
             {/* Shuffle Button */}
             <Button
               onClick={shuffleEvents}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl"
+              className="bg-linear-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl"
             >
               <Shuffle className="h-4 w-4 mr-2" />
               Shuffle
@@ -308,7 +357,7 @@ export default function PlayfulEventDiscovery() {
           {/* Enhanced Features Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Mood Color Palette */}
-            <Card className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <Card className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
               <div className="flex items-center gap-2 mb-3">
                 <Palette className="h-5 w-5 text-purple-600" />
                 <h3 className="font-semibold">Event Mood</h3>
@@ -319,7 +368,9 @@ export default function PlayfulEventDiscovery() {
                     key={color.color}
                     onClick={() => setSelectedMoodColor(color.color)}
                     className={`w-8 h-8 rounded-full border-2 ${
-                      selectedMoodColor === color.color ? 'border-gray-900 dark:border-white scale-110' : 'border-gray-300'
+                      selectedMoodColor === color.color
+                        ? "border-gray-900 dark:border-white scale-110"
+                        : "border-gray-300"
                     }`}
                     style={{ backgroundColor: color.color }}
                     whileHover={{ scale: 1.1 }}
@@ -329,12 +380,13 @@ export default function PlayfulEventDiscovery() {
                 ))}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                {moodColors.find(c => c.color === selectedMoodColor)?.mood || "Select a mood"}
+                {moodColors.find((c) => c.color === selectedMoodColor)?.mood ||
+                  "Select a mood"}
               </p>
             </Card>
 
             {/* Budget Forecast Slider */}
-            <Card className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <Card className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs">
               <div className="flex items-center gap-2 mb-3">
                 <DollarSign className="h-5 w-5 text-green-600" />
                 <h3 className="font-semibold">Budget Range</h3>
@@ -350,7 +402,8 @@ export default function PlayfulEventDiscovery() {
               <div className="text-sm space-y-1">
                 <p className="font-medium">${budgetRange[0]} maximum</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {getBudgetForecast(budgetRange[0]).availableEvents} events available
+                  {getBudgetForecast(budgetRange[0]).availableEvents} events
+                  available
                 </p>
                 <p className="text-xs text-purple-600">
                   {getBudgetForecast(budgetRange[0]).recommendation}
@@ -359,7 +412,7 @@ export default function PlayfulEventDiscovery() {
             </Card>
 
             {/* Recommendation Mascot */}
-            <Card className="p-4 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200">
+            <Card className="p-4 bg-linear-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200">
               <div className="flex items-start gap-3">
                 <motion.div
                   className="p-2 bg-purple-600 rounded-full"
@@ -369,7 +422,9 @@ export default function PlayfulEventDiscovery() {
                   <Bot className="h-5 w-5 text-white" />
                 </motion.div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-1">Vibe Bot</h3>
+                  <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-1">
+                    Vibe Bot
+                  </h3>
                   <p className="text-sm text-purple-700 dark:text-purple-300 leading-relaxed">
                     {mascotMessage}
                   </p>
@@ -389,7 +444,7 @@ export default function PlayfulEventDiscovery() {
         </motion.div>
 
         {/* Category Pills */}
-        <motion.div 
+        <motion.div
           className="flex flex-wrap gap-3 mb-8 justify-center"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -402,7 +457,7 @@ export default function PlayfulEventDiscovery() {
               className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
                 selectedCategory === category.id
                   ? `${category.color} text-white shadow-lg scale-110`
-                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:shadow-md'
+                  : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 hover:shadow-md"
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -424,12 +479,16 @@ export default function PlayfulEventDiscovery() {
                 key={index}
                 className="h-64 bg-white dark:bg-slate-800 rounded-2xl"
                 animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: index * 0.2 }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  delay: index * 0.2,
+                }}
               />
             ))}
           </div>
         ) : (
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             layout
           >
@@ -441,17 +500,17 @@ export default function PlayfulEventDiscovery() {
                   {...getCardAnimation(index)}
                   layout
                   exit={{ scale: 0, opacity: 0 }}
-                  whileHover={{ 
-                    scale: 1.05, 
+                  whileHover={{
+                    scale: 1.05,
                     rotateY: 5,
-                    transition: { duration: 0.2 }
+                    transition: { duration: 0.2 },
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl overflow-hidden relative group cursor-pointer">
+                  <Card className="border-0 shadow-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs rounded-2xl overflow-hidden relative group cursor-pointer">
                     {/* Like Button */}
                     <motion.button
-                      className="absolute top-4 right-4 z-10 p-2 bg-white/80 dark:bg-slate-800/80 rounded-full backdrop-blur-sm"
+                      className="absolute top-4 right-4 z-10 p-2 bg-white/80 dark:bg-slate-800/80 rounded-full backdrop-blur-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleLike(event.id);
@@ -459,12 +518,12 @@ export default function PlayfulEventDiscovery() {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <Heart 
+                      <Heart
                         className={`h-5 w-5 ${
-                          likedEvents.includes(event.id) 
-                            ? 'text-red-500 fill-current' 
-                            : 'text-gray-400'
-                        }`} 
+                          likedEvents.includes(event.id)
+                            ? "text-red-500 fill-current"
+                            : "text-gray-400"
+                        }`}
                       />
                     </motion.button>
 
@@ -477,19 +536,20 @@ export default function PlayfulEventDiscovery() {
                         whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.3 }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      
+                      <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+
                       {/* Category Badge */}
-                      <Badge 
-                        className="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0"
-                      >
-                        {event.category?.replace('-', ' ').toUpperCase()}
+                      <Badge className="absolute top-4 left-4 bg-linear-to-r from-purple-600 to-pink-600 text-white border-0">
+                        {event.category?.replace("-", " ").toUpperCase()}
                       </Badge>
 
                       {/* Price */}
-                      <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                      <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs rounded-lg px-3 py-1">
                         <span className="font-bold text-purple-600">
-                          From ${typeof event.price === 'object' ? event.price.min : event.price}
+                          From $
+                          {typeof event.price === "object"
+                            ? event.price.min
+                            : event.price}
                         </span>
                       </div>
                     </div>
@@ -499,7 +559,7 @@ export default function PlayfulEventDiscovery() {
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors">
                           {event.title}
                         </h3>
-                        
+
                         <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
                           {event.description}
                         </p>
@@ -522,37 +582,45 @@ export default function PlayfulEventDiscovery() {
                           </div>
                           <div className="flex items-center gap-1">
                             <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium">{event.rating || 4.5}</span>
+                            <span className="text-sm font-medium">
+                              {event.rating || 4.5}
+                            </span>
                           </div>
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             className="flex-1 rounded-xl border-purple-200 hover:bg-purple-50"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              console.log("View Details clicked for event:", event.id);
+                              console.log(
+                                "View Details clicked for event:",
+                                event.id
+                              );
                               setLocation(`/enhanced-event/${event.id}`);
                             }}
                           >
                             View Details
                           </Button>
-                          <Button 
-                            size="sm" 
-                            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl"
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              console.log("Book Now clicked for event:", event.id);
+                              console.log(
+                                "Book Now clicked for event:",
+                                event.id
+                              );
                               setLocation(`/party-booking/${event.id}`);
                             }}
                           >
                             Book Now
                           </Button>
-                          
+
                           {/* Share Button */}
                           <Button
                             size="sm"
@@ -573,7 +641,7 @@ export default function PlayfulEventDiscovery() {
                     </CardContent>
 
                     {/* Hover Glow Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-pink-600/0 to-blue-600/0 group-hover:from-purple-600/10 group-hover:via-pink-600/10 group-hover:to-blue-600/10 transition-all duration-300 rounded-2xl" />
+                    <div className="absolute inset-0 bg-linear-to-r from-purple-600/0 via-pink-600/0 to-blue-600/0 group-hover:from-purple-600/10 group-hover:via-pink-600/10 group-hover:to-blue-600/10 transition-all duration-300 rounded-2xl" />
                   </Card>
                 </motion.div>
               ))}
@@ -583,7 +651,7 @@ export default function PlayfulEventDiscovery() {
 
         {/* No Results */}
         {!isLoading && filteredEvents.length === 0 && (
-          <motion.div 
+          <motion.div
             className="text-center py-12"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -601,12 +669,12 @@ export default function PlayfulEventDiscovery() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Try adjusting your search or category filters
             </p>
-            <Button 
+            <Button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedCategory("all");
               }}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
+              className="bg-linear-to-r from-purple-600 to-pink-600 rounded-xl"
             >
               Reset Filters
             </Button>
@@ -617,7 +685,7 @@ export default function PlayfulEventDiscovery() {
         <AnimatePresence>
           {showSharePreview && selectedEventForShare && (
             <motion.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -643,7 +711,10 @@ export default function PlayfulEventDiscovery() {
                 </div>
 
                 {/* Share Preview */}
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 mb-4" style={{ borderColor: selectedMoodColor }}>
+                <div
+                  className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 mb-4"
+                  style={{ borderColor: selectedMoodColor }}
+                >
                   <div className="flex gap-3">
                     <img
                       src={selectedEventForShare.image}
@@ -651,15 +722,26 @@ export default function PlayfulEventDiscovery() {
                       className="w-16 h-16 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-sm">{selectedEventForShare.title}</h4>
+                      <h4 className="font-semibold text-sm">
+                        {selectedEventForShare.title}
+                      </h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         {selectedEventForShare.description?.slice(0, 80)}...
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs">
-                        <Badge style={{ backgroundColor: selectedMoodColor, color: 'white' }}>
-                          {selectedEventForShare.category?.replace('-', ' ').toUpperCase()}
+                        <Badge
+                          style={{
+                            backgroundColor: selectedMoodColor,
+                            color: "white",
+                          }}
+                        >
+                          {selectedEventForShare.category
+                            ?.replace("-", " ")
+                            .toUpperCase()}
                         </Badge>
-                        <span className="text-gray-500">{selectedEventForShare.city}</span>
+                        <span className="text-gray-500">
+                          {selectedEventForShare.city}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -671,7 +753,7 @@ export default function PlayfulEventDiscovery() {
                     { name: "Facebook", color: "#1877f2", icon: "📘" },
                     { name: "Twitter", color: "#1da1f2", icon: "🐦" },
                     { name: "Instagram", color: "#e4405f", icon: "📷" },
-                    { name: "WhatsApp", color: "#25d366", icon: "💬" }
+                    { name: "WhatsApp", color: "#25d366", icon: "💬" },
                   ].map((platform) => (
                     <Button
                       key={platform.name}
@@ -703,11 +785,13 @@ export default function PlayfulEventDiscovery() {
                   <Button
                     size="sm"
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://vibes.com/events/${selectedEventForShare.id}`);
+                      navigator.clipboard.writeText(
+                        `https://vibes.com/events/${selectedEventForShare.id}`
+                      );
                       setShowConfetti(true);
                       setTimeout(() => setShowConfetti(false), 1000);
                     }}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="bg-linear-to-r from-purple-600 to-pink-600"
                   >
                     <Download className="h-4 w-4 mr-1" />
                     Copy

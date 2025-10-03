@@ -9,8 +9,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Phone, MapPin, Calendar, Crown, Settings, Bell, Eye, Lock, Camera, Star, Trophy, Sparkles } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Crown,
+  Settings,
+  Bell,
+  Eye,
+  Lock,
+  Camera,
+  Star,
+  Trophy,
+  Sparkles,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -56,8 +77,8 @@ const mockUserProfile: UserProfile = {
     marketingEmails: true,
     eventReminders: true,
     theme: "system",
-    language: "en"
-  }
+    language: "en",
+  },
 };
 
 export default function ProfilePage() {
@@ -68,36 +89,39 @@ export default function ProfilePage() {
 
   const updateProfile = useMutation({
     mutationFn: async (updatedProfile: Partial<UserProfile>) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return updatedProfile;
     },
     onSuccess: () => {
       setIsEditing(false);
       toast({
         title: "✅ Profile Updated!",
-        description: "Your changes have been saved successfully."
+        description: "Your changes have been saved successfully.",
       });
-    }
+    },
   });
 
   const updatePreferences = useMutation({
-    mutationFn: async (preferences: UserProfile['preferences']) => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+    mutationFn: async (preferences: UserProfile["preferences"]) => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
       return preferences;
     },
     onSuccess: () => {
       toast({
         title: "⚙️ Preferences Saved!",
-        description: "Your notification settings have been updated."
+        description: "Your notification settings have been updated.",
       });
-    }
+    },
   });
 
   const handleSaveProfile = () => {
     updateProfile.mutate(profile);
   };
 
-  const handlePreferenceChange = (key: keyof UserProfile['preferences'], value: any) => {
+  const handlePreferenceChange = (
+    key: keyof UserProfile["preferences"],
+    value: any
+  ) => {
     const newPreferences = { ...profile.preferences, [key]: value };
     setProfile({ ...profile, preferences: newPreferences });
     updatePreferences.mutate(newPreferences);
@@ -106,22 +130,32 @@ export default function ProfilePage() {
   const getSubscriptionBadge = (tier: string) => {
     switch (tier) {
       case "premium":
-        return <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"><Crown className="h-3 w-3 mr-1" />Premium</Badge>;
+        return (
+          <Badge className="bg-linear-to-r from-purple-600 to-pink-600 text-white">
+            <Crown className="h-3 w-3 mr-1" />
+            Premium
+          </Badge>
+        );
       case "enterprise":
-        return <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"><Trophy className="h-3 w-3 mr-1" />Enterprise</Badge>;
+        return (
+          <Badge className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
+            <Trophy className="h-3 w-3 mr-1" />
+            Enterprise
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Free</Badge>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <User className="h-8 w-8 text-blue-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               My Profile
             </h1>
             <Settings className="h-8 w-8 text-purple-600" />
@@ -135,21 +169,29 @@ export default function ProfilePage() {
               <div className="relative">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={profile.profileImage} />
-                  <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                    {profile.fullName.split(' ').map(n => n[0]).join('')}
+                  <AvatarFallback className="text-2xl bg-linear-to-r from-blue-600 to-purple-600 text-white">
+                    {profile.fullName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
-                <Button size="sm" className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0">
+                <Button
+                  size="sm"
+                  className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
+                >
                   <Camera className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-2xl font-bold">{profile.fullName}</h2>
                   {getSubscriptionBadge(profile.subscriptionTier)}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-2">@{profile.username}</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  @{profile.username}
+                </p>
                 <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
@@ -161,7 +203,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4" />
-                    <span>Member since {new Date(profile.joinDate).toLocaleDateString()}</span>
+                    <span>
+                      Member since{" "}
+                      {new Date(profile.joinDate).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -196,7 +241,9 @@ export default function ProfilePage() {
                     <Input
                       id="fullName"
                       value={profile.fullName}
-                      onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
+                      onChange={(e) =>
+                        setProfile({ ...profile, fullName: e.target.value })
+                      }
                       disabled={!isEditing}
                     />
                   </div>
@@ -206,7 +253,9 @@ export default function ProfilePage() {
                       id="email"
                       type="email"
                       value={profile.email}
-                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      onChange={(e) =>
+                        setProfile({ ...profile, email: e.target.value })
+                      }
                       disabled={!isEditing}
                     />
                   </div>
@@ -215,7 +264,9 @@ export default function ProfilePage() {
                     <Input
                       id="phone"
                       value={profile.phone || ""}
-                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                      onChange={(e) =>
+                        setProfile({ ...profile, phone: e.target.value })
+                      }
                       disabled={!isEditing}
                     />
                   </div>
@@ -224,18 +275,22 @@ export default function ProfilePage() {
                     <Input
                       id="location"
                       value={profile.location || ""}
-                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                      onChange={(e) =>
+                        setProfile({ ...profile, location: e.target.value })
+                      }
                       disabled={!isEditing}
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
                   <Textarea
                     id="bio"
                     value={profile.bio || ""}
-                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, bio: e.target.value })
+                    }
                     disabled={!isEditing}
                     placeholder="Tell us about yourself and your event planning style..."
                     className="min-h-[100px]"
@@ -267,44 +322,60 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Email Notifications</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Receive updates about your events via email</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Receive updates about your events via email
+                    </p>
                   </div>
                   <Switch
                     checked={profile.preferences.emailNotifications}
-                    onCheckedChange={(checked) => handlePreferenceChange('emailNotifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handlePreferenceChange("emailNotifications", checked)
+                    }
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">SMS Notifications</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Get text messages for urgent updates</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Get text messages for urgent updates
+                    </p>
                   </div>
                   <Switch
                     checked={profile.preferences.smsNotifications}
-                    onCheckedChange={(checked) => handlePreferenceChange('smsNotifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handlePreferenceChange("smsNotifications", checked)
+                    }
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Marketing Emails</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Receive tips, trends, and platform updates</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Receive tips, trends, and platform updates
+                    </p>
                   </div>
                   <Switch
                     checked={profile.preferences.marketingEmails}
-                    onCheckedChange={(checked) => handlePreferenceChange('marketingEmails', checked)}
+                    onCheckedChange={(checked) =>
+                      handlePreferenceChange("marketingEmails", checked)
+                    }
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Event Reminders</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Get reminded about upcoming events</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Get reminded about upcoming events
+                    </p>
                   </div>
                   <Switch
                     checked={profile.preferences.eventReminders}
-                    onCheckedChange={(checked) => handlePreferenceChange('eventReminders', checked)}
+                    onCheckedChange={(checked) =>
+                      handlePreferenceChange("eventReminders", checked)
+                    }
                   />
                 </div>
               </CardContent>
@@ -322,7 +393,9 @@ export default function ProfilePage() {
                   <Label>Theme</Label>
                   <Select
                     value={profile.preferences.theme}
-                    onValueChange={(value) => handlePreferenceChange('theme', value as any)}
+                    onValueChange={(value) =>
+                      handlePreferenceChange("theme", value as any)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -339,7 +412,9 @@ export default function ProfilePage() {
                   <Label>Language</Label>
                   <Select
                     value={profile.preferences.language}
-                    onValueChange={(value) => handlePreferenceChange('language', value)}
+                    onValueChange={(value) =>
+                      handlePreferenceChange("language", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -368,7 +443,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="text-xl font-semibold">Premium Plan</h3>
-                    <p className="text-gray-600 dark:text-gray-400">$8.99/month</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      $8.99/month
+                    </p>
                   </div>
                   {getSubscriptionBadge(profile.subscriptionTier)}
                 </div>
@@ -396,9 +473,7 @@ export default function ProfilePage() {
                   <Button variant="outline" className="flex-1">
                     Change Plan
                   </Button>
-                  <Button variant="outline">
-                    Billing History
-                  </Button>
+                  <Button variant="outline">Billing History</Button>
                 </div>
               </CardContent>
             </Card>
@@ -416,7 +491,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h4 className="font-medium">Password</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Last changed 3 months ago</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Last changed 3 months ago
+                    </p>
                   </div>
                   <Button variant="outline">Change Password</Button>
                 </div>
@@ -424,7 +501,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h4 className="font-medium">Two-Factor Authentication</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Add an extra layer of security
+                    </p>
                   </div>
                   <Button variant="outline">Enable 2FA</Button>
                 </div>
@@ -432,7 +511,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h4 className="font-medium">Active Sessions</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Manage devices signed into your account</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Manage devices signed into your account
+                    </p>
                   </div>
                   <Button variant="outline">View Sessions</Button>
                 </div>

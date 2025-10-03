@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -9,14 +15,14 @@ import { Separator } from "@/components/ui/separator";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  CreditCard, 
-  Smartphone, 
-  QrCode, 
-  Waves, 
-  CheckCircle, 
-  AlertCircle, 
-  Timer, 
+import {
+  CreditCard,
+  Smartphone,
+  QrCode,
+  Waves,
+  CheckCircle,
+  AlertCircle,
+  Timer,
   Zap,
   Gift,
   Star,
@@ -34,7 +40,7 @@ import {
   Plus,
   Minus,
   ShoppingCart,
-  Loader2
+  Loader2,
 } from "lucide-react";
 
 interface PaymentMethod {
@@ -52,7 +58,7 @@ interface PaymentStep {
   id: string;
   title: string;
   description: string;
-  status: 'pending' | 'processing' | 'completed' | 'error';
+  status: "pending" | "processing" | "completed" | "error";
   progress: number;
 }
 
@@ -67,8 +73,11 @@ interface DrinkItem {
 }
 
 export default function InteractiveDrinkPayment() {
-  const [currentStep, setCurrentStep] = useState<'cart' | 'payment' | 'processing' | 'confirmation'>('cart');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [currentStep, setCurrentStep] = useState<
+    "cart" | "payment" | "processing" | "confirmation"
+  >("cart");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
   const [cartItems, setCartItems] = useState<DrinkItem[]>([]);
   const [paymentSteps, setPaymentSteps] = useState<PaymentStep[]>([]);
   const [paymentProgress, setPaymentProgress] = useState(0);
@@ -76,7 +85,7 @@ export default function InteractiveDrinkPayment() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [tipAmount, setTipAmount] = useState(0);
-  const [promoCode, setPromoCode] = useState('');
+  const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
 
   const { toast } = useToast();
@@ -91,7 +100,7 @@ export default function InteractiveDrinkPayment() {
         price: 12,
         quantity: 2,
         category: "cocktail",
-        customizations: ["Extra Mint", "Less Sugar"]
+        customizations: ["Extra Mint", "Less Sugar"],
       },
       {
         id: "drink-espresso-martini",
@@ -99,51 +108,55 @@ export default function InteractiveDrinkPayment() {
         price: 14,
         quantity: 1,
         category: "cocktail",
-        customizations: []
-      }
+        customizations: [],
+      },
     ]);
   }, []);
 
   const paymentMethods: PaymentMethod[] = [
     {
-      id: 'nfc',
-      name: 'NFC Wristband',
-      description: 'Tap your wristband to pay instantly',
+      id: "nfc",
+      name: "NFC Wristband",
+      description: "Tap your wristband to pay instantly",
       icon: Waves,
-      processingTime: '< 1 second',
+      processingTime: "< 1 second",
       discount: 5,
       popular: true,
-      available: true
+      available: true,
     },
     {
-      id: 'qr',
-      name: 'QR Code',
-      description: 'Scan with your phone to pay',
+      id: "qr",
+      name: "QR Code",
+      description: "Scan with your phone to pay",
       icon: QrCode,
-      processingTime: '< 3 seconds',
-      available: true
+      processingTime: "< 3 seconds",
+      available: true,
     },
     {
-      id: 'mobile',
-      name: 'Mobile Payment',
-      description: 'Apple Pay, Google Pay, Samsung Pay',
+      id: "mobile",
+      name: "Mobile Payment",
+      description: "Apple Pay, Google Pay, Samsung Pay",
       icon: Smartphone,
-      processingTime: '< 5 seconds',
-      available: true
+      processingTime: "< 5 seconds",
+      available: true,
     },
     {
-      id: 'card',
-      name: 'Credit Card',
-      description: 'Traditional card payment',
+      id: "card",
+      name: "Credit Card",
+      description: "Traditional card payment",
       icon: CreditCard,
-      processingTime: '< 10 seconds',
-      available: false
-    }
+      processingTime: "< 10 seconds",
+      available: false,
+    },
   ];
 
   const paymentProcessMutation = useMutation({
     mutationFn: async (paymentData: any) => {
-      const response = await apiRequest("POST", "/api/drinks/interactive-payment", paymentData);
+      const response = await apiRequest(
+        "POST",
+        "/api/drinks/interactive-payment",
+        paymentData
+      );
       return response.json();
     },
     onSuccess: (data) => {
@@ -151,28 +164,35 @@ export default function InteractiveDrinkPayment() {
       setLoyaltyPoints(data.loyaltyPointsEarned || 25);
       toast({
         title: "Payment Successful!",
-        description: `Order confirmed! You earned ${data.loyaltyPointsEarned || 25} loyalty points.`,
+        description: `Order confirmed! You earned ${
+          data.loyaltyPointsEarned || 25
+        } loyalty points.`,
       });
-      
+
       // Clear cart and refresh data
       setCartItems([]);
       queryClient.invalidateQueries({ queryKey: ["/api/drinks/orders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/drinks/real-time-stats"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/drinks/real-time-stats"],
+      });
     },
     onError: (error) => {
       toast({
         title: "Payment Failed",
-        description: "There was an issue processing your payment. Please try again.",
+        description:
+          "There was an issue processing your payment. Please try again.",
         variant: "destructive",
       });
-      setCurrentStep('payment');
+      setCurrentStep("payment");
       setIsProcessing(false);
     },
   });
 
   const promoMutation = useMutation({
     mutationFn: async (code: string) => {
-      const response = await apiRequest("POST", "/api/drinks/apply-promo", { code });
+      const response = await apiRequest("POST", "/api/drinks/apply-promo", {
+        code,
+      });
       return response.json();
     },
     onSuccess: (data) => {
@@ -191,17 +211,20 @@ export default function InteractiveDrinkPayment() {
     },
   });
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   const discountAmount = (subtotal * discount) / 100;
   const tip = tipAmount;
   const total = subtotal - discountAmount + tip;
 
   const updateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      setCartItems(prev => prev.filter(item => item.id !== itemId));
+      setCartItems((prev) => prev.filter((item) => item.id !== itemId));
     } else {
-      setCartItems(prev => 
-        prev.map(item => 
+      setCartItems((prev) =>
+        prev.map((item) =>
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
       );
@@ -210,26 +233,55 @@ export default function InteractiveDrinkPayment() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "cocktail": return Martini;
-      case "beer": return Beer;
-      case "wine": return Wine;
-      case "coffee": return Coffee;
-      default: return Wine;
+      case "cocktail":
+        return Martini;
+      case "beer":
+        return Beer;
+      case "wine":
+        return Wine;
+      case "coffee":
+        return Coffee;
+      default:
+        return Wine;
     }
   };
 
   const initializePaymentSteps = (method: string) => {
     const baseSteps = [
-      { id: 'validate', title: 'Validating Payment', description: 'Checking payment method', status: 'processing' as const, progress: 0 },
-      { id: 'process', title: 'Processing Payment', description: 'Securing transaction', status: 'pending' as const, progress: 0 },
-      { id: 'confirm', title: 'Confirming Order', description: 'Creating your order', status: 'pending' as const, progress: 0 },
-      { id: 'notify', title: 'Notifying Bar', description: 'Sending to preparation queue', status: 'pending' as const, progress: 0 }
+      {
+        id: "validate",
+        title: "Validating Payment",
+        description: "Checking payment method",
+        status: "processing" as const,
+        progress: 0,
+      },
+      {
+        id: "process",
+        title: "Processing Payment",
+        description: "Securing transaction",
+        status: "pending" as const,
+        progress: 0,
+      },
+      {
+        id: "confirm",
+        title: "Confirming Order",
+        description: "Creating your order",
+        status: "pending" as const,
+        progress: 0,
+      },
+      {
+        id: "notify",
+        title: "Notifying Bar",
+        description: "Sending to preparation queue",
+        status: "pending" as const,
+        progress: 0,
+      },
     ];
 
-    if (method === 'nfc') {
-      baseSteps[0].description = 'Reading NFC wristband';
-    } else if (method === 'qr') {
-      baseSteps[0].description = 'Processing QR scan';
+    if (method === "nfc") {
+      baseSteps[0].description = "Reading NFC wristband";
+    } else if (method === "qr") {
+      baseSteps[0].description = "Processing QR scan";
     }
 
     setPaymentSteps(baseSteps);
@@ -245,29 +297,43 @@ export default function InteractiveDrinkPayment() {
       return;
     }
 
-    setCurrentStep('processing');
+    setCurrentStep("processing");
     setIsProcessing(true);
     initializePaymentSteps(selectedPaymentMethod);
 
     // Simulate payment processing with realistic timing
     const delays = { nfc: 800, qr: 2000, mobile: 3000, card: 5000 };
-    const totalDelay = delays[selectedPaymentMethod as keyof typeof delays] || 3000;
+    const totalDelay =
+      delays[selectedPaymentMethod as keyof typeof delays] || 3000;
     const stepDelay = totalDelay / 4;
 
     for (let i = 0; i < paymentSteps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, stepDelay));
-      
-      setPaymentSteps(prev => prev.map((step, index) => {
-        if (index < i) return { ...step, status: 'completed', progress: 100 };
-        if (index === i) return { ...step, status: 'processing', progress: Math.random() * 50 + 50 };
-        return step;
-      }));
-      
-      setPaymentProgress((i + 1) / 4 * 100);
+      await new Promise((resolve) => setTimeout(resolve, stepDelay));
+
+      setPaymentSteps((prev) =>
+        prev.map((step, index) => {
+          if (index < i) return { ...step, status: "completed", progress: 100 };
+          if (index === i)
+            return {
+              ...step,
+              status: "processing",
+              progress: Math.random() * 50 + 50,
+            };
+          return step;
+        })
+      );
+
+      setPaymentProgress(((i + 1) / 4) * 100);
     }
 
     // Complete all steps
-    setPaymentSteps(prev => prev.map(step => ({ ...step, status: 'completed' as const, progress: 100 })));
+    setPaymentSteps((prev) =>
+      prev.map((step) => ({
+        ...step,
+        status: "completed" as const,
+        progress: 100,
+      }))
+    );
     setPaymentProgress(100);
 
     // Process payment
@@ -278,13 +344,13 @@ export default function InteractiveDrinkPayment() {
       tipAmount: tip,
       promoCode: promoCode || null,
       discount: discountAmount,
-      vendorId: "vendor-paradise-bar" // Automatically credit vendor account
+      vendorId: "vendor-paradise-bar", // Automatically credit vendor account
     };
 
     paymentProcessMutation.mutate(paymentData);
-    
+
     setTimeout(() => {
-      setCurrentStep('confirmation');
+      setCurrentStep("confirmation");
       setIsProcessing(false);
     }, 1000);
   };
@@ -302,20 +368,29 @@ export default function InteractiveDrinkPayment() {
           <ShoppingCart className="mr-2 h-6 w-6" />
           Your Order
         </CardTitle>
-        <CardDescription>Review your items and proceed to payment</CardDescription>
+        <CardDescription>
+          Review your items and proceed to payment
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {cartItems.map((item) => {
           const Icon = getCategoryIcon(item.category);
           return (
-            <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div
+              key={item.id}
+              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
               <div className="flex items-center space-x-4">
                 <Icon className="h-8 w-8 text-purple-600" />
                 <div>
                   <h4 className="font-semibold">{item.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">${item.price}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    ${item.price}
+                  </p>
                   {item.customizations.length > 0 && (
-                    <p className="text-xs text-gray-500">{item.customizations.join(', ')}</p>
+                    <p className="text-xs text-gray-500">
+                      {item.customizations.join(", ")}
+                    </p>
                   )}
                 </div>
               </div>
@@ -327,7 +402,9 @@ export default function InteractiveDrinkPayment() {
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                <span className="w-8 text-center font-semibold">
+                  {item.quantity}
+                </span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -353,11 +430,15 @@ export default function InteractiveDrinkPayment() {
             onChange={(e) => setPromoCode(e.target.value)}
             disabled={promoMutation.isPending}
           />
-          <Button 
+          <Button
             onClick={applyPromoCode}
             disabled={!promoCode.trim() || promoMutation.isPending}
           >
-            {promoMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
+            {promoMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Apply"
+            )}
           </Button>
         </div>
 
@@ -365,7 +446,7 @@ export default function InteractiveDrinkPayment() {
         <div>
           <Label className="text-sm font-medium">Add Tip</Label>
           <div className="flex space-x-2 mt-2">
-            {[0, 2, 3, 5].map(amount => (
+            {[0, 2, 3, 5].map((amount) => (
               <Button
                 key={amount}
                 size="sm"
@@ -402,10 +483,10 @@ export default function InteractiveDrinkPayment() {
           </div>
         </div>
 
-        <Button 
-          className="w-full" 
+        <Button
+          className="w-full"
           size="lg"
-          onClick={() => setCurrentStep('payment')}
+          onClick={() => setCurrentStep("payment")}
           disabled={cartItems.length === 0}
         >
           Proceed to Payment
@@ -422,7 +503,9 @@ export default function InteractiveDrinkPayment() {
           <CreditCard className="mr-2 h-6 w-6" />
           Choose Payment Method
         </CardTitle>
-        <CardDescription>Select how you'd like to pay for your drinks</CardDescription>
+        <CardDescription>
+          Select how you'd like to pay for your drinks
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
@@ -433,16 +516,22 @@ export default function InteractiveDrinkPayment() {
                 key={method.id}
                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                   selectedPaymentMethod === method.id
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
                     : method.available
-                    ? 'border-gray-200 hover:border-gray-300'
-                    : 'border-gray-100 opacity-50 cursor-not-allowed'
+                    ? "border-gray-200 hover:border-gray-300"
+                    : "border-gray-100 opacity-50 cursor-not-allowed"
                 }`}
-                onClick={() => method.available && setSelectedPaymentMethod(method.id)}
+                onClick={() =>
+                  method.available && setSelectedPaymentMethod(method.id)
+                }
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <Icon className={`h-8 w-8 ${method.available ? 'text-purple-600' : 'text-gray-400'}`} />
+                    <Icon
+                      className={`h-8 w-8 ${
+                        method.available ? "text-purple-600" : "text-gray-400"
+                      }`}
+                    />
                     <div>
                       <div className="flex items-center space-x-2">
                         <h4 className="font-semibold">{method.name}</h4>
@@ -458,12 +547,18 @@ export default function InteractiveDrinkPayment() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">{method.description}</p>
-                      <p className="text-xs text-gray-500">{method.processingTime}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {method.description}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {method.processingTime}
+                      </p>
                     </div>
                   </div>
                   {!method.available && (
-                    <Badge variant="destructive" className="text-xs">Unavailable</Badge>
+                    <Badge variant="destructive" className="text-xs">
+                      Unavailable
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -472,15 +567,15 @@ export default function InteractiveDrinkPayment() {
         </div>
 
         <div className="flex space-x-3 pt-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setCurrentStep('cart')}
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep("cart")}
             className="flex-1"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Cart
           </Button>
-          <Button 
+          <Button
             onClick={processPayment}
             disabled={!selectedPaymentMethod}
             className="flex-1"
@@ -509,29 +604,37 @@ export default function InteractiveDrinkPayment() {
             ${total.toFixed(2)}
           </div>
           <p className="text-gray-600 dark:text-gray-300">
-            Processing via {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
+            Processing via{" "}
+            {paymentMethods.find((m) => m.id === selectedPaymentMethod)?.name}
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="text-center">
             <Progress value={paymentProgress} className="w-full" />
-            <p className="text-sm text-gray-500 mt-2">{Math.round(paymentProgress)}% complete</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {Math.round(paymentProgress)}% complete
+            </p>
           </div>
 
           {paymentSteps.map((step, index) => (
             <div key={step.id} className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step.status === 'completed' ? 'bg-green-500 text-white' :
-                step.status === 'processing' ? 'bg-purple-500 text-white' :
-                step.status === 'error' ? 'bg-red-500 text-white' :
-                'bg-gray-200 text-gray-400'
-              }`}>
-                {step.status === 'completed' ? (
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  step.status === "completed"
+                    ? "bg-green-500 text-white"
+                    : step.status === "processing"
+                    ? "bg-purple-500 text-white"
+                    : step.status === "error"
+                    ? "bg-red-500 text-white"
+                    : "bg-gray-200 text-gray-400"
+                }`}
+              >
+                {step.status === "completed" ? (
                   <CheckCircle className="h-4 w-4" />
-                ) : step.status === 'processing' ? (
+                ) : step.status === "processing" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
-                ) : step.status === 'error' ? (
+                ) : step.status === "error" ? (
                   <AlertCircle className="h-4 w-4" />
                 ) : (
                   <Timer className="h-4 w-4" />
@@ -539,8 +642,10 @@ export default function InteractiveDrinkPayment() {
               </div>
               <div className="flex-1">
                 <h4 className="font-medium">{step.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{step.description}</p>
-                {step.status === 'processing' && (
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {step.description}
+                </p>
+                {step.status === "processing" && (
                   <Progress value={step.progress} className="w-full mt-1" />
                 )}
               </div>
@@ -554,19 +659,26 @@ export default function InteractiveDrinkPayment() {
   const renderConfirmation = () => (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="text-center">
-        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-          showCelebration ? 'bg-green-500 animate-pulse' : 'bg-green-500'
-        }`}>
+        <div
+          className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+            showCelebration ? "bg-green-500 animate-pulse" : "bg-green-500"
+          }`}
+        >
           <CheckCircle className="h-8 w-8 text-white" />
         </div>
         <CardTitle className="text-2xl">Payment Successful!</CardTitle>
-        <CardDescription>Your order has been confirmed and sent to the bar</CardDescription>
+        <CardDescription>
+          Your order has been confirmed and sent to the bar
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-center space-y-2">
-          <div className="text-3xl font-bold text-green-600">${total.toFixed(2)}</div>
+          <div className="text-3xl font-bold text-green-600">
+            ${total.toFixed(2)}
+          </div>
           <p className="text-gray-600 dark:text-gray-300">
-            Paid via {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
+            Paid via{" "}
+            {paymentMethods.find((m) => m.id === selectedPaymentMethod)?.name}
           </p>
         </div>
 
@@ -574,7 +686,9 @@ export default function InteractiveDrinkPayment() {
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-center">
             <div className="flex items-center justify-center space-x-2 mb-2">
               <Star className="h-5 w-5 text-yellow-600" />
-              <span className="font-semibold">You earned {loyaltyPoints} loyalty points!</span>
+              <span className="font-semibold">
+                You earned {loyaltyPoints} loyalty points!
+              </span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300">
               Use points for discounts on future orders
@@ -586,7 +700,9 @@ export default function InteractiveDrinkPayment() {
           <h4 className="font-semibold">Order Summary:</h4>
           {cartItems.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
-              <span>{item.name} x{item.quantity}</span>
+              <span>
+                {item.name} x{item.quantity}
+              </span>
               <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
@@ -595,7 +711,9 @@ export default function InteractiveDrinkPayment() {
         <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
           <div className="flex items-center space-x-2 mb-2">
             <Timer className="h-5 w-5 text-purple-600" />
-            <span className="font-semibold">Estimated wait time: 5-8 minutes</span>
+            <span className="font-semibold">
+              Estimated wait time: 5-8 minutes
+            </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             You'll receive a notification when your order is ready for pickup
@@ -603,15 +721,15 @@ export default function InteractiveDrinkPayment() {
         </div>
 
         <div className="flex space-x-3">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => {
-              setCurrentStep('cart');
-              setSelectedPaymentMethod('');
+              setCurrentStep("cart");
+              setSelectedPaymentMethod("");
               setPaymentProgress(0);
               setShowCelebration(false);
               setTipAmount(0);
-              setPromoCode('');
+              setPromoCode("");
               setDiscount(0);
             }}
             className="flex-1"
@@ -628,7 +746,7 @@ export default function InteractiveDrinkPayment() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 p-4">
       <div className="container mx-auto py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -644,31 +762,47 @@ export default function InteractiveDrinkPayment() {
         <div className="flex justify-center mb-8">
           <div className="flex items-center space-x-4">
             {[
-              { step: 'cart', label: 'Cart', icon: ShoppingCart },
-              { step: 'payment', label: 'Payment', icon: CreditCard },
-              { step: 'processing', label: 'Processing', icon: Loader2 },
-              { step: 'confirmation', label: 'Confirmation', icon: CheckCircle }
+              { step: "cart", label: "Cart", icon: ShoppingCart },
+              { step: "payment", label: "Payment", icon: CreditCard },
+              { step: "processing", label: "Processing", icon: Loader2 },
+              {
+                step: "confirmation",
+                label: "Confirmation",
+                icon: CheckCircle,
+              },
             ].map(({ step, label, icon: Icon }, index) => (
               <div key={step} className="flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentStep === step ? 'bg-purple-600 text-white' :
-                  index < ['cart', 'payment', 'processing', 'confirmation'].indexOf(currentStep) ? 'bg-green-500 text-white' :
-                  'bg-gray-200 text-gray-400'
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    currentStep === step
+                      ? "bg-purple-600 text-white"
+                      : index <
+                        [
+                          "cart",
+                          "payment",
+                          "processing",
+                          "confirmation",
+                        ].indexOf(currentStep)
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 text-gray-400"
+                  }`}
+                >
                   <Icon className="h-5 w-5" />
                 </div>
                 <span className="ml-2 text-sm font-medium">{label}</span>
-                {index < 3 && <ArrowRight className="h-4 w-4 mx-3 text-gray-400" />}
+                {index < 3 && (
+                  <ArrowRight className="h-4 w-4 mx-3 text-gray-400" />
+                )}
               </div>
             ))}
           </div>
         </div>
 
         {/* Main Content */}
-        {currentStep === 'cart' && renderCart()}
-        {currentStep === 'payment' && renderPaymentMethods()}
-        {currentStep === 'processing' && renderProcessing()}
-        {currentStep === 'confirmation' && renderConfirmation()}
+        {currentStep === "cart" && renderCart()}
+        {currentStep === "payment" && renderPaymentMethods()}
+        {currentStep === "processing" && renderProcessing()}
+        {currentStep === "confirmation" && renderConfirmation()}
 
         {/* Celebration Animation */}
         {showCelebration && (

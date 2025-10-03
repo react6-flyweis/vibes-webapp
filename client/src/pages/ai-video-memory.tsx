@@ -122,7 +122,7 @@ export default function AIVideoMemory() {
         {/* Header */}
         <div className="text-center mb-8">
           <Video className="w-16 h-16 text-yellow-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-yellow-200 bg-clip-text text-transparent">
             AI Video Memory Generator
           </h1>
           <p className="text-white/90 mt-2 text-xl">Create epic after-movies with AI magic</p>
@@ -163,7 +163,7 @@ export default function AIVideoMemory() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Event Selection & Generation */}
           <div className="space-y-6">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
                 <CardTitle className="text-party-dark">Generate New Video Memory</CardTitle>
                 <CardDescription>Select an event to create an AI after-movie</CardDescription>
@@ -242,7 +242,7 @@ export default function AIVideoMemory() {
 
             {/* Event Highlights Preview */}
             {highlights && (
-              <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+              <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
                   <CardTitle className="text-party-dark">Event Highlights Preview</CardTitle>
                   <CardDescription>What will be included in your video</CardDescription>
@@ -275,7 +275,7 @@ export default function AIVideoMemory() {
 
           {/* Generated Videos */}
           <div>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
                 <CardTitle className="text-party-dark">Your Video Memories</CardTitle>
                 <CardDescription>AI-generated after-movies from your events</CardDescription>

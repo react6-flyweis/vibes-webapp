@@ -166,7 +166,7 @@ const VirtualPartyTwin = () => {
                   <CardDescription>Real-time replica of your physical space</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg mb-4 flex items-center justify-center">
+                  <div className="aspect-video bg-linear-to-br from-blue-400 to-purple-500 rounded-lg mb-4 flex items-center justify-center">
                     <div className="text-white text-center">
                       <Monitor className="w-16 h-16 mx-auto mb-4" />
                       <p className="text-lg font-semibold">Virtual Party Space</p>
@@ -294,7 +294,7 @@ const VirtualPartyTwin = () => {
                 <CardDescription>Real-time virtual guest locations</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
+                <div className="aspect-video bg-linear-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
                   <div className="text-white text-center">
                     <Globe className="w-16 h-16 mx-auto mb-4" />
                     <p className="text-lg font-semibold">Live Global Map</p>

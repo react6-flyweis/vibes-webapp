@@ -89,7 +89,7 @@ export default function SocialGroupsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -128,7 +128,7 @@ export default function SocialGroupsPage() {
             </Select>
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+                <Button className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Group
                 </Button>
@@ -173,7 +173,7 @@ export default function SocialGroupsPage() {
                       Cancel
                     </Button>
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600"
+                      className="flex-1 bg-linear-to-r from-purple-600 to-blue-600"
                       onClick={() => setShowCreateDialog(false)}
                     >
                       Create Group
@@ -256,7 +256,7 @@ export default function SocialGroupsPage() {
                       View Details
                     </Button>
                   </Link>
-                  <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                  <Button size="sm" className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                     <UserPlus className="h-4 w-4 mr-2" />
                     Join
                   </Button>
@@ -285,7 +285,7 @@ export default function SocialGroupsPage() {
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/virtual-meeting-platform">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+              <Button size="lg" className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                 <Calendar className="h-5 w-5 mr-2" />
                 Join Virtual Meetings
               </Button>

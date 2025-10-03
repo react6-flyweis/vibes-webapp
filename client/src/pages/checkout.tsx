@@ -220,7 +220,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
       <Navigation />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -262,7 +262,7 @@ export default function Checkout() {
                 <ul className="space-y-2">
                   {planDetails.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 shrink-0" />
                       <span className="text-sm text-gray-600">{feature}</span>
                     </li>
                   ))}

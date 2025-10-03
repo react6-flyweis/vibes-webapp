@@ -47,7 +47,7 @@ const PremiumDashboard = () => {
       description: "Lorem Ipsum is simply dummy text of the printing",
       category: "Wedding",
       colors: [
-        "bg-gradient-to-br from-yellow-400 to-yellow-200",
+        "bg-linear-to-br from-yellow-400 to-yellow-200",
         "bg-purple-500",
         "bg-orange-500",
       ],
@@ -64,7 +64,7 @@ const PremiumDashboard = () => {
       description: "Lorem Ipsum is simply dummy text of the printing",
       category: "Wedding",
       colors: [
-        "bg-gradient-to-br from-yellow-400 to-yellow-200",
+        "bg-linear-to-br from-yellow-400 to-yellow-200",
         "bg-purple-500",
         "bg-orange-500",
       ],
@@ -108,7 +108,7 @@ const PremiumDashboard = () => {
   ];
 
 
-  const cardClasses = "bg-white/10 text-slate-200 border-slate-700 backdrop-blur-sm";
+  const cardClasses = "bg-white/10 text-slate-200 border-slate-700 backdrop-blur-xs";
 
   return (
     <div
@@ -185,7 +185,7 @@ const PremiumDashboard = () => {
 
         {/* Premium Features Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 ">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 bg-white/10 text-slate-200  backdrop-blur-sm border-[#FFFFFF1A] border-[1px]">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 bg-white/10 text-slate-200  backdrop-blur-xs border-[#FFFFFF1A] border">
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
@@ -409,7 +409,7 @@ const PremiumDashboard = () => {
 
           {/* Themes Tab */}
           <TabsContent value="themes" className="space-y-6">
-            <div className="relative w-full min-h-[650px] bg-white/10 text-slate-200  backdrop-blur-sm p-6">
+            <div className="relative w-full min-h-[650px] bg-white/10 text-slate-200  backdrop-blur-xs p-6">
               {/* Heading */}
               <h2 className="text-white text-2xl font-bold mb-1">Premium Themes</h2>
               <p className="text-slate-200 text-sm mb-8">

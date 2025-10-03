@@ -134,7 +134,7 @@ export default function EcosystemDashboard() {
 
   if (healthLoading || metricsLoading || flowsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-8">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -145,13 +145,13 @@ export default function EcosystemDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-8">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <Network className="h-12 w-12 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Ecosystem Dashboard
             </h1>
           </div>
@@ -509,23 +509,23 @@ export default function EcosystemDashboard() {
               <CardContent>
                 <div className="h-64 flex items-end justify-center space-x-4">
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-32 w-12 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t"></div>
+                    <div className="h-32 w-12 bg-linear-to-t from-blue-500 to-blue-300 rounded-t"></div>
                     <span className="text-xs text-gray-600">VibeInvite</span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-40 w-12 bg-gradient-to-t from-purple-500 to-purple-300 rounded-t"></div>
+                    <div className="h-40 w-12 bg-linear-to-t from-purple-500 to-purple-300 rounded-t"></div>
                     <span className="text-xs text-gray-600">Design Studio</span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-28 w-12 bg-gradient-to-t from-green-500 to-green-300 rounded-t"></div>
+                    <div className="h-28 w-12 bg-linear-to-t from-green-500 to-green-300 rounded-t"></div>
                     <span className="text-xs text-gray-600">Party Decorator</span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-36 w-12 bg-gradient-to-t from-orange-500 to-orange-300 rounded-t"></div>
+                    <div className="h-36 w-12 bg-linear-to-t from-orange-500 to-orange-300 rounded-t"></div>
                     <span className="text-xs text-gray-600">Venue Showcase</span>
                   </div>
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="h-44 w-12 bg-gradient-to-t from-pink-500 to-pink-300 rounded-t"></div>
+                    <div className="h-44 w-12 bg-linear-to-t from-pink-500 to-pink-300 rounded-t"></div>
                     <span className="text-xs text-gray-600">Seat Tracker</span>
                   </div>
                 </div>

@@ -35,7 +35,7 @@ export default function SimpleHome() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent animate-party-wiggle">Welcome to Vibes!</h1>
+            <h1 className="text-5xl font-bold bg-linear-to-r from-white to-yellow-200 bg-clip-text text-transparent animate-party-wiggle">Welcome to Vibes!</h1>
             <p className="text-white/90 mt-2 text-xl font-medium">Ready to plan your next amazing event?</p>
           </div>
           <div className="flex items-center gap-4">
@@ -121,7 +121,7 @@ export default function SimpleHome() {
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           <Link href="/events/1">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-party-coral/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-party-coral/30">
               <CardHeader className="text-center">
                 <Calendar className="h-10 w-10 text-party-coral mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">Plan Event</CardTitle>
@@ -131,7 +131,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/ai-party-designer">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-party-purple/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-party-purple/30">
               <CardHeader className="text-center">
                 <Sparkles className="h-10 w-10 text-party-purple mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">AI Party Designer</CardTitle>
@@ -141,7 +141,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/live-music-voting">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-party-turquoise/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-party-turquoise/30">
               <CardHeader className="text-center">
                 <Music className="h-10 w-10 text-party-turquoise mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">Live Music Voting</CardTitle>
@@ -151,7 +151,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/ai-video-memory">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-party-pink/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-party-pink/30">
               <CardHeader className="text-center">
                 <Video className="h-10 w-10 text-party-pink mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">AI Video Memory</CardTitle>
@@ -161,7 +161,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/smart-contract-escrow">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-green-400/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-green-400/30">
               <CardHeader className="text-center">
                 <Shield className="h-10 w-10 text-green-500 mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">Smart Contract Escrow</CardTitle>
@@ -171,7 +171,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/nightclub-experience">
-            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur hover:scale-105 animate-party-wiggle border-2 border-party-pink/30">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer bg-white/95 backdrop-blur-sm hover:scale-105 animate-party-wiggle border-2 border-party-pink/30">
               <CardHeader className="text-center">
                 <Heart className="h-10 w-10 text-party-pink mx-auto mb-2" />
                 <CardTitle className="text-lg font-bold text-party-dark">Nightclub Experience</CardTitle>
@@ -208,7 +208,7 @@ export default function SimpleHome() {
           </Link>
 
           <Link href="/vendors">
-            <div className="p-4 rounded-lg bg-gradient-to-br from-orange-50 to-red-50 hover:shadow-md transition-shadow cursor-pointer">
+            <div className="p-4 rounded-lg bg-linear-to-br from-orange-50 to-red-50 hover:shadow-md transition-shadow cursor-pointer">
               <Crown className="h-8 w-8 text-orange-600 mb-2" />
               <h3 className="font-semibold text-gray-800">Vendor Marketplace</h3>
               <p className="text-sm text-gray-600">Find party vendors</p>
@@ -219,7 +219,7 @@ export default function SimpleHome() {
         {/* Call to Action */}
         <div className="text-center">
           <Link href="/demo">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-3">
+            <Button size="lg" className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-3">
               <Sparkles className="w-5 h-5 mr-2" />
               Explore All Features
               <ArrowRight className="w-5 h-5 ml-2" />

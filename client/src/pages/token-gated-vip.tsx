@@ -246,7 +246,7 @@ export default function TokenGatedVIP() {
         {/* Header */}
         <div className="text-center mb-8">
           <Crown className="w-16 h-16 text-yellow-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-yellow-200 bg-clip-text text-transparent">
             Token-Gated VIP Experiences
           </h1>
           <p className="text-white/90 mt-2 text-xl">Exclusive experiences for NFT holders and token owners</p>
@@ -292,28 +292,28 @@ export default function TokenGatedVIP() {
         {/* Marketplace Stats */}
         {marketplaceStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Crown className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.totalExperiences || '23'}</div>
                 <p className="text-gray-600 text-sm">VIP Experiences</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.activeMembers || '447'}</div>
                 <p className="text-gray-600 text-sm">VIP Members</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Coins className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.totalRevenue || '47.2 ETH'}</div>
                 <p className="text-gray-600 text-sm">Total Revenue</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.averageExclusivity || '8.9'}/10</div>
@@ -325,7 +325,7 @@ export default function TokenGatedVIP() {
 
         {/* User Token Overview */}
         {userTokens && (
-          <Card className="mb-8 bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="mb-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Wallet className="w-6 h-6 mr-2 text-blue-600" />
@@ -340,7 +340,7 @@ export default function TokenGatedVIP() {
                   <div className="grid grid-cols-2 gap-3">
                     {userTokens.nfts.slice(0, 4).map((nft, index) => (
                       <div key={index} className="border rounded-lg p-3 text-center">
-                        <div className="w-full h-20 bg-gradient-to-br from-blue-200 to-purple-200 rounded mb-2 flex items-center justify-center">
+                        <div className="w-full h-20 bg-linear-to-br from-blue-200 to-purple-200 rounded mb-2 flex items-center justify-center">
                           <Award className="w-8 h-8 text-blue-600" />
                         </div>
                         <p className="text-sm font-medium">{nft.name}</p>
@@ -406,9 +406,9 @@ export default function TokenGatedVIP() {
               const occupancyRate = (experience.currentMembers / experience.capacity) * 100;
               
               return (
-                <Card key={experience.id} className="bg-white/95 backdrop-blur border-2 border-white/30 hover:scale-105 transition-all duration-300">
+                <Card key={experience.id} className="bg-white/95 backdrop-blur-sm border-2 border-white/30 hover:scale-105 transition-all duration-300">
                   <CardHeader className="pb-2">
-                    <div className={`w-full h-48 bg-gradient-to-br ${exclusivityGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
+                    <div className={`w-full h-48 bg-linear-to-br ${exclusivityGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
                       <CategoryIcon className="w-20 h-20 text-white/80" />
                       <div className="absolute top-2 left-2">
                         <Badge className="bg-black/50 text-white">

@@ -92,14 +92,14 @@ export default function Navigation() {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden md:flex items-center justify-between p-4 bg-[#111827] text-black dark:bg-gray-900 border-b border-[#111827] dark:border-gray-700 sticky top-0 z-50 backdrop-blur-sm  dark:bg-gray-900/95">
+      <nav className="hidden md:flex items-center justify-between p-4 bg-[#111827] text-black dark:bg-gray-900 border-b border-[#111827] dark:border-gray-700 sticky top-0 z-50 backdrop-blur-xs  dark:bg-gray-900/95">
         <div className="flex items-center space-x-8">
           <Link href="/">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Vibes
               </span>
             </div>
@@ -228,10 +228,10 @@ export default function Navigation() {
         <div className="flex items-center justify-between p-4">
           <Link href="/">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Vibes
               </span>
             </div>

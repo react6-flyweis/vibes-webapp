@@ -430,7 +430,7 @@ export default function SmartScheduling() {
                     <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
                       {suggestion.reasons.map((reason, ridx) => (
                         <li key={ridx} className="flex items-start gap-1">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 shrink-0" />
                           {reason}
                         </li>
                       ))}

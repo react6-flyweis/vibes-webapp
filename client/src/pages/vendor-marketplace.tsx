@@ -334,7 +334,7 @@ export default function VendorMarketplace() {
         </div>
         
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
@@ -433,8 +433,8 @@ export default function VendorMarketplace() {
         {/* Results */}
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Category Sidebar */}
-          <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="lg:w-64 shrink-0">
+            <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6">
               <h3 className="font-semibold party-dark mb-4">Categories</h3>
               <div className="space-y-3">
                 {categoryGroups.map((group) => (
@@ -500,7 +500,7 @@ export default function VendorMarketplace() {
         </div>
         
         {/* Call to Action */}
-        <div className="bg-gradient-to-br from-party-coral to-party-turquoise rounded-xl p-8 mt-12 text-center text-white" style={{
+        <div className="bg-linear-to-br from-party-coral to-party-turquoise rounded-xl p-8 mt-12 text-center text-white" style={{
           background: "linear-gradient(90deg, #9333EA 0%, #DB2777 50%, #F97316 100%)"
 
         }}>

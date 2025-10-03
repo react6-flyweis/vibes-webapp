@@ -151,14 +151,14 @@ export default function StaffingMarketplace() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -170,7 +170,7 @@ export default function StaffingMarketplace() {
 
         {/* Search and Filters */}
         <div className="mb-8">
-          <Card className="bg-white/10 backdrop-blur border-white/20">
+          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
@@ -206,11 +206,11 @@ export default function StaffingMarketplace() {
         {/* Staff Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {filteredStaff.map((staff: StaffMember) => (
-            <Card key={staff.id} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-all cursor-pointer">
+            <Card key={staff.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
                       {staff.name.charAt(0)}
                     </div>
                     <div>
@@ -270,7 +270,7 @@ export default function StaffingMarketplace() {
         {/* Booking Modal */}
         {selectedStaff && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="bg-white/10 backdrop-blur border-white/20 w-full max-w-2xl">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 w-full max-w-2xl">
               <CardHeader>
                 <CardTitle className="text-white text-xl">
                   Book {selectedStaff.name}

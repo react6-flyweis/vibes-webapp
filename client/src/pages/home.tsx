@@ -25,7 +25,7 @@ export default function HomePage() {
 
   if (showDashboard) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
@@ -39,7 +39,7 @@ export default function HomePage() {
                 Demo User
               </Badge>
               <Link href="/pricing">
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                <Button className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                   <Trophy className="h-4 w-4 mr-2" />
                   Upgrade to Premium
                 </Button>
@@ -62,7 +62,7 @@ export default function HomePage() {
           {/* Quick Actions */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Link href="/find-events">
-              <Card className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 text-white cursor-pointer">
+              <Card className="hover:shadow-lg transition-all duration-300 bg-linear-to-r from-blue-600 to-purple-600 text-white cursor-pointer">
                 <CardContent className="p-6 text-center">
                   <Calendar className="h-16 w-16 mx-auto mb-4 text-white" />
                   <h3 className="text-xl font-bold mb-2">Find & Book Events</h3>
@@ -76,7 +76,7 @@ export default function HomePage() {
             </Link>
 
             <Link href="/create-event">
-              <Card className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-green-600 to-teal-600 text-white cursor-pointer">
+              <Card className="hover:shadow-lg transition-all duration-300 bg-linear-to-r from-green-600 to-teal-600 text-white cursor-pointer">
                 <CardContent className="p-6 text-center">
                   <Sparkles className="h-16 w-16 mx-auto mb-4 text-white" />
                   <h3 className="text-xl font-bold mb-2">Create Your Event</h3>
@@ -90,7 +90,7 @@ export default function HomePage() {
             </Link>
 
             <Link href="/vendors">
-              <Card className="hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-orange-600 to-red-600 text-white cursor-pointer">
+              <Card className="hover:shadow-lg transition-all duration-300 bg-linear-to-r from-orange-600 to-red-600 text-white cursor-pointer">
                 <CardContent className="p-6 text-center">
                   <Building2 className="h-16 w-16 mx-auto mb-4 text-white" />
                   <h3 className="text-xl font-bold mb-2">Vendor Marketplace</h3>
@@ -105,7 +105,7 @@ export default function HomePage() {
           </div>
 
           {/* Web3 Blockchain Features */}
-          <Card className="mb-8 bg-gradient-to-r from-purple-900 to-blue-900 text-white">
+          <Card className="mb-8 bg-linear-to-r from-purple-900 to-blue-900 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <Crown className="h-8 w-8 text-yellow-400" />
@@ -118,7 +118,7 @@ export default function HomePage() {
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/nft-guest-passes">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Trophy className="h-12 w-12 text-yellow-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Dynamic NFT Passes</CardTitle>
@@ -128,7 +128,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/global-marketplace">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Users className="h-12 w-12 text-green-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Global Marketplace</CardTitle>
@@ -138,7 +138,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/event-dao">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Star className="h-12 w-12 text-blue-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Event-as-a-DAO</CardTitle>
@@ -148,7 +148,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/ai-vibe-modeling">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Sparkles className="h-12 w-12 text-pink-400 mx-auto mb-2" />
                       <CardTitle className="text-white">AI Vibe Modeling</CardTitle>
@@ -158,7 +158,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/token-gated-vip">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Crown className="h-12 w-12 text-yellow-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Token-Gated VIP</CardTitle>
@@ -168,7 +168,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/ar-vr-immersive">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Zap className="h-12 w-12 text-cyan-400 mx-auto mb-2" />
                       <CardTitle className="text-white">AR/VR Immersive</CardTitle>
@@ -178,7 +178,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/sustainability-badges">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Heart className="h-12 w-12 text-green-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Sustainability Badges</CardTitle>
@@ -188,7 +188,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/smart-contract-escrow">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Trophy className="h-12 w-12 text-orange-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Smart Escrow</CardTitle>
@@ -198,7 +198,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/vendor-liquidity">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Coins className="h-12 w-12 text-yellow-400 mx-auto mb-2" />
                       <CardTitle className="text-white">DeFi Liquidity</CardTitle>
@@ -208,7 +208,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/branded-micro-events">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Star className="h-12 w-12 text-pink-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Brand Activations</CardTitle>
@@ -218,7 +218,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/venue-integration">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Building2 className="h-12 w-12 text-green-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Venue Partners</CardTitle>
@@ -231,7 +231,7 @@ export default function HomePage() {
           </Card>
 
           {/* Event Discovery & Booking */}
-          <Card className="mb-8 bg-gradient-to-r from-blue-900 to-green-900 text-white">
+          <Card className="mb-8 bg-linear-to-r from-blue-900 to-green-900 text-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <Calendar className="h-8 w-8 text-green-400" />
@@ -244,7 +244,7 @@ export default function HomePage() {
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/event-discovery">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Calendar className="h-12 w-12 text-blue-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Discover Events</CardTitle>
@@ -254,7 +254,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/loyalty-rewards">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Trophy className="h-12 w-12 text-yellow-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Loyalty & Rewards</CardTitle>
@@ -264,7 +264,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/social-groups">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Users className="h-12 w-12 text-purple-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Social Groups</CardTitle>
@@ -274,7 +274,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/live-updates">
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur border-white/20">
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/10 backdrop-blur-sm border-white/20">
                     <CardHeader className="text-center">
                       <Zap className="h-12 w-12 text-red-400 mx-auto mb-2" />
                       <CardTitle className="text-white">Live Updates</CardTitle>
@@ -287,10 +287,10 @@ export default function HomePage() {
           </Card>
 
           {/* Interactive Live Vibes Invite - Featured Section */}
-          <Card className="mb-8 bg-gradient-to-r from-pink-600 to-purple-600 text-white border-0 shadow-2xl">
+          <Card className="mb-8 bg-linear-to-r from-pink-600 to-purple-600 text-white border-0 shadow-2xl">
             <CardHeader className="text-center pb-4">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-linear-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
                   <span className="text-3xl">✨</span>
                 </div>
                 <div>
@@ -402,7 +402,7 @@ export default function HomePage() {
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/ai-theme-generator">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-green-50 to-emerald-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Star className="h-8 w-8 text-green-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">AI Theme Generator</h3>
                     <p className="text-sm text-gray-600">AI-curated event themes</p>
@@ -410,7 +410,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/ai-vibe-analyzer">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-pink-50 to-rose-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-pink-50 to-rose-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Heart className="h-8 w-8 text-pink-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">AI Vibe Analyzer</h3>
                     <p className="text-sm text-gray-600">Real-time sentiment tracking</p>
@@ -418,7 +418,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/ar-space-planner">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-blue-50 to-cyan-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Trophy className="h-8 w-8 text-blue-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">3D/AR Space Planner</h3>
                     <p className="text-sm text-gray-600">Virtual venue design</p>
@@ -426,7 +426,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/smart-scheduling">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-purple-50 to-violet-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Sparkles className="h-8 w-8 text-purple-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Smart Scheduling</h3>
                     <p className="text-sm text-gray-600">AI calendar optimization</p>
@@ -434,7 +434,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/sustainability-tracker">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-teal-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-green-50 to-teal-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Heart className="h-8 w-8 text-green-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Sustainability Tracker</h3>
                     <p className="text-sm text-gray-600">Eco-friendly planning</p>
@@ -442,7 +442,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/host-achievements">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-yellow-50 to-orange-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-yellow-50 to-orange-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Trophy className="h-8 w-8 text-yellow-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Host Achievements</h3>
                     <p className="text-sm text-gray-600">Gamified hosting</p>
@@ -450,7 +450,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/livestream-companion">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-red-50 to-pink-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-red-50 to-pink-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Zap className="h-8 w-8 text-red-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Livestream Companion</h3>
                     <p className="text-sm text-gray-600">Interactive streaming</p>
@@ -458,7 +458,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/vendors">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-indigo-50 to-blue-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Users className="h-8 w-8 text-indigo-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Vendor Marketplace</h3>
                     <p className="text-sm text-gray-600">Find trusted vendors</p>
@@ -480,7 +480,7 @@ export default function HomePage() {
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/vibe-curator">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-indigo-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-purple-50 to-indigo-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Heart className="h-8 w-8 text-purple-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">AI Vibe Curator</h3>
                     <p className="text-sm text-gray-600">Personal party strategist</p>
@@ -488,7 +488,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/virtual-party-twin">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-cyan-50 to-blue-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Zap className="h-8 w-8 text-cyan-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Virtual Party Twin</h3>
                     <p className="text-sm text-gray-600">Metaverse party experience</p>
@@ -496,7 +496,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/adaptive-environment">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-orange-50 to-red-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-orange-50 to-red-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Star className="h-8 w-8 text-orange-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Adaptive Environment</h3>
                     <p className="text-sm text-gray-600">Smart venue control</p>
@@ -504,7 +504,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link href="/vibe-verified-guests">
-                  <div className="p-4 rounded-lg bg-gradient-to-br from-yellow-50 to-orange-50 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="p-4 rounded-lg bg-linear-to-br from-yellow-50 to-orange-50 hover:shadow-md transition-shadow cursor-pointer">
                     <Trophy className="h-8 w-8 text-yellow-600 mb-2" />
                     <h3 className="font-semibold text-gray-800">Vibe-Verified Guests</h3>
                     <p className="text-sm text-gray-600">Social reputation system</p>
@@ -540,7 +540,7 @@ export default function HomePage() {
 
   // Landing page for non-authenticated users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -612,7 +612,7 @@ export default function HomePage() {
         </div>
 
         {/* CTA Section */}
-        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <Card className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
           <CardContent className="text-center py-12">
             <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Events?</h2>
             <p className="text-xl mb-8 opacity-90">

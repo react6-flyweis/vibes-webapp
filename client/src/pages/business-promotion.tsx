@@ -100,7 +100,7 @@ export default function BusinessPromotionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -424,7 +424,7 @@ export default function BusinessPromotionPage() {
         </div>
 
         {/* Benefits */}
-        <Card className="bg-gradient-to-r from-violet-600 to-purple-600 text-white">
+        <Card className="bg-linear-to-r from-violet-600 to-purple-600 text-white">
           <CardContent className="py-12">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-4">Why Choose Vibely for Your Business?</h2>

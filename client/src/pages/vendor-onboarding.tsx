@@ -23,17 +23,34 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/navigation";
-import { Upload, Check, Store, MapPin, DollarSign, Calendar, Shield } from "lucide-react";
+import {
+  Upload,
+  Check,
+  Store,
+  MapPin,
+  DollarSign,
+  Calendar,
+  Shield,
+} from "lucide-react";
 
 const vendorOnboardingSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
   businessLogo: z.string().url().optional().or(z.literal("")),
-  businessDescription: z.string().min(1, "Description is required").max(300, "Description must be 300 characters or less"),
+  businessDescription: z
+    .string()
+    .min(1, "Description is required")
+    .max(300, "Description must be 300 characters or less"),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   businessEmail: z.string().email("Valid email is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
@@ -47,7 +64,9 @@ const vendorOnboardingSchema = z.object({
   priceRangeMin: z.number().min(0, "Price range minimum must be 0 or more"),
   priceRangeMax: z.number().min(0, "Price range maximum must be 0 or more"),
   depositRequired: z.boolean().default(false),
-  paymentMethods: z.array(z.string()).min(1, "Select at least one payment method"),
+  paymentMethods: z
+    .array(z.string())
+    .min(1, "Select at least one payment method"),
   portfolioImages: z.array(z.string()).optional(),
   promoVideo: z.string().url().optional().or(z.literal("")),
   reviewsLink: z.string().url().optional().or(z.literal("")),
@@ -65,7 +84,7 @@ const vendorCategories = [
   { id: "alcohol-delivery", label: "Alcohol Delivery Services", icon: "🚚" },
   { id: "beverage-caterers", label: "Beverage Caterers", icon: "🥤" },
   { id: "specialty-drinks", label: "Specialty Drink Vendors", icon: "☕" },
-  
+
   // Food Vendors & Caterers
   { id: "full-service-caterers", label: "Full-Service Caterers", icon: "🍽️" },
   { id: "food-trucks", label: "Food Trucks", icon: "🚛" },
@@ -73,7 +92,7 @@ const vendorCategories = [
   { id: "grazing-tables", label: "Grazing Table Providers", icon: "🧀" },
   { id: "dessert-specialists", label: "Dessert Specialists", icon: "🎂" },
   { id: "snack-vendors", label: "Snack Vendors", icon: "🍿" },
-  
+
   // Entertainment Providers
   { id: "djs", label: "DJs & Mobile DJ Services", icon: "🎵" },
   { id: "live-music", label: "Live Bands & Musicians", icon: "🎸" },
@@ -81,52 +100,76 @@ const vendorCategories = [
   { id: "av-technicians", label: "Audio/Visual Technicians", icon: "🔊" },
   { id: "party-hosts", label: "Party Hosts & MCs", icon: "🎭" },
   { id: "performers", label: "Magicians, Dancers, Comedians", icon: "🎪" },
-  
+
   // Decor & Rentals
   { id: "event-decorators", label: "Event Decorators", icon: "🎈" },
   { id: "balloon-artists", label: "Balloon Artists", icon: "🎈" },
   { id: "furniture-rentals", label: "Table & Chair Rentals", icon: "🪑" },
   { id: "tent-rentals", label: "Tent & Canopy Rentals", icon: "⛺" },
   { id: "linen-rentals", label: "Linen & Tableware Rentals", icon: "🍽️" },
-  { id: "flower-arrangements", label: "Flower Arrangement Vendors", icon: "🌸" },
-  
+  {
+    id: "flower-arrangements",
+    label: "Flower Arrangement Vendors",
+    icon: "🌸",
+  },
+
   // Photo & Video
   { id: "photographers", label: "Event Photographers", icon: "📸" },
   { id: "videographers", label: "Videographers", icon: "🎥" },
   { id: "photo-booth-rentals", label: "Photo Booth Rentals", icon: "📷" },
-  { id: "content-concierge", label: "Social Media Content Services", icon: "📱" },
-  
+  {
+    id: "content-concierge",
+    label: "Social Media Content Services",
+    icon: "📱",
+  },
+
   // Party Planners & Coordinators
   { id: "event-planners", label: "Full-Service Event Planners", icon: "📋" },
   { id: "themed-designers", label: "Themed Party Designers", icon: "🎨" },
   { id: "wedding-planners", label: "Wedding Planners", icon: "💒" },
   { id: "kids-coordinators", label: "Kids Party Coordinators", icon: "🎠" },
   { id: "corporate-managers", label: "Corporate Event Managers", icon: "🏢" },
-  
+
   // Supplies & Party Favors
   { id: "party-supply-stores", label: "Party Supply Stores", icon: "🎁" },
   { id: "favor-boutiques", label: "Online Favor Boutiques", icon: "💝" },
   { id: "eco-suppliers", label: "Eco-Friendly Party Suppliers", icon: "🌱" },
   { id: "custom-print-shops", label: "Custom Print Shops", icon: "🖨️" },
-  
+
   // Activities & Games
   { id: "bounce-house-rentals", label: "Bounce House Rentals", icon: "🏰" },
   { id: "game-rentals", label: "Game Rentals", icon: "🎯" },
-  { id: "face-painting", label: "Face Painting & Caricature Artists", icon: "🎨" },
+  {
+    id: "face-painting",
+    label: "Face Painting & Caricature Artists",
+    icon: "🎨",
+  },
   { id: "craft-stations", label: "Craft Stations & DIY Booths", icon: "✂️" },
-  
+
   // Logistics
   { id: "valet-parking", label: "Valet & Parking Attendants", icon: "🚗" },
   { id: "event-security", label: "Event Security", icon: "🛡️" },
   { id: "cleaning-crews", label: "Cleaning Crews", icon: "🧹" },
   { id: "delivery-drivers", label: "Delivery Drivers & Runners", icon: "🚚" },
-  { id: "portable-restrooms", label: "Portable Restroom Providers", icon: "🚻" },
-  
+  {
+    id: "portable-restrooms",
+    label: "Portable Restroom Providers",
+    icon: "🚻",
+  },
+
   // Local Vendor Market
   { id: "boutique-brands", label: "Boutique Alcohol Brands", icon: "🍷" },
   { id: "home-based-chefs", label: "Home-Based Bakers & Chefs", icon: "🏠" },
-  { id: "cultural-services", label: "Cultural/Themed Service Providers", icon: "🌎" },
-  { id: "minority-owned", label: "Minority/Women-Owned Businesses", icon: "⭐" },
+  {
+    id: "cultural-services",
+    label: "Cultural/Themed Service Providers",
+    icon: "🌎",
+  },
+  {
+    id: "minority-owned",
+    label: "Minority/Women-Owned Businesses",
+    icon: "⭐",
+  },
 ];
 
 const serviceDayOptions = [
@@ -195,14 +238,15 @@ export default function VendorOnboarding() {
         socialMediaHandles: data.socialMediaHandles || null,
         portfolioImages: data.portfolioImages || [],
       };
-      
+
       const response = await apiRequest("POST", "/api/vendors", processedData);
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Application Submitted!",
-        description: "Your vendor application has been submitted successfully. You'll receive a confirmation email shortly.",
+        description:
+          "Your vendor application has been submitted successfully. You'll receive a confirmation email shortly.",
       });
       navigate("/vendors/dashboard");
     },
@@ -230,14 +274,16 @@ export default function VendorOnboarding() {
   return (
     <div className="min-h-screen bg-[#0C111F]">
       <Navigation />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Join Vibes as a Vendor</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Join Vibes as a Vendor
+          </h1>
           <p className="text-xl text-white mb-6">
             Connect with party planners and grow your business on our platform
           </p>
-          
+
           {/* Progress Bar */}
           <div className="flex items-center justify-center space-x-2 mb-8">
             {Array.from({ length: totalSteps }, (_, i) => (
@@ -265,7 +311,6 @@ export default function VendorOnboarding() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            
             {/* Step 1: Business Information */}
             {step === 1 && (
               <Card>
@@ -287,7 +332,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Business Name *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Amazing DJ Services" {...field} />
+                            <Input
+                              placeholder="Amazing DJ Services"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -301,7 +349,11 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Business Email *</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="info@amazing-dj.com" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="info@amazing-dj.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -314,7 +366,9 @@ export default function VendorOnboarding() {
                     name="businessDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Business Description * (max 300 characters)</FormLabel>
+                        <FormLabel>
+                          Business Description * (max 300 characters)
+                        </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Professional DJ services for weddings, parties, and corporate events..."
@@ -353,7 +407,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Website URL</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://amazing-dj.com" {...field} />
+                            <Input
+                              placeholder="https://amazing-dj.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -369,7 +426,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Business Logo URL</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://example.com/logo.jpg" {...field} />
+                            <Input
+                              placeholder="https://example.com/logo.jpg"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -383,7 +443,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Social Media Handles</FormLabel>
                           <FormControl>
-                            <Input placeholder="@amazing_dj, /amazingdjservices" {...field} />
+                            <Input
+                              placeholder="@amazing_dj, /amazingdjservices"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -412,7 +475,9 @@ export default function VendorOnboarding() {
                     name="categories"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vendor Categories * (select all that apply)</FormLabel>
+                        <FormLabel>
+                          Vendor Categories * (select all that apply)
+                        </FormLabel>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                           {vendorCategories.map((category) => (
                             <div
@@ -425,15 +490,21 @@ export default function VendorOnboarding() {
                               onClick={() => {
                                 const current = field.value || [];
                                 if (current.includes(category.id)) {
-                                  field.onChange(current.filter(id => id !== category.id));
+                                  field.onChange(
+                                    current.filter((id) => id !== category.id)
+                                  );
                                 } else {
                                   field.onChange([...current, category.id]);
                                 }
                               }}
                             >
                               <div className="text-center">
-                                <div className="text-2xl mb-1">{category.icon}</div>
-                                <div className="text-sm font-medium">{category.label}</div>
+                                <div className="text-2xl mb-1">
+                                  {category.icon}
+                                </div>
+                                <div className="text-sm font-medium">
+                                  {category.label}
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -469,7 +540,11 @@ export default function VendorOnboarding() {
                               type="number"
                               placeholder="25"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value ? Number(e.target.value) : 0
+                                )
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -507,7 +582,11 @@ export default function VendorOnboarding() {
                             {serviceDayOptions.map((option) => (
                               <Badge
                                 key={option.id}
-                                variant={field.value?.includes(option.id) ? "default" : "outline"}
+                                variant={
+                                  field.value?.includes(option.id)
+                                    ? "default"
+                                    : "outline"
+                                }
                                 className={`cursor-pointer ${
                                   field.value?.includes(option.id)
                                     ? "bg-party-coral text-white"
@@ -516,7 +595,9 @@ export default function VendorOnboarding() {
                                 onClick={() => {
                                   const current = field.value || [];
                                   if (current.includes(option.id)) {
-                                    field.onChange(current.filter(id => id !== option.id));
+                                    field.onChange(
+                                      current.filter((id) => id !== option.id)
+                                    );
                                   } else {
                                     field.onChange([...current, option.id]);
                                   }
@@ -560,7 +641,11 @@ export default function VendorOnboarding() {
                               type="number"
                               placeholder="100"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value ? Number(e.target.value) : 0
+                                )
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -579,7 +664,11 @@ export default function VendorOnboarding() {
                               type="number"
                               placeholder="200"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value ? Number(e.target.value) : 0
+                                )
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -598,7 +687,11 @@ export default function VendorOnboarding() {
                               type="number"
                               placeholder="2000"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value ? Number(e.target.value) : 0
+                                )
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -635,7 +728,11 @@ export default function VendorOnboarding() {
                           {paymentMethodOptions.map((method) => (
                             <Badge
                               key={method.id}
-                              variant={field.value?.includes(method.id) ? "default" : "outline"}
+                              variant={
+                                field.value?.includes(method.id)
+                                  ? "default"
+                                  : "outline"
+                              }
                               className={`cursor-pointer ${
                                 field.value?.includes(method.id)
                                   ? "bg-party-coral text-white"
@@ -644,7 +741,9 @@ export default function VendorOnboarding() {
                               onClick={() => {
                                 const current = field.value || [];
                                 if (current.includes(method.id)) {
-                                  field.onChange(current.filter(id => id !== method.id));
+                                  field.onChange(
+                                    current.filter((id) => id !== method.id)
+                                  );
                                 } else {
                                   field.onChange([...current, method.id]);
                                 }
@@ -681,9 +780,14 @@ export default function VendorOnboarding() {
                       name="reviewsLink"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Link to Reviews (Yelp, Google, etc.)</FormLabel>
+                          <FormLabel>
+                            Link to Reviews (Yelp, Google, etc.)
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="https://yelp.com/biz/amazing-dj" {...field} />
+                            <Input
+                              placeholder="https://yelp.com/biz/amazing-dj"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -697,7 +801,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Promo Video URL</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://youtube.com/watch?v=..." {...field} />
+                            <Input
+                              placeholder="https://youtube.com/watch?v=..."
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -730,7 +837,10 @@ export default function VendorOnboarding() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Calendar Integration (Optional)</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select calendar type" />
@@ -756,7 +866,10 @@ export default function VendorOnboarding() {
                         <FormItem>
                           <FormLabel>Business License URL</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://example.com/license.pdf" {...field} />
+                            <Input
+                              placeholder="https://example.com/license.pdf"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -769,11 +882,15 @@ export default function VendorOnboarding() {
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center space-x-2">
                         <Checkbox id="terms" />
-                        <label htmlFor="terms">I agree to Vibes Vendor Terms & Conditions</label>
+                        <label htmlFor="terms">
+                          I agree to Vibes Vendor Terms & Conditions
+                        </label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Checkbox id="verification" />
-                        <label htmlFor="verification">I verify business ownership or authorization</label>
+                        <label htmlFor="verification">
+                          I verify business ownership or authorization
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -784,7 +901,7 @@ export default function VendorOnboarding() {
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6">
               <Button
-              className="bg-white"
+                className="bg-white"
                 type="button"
                 variant="outline"
                 onClick={prevStep}
@@ -792,7 +909,7 @@ export default function VendorOnboarding() {
               >
                 Previous
               </Button>
-              
+
               <div className="space-x-4">
                 {step < totalSteps ? (
                   <Button type="button" onClick={nextStep}>
@@ -804,7 +921,9 @@ export default function VendorOnboarding() {
                     disabled={submitMutation.isPending}
                     className="bg-party-coral hover:bg-red-500 text-white"
                   >
-                    {submitMutation.isPending ? "Submitting..." : "Submit Application"}
+                    {submitMutation.isPending
+                      ? "Submitting..."
+                      : "Submit Application"}
                   </Button>
                 )}
               </div>

@@ -9,12 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Camera, 
-  Video, 
-  Play, 
-  Pause, 
-  Square, 
+import {
+  Camera,
+  Video,
+  Play,
+  Pause,
+  Square,
   RotateCcw,
   Sparkles,
   Filter,
@@ -58,7 +58,7 @@ import {
   MapPin,
   Clock,
   Calendar,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 
 interface ARFilter {
@@ -122,7 +122,7 @@ interface HighlightReel {
 
 export default function ImmersivePartyCam() {
   const { toast } = useToast();
-  
+
   // State management
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -130,11 +130,14 @@ export default function ImmersivePartyCam() {
   const [selectedMode, setSelectedMode] = useState<CameraMode["id"]>("360");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [isLiveStreaming, setIsLiveStreaming] = useState(false);
-  const [currentView, setCurrentView] = useState<"live" | "gallery" | "highlights">("live");
+  const [currentView, setCurrentView] = useState<
+    "live" | "gallery" | "highlights"
+  >("live");
   const [filterIntensity, setFilterIntensity] = useState([75]);
   const [arEnabled, setArEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const [selectedHighlightStyle, setSelectedHighlightStyle] = useState<HighlightReel["style"]>("cinematic");
+  const [selectedHighlightStyle, setSelectedHighlightStyle] =
+    useState<HighlightReel["style"]>("cinematic");
   const [showSettings, setShowSettings] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -166,7 +169,11 @@ export default function ImmersivePartyCam() {
 
   // Mutations
   const startRecordingMutation = useMutation({
-    mutationFn: async (data: { mode: string; filters: string[]; settings: any }) => {
+    mutationFn: async (data: {
+      mode: string;
+      filters: string[];
+      settings: any;
+    }) => {
       const response = await fetch("/api/partycam/start-recording", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -176,12 +183,19 @@ export default function ImmersivePartyCam() {
     },
     onSuccess: () => {
       setIsRecording(true);
-      toast({ title: "Recording Started", description: "360° immersive recording is now active" });
+      toast({
+        title: "Recording Started",
+        description: "360° immersive recording is now active",
+      });
     },
   });
 
   const generateHighlightMutation = useMutation({
-    mutationFn: async (data: { recordings: string[]; style: string; music: string }) => {
+    mutationFn: async (data: {
+      recordings: string[];
+      style: string;
+      music: string;
+    }) => {
       const response = await fetch("/api/partycam/generate-highlight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -190,7 +204,10 @@ export default function ImmersivePartyCam() {
       return response.json();
     },
     onSuccess: () => {
-      toast({ title: "Highlight Reel Generated", description: "Your party story is ready to share!" });
+      toast({
+        title: "Highlight Reel Generated",
+        description: "Your party story is ready to share!",
+      });
     },
   });
 
@@ -204,194 +221,213 @@ export default function ImmersivePartyCam() {
   });
 
   // Mock data
-  const mockFilters: ARFilter[] = Array.isArray(arFilters) ? arFilters : [
-    {
-      id: "neon-rave",
-      name: "Neon Rave",
-      description: "Electric neon effects with pulsing beats visualization",
-      category: "theme",
-      thumbnail: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150",
-      previewVideo: "/api/filters/neon-rave-preview.mp4",
-      isActive: true,
-      isPremium: false,
-      usageCount: 1247,
-      rating: 4.8,
-      tags: ["electronic", "glow", "party"],
-      eventThemes: ["rave", "electronic", "nightclub"],
-    },
-    {
-      id: "masquerade-mystery",
-      name: "Masquerade Mystery",
-      description: "Elegant venetian masks with golden particle effects",
-      category: "theme",
-      thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=150",
-      previewVideo: "/api/filters/masquerade-preview.mp4",
-      isActive: false,
-      isPremium: true,
-      usageCount: 892,
-      rating: 4.9,
-      tags: ["elegant", "formal", "mystery"],
-      eventThemes: ["masquerade", "formal", "gala"],
-    },
-    {
-      id: "coca-cola-fizz",
-      name: "Coca-Cola Fizz",
-      description: "Refreshing bubbles and Coca-Cola branding effects",
-      category: "sponsor",
-      thumbnail: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=150",
-      previewVideo: "/api/filters/cocacola-preview.mp4",
-      isActive: false,
-      isPremium: false,
-      usageCount: 2341,
-      rating: 4.6,
-      tags: ["refreshing", "bubbles", "brand"],
-      sponsorBrand: "Coca-Cola",
-      sponsorLogo: "/api/brands/cocacola-logo.png",
-      eventThemes: ["summer", "casual", "outdoor"],
-    },
-    {
-      id: "galaxy-dreams",
-      name: "Galaxy Dreams",
-      description: "Cosmic effects with stars and nebula backgrounds",
-      category: "effect",
-      thumbnail: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=150",
-      previewVideo: "/api/filters/galaxy-preview.mp4",
-      isActive: false,
-      isPremium: true,
-      usageCount: 567,
-      rating: 4.7,
-      tags: ["cosmic", "dreamy", "space"],
-      eventThemes: ["futuristic", "space", "sci-fi"],
-    },
-  ];
+  const mockFilters: ARFilter[] = Array.isArray(arFilters)
+    ? arFilters
+    : [
+        {
+          id: "neon-rave",
+          name: "Neon Rave",
+          description: "Electric neon effects with pulsing beats visualization",
+          category: "theme",
+          thumbnail:
+            "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150",
+          previewVideo: "/api/filters/neon-rave-preview.mp4",
+          isActive: true,
+          isPremium: false,
+          usageCount: 1247,
+          rating: 4.8,
+          tags: ["electronic", "glow", "party"],
+          eventThemes: ["rave", "electronic", "nightclub"],
+        },
+        {
+          id: "masquerade-mystery",
+          name: "Masquerade Mystery",
+          description: "Elegant venetian masks with golden particle effects",
+          category: "theme",
+          thumbnail:
+            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=150",
+          previewVideo: "/api/filters/masquerade-preview.mp4",
+          isActive: false,
+          isPremium: true,
+          usageCount: 892,
+          rating: 4.9,
+          tags: ["elegant", "formal", "mystery"],
+          eventThemes: ["masquerade", "formal", "gala"],
+        },
+        {
+          id: "coca-cola-fizz",
+          name: "Coca-Cola Fizz",
+          description: "Refreshing bubbles and Coca-Cola branding effects",
+          category: "sponsor",
+          thumbnail:
+            "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=150",
+          previewVideo: "/api/filters/cocacola-preview.mp4",
+          isActive: false,
+          isPremium: false,
+          usageCount: 2341,
+          rating: 4.6,
+          tags: ["refreshing", "bubbles", "brand"],
+          sponsorBrand: "Coca-Cola",
+          sponsorLogo: "/api/brands/cocacola-logo.png",
+          eventThemes: ["summer", "casual", "outdoor"],
+        },
+        {
+          id: "galaxy-dreams",
+          name: "Galaxy Dreams",
+          description: "Cosmic effects with stars and nebula backgrounds",
+          category: "effect",
+          thumbnail:
+            "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=150",
+          previewVideo: "/api/filters/galaxy-preview.mp4",
+          isActive: false,
+          isPremium: true,
+          usageCount: 567,
+          rating: 4.7,
+          tags: ["cosmic", "dreamy", "space"],
+          eventThemes: ["futuristic", "space", "sci-fi"],
+        },
+      ];
 
   // Helper function to map mode IDs to icons
   const getModeIcon = (modeId: string) => {
     const iconMap = {
       "360": Globe,
-      "standard": Monitor,
-      "vr": Eye,
-      "ar": Sparkles,
+      standard: Monitor,
+      vr: Eye,
+      ar: Sparkles,
     };
     return iconMap[modeId as keyof typeof iconMap] || Camera;
   };
 
   // Process camera modes and add icons
-  const processedModes: CameraMode[] = Array.isArray(cameraModes) 
-    ? cameraModes.map(mode => ({ ...mode, icon: getModeIcon(mode.id) }))
+  const processedModes: CameraMode[] = Array.isArray(cameraModes)
+    ? cameraModes.map((mode) => ({ ...mode, icon: getModeIcon(mode.id) }))
     : [];
 
-  const mockModes: CameraMode[] = processedModes.length > 0 ? processedModes : [
-    {
-      id: "360",
-      name: "360° Immersive",
-      description: "Full spherical recording for VR experiences",
-      icon: Globe,
-      resolution: "4K",
-      frameRate: "60fps",
-      isActive: true,
-    },
-    {
-      id: "standard",
-      name: "Standard HD",
-      description: "Traditional high-definition recording",
-      icon: Monitor,
-      resolution: "1080p",
-      frameRate: "30fps",
-      isActive: false,
-    },
-    {
-      id: "vr",
-      name: "VR Ready",
-      description: "Optimized for VR headset viewing",
-      icon: Eye,
-      resolution: "2K",
-      frameRate: "90fps",
-      isActive: false,
-    },
-    {
-      id: "ar",
-      name: "AR Enhanced",
-      description: "Augmented reality with object tracking",
-      icon: Sparkles,
-      resolution: "1080p",
-      frameRate: "60fps",
-      isActive: false,
-    },
-  ];
+  const mockModes: CameraMode[] =
+    processedModes.length > 0
+      ? processedModes
+      : [
+          {
+            id: "360",
+            name: "360° Immersive",
+            description: "Full spherical recording for VR experiences",
+            icon: Globe,
+            resolution: "4K",
+            frameRate: "60fps",
+            isActive: true,
+          },
+          {
+            id: "standard",
+            name: "Standard HD",
+            description: "Traditional high-definition recording",
+            icon: Monitor,
+            resolution: "1080p",
+            frameRate: "30fps",
+            isActive: false,
+          },
+          {
+            id: "vr",
+            name: "VR Ready",
+            description: "Optimized for VR headset viewing",
+            icon: Eye,
+            resolution: "2K",
+            frameRate: "90fps",
+            isActive: false,
+          },
+          {
+            id: "ar",
+            name: "AR Enhanced",
+            description: "Augmented reality with object tracking",
+            icon: Sparkles,
+            resolution: "1080p",
+            frameRate: "60fps",
+            isActive: false,
+          },
+        ];
 
-  const mockRecordings: RecordingSession[] = Array.isArray(recordings) ? recordings : [
-    {
-      id: "rec-birthday-bash",
-      name: "Birthday Bash - Main Room",
-      duration: 1847,
-      mode: "360° Immersive",
-      filters: ["neon-rave", "galaxy-dreams"],
-      thumbnail: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=300",
-      timestamp: "2 hours ago",
-      size: "2.4 GB",
-      quality: "4K",
-      is360: true,
-      hasAR: true,
-      views: 234,
-      likes: 67,
-      shares: 23,
-    },
-    {
-      id: "rec-dance-floor",
-      name: "Dance Floor Action",
-      duration: 892,
-      mode: "AR Enhanced",
-      filters: ["coca-cola-fizz"],
-      thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300",
-      timestamp: "4 hours ago",
-      size: "1.1 GB",
-      quality: "HD",
-      is360: false,
-      hasAR: true,
-      views: 456,
-      likes: 123,
-      shares: 45,
-    },
-  ];
+  const mockRecordings: RecordingSession[] = Array.isArray(recordings)
+    ? recordings
+    : [
+        {
+          id: "rec-birthday-bash",
+          name: "Birthday Bash - Main Room",
+          duration: 1847,
+          mode: "360° Immersive",
+          filters: ["neon-rave", "galaxy-dreams"],
+          thumbnail:
+            "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=300",
+          timestamp: "2 hours ago",
+          size: "2.4 GB",
+          quality: "4K",
+          is360: true,
+          hasAR: true,
+          views: 234,
+          likes: 67,
+          shares: 23,
+        },
+        {
+          id: "rec-dance-floor",
+          name: "Dance Floor Action",
+          duration: 892,
+          mode: "AR Enhanced",
+          filters: ["coca-cola-fizz"],
+          thumbnail:
+            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300",
+          timestamp: "4 hours ago",
+          size: "1.1 GB",
+          quality: "HD",
+          is360: false,
+          hasAR: true,
+          views: 456,
+          likes: 123,
+          shares: 45,
+        },
+      ];
 
-  const mockHighlights: HighlightReel[] = Array.isArray(highlightReels) ? highlightReels : [
-    {
-      id: "highlight-birthday-epic",
-      title: "Birthday Epic Moments",
-      description: "Best moments from the birthday celebration with cinematic effects",
-      thumbnail: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=300",
-      duration: 187,
-      clips: 12,
-      style: "cinematic",
-      music: "Uplifting Electronic",
-      transitions: "Smooth Fade",
-      generatedAt: "1 hour ago",
-      downloads: 89,
-      shares: 234,
-    },
-    {
-      id: "highlight-dance-madness",
-      title: "Dance Floor Madness",
-      description: "High-energy dance moments with beat-synchronized effects",
-      thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300",
-      duration: 156,
-      clips: 8,
-      style: "music-video",
-      music: "Electronic Dance",
-      transitions: "Beat Drop",
-      generatedAt: "3 hours ago",
-      downloads: 156,
-      shares: 445,
-    },
-  ];
+  const mockHighlights: HighlightReel[] = Array.isArray(highlightReels)
+    ? highlightReels
+    : [
+        {
+          id: "highlight-birthday-epic",
+          title: "Birthday Epic Moments",
+          description:
+            "Best moments from the birthday celebration with cinematic effects",
+          thumbnail:
+            "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=300",
+          duration: 187,
+          clips: 12,
+          style: "cinematic",
+          music: "Uplifting Electronic",
+          transitions: "Smooth Fade",
+          generatedAt: "1 hour ago",
+          downloads: 89,
+          shares: 234,
+        },
+        {
+          id: "highlight-dance-madness",
+          title: "Dance Floor Madness",
+          description:
+            "High-energy dance moments with beat-synchronized effects",
+          thumbnail:
+            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300",
+          duration: 156,
+          clips: 8,
+          style: "music-video",
+          music: "Electronic Dance",
+          transitions: "Beat Drop",
+          generatedAt: "3 hours ago",
+          downloads: 156,
+          shares: 445,
+        },
+      ];
 
   // Recording timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRecording && !isPaused) {
       interval = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -401,7 +437,9 @@ export default function ImmersivePartyCam() {
   useEffect(() => {
     if (isLiveStreaming) {
       const interval = setInterval(() => {
-        setViewerCount(prev => Math.max(0, prev + Math.floor(Math.random() * 10) - 4));
+        setViewerCount((prev) =>
+          Math.max(0, prev + Math.floor(Math.random() * 10) - 4)
+        );
       }, 3000);
       return () => clearInterval(interval);
     }
@@ -412,9 +450,11 @@ export default function ImmersivePartyCam() {
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     if (hrs > 0) {
-      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      return `${hrs}:${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
     }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const handleStartRecording = () => {
@@ -438,13 +478,16 @@ export default function ImmersivePartyCam() {
     setIsRecording(false);
     setIsPaused(false);
     setRecordingTime(0);
-    toast({ title: "Recording Saved", description: "Your immersive recording has been saved to gallery" });
+    toast({
+      title: "Recording Saved",
+      description: "Your immersive recording has been saved to gallery",
+    });
   };
 
   const handleToggleFilter = (filterId: string) => {
-    setActiveFilters(prev => 
-      prev.includes(filterId) 
-        ? prev.filter(id => id !== filterId)
+    setActiveFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((id) => id !== filterId)
         : [...prev, filterId]
     );
     toggleFilterMutation.mutate(filterId);
@@ -452,36 +495,50 @@ export default function ImmersivePartyCam() {
 
   const handleGenerateHighlight = () => {
     generateHighlightMutation.mutate({
-      recordings: mockRecordings.map(r => r.id),
+      recordings: mockRecordings.map((r) => r.id),
       style: selectedHighlightStyle,
       music: "auto-select",
     });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
             Immersive PartyCam
           </h1>
           <p className="text-xl text-purple-200">
-            360° recording, AR filters, and cinematic highlight reels for unforgettable party memories
+            360° recording, AR filters, and cinematic highlight reels for
+            unforgettable party memories
           </p>
         </div>
 
-        <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as any)} className="space-y-6">
+        <Tabs
+          value={currentView}
+          onValueChange={(value) => setCurrentView(value as any)}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-3 bg-purple-800/50">
-            <TabsTrigger value="live" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger
+              value="live"
+              className="data-[state=active]:bg-purple-600"
+            >
               <Camera className="mr-2 h-4 w-4" />
               Live Camera
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger
+              value="gallery"
+              className="data-[state=active]:bg-purple-600"
+            >
               <Film className="mr-2 h-4 w-4" />
               Recordings
             </TabsTrigger>
-            <TabsTrigger value="highlights" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger
+              value="highlights"
+              className="data-[state=active]:bg-purple-600"
+            >
               <Star className="mr-2 h-4 w-4" />
               Highlight Reels
             </TabsTrigger>
@@ -494,7 +551,7 @@ export default function ImmersivePartyCam() {
               <div className="lg:col-span-2">
                 <Card className="bg-black/40 border-purple-500/50">
                   <CardContent className="p-6">
-                    <div className="relative aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg overflow-hidden mb-4">
+                    <div className="relative aspect-video bg-linear-to-br from-purple-900/50 to-blue-900/50 rounded-lg overflow-hidden mb-4">
                       <video
                         ref={videoRef}
                         className="w-full h-full object-cover"
@@ -502,12 +559,14 @@ export default function ImmersivePartyCam() {
                         muted
                         poster="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800"
                       />
-                      
+
                       {/* Recording Indicator */}
                       {isRecording && (
                         <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600/90 px-3 py-1 rounded-full">
                           <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                          <span className="text-sm font-medium">REC {formatTime(recordingTime)}</span>
+                          <span className="text-sm font-medium">
+                            REC {formatTime(recordingTime)}
+                          </span>
                         </div>
                       )}
 
@@ -525,13 +584,20 @@ export default function ImmersivePartyCam() {
                       {/* Active Filters Overlay */}
                       {activeFilters.length > 0 && (
                         <div className="absolute bottom-4 left-4 flex gap-2">
-                          {activeFilters.map(filterId => {
-                            const filter = mockFilters.find(f => f.id === filterId);
-                            return filter && (
-                              <Badge key={filterId} className="bg-purple-600/80">
-                                <Sparkles className="w-3 h-3 mr-1" />
-                                {filter.name}
-                              </Badge>
+                          {activeFilters.map((filterId) => {
+                            const filter = mockFilters.find(
+                              (f) => f.id === filterId
+                            );
+                            return (
+                              filter && (
+                                <Badge
+                                  key={filterId}
+                                  className="bg-purple-600/80"
+                                >
+                                  <Sparkles className="w-3 h-3 mr-1" />
+                                  {filter.name}
+                                </Badge>
+                              )
                             );
                           })}
                         </div>
@@ -540,7 +606,7 @@ export default function ImmersivePartyCam() {
                       {/* Camera Mode Indicator */}
                       <div className="absolute bottom-4 right-4">
                         <Badge className="bg-blue-600/80">
-                          {mockModes.find(m => m.id === selectedMode)?.name}
+                          {mockModes.find((m) => m.id === selectedMode)?.name}
                         </Badge>
                       </div>
                     </div>
@@ -548,7 +614,7 @@ export default function ImmersivePartyCam() {
                     {/* Controls */}
                     <div className="flex justify-center gap-4">
                       {!isRecording ? (
-                        <Button 
+                        <Button
                           onClick={handleStartRecording}
                           className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full"
                           disabled={startRecordingMutation.isPending}
@@ -563,7 +629,11 @@ export default function ImmersivePartyCam() {
                             variant="outline"
                             className="border-purple-500 text-purple-300"
                           >
-                            {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                            {isPaused ? (
+                              <Play className="h-4 w-4" />
+                            ) : (
+                              <Pause className="h-4 w-4" />
+                            )}
                           </Button>
                           <Button
                             onClick={handleStopRecording}
@@ -578,7 +648,11 @@ export default function ImmersivePartyCam() {
                       <Button
                         onClick={() => setIsLiveStreaming(!isLiveStreaming)}
                         variant={isLiveStreaming ? "default" : "outline"}
-                        className={isLiveStreaming ? "bg-purple-600" : "border-purple-500 text-purple-300"}
+                        className={
+                          isLiveStreaming
+                            ? "bg-purple-600"
+                            : "border-purple-500 text-purple-300"
+                        }
                       >
                         <Radio className="mr-2 h-4 w-4" />
                         {isLiveStreaming ? "Stop Stream" : "Go Live"}
@@ -589,7 +663,11 @@ export default function ImmersivePartyCam() {
                         variant="outline"
                         className="border-purple-500 text-purple-300"
                       >
-                        {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                        {isFullscreen ? (
+                          <Minimize className="h-4 w-4" />
+                        ) : (
+                          <Maximize className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </CardContent>
@@ -601,32 +679,42 @@ export default function ImmersivePartyCam() {
                 {/* Camera Modes */}
                 <Card className="bg-purple-800/30 border-purple-500/50">
                   <CardHeader>
-                    <CardTitle className="text-purple-300">Camera Mode</CardTitle>
+                    <CardTitle className="text-purple-300">
+                      Camera Mode
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {mockModes.map((mode) => (
-                      <div 
+                      <div
                         key={mode.id}
                         className={`p-3 rounded-lg cursor-pointer transition-all ${
-                          selectedMode === mode.id 
-                            ? 'bg-purple-600/80 border-2 border-purple-400' 
-                            : 'bg-purple-900/50 border border-purple-700/50'
+                          selectedMode === mode.id
+                            ? "bg-purple-600/80 border-2 border-purple-400"
+                            : "bg-purple-900/50 border border-purple-700/50"
                         }`}
                         onClick={() => setSelectedMode(mode.id)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <mode.icon className="h-4 w-4" />
-                            <span className="font-medium text-sm">{mode.name}</span>
+                            <span className="font-medium text-sm">
+                              {mode.name}
+                            </span>
                           </div>
                           {selectedMode === mode.id && (
                             <div className="w-2 h-2 bg-green-400 rounded-full" />
                           )}
                         </div>
-                        <p className="text-xs text-purple-200 mt-1">{mode.description}</p>
+                        <p className="text-xs text-purple-200 mt-1">
+                          {mode.description}
+                        </p>
                         <div className="flex gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">{mode.resolution}</Badge>
-                          <Badge variant="outline" className="text-xs">{mode.frameRate}</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {mode.resolution}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {mode.frameRate}
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -636,20 +724,22 @@ export default function ImmersivePartyCam() {
                 {/* Quick Settings */}
                 <Card className="bg-purple-800/30 border-purple-500/50">
                   <CardHeader>
-                    <CardTitle className="text-purple-300">Quick Settings</CardTitle>
+                    <CardTitle className="text-purple-300">
+                      Quick Settings
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">AR Effects</span>
-                      <Switch 
-                        checked={arEnabled} 
+                      <Switch
+                        checked={arEnabled}
                         onCheckedChange={setArEnabled}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Audio Recording</span>
-                      <Switch 
-                        checked={audioEnabled} 
+                      <Switch
+                        checked={audioEnabled}
                         onCheckedChange={setAudioEnabled}
                       />
                     </div>
@@ -670,7 +760,9 @@ export default function ImmersivePartyCam() {
                 {isLiveStreaming && (
                   <Card className="bg-purple-600/30 border-purple-400/50">
                     <CardHeader>
-                      <CardTitle className="text-purple-200">Live Stats</CardTitle>
+                      <CardTitle className="text-purple-200">
+                        Live Stats
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between">
@@ -679,7 +771,9 @@ export default function ImmersivePartyCam() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Duration</span>
-                        <span className="font-bold">{formatTime(recordingTime)}</span>
+                        <span className="font-bold">
+                          {formatTime(recordingTime)}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Quality</span>
@@ -703,32 +797,38 @@ export default function ImmersivePartyCam() {
                 <ScrollArea className="h-64">
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {mockFilters.map((filter) => (
-                      <div 
+                      <div
                         key={filter.id}
                         className={`relative cursor-pointer transition-all ${
                           activeFilters.includes(filter.id)
-                            ? 'ring-2 ring-purple-400 scale-105'
-                            : 'hover:scale-105'
+                            ? "ring-2 ring-purple-400 scale-105"
+                            : "hover:scale-105"
                         }`}
                         onClick={() => handleToggleFilter(filter.id)}
                       >
                         <div className="aspect-square rounded-lg overflow-hidden">
-                          <img 
-                            src={filter.thumbnail} 
+                          <img
+                            src={filter.thumbnail}
                             alt={filter.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        
+
                         {/* Filter Info */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent rounded-lg flex flex-col justify-end p-2">
-                          <h4 className="text-xs font-medium text-white">{filter.name}</h4>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent rounded-lg flex flex-col justify-end p-2">
+                          <h4 className="text-xs font-medium text-white">
+                            {filter.name}
+                          </h4>
                           <div className="flex items-center gap-1 mt-1">
                             {filter.category === "sponsor" && (
-                              <Badge className="bg-yellow-600 text-xs px-1">Sponsor</Badge>
+                              <Badge className="bg-yellow-600 text-xs px-1">
+                                Sponsor
+                              </Badge>
                             )}
                             {filter.isPremium && (
-                              <Badge className="bg-purple-600 text-xs px-1">Pro</Badge>
+                              <Badge className="bg-purple-600 text-xs px-1">
+                                Pro
+                              </Badge>
                             )}
                           </div>
                         </div>
@@ -740,7 +840,9 @@ export default function ImmersivePartyCam() {
 
                         {/* Usage Count */}
                         <div className="absolute top-2 left-2 bg-black/60 rounded px-1">
-                          <span className="text-xs text-white">{filter.usageCount}</span>
+                          <span className="text-xs text-white">
+                            {filter.usageCount}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -754,23 +856,30 @@ export default function ImmersivePartyCam() {
           <TabsContent value="gallery" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {mockRecordings.map((recording) => (
-                <Card key={recording.id} className="bg-purple-800/30 border-purple-500/50 overflow-hidden">
+                <Card
+                  key={recording.id}
+                  className="bg-purple-800/30 border-purple-500/50 overflow-hidden"
+                >
                   <div className="aspect-video relative">
-                    <img 
-                      src={recording.thumbnail} 
+                    <img
+                      src={recording.thumbnail}
                       alt={recording.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
+
                     {/* Duration */}
                     <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded">
-                      <span className="text-xs text-white">{formatTime(recording.duration)}</span>
+                      <span className="text-xs text-white">
+                        {formatTime(recording.duration)}
+                      </span>
                     </div>
 
                     {/* Quality Badges */}
                     <div className="absolute top-2 left-2 flex gap-1">
-                      <Badge className="bg-blue-600 text-xs">{recording.quality}</Badge>
+                      <Badge className="bg-blue-600 text-xs">
+                        {recording.quality}
+                      </Badge>
                       {recording.is360 && (
                         <Badge className="bg-purple-600 text-xs">360°</Badge>
                       )}
@@ -781,9 +890,9 @@ export default function ImmersivePartyCam() {
 
                     {/* Play Button */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Button 
-                        size="sm" 
-                        className="bg-white/20 hover:bg-white/30 backdrop-blur-sm"
+                      <Button
+                        size="sm"
+                        className="bg-white/20 hover:bg-white/30 backdrop-blur-xs"
                       >
                         <Play className="h-6 w-6" />
                       </Button>
@@ -791,7 +900,9 @@ export default function ImmersivePartyCam() {
                   </div>
 
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-white mb-2">{recording.name}</h3>
+                    <h3 className="font-semibold text-white mb-2">
+                      {recording.name}
+                    </h3>
                     <div className="flex items-center justify-between text-sm text-purple-200 mb-3">
                       <span>{recording.timestamp}</span>
                       <span>{recording.size}</span>
@@ -815,12 +926,20 @@ export default function ImmersivePartyCam() {
 
                     {/* Active Filters */}
                     <div className="flex flex-wrap gap-1 mb-3">
-                      {recording.filters.map(filterId => {
-                        const filter = mockFilters.find(f => f.id === filterId);
-                        return filter && (
-                          <Badge key={filterId} variant="outline" className="text-xs">
-                            {filter.name}
-                          </Badge>
+                      {recording.filters.map((filterId) => {
+                        const filter = mockFilters.find(
+                          (f) => f.id === filterId
+                        );
+                        return (
+                          filter && (
+                            <Badge
+                              key={filterId}
+                              variant="outline"
+                              className="text-xs"
+                            >
+                              {filter.name}
+                            </Badge>
+                          )
                         );
                       })}
                     </div>
@@ -848,7 +967,7 @@ export default function ImmersivePartyCam() {
           {/* Highlight Reels Tab */}
           <TabsContent value="highlights" className="space-y-6">
             {/* Generate New Highlight */}
-            <Card className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-500/50">
+            <Card className="bg-linear-to-r from-purple-600/30 to-pink-600/30 border-purple-500/50">
               <CardHeader>
                 <CardTitle className="text-purple-200 flex items-center gap-2">
                   <Wand2 className="h-5 w-5" />
@@ -857,23 +976,27 @@ export default function ImmersivePartyCam() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {["cinematic", "social", "music-video", "documentary"].map((style) => (
-                    <div
-                      key={style}
-                      className={`p-4 rounded-lg cursor-pointer text-center transition-all ${
-                        selectedHighlightStyle === style
-                          ? 'bg-purple-600 border-2 border-purple-400'
-                          : 'bg-purple-900/50 border border-purple-700/50'
-                      }`}
-                      onClick={() => setSelectedHighlightStyle(style as any)}
-                    >
-                      <div className="capitalize font-medium">{style.replace('-', ' ')}</div>
-                    </div>
-                  ))}
+                  {["cinematic", "social", "music-video", "documentary"].map(
+                    (style) => (
+                      <div
+                        key={style}
+                        className={`p-4 rounded-lg cursor-pointer text-center transition-all ${
+                          selectedHighlightStyle === style
+                            ? "bg-purple-600 border-2 border-purple-400"
+                            : "bg-purple-900/50 border border-purple-700/50"
+                        }`}
+                        onClick={() => setSelectedHighlightStyle(style as any)}
+                      >
+                        <div className="capitalize font-medium">
+                          {style.replace("-", " ")}
+                        </div>
+                      </div>
+                    )
+                  )}
                 </div>
-                <Button 
+                <Button
                   onClick={handleGenerateHighlight}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
+                  className="w-full bg-linear-to-r from-purple-600 to-pink-600"
                   disabled={generateHighlightMutation.isPending}
                 >
                   <Sparkles className="mr-2 h-4 w-4" />
@@ -885,32 +1008,37 @@ export default function ImmersivePartyCam() {
             {/* Existing Highlights */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {mockHighlights.map((highlight) => (
-                <Card key={highlight.id} className="bg-purple-800/30 border-purple-500/50 overflow-hidden">
+                <Card
+                  key={highlight.id}
+                  className="bg-purple-800/30 border-purple-500/50 overflow-hidden"
+                >
                   <div className="aspect-video relative">
-                    <img 
-                      src={highlight.thumbnail} 
+                    <img
+                      src={highlight.thumbnail}
                       alt={highlight.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
+
                     {/* Duration */}
                     <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded">
-                      <span className="text-xs text-white">{formatTime(highlight.duration)}</span>
+                      <span className="text-xs text-white">
+                        {formatTime(highlight.duration)}
+                      </span>
                     </div>
 
                     {/* Style Badge */}
                     <div className="absolute top-2 left-2">
-                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-xs capitalize">
-                        {highlight.style.replace('-', ' ')}
+                      <Badge className="bg-linear-to-r from-purple-600 to-pink-600 text-xs capitalize">
+                        {highlight.style.replace("-", " ")}
                       </Badge>
                     </div>
 
                     {/* Play Button */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Button 
-                        size="sm" 
-                        className="bg-white/20 hover:bg-white/30 backdrop-blur-sm"
+                      <Button
+                        size="sm"
+                        className="bg-white/20 hover:bg-white/30 backdrop-blur-xs"
                       >
                         <Play className="h-6 w-6" />
                       </Button>
@@ -918,22 +1046,30 @@ export default function ImmersivePartyCam() {
                   </div>
 
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-white mb-2">{highlight.title}</h3>
-                    <p className="text-sm text-purple-200 mb-3">{highlight.description}</p>
-                    
+                    <h3 className="font-semibold text-white mb-2">
+                      {highlight.title}
+                    </h3>
+                    <p className="text-sm text-purple-200 mb-3">
+                      {highlight.description}
+                    </p>
+
                     {/* Details */}
                     <div className="grid grid-cols-2 gap-4 text-sm text-purple-300 mb-3">
                       <div>
-                        <span className="text-purple-400">Clips:</span> {highlight.clips}
+                        <span className="text-purple-400">Clips:</span>{" "}
+                        {highlight.clips}
                       </div>
                       <div>
-                        <span className="text-purple-400">Music:</span> {highlight.music}
+                        <span className="text-purple-400">Music:</span>{" "}
+                        {highlight.music}
                       </div>
                       <div>
-                        <span className="text-purple-400">Generated:</span> {highlight.generatedAt}
+                        <span className="text-purple-400">Generated:</span>{" "}
+                        {highlight.generatedAt}
                       </div>
                       <div>
-                        <span className="text-purple-400">Transitions:</span> {highlight.transitions}
+                        <span className="text-purple-400">Transitions:</span>{" "}
+                        {highlight.transitions}
                       </div>
                     </div>
 

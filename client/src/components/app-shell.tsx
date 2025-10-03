@@ -3,14 +3,12 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SearchActions from "./SearchActions";
-import { Search, Bell, Sparkles, Sun, Moon } from "lucide-react";
+import { Bell, Sparkles, Sun, Moon } from "lucide-react";
 
 // Swiper Imports
 import DesktopNav from "./DesktopNav";
 import MobileNavSheet from "./MobileNavSheet";
-import CommandPalette from "./CommandPalette";
-import UserMenu from "./UserMenu";
-import { navigationItems, quickActions } from "./app-shell-data";
+import { navigationItems } from "./app-shell-data";
 
 import TopBar from "./Topbar/TopBar";
 import Footer from "./HomPage/Footer";
@@ -89,10 +87,10 @@ export function AppShell({ children }: AppShellProps) {
                   href="/"
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-linear-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <span className="text-xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Vibes
                   </span>
                 </Link>
@@ -132,7 +130,7 @@ export function AppShell({ children }: AppShellProps) {
         {/* <div className="fixed bottom-6 right-6 z-40">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="lg" className="rounded-full w-14 h-14 shadow-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button size="lg" className="rounded-full w-14 h-14 shadow-lg bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 <Plus className="w-6 h-6" />
               </Button>
             </DropdownMenuTrigger>

@@ -119,7 +119,7 @@ const WeddingDashboard: React.FC = () => {
         {/* Top Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Wedding Moment Capture Gallery */}
-          <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-2xl">
+          <div className="bg-white/95 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
               <Camera className="w-5 h-5 text-pink-500" />
               <h2 className="text-xl font-bold text-gray-800">Wedding Moment Capture Gallery</h2>
@@ -156,7 +156,7 @@ const WeddingDashboard: React.FC = () => {
           </div>
 
           {/* Ambient Music Selector */}
-          <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-2xl">
+          <div className="bg-white/95 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
               <Music className="w-5 h-5 text-purple-500" />
               <h2 className="text-xl font-bold text-gray-800">Ambient Music Selector</h2>
@@ -219,7 +219,7 @@ const WeddingDashboard: React.FC = () => {
           </div>
 
           {/* AI Wedding Experience Predictor */}
-          <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-2xl">
+          <div className="bg-white/95 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="w-5 h-5 text-blue-500" />
               <h2 className="text-xl font-bold text-gray-800">AI Wedding Experience Predictor</h2>
@@ -254,7 +254,7 @@ const WeddingDashboard: React.FC = () => {
               <div className="text-sm font-medium text-gray-700">AI Recommendations</div>
               {recommendations.map((rec, index) => (
                 <div key={index} className="bg-blue-50 rounded p-3 flex items-start gap-2">
-                  <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <Info className="w-3 h-3 text-blue-500 mt-0.5 shrink-0" />
                   <span className="text-xs text-gray-900">{rec}</span>
                 </div>
               ))}
@@ -264,7 +264,7 @@ const WeddingDashboard: React.FC = () => {
 
         {/* Bottom Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white/95 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-2xl">
+          <div className="bg-white/95 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-5 text-yellow-500">⏱️</div>
               <h2 className="text-xl font-bold text-gray-800">Wedding Countdown</h2>
@@ -283,7 +283,7 @@ const WeddingDashboard: React.FC = () => {
                 { label: 'Minutes', value: countdown.minutes },
                 { label: 'Seconds', value: countdown.seconds }
               ].map((item, index) => (
-                <div key={index} className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-3 text-center">
+                <div key={index} className="bg-linear-to-br from-yellow-50 to-yellow-100 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold text-yellow-600">{item.value}</div>
                   <div className="text-xs text-gray-600">{item.label}</div>
                 </div>
@@ -309,7 +309,7 @@ const WeddingDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-200 rounded-lg p-6 shadow-2xl">
+          <div className="bg-linear-to-br from-pink-50 to-purple-50 border border-pink-200 rounded-lg p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <Heart className="w-5 h-5 text-pink-500" />
               <h2 className="text-xl font-bold text-gray-800">Quick Wedding Actions</h2>
@@ -358,7 +358,7 @@ monitoring, and benefit from our comprehensive admin oversight system.
         
         <button
           onClick={toggleFAB}
-          className="w-16 h-14 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-xl flex items-center justify-center hover:shadow-2xl transition-shadow relative"
+          className="w-16 h-14 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-xl flex items-center justify-center hover:shadow-2xl transition-shadow relative"
         >
           <Plus className="w-4 h-4" />
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">

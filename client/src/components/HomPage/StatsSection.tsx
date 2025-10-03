@@ -33,9 +33,9 @@ const StatsSection: React.FC = () => {
   return (
     <div className="w-full flex justify-center px-6 py-10">
       {/* Outer gradient wrapper */}
-      <div className="w-full container rounded-2xl p-[2px] bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500">
+      <div className="w-full container rounded-2xl p-[2px] bg-linear-to-r from-purple-600 via-pink-500 to-orange-500">
         {/* Inner card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 rounded-2xl bg-gradient-to-r from-purple-100 to-blue-100 p-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 rounded-2xl bg-linear-to-r from-purple-100 to-blue-100 p-8">
           {stats.map((item, index) => (
             <div key={index} className="flex flex-col items-center text-center">
               <p className={`text-3xl font-bold ${item.color}`}>{item.value}</p>

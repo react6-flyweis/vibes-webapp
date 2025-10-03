@@ -6,7 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Palette, Music, ShoppingBag, Heart, Wand2 } from "lucide-react";
+import {
+  Sparkles,
+  Palette,
+  Music,
+  ShoppingBag,
+  Heart,
+  Wand2,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -39,7 +46,7 @@ const presetThemes: Record<string, ThemeGeneration> = {
       "Açaí bowls with fresh berries",
       "Craft cold brew coffee",
       "Smoked salmon bagels",
-      "Fresh fruit platters"
+      "Fresh fruit platters",
     ],
     musicPlaylist: {
       genre: "Chill Indie/Acoustic",
@@ -48,29 +55,29 @@ const presetThemes: Record<string, ThemeGeneration> = {
         "Breath Me - Sia",
         "Vienna - Billy Joel",
         "Something in the Way She Moves - James Taylor",
-        "Holocene - Bon Iver"
-      ]
+        "Holocene - Bon Iver",
+      ],
     },
     decorSuggestions: [
       {
         item: "Eucalyptus garlands",
         price: "$25",
         link: "https://amazon.com/eucalyptus-garland",
-        description: "Fresh green garlands for natural ambiance"
+        description: "Fresh green garlands for natural ambiance",
       },
       {
-        item: "White market umbrellas", 
+        item: "White market umbrellas",
         price: "$89",
         link: "https://amazon.com/market-umbrellas",
-        description: "Provide shade and elegant coverage"
+        description: "Provide shade and elegant coverage",
       },
       {
         item: "Rustic wooden serving boards",
         price: "$35",
         link: "https://amazon.com/wooden-boards",
-        description: "Perfect for charcuterie and appetizers"
-      }
-    ]
+        description: "Perfect for charcuterie and appetizers",
+      },
+    ],
   },
   "neon retro rave": {
     name: "Electric Nostalgia",
@@ -82,45 +89,47 @@ const presetThemes: Record<string, ThemeGeneration> = {
       "Glow-in-the-dark jello shots",
       "Retro candy bar",
       "Pop rocks cocktails",
-      "Neon-colored popcorn"
+      "Neon-colored popcorn",
     ],
     musicPlaylist: {
       genre: "Synthwave/Electronic",
       songs: [
         "Blinding Lights - The Weeknd",
-        "I Can't Sleep - Clay Walker", 
+        "I Can't Sleep - Clay Walker",
         "Midnight City - M83",
         "Electric Feel - MGMT",
-        "One More Time - Daft Punk"
-      ]
+        "One More Time - Daft Punk",
+      ],
     },
     decorSuggestions: [
       {
         item: "LED strip lights (multicolor)",
         price: "$45",
         link: "https://amazon.com/led-strips",
-        description: "Create electric ambiance throughout space"
+        description: "Create electric ambiance throughout space",
       },
       {
         item: "Blacklight reactive decorations",
         price: "$28",
         link: "https://amazon.com/blacklight-decor",
-        description: "Glow under UV lighting for authentic rave feel"
+        description: "Glow under UV lighting for authentic rave feel",
       },
       {
         item: "Disco ball with spotlight",
         price: "$65",
         link: "https://amazon.com/disco-ball",
-        description: "Classic party centerpiece with modern LED"
-      }
-    ]
-  }
+        description: "Classic party centerpiece with modern LED",
+      },
+    ],
+  },
 };
 
 export default function AIThemeGenerator() {
   const [vibeInput, setVibeInput] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<string>("");
-  const [generatedTheme, setGeneratedTheme] = useState<ThemeGeneration | null>(null);
+  const [generatedTheme, setGeneratedTheme] = useState<ThemeGeneration | null>(
+    null
+  );
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -129,20 +138,20 @@ export default function AIThemeGenerator() {
       try {
         // Check if it matches a preset first
         const lowerVibe = vibeDescription.toLowerCase();
-        const matchedPreset = Object.keys(presetThemes).find(key => 
-          lowerVibe.includes(key) || key.includes(lowerVibe)
+        const matchedPreset = Object.keys(presetThemes).find(
+          (key) => lowerVibe.includes(key) || key.includes(lowerVibe)
         );
-        
+
         if (matchedPreset) {
           return presetThemes[matchedPreset];
         }
 
         // Try AI API for custom theme generation
         try {
-          const response = await apiRequest('/api/ai/generate-theme', 'POST', {
+          const response = await apiRequest("/api/ai/generate-theme", "POST", {
             eventType: vibeDescription,
             guestCount: 20,
-            budget: "moderate"
+            budget: "moderate",
           });
 
           // Transform AI response to match our theme structure
@@ -154,88 +163,118 @@ export default function AIThemeGenerator() {
             menuSuggestions: response.foodIdeas || [
               "AI-curated menu suggestions",
               "Personalized food recommendations",
-              "Theme-matched cuisine"
+              "Theme-matched cuisine",
             ],
             musicPlaylist: {
               genre: "AI Curated",
               songs: response.musicSuggestions || [
                 "AI-selected tracks",
                 "Mood-matched music",
-                "Custom playlist"
-              ]
+                "Custom playlist",
+              ],
             },
-            decorSuggestions: response.decorations?.map((item: string, index: number) => ({
-              item: item,
-              price: `$${25 + (index * 15)}`,
-              link: "#",
-              description: `AI-recommended ${item.toLowerCase()}`
-            })) || [
+            decorSuggestions: response.decorations?.map(
+              (item: string, index: number) => ({
+                item: item,
+                price: `$${25 + index * 15}`,
+                link: "#",
+                description: `AI-recommended ${item.toLowerCase()}`,
+              })
+            ) || [
               {
                 item: "AI-recommended decorations",
                 price: "$50",
                 link: "#",
-                description: "Intelligent decoration suggestions"
-              }
-            ]
+                description: "Intelligent decoration suggestions",
+              },
+            ],
           };
         } catch (aiError) {
           // Generate intelligent theme based on description
-          const words = vibeDescription.toLowerCase().split(' ');
+          const words = vibeDescription.toLowerCase().split(" ");
           const eventKeywords = {
-            birthday: { colors: ["#FF6B6B", "#4ECDC4", "#45B7D1"], music: "Pop & Dance Hits", vibe: "Celebratory & Joyful" },
-            wedding: { colors: ["#F8F9FA", "#E9ECEF", "#DEE2E6"], music: "Romantic Classics", vibe: "Elegant & Romantic" },
-            corporate: { colors: ["#2C3E50", "#3498DB", "#E74C3C"], music: "Professional Background", vibe: "Professional & Modern" },
-            holiday: { colors: ["#C0392B", "#27AE60", "#F39C12"], music: "Holiday Classics", vibe: "Festive & Warm" },
-            graduation: { colors: ["#8E44AD", "#F1C40F", "#2ECC71"], music: "Uplifting Anthems", vibe: "Achievement & Success" }
+            birthday: {
+              colors: ["#FF6B6B", "#4ECDC4", "#45B7D1"],
+              music: "Pop & Dance Hits",
+              vibe: "Celebratory & Joyful",
+            },
+            wedding: {
+              colors: ["#F8F9FA", "#E9ECEF", "#DEE2E6"],
+              music: "Romantic Classics",
+              vibe: "Elegant & Romantic",
+            },
+            corporate: {
+              colors: ["#2C3E50", "#3498DB", "#E74C3C"],
+              music: "Professional Background",
+              vibe: "Professional & Modern",
+            },
+            holiday: {
+              colors: ["#C0392B", "#27AE60", "#F39C12"],
+              music: "Holiday Classics",
+              vibe: "Festive & Warm",
+            },
+            graduation: {
+              colors: ["#8E44AD", "#F1C40F", "#2ECC71"],
+              music: "Uplifting Anthems",
+              vibe: "Achievement & Success",
+            },
           };
 
-          let selectedTheme = { colors: ["#6366F1", "#8B5CF6", "#EC4899"], music: "Mixed Playlist", vibe: "Custom Celebration" };
-          
+          let selectedTheme = {
+            colors: ["#6366F1", "#8B5CF6", "#EC4899"],
+            music: "Mixed Playlist",
+            vibe: "Custom Celebration",
+          };
+
           for (const [key, theme] of Object.entries(eventKeywords)) {
-            if (words.some(word => word.includes(key) || key.includes(word))) {
+            if (
+              words.some((word) => word.includes(key) || key.includes(word))
+            ) {
               selectedTheme = theme;
               break;
             }
           }
 
           return {
-            name: `${vibeDescription.charAt(0).toUpperCase() + vibeDescription.slice(1)} Theme`,
+            name: `${
+              vibeDescription.charAt(0).toUpperCase() + vibeDescription.slice(1)
+            } Theme`,
             colors: selectedTheme.colors,
             fonts: ["Inter", "Playfair Display"],
             vibe: selectedTheme.vibe,
             menuSuggestions: [
               "Themed appetizers and finger foods",
               "Signature cocktails or beverages",
-              "Custom dessert station"
+              "Custom dessert station",
             ],
             musicPlaylist: {
               genre: selectedTheme.music,
               songs: [
                 "Curated playlist for your event",
                 "Mix of crowd favorites",
-                "Background ambiance music"
-              ]
+                "Background ambiance music",
+              ],
             },
             decorSuggestions: [
               {
                 item: "Color-coordinated balloons",
                 price: "$35",
                 link: "#",
-                description: "Matching your theme colors"
+                description: "Matching your theme colors",
               },
               {
                 item: "Themed centerpieces",
                 price: "$50",
                 link: "#",
-                description: "Custom table decorations"
+                description: "Custom table decorations",
               },
               {
                 item: "Ambient lighting",
                 price: "$65",
                 link: "#",
-                description: "Perfect mood lighting"
-              }
-            ]
+                description: "Perfect mood lighting",
+              },
+            ],
           };
         }
       } catch (error) {
@@ -248,7 +287,7 @@ export default function AIThemeGenerator() {
       setIsGenerating(false);
       toast({
         title: "🎨 Theme Generated!",
-        description: "Your AI-powered theme is ready to inspire your event!"
+        description: "Your AI-powered theme is ready to inspire your event!",
       });
     },
     onError: (error) => {
@@ -256,10 +295,12 @@ export default function AIThemeGenerator() {
       console.error("Theme generation error:", error);
       toast({
         title: "Generation Error",
-        description: `Error: ${error.message || "Let's try again with a different vibe description."}`,
-        variant: "destructive"
+        description: `Error: ${
+          error.message || "Let's try again with a different vibe description."
+        }`,
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const handleGenerate = () => {
@@ -267,11 +308,11 @@ export default function AIThemeGenerator() {
       toast({
         title: "Describe Your Vibe",
         description: "Tell us about the atmosphere you want to create!",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
-    
+
     setIsGenerating(true);
     generateTheme.mutate(vibeInput);
   };
@@ -285,29 +326,30 @@ export default function AIThemeGenerator() {
   const applyTheme = useMutation({
     mutationFn: async () => {
       // For now, simulate saving the theme
-      return new Promise(resolve => setTimeout(resolve, 1000));
+      return new Promise((resolve) => setTimeout(resolve, 1000));
     },
     onSuccess: () => {
       toast({
         title: "🎉 Theme Applied!",
-        description: "Your AI theme has been saved to your event toolkit!"
+        description: "Your AI theme has been saved to your event toolkit!",
       });
-    }
+    },
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="h-8 w-8 text-purple-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               AI Theme Generator
             </h1>
             <Wand2 className="h-8 w-8 text-pink-600" />
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Describe your dream vibe and watch AI transform it into a complete theme with colors, music, menu ideas, and shopping links!
+            Describe your dream vibe and watch AI transform it into a complete
+            theme with colors, music, menu ideas, and shopping links!
           </p>
         </div>
 
@@ -326,9 +368,11 @@ export default function AIThemeGenerator() {
               onChange={(e) => setVibeInput(e.target.value)}
               className="min-h-[100px]"
             />
-            
+
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Quick presets:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Quick presets:
+              </span>
               {Object.keys(presetThemes).map((preset) => (
                 <Badge
                   key={preset}
@@ -341,10 +385,10 @@ export default function AIThemeGenerator() {
               ))}
             </div>
 
-            <Button 
+            <Button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
               size="lg"
             >
               {isGenerating ? (
@@ -401,11 +445,13 @@ export default function AIThemeGenerator() {
                     <div className="flex gap-2 flex-wrap">
                       {generatedTheme.colors.map((color: any, index: any) => (
                         <div key={index} className="flex flex-col items-center">
-                          <div 
-                            className="w-16 h-16 rounded-lg border-2 border-gray-200 shadow-sm"
+                          <div
+                            className="w-16 h-16 rounded-lg border-2 border-gray-200 shadow-xs"
                             style={{ backgroundColor: color }}
                           />
-                          <span className="text-xs mt-1 font-mono">{color}</span>
+                          <span className="text-xs mt-1 font-mono">
+                            {color}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -429,12 +475,17 @@ export default function AIThemeGenerator() {
                     Menu Suggestions - {generatedTheme.name}
                   </h3>
                   <div className="grid gap-2">
-                    {generatedTheme.menuSuggestions.map((item: any, index: any) => (
-                      <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-green-600">✓</span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
+                    {generatedTheme.menuSuggestions.map(
+                      (item: any, index: any) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                        >
+                          <span className="text-green-600">✓</span>
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </TabsContent>
 
@@ -444,12 +495,17 @@ export default function AIThemeGenerator() {
                     {generatedTheme.musicPlaylist.genre} Playlist
                   </h3>
                   <div className="grid gap-2">
-                    {generatedTheme.musicPlaylist.songs.map((song: any, index: any) => (
-                      <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-purple-600">♪</span>
-                        <span>{song}</span>
-                      </div>
-                    ))}
+                    {generatedTheme.musicPlaylist.songs.map(
+                      (song: any, index: any) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                        >
+                          <span className="text-purple-600">♪</span>
+                          <span>{song}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </TabsContent>
 
@@ -459,26 +515,36 @@ export default function AIThemeGenerator() {
                     Curated Shopping List
                   </h3>
                   <div className="grid gap-4">
-                    {generatedTheme.decorSuggestions.map((item: any, index: any) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-semibold">{item.item}</h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
+                    {generatedTheme.decorSuggestions.map(
+                      (item: any, index: any) => (
+                        <Card key={index}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-semibold">{item.item}</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {item.description}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-lg">
+                                  {item.price}
+                                </p>
+                                <Button size="sm" variant="outline" asChild>
+                                  <a
+                                    href={item.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    Shop Now
+                                  </a>
+                                </Button>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold text-lg">{item.price}</p>
-                              <Button size="sm" variant="outline" asChild>
-                                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                                  Shop Now
-                                </a>
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      )
+                    )}
                   </div>
                 </TabsContent>
               </Tabs>

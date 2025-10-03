@@ -70,7 +70,7 @@ export default function EventDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
         </div>
@@ -80,13 +80,13 @@ export default function EventDetail() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Event Not Found</h1>
           <p className="text-purple-200 mb-6">The event you're looking for doesn't exist.</p>
           <Button 
             onClick={() => window.location.href = "/unique-parties"}
-            className="bg-gradient-to-r from-purple-600 to-blue-600"
+            className="bg-linear-to-r from-purple-600 to-blue-600"
           >
             Browse Events
           </Button>
@@ -104,7 +104,7 @@ export default function EventDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         <img 
@@ -180,7 +180,7 @@ export default function EventDetail() {
           <div className="lg:col-span-2 space-y-8">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-4 text-center">
                   <Users className="h-6 w-6 text-purple-400 mx-auto mb-2" />
                   <div className="text-2xl font-bold text-white">{event.attendees}</div>
@@ -188,7 +188,7 @@ export default function EventDetail() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-4 text-center">
                   <Star className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
                   <div className="text-2xl font-bold text-white">{event.rating}</div>
@@ -196,7 +196,7 @@ export default function EventDetail() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-4 text-center">
                   <DollarSign className="h-6 w-6 text-green-400 mx-auto mb-2" />
                   <div className="text-2xl font-bold text-white">
@@ -206,7 +206,7 @@ export default function EventDetail() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-4 text-center">
                   <Clock className="h-6 w-6 text-blue-400 mx-auto mb-2" />
                   <div className="text-2xl font-bold text-white">{event.time}</div>
@@ -216,7 +216,7 @@ export default function EventDetail() {
             </div>
 
             {/* Description */}
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Info className="h-5 w-5" />
@@ -244,7 +244,7 @@ export default function EventDetail() {
             </Card>
 
             {/* Event Details */}
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Event Details</CardTitle>
               </CardHeader>
@@ -289,7 +289,7 @@ export default function EventDetail() {
                   </div>
                   <div className="w-full bg-white/20 rounded-full h-2 mt-2">
                     <div 
-                      className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
+                      className="bg-linear-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
                       style={{ width: `${(event.attendees / event.maxCapacity) * 100}%` }}
                     />
                   </div>
@@ -301,7 +301,7 @@ export default function EventDetail() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Booking Card */}
-            <Card className="bg-white/10 backdrop-blur border-white/20 sticky top-8">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 sticky top-8">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Ticket className="h-5 w-5" />
@@ -320,7 +320,7 @@ export default function EventDetail() {
                 </div>
 
                 <Button 
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                   size="lg"
                   onClick={() => window.location.href = `/events/booking/${event.id}`}
                 >
@@ -334,7 +334,7 @@ export default function EventDetail() {
             </Card>
 
             {/* Contact Info */}
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Need Help?</CardTitle>
               </CardHeader>
@@ -360,7 +360,7 @@ export default function EventDetail() {
             </Card>
 
             {/* Related Events */}
-            <Card className="bg-white/10 backdrop-blur border-white/20">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardHeader>
                 <CardTitle className="text-white">Similar Events</CardTitle>
               </CardHeader>

@@ -224,7 +224,7 @@ export default function ARVRImmersive() {
         {/* Header */}
         <div className="text-center mb-8">
           <Glasses className="w-16 h-16 text-cyan-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-cyan-200 bg-clip-text text-transparent">
             Immersive AR/VR Experiences
           </h1>
           <p className="text-white/90 mt-2 text-xl">Preview venues in AR and relive events in virtual reality</p>
@@ -270,28 +270,28 @@ export default function ARVRImmersive() {
         {/* AR/VR Statistics */}
         {arvrStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Film className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{arvrStats.totalExperiences || '89'}</div>
                 <p className="text-gray-600 text-sm">AR/VR Experiences</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Eye className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{arvrStats.totalViews || '12.4K'}</div>
                 <p className="text-gray-600 text-sm">Total Views</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Target className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{arvrStats.averageEngagement || '87'}%</div>
                 <p className="text-gray-600 text-sm">Engagement Rate</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Zap className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{arvrStats.conversionRate || '34'}%</div>
@@ -302,7 +302,7 @@ export default function ARVRImmersive() {
         )}
 
         {/* Filters */}
-        <Card className="mb-8 bg-white/95 backdrop-blur border-2 border-white/30">
+        <Card className="mb-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
           <CardHeader>
             <CardTitle className="text-xl flex items-center">
               <Settings className="w-6 h-6 mr-2 text-gray-600" />
@@ -362,9 +362,9 @@ export default function ARVRImmersive() {
               const typeGradient = experienceTypeColors[experience.type as keyof typeof experienceTypeColors];
               
               return (
-                <Card key={experience.id} className="bg-white/95 backdrop-blur border-2 border-white/30 hover:scale-105 transition-all duration-300">
+                <Card key={experience.id} className="bg-white/95 backdrop-blur-sm border-2 border-white/30 hover:scale-105 transition-all duration-300">
                   <CardHeader className="pb-2">
-                    <div className={`w-full h-48 bg-gradient-to-br ${typeGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
+                    <div className={`w-full h-48 bg-linear-to-br ${typeGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
                       <TypeIcon className="w-20 h-20 text-white/80" />
                       <div className="absolute top-2 left-2">
                         <Badge className="bg-black/50 text-white">
@@ -492,7 +492,7 @@ export default function ARVRImmersive() {
 
         {/* Device Compatibility Info */}
         {arvrStats && arvrStats.deviceBreakdown && (
-          <Card className="mt-8 bg-white/95 backdrop-blur border-2 border-white/30">
+          <Card className="mt-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Monitor className="w-6 h-6 mr-2 text-blue-600" />

@@ -10,7 +10,7 @@ const FormInput = ({ id, label, type = 'text', placeholder }) => (
             id={id}
             name={id}
             placeholder={placeholder}
-            className="w-full bg-white/10 border-2 border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            className="w-full bg-white/10 border-2 border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all"
         />
     </div>
 );
@@ -46,7 +46,7 @@ const ConfirmationPage = ({ bookingDetails }) => {
             
             <div className="bg-black/20 border border-white/10 rounded-lg p-6 text-left flex flex-col md:flex-row gap-6 items-center">
                 <img src={qrCodeUrl} alt="Booking QR Code" className="rounded-lg" />
-                <div className="flex-grow">
+                <div className="grow">
                     <h3 className="text-xl font-bold mb-4">Your Booking Details</h3>
                     <div className="space-y-3 text-sm">
                         <div>
@@ -83,7 +83,7 @@ const ConfirmationPage = ({ bookingDetails }) => {
 // Component for the Checkout step
 const CheckoutForm = ({ onBack, onContinue }) => {
     return (
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg text-white">
+        <div className="bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-lg text-white">
             <h2 className="text-2xl font-bold mb-2 tracking-tight">Checkout</h2>
             <p className="text-blue-100 text-sm mb-8">Complete your booking</p>
 
@@ -99,7 +99,7 @@ const CheckoutForm = ({ onBack, onContinue }) => {
                 </div>
 
                 <div className="flex items-end gap-4">
-                    <div className="flex-grow">
+                    <div className="grow">
                         <FormInput id="promo" label="Promo Code" placeholder="Enter code" />
                     </div>
                     <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium h-12 px-6 rounded-lg transition-colors">
@@ -152,12 +152,12 @@ const SeatSelection = ({ totalTickets, selectedSeats, onSeatSelect, onBack, onCo
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg text-white">
+    <div className="bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-lg text-white">
       <h2 className="text-2xl font-bold mb-2 tracking-tight">Choose Your Seats</h2>
       <p className="text-blue-100 text-sm mb-6">
         Select {totalTickets} seat(s) for your tickets. You have selected {selectedSeats.length}.
       </p>
-      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center h-16 mb-6">
+      <div className="bg-linear-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center h-16 mb-6">
         <p className="text-xl font-bold tracking-widest">STAGE</p>
       </div>
       <div className="grid grid-cols-10 gap-x-4 gap-y-4 mx-auto max-w-xl mb-6">
@@ -238,10 +238,10 @@ const TicketBooking = () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden shadow-lg">
+            <div className="bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg overflow-hidden shadow-lg">
                 <div className="h-48 bg-cover bg-center p-6 flex flex-col justify-end text-white" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1964&auto=format&fit=crop')" }}>
                     <div className="z-10"><h1 className="text-3xl font-bold mb-1 drop-shadow-lg">International Food & Wine Festival</h1><p className="text-blue-100 drop-shadow-md">Culinary Arts Society</p></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
                 </div>
                 <div className="p-4 flex items-center justify-around text-sm bg-black/20">
                     <div className="flex items-center space-x-2"><Calendar className="w-4 h-4 text-blue-400" /><span>10/5/2025</span></div>
@@ -250,7 +250,7 @@ const TicketBooking = () => {
                 </div>
             </div>
             {currentStep === 'selectTickets' && (
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg">
+              <div className="bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-lg">
                 <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Select Your Tickets</h2>
                 <p className="text-blue-100 text-sm mb-6">Choose the ticket type and quantity</p>
                 <div className="space-y-4">
@@ -262,7 +262,7 @@ const TicketBooking = () => {
                         </div><p className="text-blue-100 text-sm mb-3">{ticket.description}</p>
                        <div className="flex flex-wrap gap-2 mb-4">{ticket.features.map((feature, index) => (<span key={index} className="border border-gray-300/60 rounded-full px-3 py-1 text-xs font-medium text-blue-100 bg-white/5">{feature}</span>))}</div>
                        <div className="relative w-32">
-                          <select className="appearance-none bg-white/10 border border-white/20 rounded-md text-white px-3 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500" value={selectedTickets[ticket.id]} onChange={(e) => handleTicketChange(ticket.id, parseInt(e.target.value))}>
+                          <select className="appearance-none bg-white/10 border border-white/20 rounded-md text-white px-3 py-2 text-sm w-full focus:outline-hidden focus:ring-2 focus:ring-blue-500" value={selectedTickets[ticket.id]} onChange={(e) => handleTicketChange(ticket.id, parseInt(e.target.value))}>
                               {[...Array(11)].map((_, i) => (<option key={i} value={i} className="bg-gray-800 text-white">{i}</option>))}
                           </select>
                           <ChevronDown className="w-4 h-4 text-white/50 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -282,7 +282,7 @@ const TicketBooking = () => {
           </div>
           <div className="lg:col-span-1">
             {currentStep !== 'confirmation' && (
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 shadow-lg sticky top-8">
+              <div className="bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg p-6 shadow-lg sticky top-8">
                 <h2 className="text-2xl font-bold text-white mb-6 tracking-tight">Order Summary</h2>
                 <div className="space-y-4 pb-4 border-b border-white/20">
                   <div className="flex justify-between items-center text-sm"><span className="text-blue-100">Subtotal</span><span className="text-white">${subtotal.toFixed(2)}</span></div>

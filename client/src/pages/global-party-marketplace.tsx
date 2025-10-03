@@ -215,7 +215,7 @@ export default function GlobalPartyMarketplace() {
         {/* Header */}
         <div className="text-center mb-8">
           <Globe className="w-16 h-16 text-blue-200 mx-auto mb-4 animate-party-wiggle" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-white to-blue-200 bg-clip-text text-transparent">
             Global Party Marketplace
           </h1>
           <p className="text-white/90 mt-2 text-xl">Discover and book verified vendors worldwide with blockchain transparency</p>
@@ -224,42 +224,42 @@ export default function GlobalPartyMarketplace() {
         {/* Marketplace Stats */}
         {marketplaceStats && (
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.totalVendors || '2,847'}</div>
                 <p className="text-gray-600 text-xs">Verified Vendors</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Calendar className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.totalBookings || '12,654'}</div>
                 <p className="text-gray-600 text-xs">Total Bookings</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Star className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.averageRating || '4.8'}</div>
                 <p className="text-gray-600 text-xs">Average Rating</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Globe className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.countriesServed || '89'}</div>
                 <p className="text-gray-600 text-xs">Countries</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.totalValueTransacted || '$2.4M'}</div>
                 <p className="text-gray-600 text-xs">Value Locked</p>
               </CardContent>
             </Card>
-            <Card className="bg-white/95 backdrop-blur border-2 border-white/30">
+            <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardContent className="p-4 text-center">
                 <Shield className="w-8 h-8 text-red-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-800">{marketplaceStats.activeContracts || '156'}</div>
@@ -270,7 +270,7 @@ export default function GlobalPartyMarketplace() {
         )}
 
         {/* Search and Filters */}
-        <Card className="mb-8 bg-white/95 backdrop-blur border-2 border-white/30">
+        <Card className="mb-8 bg-white/95 backdrop-blur-sm border-2 border-white/30">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center">
               <Search className="w-8 h-8 mr-3 text-blue-600" />
@@ -364,10 +364,10 @@ export default function GlobalPartyMarketplace() {
               const categoryGradient = categoryColors[vendor.category as keyof typeof categoryColors] || 'from-gray-500 to-gray-700';
               
               return (
-                <Card key={vendor.id} className="bg-white/95 backdrop-blur border-2 border-white/30 hover:scale-105 transition-all duration-300 cursor-pointer"
+                <Card key={vendor.id} className="bg-white/95 backdrop-blur-sm border-2 border-white/30 hover:scale-105 transition-all duration-300 cursor-pointer"
                       onClick={() => setSelectedVendor(vendor.id)}>
                   <CardHeader className="pb-2">
-                    <div className={`w-full h-48 bg-gradient-to-br ${categoryGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
+                    <div className={`w-full h-48 bg-linear-to-br ${categoryGradient} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
                       <CategoryIcon className="w-20 h-20 text-white/80" />
                       <div className="absolute top-2 left-2">
                         {vendor.verified && (

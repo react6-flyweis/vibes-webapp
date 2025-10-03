@@ -132,18 +132,18 @@ export default function EventDiscovery() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 text-white">
+    <div className="min-h-screen bg-linear-to-br from-indigo-900 to-purple-900 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
             Discover Amazing Events
           </h1>
           <p className="text-purple-100 text-lg max-w-2xl mx-auto">
@@ -153,7 +153,7 @@ export default function EventDiscovery() {
         </div>
 
         {/* Enhanced Search Interface */}
-        <Card className="mb-8 bg-white/10 backdrop-blur border-white/20">
+        <Card className="mb-8 bg-white/10 backdrop-blur-sm border-white/20">
           <CardContent className="p-6">
             {/* Primary Search - Category and Location First */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -217,7 +217,7 @@ export default function EventDiscovery() {
             <div className="mb-6 text-center">
               <Button
                 onClick={() => setLocation("/create-event")}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-8 py-3"
+                className="bg-linear-to-r from-purple-600 to-pink-600 text-white font-semibold px-8 py-3"
                 size="lg"
               >
                 <Plus className="h-5 w-5 mr-2" />
@@ -322,7 +322,7 @@ export default function EventDiscovery() {
               recommendations.slice(0, 4).map((event: Event) => (
                 <Card
                   key={event.id}
-                  className="bg-white/10 backdrop-blur border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer"
+                  className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer"
                 >
                   <div className="relative">
                     <img
@@ -372,7 +372,7 @@ export default function EventDiscovery() {
               events.map((event: Event) => (
                 <Card
                   key={event.id}
-                  className="bg-white/10 backdrop-blur border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer group"
+                  className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer group"
                 >
                   <div className="relative">
                     <img
@@ -428,19 +428,19 @@ export default function EventDiscovery() {
 
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center text-purple-200">
-                        <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <MapPin className="h-4 w-4 mr-2 shrink-0" />
                         <span className="text-sm truncate">
                           {event.venue}, {event.city}
                         </span>
                       </div>
 
                       <div className="flex items-center text-purple-200">
-                        <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <Calendar className="h-4 w-4 mr-2 shrink-0" />
                         <span className="text-sm">{event.date}</span>
                       </div>
 
                       <div className="flex items-center text-purple-200">
-                        <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <Clock className="h-4 w-4 mr-2 shrink-0" />
                         <span className="text-sm">{event.time}</span>
                       </div>
                     </div>
@@ -486,7 +486,7 @@ export default function EventDiscovery() {
 
                     <Button
                       onClick={() => setLocation(`/events/booking/${event.id}`)}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
+                      className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
                       disabled={event.soldOut}
                     >
                       {event.soldOut ? "Sold Out" : "Book Now"}

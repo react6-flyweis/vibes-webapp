@@ -167,7 +167,7 @@ export default function TicketManagement() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
         </div>
@@ -176,7 +176,7 @@ export default function TicketManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">My Tickets</h1>
@@ -207,14 +207,14 @@ export default function TicketManagement() {
 
           <TabsContent value="upcoming" className="space-y-4">
             {upcomingBookings.length === 0 ? (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="text-center p-8">
                   <Ticket className="w-16 h-16 text-purple-400 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">No Upcoming Events</h3>
                   <p className="text-purple-200 mb-4">You don't have any upcoming events booked.</p>
                   <Button 
                     onClick={() => window.location.href = "/find-events"}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600"
+                    className="bg-linear-to-r from-purple-600 to-blue-600"
                   >
                     Browse Events
                   </Button>
@@ -223,7 +223,7 @@ export default function TicketManagement() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {upcomingBookings.map((booking: BookingTicket) => (
-                  <Card key={booking.id} className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/15 transition-all">
+                  <Card key={booking.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all">
                     <CardHeader>
                       <div className="flex justify-between items-start mb-2">
                         <Badge className="bg-green-600 text-white">
@@ -293,7 +293,7 @@ export default function TicketManagement() {
                       </div>
 
                       <Button
-                        className="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600"
+                        className="w-full mt-3 bg-linear-to-r from-purple-600 to-blue-600"
                         onClick={() => setSelectedBooking(booking)}
                       >
                         View Details
@@ -307,7 +307,7 @@ export default function TicketManagement() {
 
           <TabsContent value="past" className="space-y-4">
             {pastBookings.length === 0 ? (
-              <Card className="bg-white/10 backdrop-blur border-white/20">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="text-center p-8">
                   <Ticket className="w-16 h-16 text-purple-400 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">No Past Events</h3>
@@ -317,7 +317,7 @@ export default function TicketManagement() {
             ) : (
               <div className="space-y-4">
                 {pastBookings.map((booking: BookingTicket) => (
-                  <Card key={booking.id} className="bg-white/10 backdrop-blur border-white/20">
+                  <Card key={booking.id} className="bg-white/10 backdrop-blur-sm border-white/20">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -369,8 +369,8 @@ export default function TicketManagement() {
 
         {/* Booking Details Modal */}
         {selectedBooking && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <Card className="bg-white/10 backdrop-blur border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -462,7 +462,7 @@ export default function TicketManagement() {
                 {/* Actions */}
                 <div className="flex gap-3">
                   <Button
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600"
+                    className="flex-1 bg-linear-to-r from-purple-600 to-blue-600"
                     onClick={() => downloadTicket(selectedBooking)}
                   >
                     <Download className="h-4 w-4 mr-2" />
