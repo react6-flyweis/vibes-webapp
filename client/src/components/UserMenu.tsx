@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Crown, Settings, HelpCircle, LogOut } from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function UserMenu() {
+  const logout = useAuthStore((s) => s.logout);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,9 +55,14 @@ export default function UserMenu() {
           <span>Help & Support</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+        <DropdownMenuItem asChild>
+          <button
+            onClick={() => logout()}
+            className="w-full text-left flex items-center"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
