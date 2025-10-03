@@ -1,130 +1,178 @@
+import React, { lazy } from "react";
 import { Switch, Route } from "wouter";
 import { Layout } from "@/components/layout";
 
-import NotFound from "@/pages/not-found";
-import SimpleHome from "@/pages/simple-home";
-import HomePage from "@/pages/home";
-import ModernHome from "@/pages/modern-home";
-import Dashboard from "@/pages/dashboard";
-import EventPlanning from "@/pages/event-planning";
-import EnhancedEventPage from "@/pages/enhanced-event";
-import BusinessPromotionPage from "@/pages/business-promotion";
-import VendorOnboarding from "@/pages/vendor-onboarding";
-import VendorMarketplace from "@/pages/vendor-marketplace";
-import PricingPage from "@/pages/pricing";
-import PremiumDashboard from "@/pages/premium-dashboard";
-import VendorDashboard from "@/pages/vendor-dashboard";
-import CorporateDashboard from "@/pages/corporate-dashboard";
-import StaffingMarketplace from "@/pages/staffing-marketplace";
-import EnhancedStaffingMarketplace from "@/pages/enhanced-staffing-marketplace";
-import CateringMarketplace from "@/pages/catering-marketplace";
-import AIThemeGenerator from "@/pages/ai-theme-generator";
-import AIPartyDesigner from "@/pages/ai-party-designer";
-import ARSpacePlanner from "@/pages/ar-space-planner";
-import LivestreamCompanion from "@/pages/livestream-companion";
-import AIVibeAnalyzer from "@/pages/ai-vibe-analyzer";
-import SustainabilityTracker from "@/pages/sustainability-tracker";
-import HostAchievements from "@/pages/host-achievements";
-import SmartScheduling from "@/pages/smart-scheduling";
-import LiveMusicVoting from "@/pages/live-music-voting";
-import NightclubExperience from "@/pages/nightclub-experience";
-import InteractiveDrinkPayment from "@/pages/interactive-drink-payment";
-import VendorPaymentSetup from "@/pages/vendor-payment-setup";
-import VibeMall from "@/pages/vibe-mall";
-import ProHostControlPanel from "@/pages/pro-host-control-panel";
-import PartyQuestGamified from "@/pages/party-quest-gamified";
-import GuestMatchmaking from "@/pages/guest-matchmaking";
-import ARPreview from "@/pages/ar-preview";
-import VibeBotAssistant from "@/pages/vibebot-assistant";
-import SimpleLoginPage from "@/pages/simple-login";
-import ProfilePage from "@/pages/profile";
-import Login from "@/pages/auth/login";
-import Signup from "@/pages/auth/signup";
-import VibeCurator from "@/pages/vibe-curator";
-import VirtualPartyTwin from "@/pages/virtual-party-twin";
-import AdaptiveEnvironment from "@/pages/adaptive-environment";
-import VirtualMeetingPlatform from "@/pages/virtual-meeting-platform";
-import VibeVerifiedGuests from "@/pages/vibe-verified-guests";
-import DemoFeatures from "@/pages/demo-features";
-import Checkout from "@/pages/checkout";
-import TestCheckout from "@/pages/test-checkout";
-import SimplePaymentTest from "@/pages/simple-payment-test";
-import PaymentDebug from "@/pages/payment-debug";
-import StripeTest from "@/pages/stripe-test";
-import WorkingPayment from "@/pages/working-payment";
-import PremiumPage from "@/pages/premium";
-import VibeControl from "@/pages/vibe-control";
-import AIVideoMemory from "@/pages/ai-video-memory-fixed";
-import ARPartyOverlays from "@/pages/ar-party-overlays";
-import AIPersonalizedRecommendations from "@/pages/ai-personalized-recommendations";
-import SmartContractEscrow from "@/pages/smart-contract-escrow";
-import EnhancedDJBooth from "@/pages/enhanced-dj-booth";
-import AdaptiveMusicEngine from "@/pages/adaptive-music-engine";
-import NFTGuestPasses from "@/pages/nft-guest-passes";
-import GlobalPartyMarketplace from "@/pages/global-party-marketplace";
-import EventDAO from "@/pages/event-dao";
-import AIPartyMediaSuite from "@/pages/ai-party-media-suite";
-import AIVibeModeling from "@/pages/ai-vibe-modeling";
-import TokenGatedVIP from "@/pages/token-gated-vip";
-import ARVRImmersive from "@/pages/ar-vr-immersive";
-import SustainabilityBadges from "@/pages/sustainability-badges";
-import VendorLiquidity from "@/pages/vendor-liquidity";
-import BrandedMicroEvents from "@/pages/branded-micro-events";
-import VenueIntegration from "@/pages/venue-integration";
-import EventDiscovery from "@/pages/event-discovery";
-import EventBooking from "@/pages/event-booking";
-import FindAndBookEvents from "@/pages/find-and-book-events";
-import UniquePartyExperiences from "@/pages/unique-party-experiences";
-import PartyBooking from "@/pages/party-booking";
-import EventDetail from "@/pages/event-detail";
-import CreateEvent from "@/pages/create-event";
-import LoyaltyRewards from "@/pages/loyalty-rewards";
-import ProfessionalTools from "@/pages/professional-tools";
-import PlayfulEventDiscovery from "@/pages/playful-event-discovery";
-import EventSoundtrackGenerator from "@/pages/event-soundtrack-generator";
-import EventVerificationBadges from "@/pages/event-verification-badges";
-import SocialStoryTemplates from "@/pages/social-story-templates";
-import InteractiveMoodVisualizer from "@/pages/interactive-mood-visualizer";
-import GamifiedAttendanceRewards from "@/pages/gamified-attendance-rewards";
-import VoiceActivatedAssistant from "@/pages/voice-activated-assistant";
-import InteractiveLiveVibesInvite from "@/pages/interactive-live-vibes-invite";
-import VibesCardStudio from "@/pages/vibescard-studio";
-import VibesCardStudioNew from "@/pages/vibescard-studio-new";
-import VibeLedgerDashboard from "@/pages/vibeledger-dashboard";
-import InteractiveDesignGenerator from "@/pages/interactive-design-generator";
-import EcosystemDashboard from "@/pages/ecosystem-dashboard";
-import EnterpriseSuite from "@/pages/enterprise-suite";
-import SystemOverview from "@/pages/system-overview";
-import SocialGroups from "@/pages/social-groups";
-import InteractiveSeatTracker from "@/pages/interactive-seat-tracker";
-import PartyHallDecorator from "@/pages/party-hall-decorator";
-import NaturalVenueShowcase from "@/pages/natural-venue-showcase";
-import SocialDesignStudio from "@/pages/social-design-studio";
-import VibeInviteSystem from "@/pages/vibe-invite-system";
-import CompleteInviteWorkflow from "@/pages/complete-invite-workflow";
-import EviteTemplates from "@/pages/evite-templates";
-import GlobalVibePassport from "@/pages/global-vibe-passport";
-import CollaborativeDesignSharing from "@/pages/collaborative-design-sharing";
-import ImmersivePartyCam from "@/pages/immersive-party-cam";
-import InEventCommerce from "@/pages/in-event-commerce";
-import CulturalDNALayer from "@/pages/cultural-dna-layer";
-import TicketManagement from "@/pages/ticket-management";
-import DigitalTwinSystem from "@/pages/digital-twin-system";
-import AIDJCompanion from "@/pages/ai-dj-companion";
-import SmartDrinkConcierge from "@/pages/smart-drink-concierge";
-import PartyCastLive from "@/pages/partycast-live";
-import SmartEntryIdentity from "@/pages/smart-entry-identity";
-import SystemInterconnection from "@/pages/system-interconnection";
-import LiveReactionWalls from "@/pages/live-reaction-walls";
-import PaymentTest from "@/pages/payment-test";
-import { GetStarted } from "./pages/auth/get-started";
+// Lazy-loaded pages (code-splitting)
+const NotFound = lazy(() => import("@/pages/not-found"));
+const SimpleHome = lazy(() => import("@/pages/simple-home"));
+const HomePage = lazy(() => import("@/pages/home"));
+const ModernHome = lazy(() => import("@/pages/modern-home"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
+const EventPlanning = lazy(() => import("@/pages/event-planning"));
+const EnhancedEventPage = lazy(() => import("@/pages/enhanced-event"));
+const BusinessPromotionPage = lazy(() => import("@/pages/business-promotion"));
+const VendorOnboarding = lazy(() => import("@/pages/vendor-onboarding"));
+const VendorMarketplace = lazy(() => import("@/pages/vendor-marketplace"));
+const PricingPage = lazy(() => import("@/pages/pricing"));
+const PremiumDashboard = lazy(() => import("@/pages/premium-dashboard"));
+const VendorDashboard = lazy(() => import("@/pages/vendor-dashboard"));
+const CorporateDashboard = lazy(() => import("@/pages/corporate-dashboard"));
+const StaffingMarketplace = lazy(() => import("@/pages/staffing-marketplace"));
+const EnhancedStaffingMarketplace = lazy(
+  () => import("@/pages/enhanced-staffing-marketplace")
+);
+const CateringMarketplace = lazy(() => import("@/pages/catering-marketplace"));
+const AIThemeGenerator = lazy(() => import("@/pages/ai-theme-generator"));
+const AIPartyDesigner = lazy(() => import("@/pages/ai-party-designer"));
+const ARSpacePlanner = lazy(() => import("@/pages/ar-space-planner"));
+const LivestreamCompanion = lazy(() => import("@/pages/livestream-companion"));
+const AIVibeAnalyzer = lazy(() => import("@/pages/ai-vibe-analyzer"));
+const SustainabilityTracker = lazy(
+  () => import("@/pages/sustainability-tracker")
+);
+const HostAchievements = lazy(() => import("@/pages/host-achievements"));
+const SmartScheduling = lazy(() => import("@/pages/smart-scheduling"));
+const LiveMusicVoting = lazy(() => import("@/pages/live-music-voting"));
+const NightclubExperience = lazy(() => import("@/pages/nightclub-experience"));
+const InteractiveDrinkPayment = lazy(
+  () => import("@/pages/interactive-drink-payment")
+);
+const VendorPaymentSetup = lazy(() => import("@/pages/vendor-payment-setup"));
+const VibeMall = lazy(() => import("@/pages/vibe-mall"));
+const ProHostControlPanel = lazy(
+  () => import("@/pages/pro-host-control-panel")
+);
+const PartyQuestGamified = lazy(() => import("@/pages/party-quest-gamified"));
+const GuestMatchmaking = lazy(() => import("@/pages/guest-matchmaking"));
+const ARPreview = lazy(() => import("@/pages/ar-preview"));
+const VibeBotAssistant = lazy(() => import("@/pages/vibebot-assistant"));
+const SimpleLoginPage = lazy(() => import("@/pages/simple-login"));
+const ProfilePage = lazy(() => import("@/pages/profile"));
+const Login = lazy(() => import("@/pages/auth/login"));
+const Signup = lazy(() => import("@/pages/auth/signup"));
+const VibeCurator = lazy(() => import("@/pages/vibe-curator"));
+const VirtualPartyTwin = lazy(() => import("@/pages/virtual-party-twin"));
+const AdaptiveEnvironment = lazy(() => import("@/pages/adaptive-environment"));
+const VirtualMeetingPlatform = lazy(
+  () => import("@/pages/virtual-meeting-platform")
+);
+const VibeVerifiedGuests = lazy(() => import("@/pages/vibe-verified-guests"));
+const DemoFeatures = lazy(() => import("@/pages/demo-features"));
+const Checkout = lazy(() => import("@/pages/checkout"));
+const TestCheckout = lazy(() => import("@/pages/test-checkout"));
+const SimplePaymentTest = lazy(() => import("@/pages/simple-payment-test"));
+const PaymentDebug = lazy(() => import("@/pages/payment-debug"));
+const StripeTest = lazy(() => import("@/pages/stripe-test"));
+const WorkingPayment = lazy(() => import("@/pages/working-payment"));
+const PremiumPage = lazy(() => import("@/pages/premium"));
+const VibeControl = lazy(() => import("@/pages/vibe-control"));
+const AIVideoMemory = lazy(() => import("@/pages/ai-video-memory-fixed"));
+const ARPartyOverlays = lazy(() => import("@/pages/ar-party-overlays"));
+const AIPersonalizedRecommendations = lazy(
+  () => import("@/pages/ai-personalized-recommendations")
+);
+const SmartContractEscrow = lazy(() => import("@/pages/smart-contract-escrow"));
+const EnhancedDJBooth = lazy(() => import("@/pages/enhanced-dj-booth"));
+const AdaptiveMusicEngine = lazy(() => import("@/pages/adaptive-music-engine"));
+const NFTGuestPasses = lazy(() => import("@/pages/nft-guest-passes"));
+const GlobalPartyMarketplace = lazy(
+  () => import("@/pages/global-party-marketplace")
+);
+const EventDAO = lazy(() => import("@/pages/event-dao"));
+const AIPartyMediaSuite = lazy(() => import("@/pages/ai-party-media-suite"));
+const AIVibeModeling = lazy(() => import("@/pages/ai-vibe-modeling"));
+const TokenGatedVIP = lazy(() => import("@/pages/token-gated-vip"));
+const ARVRImmersive = lazy(() => import("@/pages/ar-vr-immersive"));
+const SustainabilityBadges = lazy(
+  () => import("@/pages/sustainability-badges")
+);
+const VendorLiquidity = lazy(() => import("@/pages/vendor-liquidity"));
+const BrandedMicroEvents = lazy(() => import("@/pages/branded-micro-events"));
+const VenueIntegration = lazy(() => import("@/pages/venue-integration"));
+const EventDiscovery = lazy(() => import("@/pages/event-discovery"));
+const EventBooking = lazy(() => import("@/pages/event-booking"));
+const FindAndBookEvents = lazy(() => import("@/pages/find-and-book-events"));
+const UniquePartyExperiences = lazy(
+  () => import("@/pages/unique-party-experiences")
+);
+const PartyBooking = lazy(() => import("@/pages/party-booking"));
+const EventDetail = lazy(() => import("@/pages/event-detail"));
+const CreateEvent = lazy(() => import("@/pages/create-event"));
+const LoyaltyRewards = lazy(() => import("@/pages/loyalty-rewards"));
+const ProfessionalTools = lazy(() => import("@/pages/professional-tools"));
+const PlayfulEventDiscovery = lazy(
+  () => import("@/pages/playful-event-discovery")
+);
+const EventSoundtrackGenerator = lazy(
+  () => import("@/pages/event-soundtrack-generator")
+);
+const EventVerificationBadges = lazy(
+  () => import("@/pages/event-verification-badges")
+);
+const SocialStoryTemplates = lazy(
+  () => import("@/pages/social-story-templates")
+);
+const InteractiveMoodVisualizer = lazy(
+  () => import("@/pages/interactive-mood-visualizer")
+);
+const GamifiedAttendanceRewards = lazy(
+  () => import("@/pages/gamified-attendance-rewards")
+);
+const VoiceActivatedAssistant = lazy(
+  () => import("@/pages/voice-activated-assistant")
+);
+const InteractiveLiveVibesInvite = lazy(
+  () => import("@/pages/interactive-live-vibes-invite")
+);
+const VibesCardStudio = lazy(() => import("@/pages/vibescard-studio"));
+const VibesCardStudioNew = lazy(() => import("@/pages/vibescard-studio-new"));
+const VibeLedgerDashboard = lazy(() => import("@/pages/vibeledger-dashboard"));
+const InteractiveDesignGenerator = lazy(
+  () => import("@/pages/interactive-design-generator")
+);
+const EcosystemDashboard = lazy(() => import("@/pages/ecosystem-dashboard"));
+const EnterpriseSuite = lazy(() => import("@/pages/enterprise-suite"));
+const SystemOverview = lazy(() => import("@/pages/system-overview"));
+const SocialGroups = lazy(() => import("@/pages/social-groups"));
+const InteractiveSeatTracker = lazy(
+  () => import("@/pages/interactive-seat-tracker")
+);
+const PartyHallDecorator = lazy(() => import("@/pages/party-hall-decorator"));
+const NaturalVenueShowcase = lazy(
+  () => import("@/pages/natural-venue-showcase")
+);
+const SocialDesignStudio = lazy(() => import("@/pages/social-design-studio"));
+const VibeInviteSystem = lazy(() => import("@/pages/vibe-invite-system"));
+const CompleteInviteWorkflow = lazy(
+  () => import("@/pages/complete-invite-workflow")
+);
+const EviteTemplates = lazy(() => import("@/pages/evite-templates"));
+const GlobalVibePassport = lazy(() => import("@/pages/global-vibe-passport"));
+const CollaborativeDesignSharing = lazy(
+  () => import("@/pages/collaborative-design-sharing")
+);
+const ImmersivePartyCam = lazy(() => import("@/pages/immersive-party-cam"));
+const InEventCommerce = lazy(() => import("@/pages/in-event-commerce"));
+const CulturalDNALayer = lazy(() => import("@/pages/cultural-dna-layer"));
+const TicketManagement = lazy(() => import("@/pages/ticket-management"));
+const DigitalTwinSystem = lazy(() => import("@/pages/digital-twin-system"));
+const AIDJCompanion = lazy(() => import("@/pages/ai-dj-companion"));
+const SmartDrinkConcierge = lazy(() => import("@/pages/smart-drink-concierge"));
+const PartyCastLive = lazy(() => import("@/pages/partycast-live"));
+const SmartEntryIdentity = lazy(() => import("@/pages/smart-entry-identity"));
+const SystemInterconnection = lazy(
+  () => import("@/pages/system-interconnection")
+);
+const LiveReactionWalls = lazy(() => import("@/pages/live-reaction-walls"));
+const PaymentTest = lazy(() => import("@/pages/payment-test"));
+const GetStarted = lazy(() => import("./pages/auth/get-started"));
 
 function DashboardRouter() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" component={ModernHome} />
-        <Route path="/home" component={HomePage} />
+        <Route path="/home" component={ModernHome} />
+        {/* <Route path="/home" component={HomePage} /> */}
         <Route path="/events/:id" component={EnhancedEventPage} />
         <Route path="/enhanced-event" component={EnhancedEventPage} />
         <Route path="/enhanced-event/:id" component={EnhancedEventPage} />
