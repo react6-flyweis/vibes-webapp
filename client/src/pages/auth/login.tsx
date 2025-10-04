@@ -10,9 +10,12 @@ export default function Login() {
       {/* Top back link */}
       <div className="mb-2">
         <Link href="/">
-          <a className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2">
+          <Button
+            variant="ghost"
+            className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2"
+          >
             <ChevronLeft className="w-4 h-4" /> Back
-          </a>
+          </Button>
         </Link>
       </div>
 
