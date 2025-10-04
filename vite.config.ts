@@ -5,6 +5,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
+  envDir: path.resolve(import.meta.dirname),
   plugins: [
     react(),
     runtimeErrorOverlay(),
