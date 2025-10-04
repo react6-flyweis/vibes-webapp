@@ -171,6 +171,7 @@ function DashboardRouter() {
   return (
     <Layout>
       <Switch>
+        <Route path="/" component={ModernHome} />
         <Route path="/home" component={ModernHome} />
         {/* <Route path="/home" component={HomePage} /> */}
         <Route path="/events/:id" component={EnhancedEventPage} />
@@ -376,6 +377,7 @@ function Router() {
       <Route path="/get-started" component={GetStarted} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
+      <Route path="/" component={DashboardRouter} />
       <Route path="/:rest*" component={DashboardRouter} />
     </Switch>
   );
