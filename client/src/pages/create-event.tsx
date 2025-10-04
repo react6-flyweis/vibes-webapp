@@ -9,9 +9,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MapPin, Users, DollarSign, Clock, Image, Plus, X, CreditCard } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  DollarSign,
+  Clock,
+  Image,
+  Plus,
+  X,
+  CreditCard,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const createEventSchema = z.object({
@@ -40,7 +63,7 @@ const createEventSchema = z.object({
   accountNumber: z.string().optional(),
   routingNumber: z.string().optional(),
   accountType: z.enum(["checking", "savings"]).optional(),
-  
+
   // Event planning fields for private events
   budget: z.string().optional(),
   guestCount: z.string().optional(),
@@ -57,9 +80,11 @@ export default function CreateEvent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedTicketTypes, setSelectedTicketTypes] = useState([
-    { type: "General Admission", price: "", benefits: ["Entry to event"] }
+    { type: "General Admission", price: "", benefits: ["Entry to event"] },
   ]);
-  const [eventType, setEventType] = useState<"public_event" | "private_planning" | "">("");
+  const [eventType, setEventType] = useState<
+    "public_event" | "private_planning" | ""
+  >("");
 
   const form = useForm<CreateEventForm>({
     resolver: zodResolver(createEventSchema),
@@ -86,7 +111,7 @@ export default function CreateEvent() {
       accountNumber: "",
       routingNumber: "",
       accountType: "checking" as "checking" | "savings",
-      
+
       // Event planning fields
       budget: "",
       guestCount: "",
@@ -105,7 +130,7 @@ export default function CreateEvent() {
         description: "Ready to send immersive invitations to your guests.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
-      
+
       // Navigate to Interactive Live Vibes Invite system
       setTimeout(() => {
         setLocation("/interactive-live-vibes-invite");
@@ -125,11 +150,11 @@ export default function CreateEvent() {
       ...data,
       price: parseFloat(data.price),
       maxCapacity: parseInt(data.maxCapacity),
-      tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-      ticketTypes: selectedTicketTypes.map(ticket => ({
+      tags: data.tags ? data.tags.split(",").map((tag) => tag.trim()) : [],
+      ticketTypes: selectedTicketTypes.map((ticket) => ({
         ...ticket,
         price: parseFloat(ticket.price) || 0,
-        available: parseInt(data.maxCapacity)
+        available: parseInt(data.maxCapacity),
       })),
       organizer: "Current User", // This would come from auth
       attendees: 0,
@@ -142,7 +167,10 @@ export default function CreateEvent() {
   };
 
   const addTicketType = () => {
-    setSelectedTicketTypes([...selectedTicketTypes, { type: "", price: "", benefits: [""] }]);
+    setSelectedTicketTypes([
+      ...selectedTicketTypes,
+      { type: "", price: "", benefits: [""] },
+    ]);
   };
 
   const removeTicketType = (index: number) => {
@@ -151,10 +179,10 @@ export default function CreateEvent() {
 
   const updateTicketType = (index: number, field: string, value: string) => {
     const updated = [...selectedTicketTypes];
-    if (field === 'benefits') {
-      updated[index].benefits = value.split(',').map(b => b.trim());
+    if (field === "benefits") {
+      updated[index].benefits = value.split(",").map((b) => b.trim());
     } else {
-      updated[index][field as keyof typeof updated[0]] = value;
+      updated[index][field as keyof (typeof updated)[0]] = value;
     }
     setSelectedTicketTypes(updated);
   };
@@ -172,15 +200,20 @@ export default function CreateEvent() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Event Type Selection */}
                 <div className="mb-8">
-                  <h3 className="text-xl font-semibold text-white mb-4">Choose Event Type</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Choose Event Type
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card 
+                    <Card
                       className={`p-6 cursor-pointer transition-all ${
-                        eventType === "public_event" 
-                          ? "bg-purple-500/30 border-purple-400 scale-105" 
+                        eventType === "public_event"
+                          ? "bg-purple-500/30 border-purple-400 scale-105"
                           : "bg-white/5 border-white/20 hover:bg-white/10"
                       }`}
                       onClick={() => {
@@ -190,11 +223,16 @@ export default function CreateEvent() {
                     >
                       <div className="text-center">
                         <DollarSign className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                        <h4 className="text-lg font-semibold text-white mb-2">Public Ticketed Events</h4>
-                        <p className="text-purple-200 text-sm">Concerts, festivals, shows, workshops with ticket sales</p>
+                        <h4 className="text-lg font-semibold text-white mb-2">
+                          Public Ticketed Events
+                        </h4>
+                        <p className="text-purple-200 text-sm">
+                          Concerts, festivals, shows, workshops with ticket
+                          sales
+                        </p>
                       </div>
                     </Card>
-                    
+
                     {/* <Card 
                       className={`p-6 cursor-pointer transition-all ${
                         eventType === "private_planning" 
@@ -222,18 +260,20 @@ export default function CreateEvent() {
                       <Calendar className="h-5 w-5" />
                       Event Details
                     </h3>
-                    
+
                     <FormField
                       control={form.control}
                       name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Event Title</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            Event Title
+                          </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Amazing Event Name" 
+                            <Input
+                              placeholder="Amazing Event Name"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -246,12 +286,14 @@ export default function CreateEvent() {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Description</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            Description
+                          </FormLabel>
                           <FormControl>
-                            <Textarea 
-                              placeholder="Describe your event..." 
+                            <Textarea
+                              placeholder="Describe your event..."
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200 min-h-24"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -264,8 +306,13 @@ export default function CreateEvent() {
                       name="category"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Category</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel className="text-purple-100">
+                            Category
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                 <SelectValue placeholder="Select category" />
@@ -274,32 +321,72 @@ export default function CreateEvent() {
                             <SelectContent>
                               {eventType === "public_event" ? (
                                 <>
-                                  <SelectItem value="concert">Concert & Live Music</SelectItem>
-                                  <SelectItem value="festival">Festival & Fair</SelectItem>
-                                  <SelectItem value="workshop">Workshop & Class</SelectItem>
-                                  <SelectItem value="conference">Conference & Seminar</SelectItem>
-                                  <SelectItem value="comedy">Comedy Show</SelectItem>
-                                  <SelectItem value="theater">Theater & Performance</SelectItem>
-                                  <SelectItem value="sports">Sports Event</SelectItem>
-                                  <SelectItem value="exhibition">Exhibition & Art Show</SelectItem>
-                                  <SelectItem value="networking">Networking Event</SelectItem>
+                                  <SelectItem value="concert">
+                                    Concert & Live Music
+                                  </SelectItem>
+                                  <SelectItem value="festival">
+                                    Festival & Fair
+                                  </SelectItem>
+                                  <SelectItem value="workshop">
+                                    Workshop & Class
+                                  </SelectItem>
+                                  <SelectItem value="conference">
+                                    Conference & Seminar
+                                  </SelectItem>
+                                  <SelectItem value="comedy">
+                                    Comedy Show
+                                  </SelectItem>
+                                  <SelectItem value="theater">
+                                    Theater & Performance
+                                  </SelectItem>
+                                  <SelectItem value="sports">
+                                    Sports Event
+                                  </SelectItem>
+                                  <SelectItem value="exhibition">
+                                    Exhibition & Art Show
+                                  </SelectItem>
+                                  <SelectItem value="networking">
+                                    Networking Event
+                                  </SelectItem>
                                 </>
                               ) : eventType === "private_planning" ? (
                                 <>
-                                  <SelectItem value="wedding">Wedding</SelectItem>
-                                  <SelectItem value="birthday">Birthday Party</SelectItem>
-                                  <SelectItem value="anniversary">Anniversary</SelectItem>
-                                  <SelectItem value="graduation">Graduation Party</SelectItem>
-                                  <SelectItem value="baby_shower">Baby Shower</SelectItem>
-                                  <SelectItem value="corporate">Corporate Event</SelectItem>
-                                  <SelectItem value="reunion">Family/School Reunion</SelectItem>
-                                  <SelectItem value="holiday">Holiday Celebration</SelectItem>
-                                  <SelectItem value="engagement">Engagement Party</SelectItem>
+                                  <SelectItem value="wedding">
+                                    Wedding
+                                  </SelectItem>
+                                  <SelectItem value="birthday">
+                                    Birthday Party
+                                  </SelectItem>
+                                  <SelectItem value="anniversary">
+                                    Anniversary
+                                  </SelectItem>
+                                  <SelectItem value="graduation">
+                                    Graduation Party
+                                  </SelectItem>
+                                  <SelectItem value="baby_shower">
+                                    Baby Shower
+                                  </SelectItem>
+                                  <SelectItem value="corporate">
+                                    Corporate Event
+                                  </SelectItem>
+                                  <SelectItem value="reunion">
+                                    Family/School Reunion
+                                  </SelectItem>
+                                  <SelectItem value="holiday">
+                                    Holiday Celebration
+                                  </SelectItem>
+                                  <SelectItem value="engagement">
+                                    Engagement Party
+                                  </SelectItem>
                                 </>
                               ) : (
                                 <>
-                                  <SelectItem value="party">General Party</SelectItem>
-                                  <SelectItem value="event">General Event</SelectItem>
+                                  <SelectItem value="party">
+                                    General Party
+                                  </SelectItem>
+                                  <SelectItem value="event">
+                                    General Event
+                                  </SelectItem>
                                 </>
                               )}
                               <SelectItem value="virtual">Virtual</SelectItem>
@@ -316,12 +403,14 @@ export default function CreateEvent() {
                       name="tags"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Tags (comma separated)</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            Tags (comma separated)
+                          </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="music, live, outdoor, family-friendly" 
+                            <Input
+                              placeholder="music, live, outdoor, family-friendly"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -336,18 +425,20 @@ export default function CreateEvent() {
                       <MapPin className="h-5 w-5" />
                       Location
                     </h3>
-                    
+
                     <FormField
                       control={form.control}
                       name="venue"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Venue Name</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            Venue Name
+                          </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Madison Square Garden" 
+                            <Input
+                              placeholder="Madison Square Garden"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -360,12 +451,14 @@ export default function CreateEvent() {
                       name="address"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Street Address</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            Street Address
+                          </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="4 Pennsylvania Plaza" 
+                            <Input
+                              placeholder="4 Pennsylvania Plaza"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -378,24 +471,37 @@ export default function CreateEvent() {
                       name="country"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Country</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel className="text-purple-100">
+                            Country
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                 <SelectValue placeholder="Select country" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="max-h-96 overflow-y-auto">
-                              <SelectItem value="united-states">United States</SelectItem>
+                              <SelectItem value="united-states">
+                                United States
+                              </SelectItem>
                               <SelectItem value="canada">Canada</SelectItem>
-                              <SelectItem value="united-kingdom">United Kingdom</SelectItem>
+                              <SelectItem value="united-kingdom">
+                                United Kingdom
+                              </SelectItem>
                               <SelectItem value="france">France</SelectItem>
                               <SelectItem value="germany">Germany</SelectItem>
                               <SelectItem value="italy">Italy</SelectItem>
                               <SelectItem value="spain">Spain</SelectItem>
-                              <SelectItem value="netherlands">Netherlands</SelectItem>
+                              <SelectItem value="netherlands">
+                                Netherlands
+                              </SelectItem>
                               <SelectItem value="belgium">Belgium</SelectItem>
-                              <SelectItem value="switzerland">Switzerland</SelectItem>
+                              <SelectItem value="switzerland">
+                                Switzerland
+                              </SelectItem>
                               <SelectItem value="austria">Austria</SelectItem>
                               <SelectItem value="sweden">Sweden</SelectItem>
                               <SelectItem value="norway">Norway</SelectItem>
@@ -405,40 +511,64 @@ export default function CreateEvent() {
                               <SelectItem value="portugal">Portugal</SelectItem>
                               <SelectItem value="greece">Greece</SelectItem>
                               <SelectItem value="poland">Poland</SelectItem>
-                              <SelectItem value="czech-republic">Czech Republic</SelectItem>
+                              <SelectItem value="czech-republic">
+                                Czech Republic
+                              </SelectItem>
                               <SelectItem value="hungary">Hungary</SelectItem>
                               <SelectItem value="croatia">Croatia</SelectItem>
                               <SelectItem value="slovenia">Slovenia</SelectItem>
                               <SelectItem value="slovakia">Slovakia</SelectItem>
                               <SelectItem value="estonia">Estonia</SelectItem>
                               <SelectItem value="latvia">Latvia</SelectItem>
-                              <SelectItem value="lithuania">Lithuania</SelectItem>
-                              <SelectItem value="australia">Australia</SelectItem>
-                              <SelectItem value="new-zealand">New Zealand</SelectItem>
+                              <SelectItem value="lithuania">
+                                Lithuania
+                              </SelectItem>
+                              <SelectItem value="australia">
+                                Australia
+                              </SelectItem>
+                              <SelectItem value="new-zealand">
+                                New Zealand
+                              </SelectItem>
                               <SelectItem value="japan">Japan</SelectItem>
-                              <SelectItem value="south-korea">South Korea</SelectItem>
+                              <SelectItem value="south-korea">
+                                South Korea
+                              </SelectItem>
                               <SelectItem value="china">China</SelectItem>
                               <SelectItem value="india">India</SelectItem>
-                              <SelectItem value="singapore">Singapore</SelectItem>
+                              <SelectItem value="singapore">
+                                Singapore
+                              </SelectItem>
                               <SelectItem value="thailand">Thailand</SelectItem>
                               <SelectItem value="malaysia">Malaysia</SelectItem>
-                              <SelectItem value="indonesia">Indonesia</SelectItem>
-                              <SelectItem value="philippines">Philippines</SelectItem>
+                              <SelectItem value="indonesia">
+                                Indonesia
+                              </SelectItem>
+                              <SelectItem value="philippines">
+                                Philippines
+                              </SelectItem>
                               <SelectItem value="vietnam">Vietnam</SelectItem>
                               <SelectItem value="brazil">Brazil</SelectItem>
-                              <SelectItem value="argentina">Argentina</SelectItem>
+                              <SelectItem value="argentina">
+                                Argentina
+                              </SelectItem>
                               <SelectItem value="chile">Chile</SelectItem>
                               <SelectItem value="colombia">Colombia</SelectItem>
                               <SelectItem value="peru">Peru</SelectItem>
                               <SelectItem value="mexico">Mexico</SelectItem>
-                              <SelectItem value="south-africa">South Africa</SelectItem>
+                              <SelectItem value="south-africa">
+                                South Africa
+                              </SelectItem>
                               <SelectItem value="nigeria">Nigeria</SelectItem>
                               <SelectItem value="kenya">Kenya</SelectItem>
                               <SelectItem value="egypt">Egypt</SelectItem>
                               <SelectItem value="morocco">Morocco</SelectItem>
                               <SelectItem value="israel">Israel</SelectItem>
-                              <SelectItem value="uae">United Arab Emirates</SelectItem>
-                              <SelectItem value="saudi-arabia">Saudi Arabia</SelectItem>
+                              <SelectItem value="uae">
+                                United Arab Emirates
+                              </SelectItem>
+                              <SelectItem value="saudi-arabia">
+                                Saudi Arabia
+                              </SelectItem>
                               <SelectItem value="turkey">Turkey</SelectItem>
                               <SelectItem value="russia">Russia</SelectItem>
                               <SelectItem value="ukraine">Ukraine</SelectItem>
@@ -455,12 +585,14 @@ export default function CreateEvent() {
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">City/Town/Village</FormLabel>
+                          <FormLabel className="text-purple-100">
+                            City/Town/Village
+                          </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Enter your city, town, or village" 
+                            <Input
+                              placeholder="Enter your city, town, or village"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -482,10 +614,10 @@ export default function CreateEvent() {
                           Date
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            type="date" 
+                          <Input
+                            type="date"
                             className="bg-white/10 border-white/20 text-white"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -503,10 +635,10 @@ export default function CreateEvent() {
                           Time
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            type="time" 
+                          <Input
+                            type="time"
                             className="bg-white/10 border-white/20 text-white"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -524,11 +656,11 @@ export default function CreateEvent() {
                           Max Capacity
                         </FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            placeholder="100" 
+                          <Input
+                            type="number"
+                            placeholder="100"
                             className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -550,12 +682,12 @@ export default function CreateEvent() {
                             Starting Price
                           </FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               step="0.01"
-                              placeholder="25.00" 
+                              placeholder="25.00"
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -568,8 +700,13 @@ export default function CreateEvent() {
                       name="currency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-purple-100">Currency</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel className="text-purple-100">
+                            Currency
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                 <SelectValue placeholder="Select currency" />
@@ -590,7 +727,7 @@ export default function CreateEvent() {
                     />
                   </div>
                 )}
-                
+
                 {eventType === "private_planning" && (
                   <div className="space-y-6">
                     <div className="bg-pink-500/20 border border-pink-400/30 rounded-lg p-6">
@@ -598,9 +735,12 @@ export default function CreateEvent() {
                         <Users className="h-5 w-5" />
                         Private Event Planning Service
                       </h4>
-                      <p className="text-pink-100 text-sm">Complete the planning details below to help us create your perfect event.</p>
+                      <p className="text-pink-100 text-sm">
+                        Complete the planning details below to help us create
+                        your perfect event.
+                      </p>
                     </div>
-                    
+
                     {/* Event Planning Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
@@ -613,10 +753,10 @@ export default function CreateEvent() {
                               Budget Range
                             </FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="$5,000 - $10,000" 
+                              <Input
+                                placeholder="$5,000 - $10,000"
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -634,10 +774,10 @@ export default function CreateEvent() {
                               Expected Guest Count
                             </FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="50-75 guests" 
+                              <Input
+                                placeholder="50-75 guests"
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -650,12 +790,14 @@ export default function CreateEvent() {
                         name="theme"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-purple-100">Theme or Style</FormLabel>
+                            <FormLabel className="text-purple-100">
+                              Theme or Style
+                            </FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="Elegant Garden Party, Rustic Chic, Modern Minimalist" 
+                              <Input
+                                placeholder="Elegant Garden Party, Rustic Chic, Modern Minimalist"
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -668,12 +810,14 @@ export default function CreateEvent() {
                         name="musicPreferences"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-purple-100">Music Preferences</FormLabel>
+                            <FormLabel className="text-purple-100">
+                              Music Preferences
+                            </FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="Jazz, Classical, Top 40, Live Band" 
+                              <Input
+                                placeholder="Jazz, Classical, Top 40, Live Band"
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -688,12 +832,14 @@ export default function CreateEvent() {
                         name="dietaryRestrictions"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-purple-100">Dietary Restrictions & Allergies</FormLabel>
+                            <FormLabel className="text-purple-100">
+                              Dietary Restrictions & Allergies
+                            </FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Vegetarian options, nut allergies, gluten-free requirements..." 
+                              <Textarea
+                                placeholder="Vegetarian options, nut allergies, gluten-free requirements..."
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200 min-h-24"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -706,12 +852,14 @@ export default function CreateEvent() {
                         name="specialRequests"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-purple-100">Special Requests & Notes</FormLabel>
+                            <FormLabel className="text-purple-100">
+                              Special Requests & Notes
+                            </FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Photography needs, accessibility requirements, special decorations, entertainment preferences..." 
+                              <Textarea
+                                placeholder="Photography needs, accessibility requirements, special decorations, entertainment preferences..."
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200 min-h-24"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -727,163 +875,192 @@ export default function CreateEvent() {
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 pb-2 border-b border-white/10">
                       <CreditCard className="h-5 w-5 text-purple-300" />
-                      <h3 className="text-xl font-semibold text-white">Payment Information</h3>
+                      <h3 className="text-xl font-semibold text-white">
+                        Payment Information
+                      </h3>
                     </div>
                     <p className="text-purple-200 text-sm">
-                      Enter your bank account details to receive automatic payouts from ticket sales. 
-                      We take a 7% platform fee, and you'll receive 93% of all sales directly to your account.
+                      Enter your bank account details to receive automatic
+                      payouts from ticket sales. We take a 7% platform fee, and
+                      you'll receive 93% of all sales directly to your account.
                     </p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="bankAccountHolder"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-purple-100">Account Holder Name</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="John Doe" 
-                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="bankName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-purple-100">Bank Name</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="Chase Bank" 
-                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="accountNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-purple-100">Account Number</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="1234567890" 
-                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="routingNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-purple-100">Routing Number</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="021000021" 
-                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="accountType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-purple-100">Account Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="bankAccountHolder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-purple-100">
+                              Account Holder Name
+                            </FormLabel>
                             <FormControl>
-                              <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                                <SelectValue placeholder="Select account type" />
-                              </SelectTrigger>
+                              <Input
+                                placeholder="John Doe"
+                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                {...field}
+                              />
                             </FormControl>
-                            <SelectContent>
-                              <SelectItem value="checking">Checking</SelectItem>
-                              <SelectItem value="savings">Savings</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="bankName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-purple-100">
+                              Bank Name
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Chase Bank"
+                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="accountNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-purple-100">
+                              Account Number
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="1234567890"
+                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="routingNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-purple-100">
+                              Routing Number
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="021000021"
+                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="accountType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-purple-100">
+                              Account Type
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                                  <SelectValue placeholder="Select account type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="checking">
+                                  Checking
+                                </SelectItem>
+                                <SelectItem value="savings">Savings</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 )}
 
                 {/* Ticket Types - Only for public events */}
                 {eventType === "public_event" && (
                   <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-white">Ticket Types</h3>
-                    <Button
-                      type="button"
-                      onClick={addTicketType}
-                      variant="outline"
-                      size="sm"
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Ticket Type
-                    </Button>
-                  </div>
-
-                  {selectedTicketTypes.map((ticket, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
-                      <Input
-                        placeholder="Ticket type name"
-                        value={ticket.type}
-                        onChange={(e) => updateTicketType(index, 'type', e.target.value)}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                      />
-                      <Input
-                        placeholder="Price"
-                        type="number"
-                        step="0.01"
-                        value={ticket.price}
-                        onChange={(e) => updateTicketType(index, 'price', e.target.value)}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                      />
-                      <Input
-                        placeholder="Benefits (comma separated)"
-                        value={ticket.benefits.join(', ')}
-                        onChange={(e) => updateTicketType(index, 'benefits', e.target.value)}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                      />
-                      {index > 0 && (
-                        <Button
-                          type="button"
-                          onClick={() => removeTicketType(index)}
-                          variant="outline"
-                          size="sm"
-                          className="bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-white">
+                        Ticket Types
+                      </h3>
+                      <Button
+                        type="button"
+                        onClick={addTicketType}
+                        variant="outline"
+                        size="sm"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Ticket Type
+                      </Button>
                     </div>
-                  ))}
+
+                    {selectedTicketTypes.map((ticket, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white/5 rounded-lg border border-white/10"
+                      >
+                        <Input
+                          placeholder="Ticket type name"
+                          value={ticket.type}
+                          onChange={(e) =>
+                            updateTicketType(index, "type", e.target.value)
+                          }
+                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                        />
+                        <Input
+                          placeholder="Price"
+                          type="number"
+                          step="0.01"
+                          value={ticket.price}
+                          onChange={(e) =>
+                            updateTicketType(index, "price", e.target.value)
+                          }
+                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                        />
+                        <Input
+                          placeholder="Benefits (comma separated)"
+                          value={ticket.benefits.join(", ")}
+                          onChange={(e) =>
+                            updateTicketType(index, "benefits", e.target.value)
+                          }
+                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                        />
+                        {index > 0 && (
+                          <Button
+                            type="button"
+                            onClick={() => removeTicketType(index)}
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -898,10 +1075,10 @@ export default function CreateEvent() {
                         Event Image URL (optional)
                       </FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="https://example.com/event-image.jpg" 
+                        <Input
+                          placeholder="https://example.com/event-image.jpg"
                           className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -916,31 +1093,44 @@ export default function CreateEvent() {
                       <span className="text-white font-bold text-lg">✨</span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-white">Interactive Live Vibes Invite</h3>
-                      <p className="text-purple-200">Create immersive invitations with 3D venue tours and personalized videos</p>
+                      <h3 className="text-xl font-semibold text-white">
+                        Interactive Live Vibes Invite
+                      </h3>
+                      <p className="text-purple-200">
+                        Create immersive invitations with 3D venue tours and
+                        personalized videos
+                      </p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="text-center">
-                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">🎬</div>
+                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        🎬
+                      </div>
                       <p className="text-sm text-purple-200">Personal Videos</p>
                     </div>
                     <div className="text-center">
-                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">🏢</div>
+                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        🏢
+                      </div>
                       <p className="text-sm text-purple-200">3D Venue Tour</p>
                     </div>
                     <div className="text-center">
-                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">🎵</div>
+                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        🎵
+                      </div>
                       <p className="text-sm text-purple-200">Music Preview</p>
                     </div>
                     <div className="text-center">
-                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">🎁</div>
+                      <div className="w-8 h-8 bg-purple-500/30 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        🎁
+                      </div>
                       <p className="text-sm text-purple-200">VIP Perks</p>
                     </div>
                   </div>
                   <Button
                     type="button"
-                    onClick={() => setLocation("/interactive-live-vibes-invite")}
+                    // onClick={() => setLocation("/interactive-live-vibes-invite")}
                     className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
                   >
                     Preview Immersive Invitations →
@@ -957,14 +1147,14 @@ export default function CreateEvent() {
                   >
                     Cancel
                   </Button>
-                <Link href="/enhanced-event/1">
-  <Button
-    type="button" // change from submit since it’s navigation, not form submit
-    className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
-  >
-    Create Event & Send Invites
-  </Button>
-</Link>
+                  <Link href="/enhanced-event/1">
+                    <Button
+                      type="button" // change from submit since it’s navigation, not form submit
+                      className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                    >
+                      Create Event & Send Invites
+                    </Button>
+                  </Link>
                 </div>
               </form>
             </Form>
