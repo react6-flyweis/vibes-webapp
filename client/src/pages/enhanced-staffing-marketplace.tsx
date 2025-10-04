@@ -5,17 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
-  Users, 
-  Camera, 
-  Utensils, 
-  Shield, 
-  Music, 
+import {
+  Users,
+  Camera,
+  Utensils,
+  Shield,
+  Music,
   Star,
   MapPin,
   Clock,
@@ -23,7 +35,7 @@ import {
   Search,
   Calendar as CalendarIcon,
   MessageSquare,
-  CheckCircle
+  CheckCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -60,7 +72,9 @@ export default function EnhancedStaffingMarketplace() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
   const [showBookingDialog, setShowBookingDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
@@ -69,14 +83,14 @@ export default function EnhancedStaffingMarketplace() {
     duration: "",
     eventType: "",
     guestCount: "",
-    specialRequests: ""
+    specialRequests: "",
   });
 
-  const { data: staffMembers = [], isLoading } = useQuery({
+  const { data: staffMembers = [], isLoading } = useQuery<StaffMember[]>({
     queryKey: ["/api/staffing/members", selectedCategory, searchQuery],
   });
 
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<any[]>({
     queryKey: ["/api/staffing/categories"],
   });
 
@@ -108,14 +122,14 @@ export default function EnhancedStaffingMarketplace() {
 
   const confirmBooking = () => {
     if (!selectedStaff || !selectedDate) return;
-    
+
     const booking = {
       staffId: selectedStaff.id,
       staffName: selectedStaff.name,
-      date: selectedDate.toISOString().split('T')[0],
+      date: selectedDate.toISOString().split("T")[0],
       ...bookingDetails,
       totalCost: calculateTotalCost(),
-      status: "confirmed"
+      status: "confirmed",
     };
 
     bookingMutation.mutate(booking);
@@ -132,16 +146,23 @@ export default function EnhancedStaffingMarketplace() {
       photographer: <Camera className="h-4 w-4" />,
       server: <Utensils className="h-4 w-4" />,
       security: <Shield className="h-4 w-4" />,
-      dj: <Music className="h-4 w-4" />
+      dj: <Music className="h-4 w-4" />,
     };
-    return icons[category as keyof typeof icons] || <Users className="h-4 w-4" />;
+    return (
+      icons[category as keyof typeof icons] || <Users className="h-4 w-4" />
+    );
   };
 
   const filteredStaff = (staffMembers || []).filter((staff: StaffMember) => {
-    const matchesCategory = selectedCategory === "all" || staff.category === selectedCategory;
-    const matchesSearch = !searchQuery || 
+    const matchesCategory =
+      selectedCategory === "all" || staff.category === selectedCategory;
+    const matchesSearch =
+      !searchQuery ||
       staff.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (staff.specialties && staff.specialties.some(s => s?.toLowerCase().includes(searchQuery.toLowerCase())));
+      (staff.specialties &&
+        staff.specialties.some((s) =>
+          s?.toLowerCase().includes(searchQuery.toLowerCase())
+        ));
     return matchesCategory && matchesSearch;
   });
 
@@ -151,74 +172,59 @@ export default function EnhancedStaffingMarketplace() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
-        </div>
+      <div className="min-h-screen bg-gray-900 py-10 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-gray-900 py-10">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Event Staffing Marketplace
+            Staffing Marketplace
           </h1>
           <p className="text-xl text-purple-200 max-w-3xl mx-auto">
-            Book verified professionals for your events with instant calendar availability and direct booking
+            Book verified professionals for your events with instant calendar
+            availability and direct booking
           </p>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Search className="h-5 w-5" />
-                Search Staff
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Input
-                placeholder="Search by name or specialty..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white/10 border-white/30 text-white placeholder:text-gray-300"
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Category</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="bg-white/10 border-white/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category: any) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{filteredStaff.length}</div>
-              <div className="text-purple-200">Staff members available</div>
+        <div className="mb-8 max-w-5xl mx-auto">
+          <Card className="bg-white backdrop-blur-sm border-white/20">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 " />
+                    <Input
+                      placeholder="Search by name or specialty..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10  "
+                    />
+                  </div>
+                </div>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-48 ">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category: any) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -226,7 +232,10 @@ export default function EnhancedStaffingMarketplace() {
         {/* Staff Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {filteredStaff.map((staff: StaffMember) => (
-            <Card key={staff.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all">
+            <Card
+              key={staff.id}
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all"
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -234,10 +243,14 @@ export default function EnhancedStaffingMarketplace() {
                       {staff.name.charAt(0)}
                     </div>
                     <div>
-                      <CardTitle className="text-white text-lg">{staff.name}</CardTitle>
+                      <CardTitle className="text-white text-lg">
+                        {staff.name}
+                      </CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         {getCategoryIcon(staff.category)}
-                        <span className="text-purple-200 text-sm capitalize">{staff.category}</span>
+                        <span className="text-purple-200 text-sm capitalize">
+                          {staff.category}
+                        </span>
                         {staff.verified && (
                           <Badge className="bg-green-500/20 text-green-300 text-xs">
                             <CheckCircle className="h-3 w-3 mr-1" />
@@ -250,41 +263,55 @@ export default function EnhancedStaffingMarketplace() {
                   <div className="text-right">
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-white font-semibold">{staff.rating}</span>
+                      <span className="text-white font-semibold">
+                        {staff.rating}
+                      </span>
                     </div>
-                    <div className="text-purple-200 text-sm">{staff.totalJobs} jobs</div>
+                    <div className="text-purple-200 text-sm">
+                      {staff.totalJobs} jobs
+                    </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-1">
-                    {staff.specialties && staff.specialties.slice(0, 3).map((specialty, index) => (
-                      <Badge key={index} variant="outline" className="text-xs border-purple-300 text-purple-200">
-                        {specialty}
-                      </Badge>
-                    ))}
+                    {staff.specialties &&
+                      staff.specialties.slice(0, 3).map((specialty, index) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs border-purple-300 text-purple-200"
+                        >
+                          {specialty}
+                        </Badge>
+                      ))}
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-purple-200 text-sm">
                     <MapPin className="h-4 w-4" />
                     {staff.location}
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-purple-200 text-sm">
-                    <DollarSign className="h-4 w-4" />
-                    ${staff.hourlyRate}/hour
+                    <DollarSign className="h-4 w-4" />${staff.hourlyRate}/hour
                   </div>
 
                   <div className="flex items-center gap-2 text-purple-200 text-sm">
                     <Clock className="h-4 w-4" />
-                    Next available: {staff.availableDates && staff.availableDates[0] ? staff.availableDates[0] : "Contact for availability"}
+                    Next available:{" "}
+                    {staff.availableDates && staff.availableDates[0]
+                      ? staff.availableDates[0]
+                      : "Contact for availability"}
                   </div>
-                  
+
                   <div className="flex items-center gap-2 pt-3">
-                    <Dialog open={showBookingDialog && selectedStaff?.id === staff.id} onOpenChange={setShowBookingDialog}>
+                    <Dialog
+                      open={showBookingDialog && selectedStaff?.id === staff.id}
+                      onOpenChange={setShowBookingDialog}
+                    >
                       <DialogTrigger asChild>
-                        <Button 
+                        <Button
                           onClick={() => handleDirectBooking(staff)}
                           className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                         >
@@ -294,63 +321,106 @@ export default function EnhancedStaffingMarketplace() {
                       </DialogTrigger>
                       <DialogContent className="max-w-4xl bg-gray-900 border-gray-700">
                         <DialogHeader>
-                          <DialogTitle className="text-white">Book {staff.name} - {staff.category}</DialogTitle>
+                          <DialogTitle className="text-white">
+                            Book {staff.name} - {staff.category}
+                          </DialogTitle>
                         </DialogHeader>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                           {/* Calendar Section */}
                           <div>
-                            <h3 className="text-lg font-semibold text-white mb-4">Select Date & Time</h3>
+                            <h3 className="text-lg font-semibold text-white mb-4">
+                              Select Date & Time
+                            </h3>
                             <Calendar
                               mode="single"
                               selected={selectedDate}
                               onSelect={setSelectedDate}
                               disabled={(date) => {
-                                const dateStr = date.toISOString().split('T')[0];
-                                return !staff.availableDates?.includes(dateStr) || date < new Date();
+                                const dateStr = date
+                                  .toISOString()
+                                  .split("T")[0];
+                                return (
+                                  !staff.availableDates?.includes(dateStr) ||
+                                  date < new Date()
+                                );
                               }}
                               className="rounded-md border border-gray-700 bg-gray-800 text-white"
                             />
                             {selectedDate && (
                               <div className="mt-4 p-3 bg-gray-800 rounded-lg">
-                                <p className="text-sm text-gray-300 mb-2">Available times for {selectedDate.toDateString()}:</p>
+                                <p className="text-sm text-gray-300 mb-2">
+                                  Available times for{" "}
+                                  {selectedDate.toDateString()}:
+                                </p>
                                 <div className="grid grid-cols-3 gap-2">
-                                  {getAvailableTimeSlots(selectedDate).map((time) => (
-                                    <Button
-                                      key={time}
-                                      variant="outline"
-                                      size="sm"
-                                      className="bg-green-500/20 text-green-300 border-green-500/50 hover:bg-green-500/30"
-                                      onClick={() => setBookingDetails({...bookingDetails, startTime: time})}
-                                    >
-                                      {time}
-                                    </Button>
-                                  ))}
+                                  {getAvailableTimeSlots(selectedDate).map(
+                                    (time) => (
+                                      <Button
+                                        key={time}
+                                        variant="outline"
+                                        size="sm"
+                                        className="bg-green-500/20 text-green-300 border-green-500/50 hover:bg-green-500/30"
+                                        onClick={() =>
+                                          setBookingDetails({
+                                            ...bookingDetails,
+                                            startTime: time,
+                                          })
+                                        }
+                                      >
+                                        {time}
+                                      </Button>
+                                    )
+                                  )}
                                 </div>
                               </div>
                             )}
                           </div>
-                          
+
                           {/* Booking Form */}
                           <div className="space-y-4">
                             <div>
                               <Label className="text-white">Event Type</Label>
-                              <Select onValueChange={(value) => setBookingDetails({...bookingDetails, eventType: value})}>
+                              <Select
+                                onValueChange={(value) =>
+                                  setBookingDetails({
+                                    ...bookingDetails,
+                                    eventType: value,
+                                  })
+                                }
+                              >
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                                   <SelectValue placeholder="Select event type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="wedding">Wedding</SelectItem>
-                                  <SelectItem value="corporate">Corporate Event</SelectItem>
-                                  <SelectItem value="birthday">Birthday Party</SelectItem>
-                                  <SelectItem value="private">Private Party</SelectItem>
-                                  <SelectItem value="conference">Conference</SelectItem>
+                                  <SelectItem value="wedding">
+                                    Wedding
+                                  </SelectItem>
+                                  <SelectItem value="corporate">
+                                    Corporate Event
+                                  </SelectItem>
+                                  <SelectItem value="birthday">
+                                    Birthday Party
+                                  </SelectItem>
+                                  <SelectItem value="private">
+                                    Private Party
+                                  </SelectItem>
+                                  <SelectItem value="conference">
+                                    Conference
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
-                            
+
                             <div>
                               <Label className="text-white">Duration</Label>
-                              <Select onValueChange={(value) => setBookingDetails({...bookingDetails, duration: value})}>
+                              <Select
+                                onValueChange={(value) =>
+                                  setBookingDetails({
+                                    ...bookingDetails,
+                                    duration: value,
+                                  })
+                                }
+                              >
                                 <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                                   <SelectValue placeholder="Select duration" />
                                 </SelectTrigger>
@@ -363,78 +433,120 @@ export default function EnhancedStaffingMarketplace() {
                                 </SelectContent>
                               </Select>
                             </div>
-                            
+
                             <div>
                               <Label className="text-white">Guest Count</Label>
-                              <Input 
+                              <Input
                                 type="number"
                                 placeholder="Number of guests"
                                 className="bg-gray-800 border-gray-700 text-white"
                                 value={bookingDetails.guestCount}
-                                onChange={(e) => setBookingDetails({...bookingDetails, guestCount: e.target.value})}
+                                onChange={(e) =>
+                                  setBookingDetails({
+                                    ...bookingDetails,
+                                    guestCount: e.target.value,
+                                  })
+                                }
                               />
                             </div>
-                            
+
                             <div>
-                              <Label className="text-white">Special Requests</Label>
-                              <Textarea 
+                              <Label className="text-white">
+                                Special Requests
+                              </Label>
+                              <Textarea
                                 placeholder="Any special requirements or notes..."
                                 className="bg-gray-800 border-gray-700 text-white"
                                 value={bookingDetails.specialRequests}
-                                onChange={(e) => setBookingDetails({...bookingDetails, specialRequests: e.target.value})}
+                                onChange={(e) =>
+                                  setBookingDetails({
+                                    ...bookingDetails,
+                                    specialRequests: e.target.value,
+                                  })
+                                }
                               />
                             </div>
-                            
+
                             <div className="p-4 bg-gray-800 rounded-lg">
                               <div className="flex justify-between items-center text-white mb-2">
                                 <span>Rate: ${staff.hourlyRate}/hour</span>
-                                <span>Duration: {bookingDetails.duration || "0"} hours</span>
+                                <span>
+                                  Duration: {bookingDetails.duration || "0"}{" "}
+                                  hours
+                                </span>
                               </div>
                               <div className="flex justify-between items-center text-white font-semibold">
                                 <span>Total Cost:</span>
-                                <span className="text-green-400">${calculateTotalCost()}</span>
+                                <span className="text-green-400">
+                                  ${calculateTotalCost()}
+                                </span>
                               </div>
                             </div>
-                            
-                            <Button 
+
+                            <Button
                               className="w-full bg-linear-to-r from-purple-600 to-blue-600"
                               onClick={confirmBooking}
-                              disabled={!selectedDate || !bookingDetails.duration || bookingMutation.isPending}
+                              disabled={
+                                !selectedDate ||
+                                !bookingDetails.duration ||
+                                bookingMutation.isPending
+                              }
                             >
-                              {bookingMutation.isPending ? "Processing..." : "Confirm Booking"}
+                              {bookingMutation.isPending
+                                ? "Processing..."
+                                : "Confirm Booking"}
                             </Button>
                           </div>
                         </div>
                       </DialogContent>
                     </Dialog>
-                    
+
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="border-purple-300 text-purple-200 hover:bg-purple-500/20">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-purple-300 text-purple-200 hover:bg-purple-500/20"
+                        >
                           <MessageSquare className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
                         <DialogHeader>
-                          <DialogTitle className="text-white">Reviews for {staff.name}</DialogTitle>
+                          <DialogTitle className="text-white">
+                            Reviews for {staff.name}
+                          </DialogTitle>
                         </DialogHeader>
                         <div className="max-h-96 overflow-y-auto space-y-4">
                           {staff.reviews?.map((review) => (
-                            <div key={review.id} className="p-4 bg-gray-800 rounded-lg">
+                            <div
+                              key={review.id}
+                              className="p-4 bg-gray-800 rounded-lg"
+                            >
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-semibold text-white">{review.clientName}</span>
+                                <span className="font-semibold text-white">
+                                  {review.clientName}
+                                </span>
                                 <div className="flex items-center gap-1">
                                   {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star 
-                                      key={i} 
-                                      className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-600'}`} 
+                                    <Star
+                                      key={i}
+                                      className={`h-4 w-4 ${
+                                        i < review.rating
+                                          ? "text-yellow-400 fill-current"
+                                          : "text-gray-600"
+                                      }`}
                                     />
                                   ))}
                                 </div>
                               </div>
-                              <p className="text-gray-300 text-sm mb-2">{review.comment}</p>
+                              <p className="text-gray-300 text-sm mb-2">
+                                {review.comment}
+                              </p>
                               <div className="flex items-center gap-2 text-xs text-gray-400">
-                                <Badge variant="outline" className="text-xs">{review.eventType}</Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {review.eventType}
+                                </Badge>
                                 <span>•</span>
                                 <span>{review.date}</span>
                               </div>
@@ -458,7 +570,9 @@ export default function EnhancedStaffingMarketplace() {
         {filteredStaff.length === 0 && (
           <div className="text-center text-white py-12">
             <h3 className="text-xl mb-2">No staff members found</h3>
-            <p className="text-purple-200">Try adjusting your search criteria</p>
+            <p className="text-purple-200">
+              Try adjusting your search criteria
+            </p>
           </div>
         )}
       </div>
