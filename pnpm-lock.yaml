@@ -116,6 +116,9 @@ importers:
       '@types/memoizee':
         specifier: ^0.4.12
         version: 0.4.12
+      axios:
+        specifier: ^1.12.2
+        version: 1.12.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
