@@ -5,15 +5,15 @@ import {
   Palette,
   MapPin,
   Armchair,
-  Mail,
+  // Mail,
   Sparkles,
   FileText,
   Search,
   Plus,
   Heart,
   Star,
-  TrendingUp,
-  Zap,
+  // TrendingUp,
+  // Zap,
   // Settings,
   // Bell,
   // Menu,
@@ -48,6 +48,10 @@ export type NavCategory = {
 };
 
 export const navigationItems: NavCategory[] = [
+  // {
+  //   title: "Home",
+  //   href: "/",
+  // },
   {
     title: "Events",
     items: [
@@ -86,12 +90,12 @@ export const navigationItems: NavCategory[] = [
         icon: Palette,
         description: "Create stunning invitations",
       },
-      {
-        name: "Complete Invite Workflow",
-        href: "/complete-invite-workflow",
-        icon: Mail,
-        description: "Full invitation system demo",
-      },
+      // {
+      //   name: "Complete Invite Workflow",
+      //   href: "/complete-invite-workflow",
+      //   icon: Mail,
+      //   description: "Full invitation system demo",
+      // },
       {
         name: "Evite Templates",
         href: "/evite-templates",
@@ -156,35 +160,35 @@ export const navigationItems: NavCategory[] = [
       },
     ],
   },
-  {
-    title: "AI Features",
-    items: [
-      {
-        name: "AI Theme Generator",
-        href: "/ai-theme-generator",
-        icon: Sparkles,
-        description: "Intelligent theme suggestions",
-      },
-      {
-        name: "AI Party Designer",
-        href: "/ai-party-designer",
-        icon: Palette,
-        description: "Complete party planning",
-      },
-      {
-        name: "AI Vibe Analyzer",
-        href: "/ai-vibe-analyzer",
-        icon: TrendingUp,
-        description: "Event mood analysis",
-      },
-      {
-        name: "VibeBot Assistant",
-        href: "/vibebot-assistant",
-        icon: Zap,
-        description: "Your AI event assistant",
-      },
-    ],
-  },
+  // {
+  //   title: "AI Features",
+  //   items: [
+  //     {
+  //       name: "AI Theme Generator",
+  //       href: "/ai-theme-generator",
+  //       icon: Sparkles,
+  //       description: "Intelligent theme suggestions",
+  //     },
+  //     {
+  //       name: "AI Party Designer",
+  //       href: "/ai-party-designer",
+  //       icon: Palette,
+  //       description: "Complete party planning",
+  //     },
+  //     {
+  //       name: "AI Vibe Analyzer",
+  //       href: "/ai-vibe-analyzer",
+  //       icon: TrendingUp,
+  //       description: "Event mood analysis",
+  //     },
+  //     {
+  //       name: "VibeBot Assistant",
+  //       href: "/vibebot-assistant",
+  //       icon: Zap,
+  //       description: "Your AI event assistant",
+  //     },
+  //   ],
+  // },
   //   {
   //     title: "Community",
   //     items: [
