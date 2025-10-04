@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import OtpVerificationDialog from "./OtpVerificationDialog";
 
 import {
   Form,
@@ -17,8 +18,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+// ...existing code...
+import {
+  useLoginMutation,
+  useVerifyOtpMutation,
+  useResendOtpMutation,
+} from "@/hooks/useAuthMutations";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -26,13 +31,15 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
+  const [showOtp, setShowOtp] = useState(false);
+  const [otpEmail, setOtpEmail] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<LoginForm>({
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -41,31 +48,78 @@ export function LoginForm() {
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: async (data: LoginForm) => {
-      return await apiRequest("/api/auth/login", "POST", data);
-    },
-    onSuccess: (data) => {
+  const loginMutation = useLoginMutation();
+
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      const res = await loginMutation.mutateAsync(data);
+
+      // Backend returns OTP sent response with nextStep verify-otp
+      if (
+        res &&
+        res.data &&
+        (res.data.nextStep === "verify-otp" || res.data.otp)
+      ) {
+        setOtpEmail(
+          (res.data && (res.data.email || form.getValues("email"))) || undefined
+        );
+        setShowOtp(true);
+        toast({
+          title: "Enter verification code",
+          description: "A one-time code was sent to your email.",
+        });
+        return;
+      }
+
       toast({
         title: "Welcome back!",
         description: "You've successfully logged into Vibes.",
       });
-      // Redirect to main dashboard
       window.location.href = "/";
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       console.error("Login error:", error);
       toast({
         title: "Login Failed",
         description:
-          error.message || "Invalid email or password. Please try again.",
+          error?.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
-  const onSubmit = (data: LoginForm) => {
-    loginMutation.mutate(data);
+  const verifyMutation = useVerifyOtpMutation();
+
+  const resendMutation = useResendOtpMutation();
+
+  const handleVerify = async (code: string) => {
+    try {
+      await verifyMutation.mutateAsync({ email: otpEmail, otp: code });
+      toast({ title: "Logged in", description: "Verification successful." });
+      setShowOtp(false);
+      window.location.href = "/";
+    } catch (err: any) {
+      toast({
+        title: "Verification failed",
+        description: err?.message || "Invalid code",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResend = async () => {
+    try {
+      await resendMutation.mutateAsync({ email: otpEmail });
+      toast({
+        title: "Sent",
+        description: "A new code was sent to your email.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err?.message || "Could not resend code",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -174,6 +228,13 @@ export function LoginForm() {
           login
         </Button>
       </form>
+      <OtpVerificationDialog
+        open={showOtp}
+        onOpenChange={setShowOtp}
+        email={otpEmail}
+        onVerify={handleVerify}
+        onResend={handleResend}
+      />
     </Form>
   );
 }
