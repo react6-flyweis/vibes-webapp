@@ -61,14 +61,14 @@ function normalizeAxiosError(err: unknown): never {
   throw new Error(String(err));
 }
 
-export async function apiRequest(
+export async function apiRequest<T = any>(
   url: string,
   method: string = "GET",
   data?: unknown | undefined
-): Promise<any> {
+): Promise<T> {
   try {
     const res = await axiosInstance.request({ url, method, data });
-    return res.data;
+    return res.data as T;
   } catch (err) {
     normalizeAxiosError(err);
   }
