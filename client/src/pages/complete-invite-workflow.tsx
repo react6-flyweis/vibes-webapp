@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -19,69 +18,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import {
-  Send,
   Users,
   Calendar,
   MapPin,
-  Clock,
-  Star,
-  Heart,
-  Share2,
-  Download,
   Eye,
-  QrCode,
-  Smartphone,
-  Mail,
-  MessageSquare,
-  Instagram,
-  Twitter,
-  Facebook,
   Palette,
   Camera,
   Music,
-  Gift,
   Crown,
   Zap,
-  Sparkles,
   Globe,
-  Lock,
-  CheckCircle,
-  AlertCircle,
-  Play,
-  Pause,
-  Volume2,
-  Image as ImageIcon,
-  Video,
+  ImageIcon,
   ArrowRight,
   ArrowLeft,
-  Plus,
-  Edit3,
-  Copy,
-  ExternalLink,
-  Settings,
   Sliders,
   Wand2,
   Bot,
   Gamepad2,
-  ShoppingBag,
-  Headphones,
+  Lock,
+  CreditCard,
 } from "lucide-react";
 import image1 from "../../assests/templateImage/1.jpg";
 import image2 from "../../assests/templateImage/2.jpg";
@@ -120,7 +82,6 @@ interface InvitationEvent {
   culturalTheme?: string;
   vibesTags: string[];
   sustainabilityScore?: number;
-  setCurrentStep: string;
 }
 
 interface InvitationTemplate {
@@ -1218,7 +1179,7 @@ export default function CompleteInviteWorkflow() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-3/4 bg-linear-to-br from-purple-100 to-blue-100 dark:from-purple-900 to-blue-900 rounded-lg p-6 relative overflow-hidden">
+                  <div className="aspect-3/4 bg-gradient-to-br from-purple-100 to-indigo-200 dark:from-purple-900 dark:to-indigo-800 rounded-lg p-6 relative overflow-hidden">
                     {/* Mock invitation preview */}
                     <div
                       className="w-full h-full rounded-lg shadow-lg relative"
@@ -1291,12 +1252,50 @@ export default function CompleteInviteWorkflow() {
 
           {currentStep === "guests" && <GuestManagement />}
           {currentStep === "preview" && (
-            <PreviewInvitation
-              setCurrentStep={setCurrentStep}
-              event={selectedEvent}
-              template={selectedTemplate}
-              guests={guestList}
-            />
+            <PreviewInvitation setCurrentStep={setCurrentStep} />
+          )}
+
+          {currentStep === "send" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-[#EB6F71]" />
+                  Send Your Invitation
+                </CardTitle>
+                <CardDescription>
+                  Lorem ipsum is simply dummy text of the printing and
+                  typesetting industry.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className=" bg-white/5 p-6 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-4xl font-extrabold  mb-2">$99.99</div>
+                    <p className="text-sm  mb-4">
+                      To proceed with sending your invitation, please complete a
+                      one-time platform fee of
+                      <span className="font-semibold"> $99.99 USD</span>.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 text-sm ">
+                    <p>
+                      <Lock className="inline w-4 h-4 mr-2" />
+                      This fee helps us maintain a secure, high-quality
+                      experience for you and your guests. Once your payment is
+                      confirmed, you'll be able to send your invitation without
+                      any further charges.
+                    </p>
+
+                    <p>
+                      <Lock className="inline w-4 h-4 mr-2" />
+                      <span className="font-medium">One-time only.</span> No
+                      hidden costs. Immediate access.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Navigation Buttons */}
