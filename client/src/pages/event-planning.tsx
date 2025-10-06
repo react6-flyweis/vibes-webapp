@@ -152,7 +152,7 @@ type SongSuggestionForm = z.infer<typeof songSuggestionSchema>;
 
 export default function EventPlanning() {
   const { eventId } = useParams();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
