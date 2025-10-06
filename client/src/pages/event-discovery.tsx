@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useEvents } from "@/hooks/useEvents";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,31 +76,56 @@ interface EventFilters {
   sortBy: string;
 }
 
-const eventsData = [
-  {
-    id: "party_bus_001",
-    title: "Miami Party Bus Tour",
-    description:
-      "VIP party bus experience through Miami's hottest nightlife spots with LED lights, premium sound system, and celebrity DJ.",
-    category: "party-bus",
-    venue: "Miami Party Bus Co.",
-    address: "South Beach District",
-    city: "Miami",
-    date: "2025-06-20",
-    time: "18:00",
-    price: { min: 89, max: 149, currency: "USD" },
-    image:
-      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=240&fit=crop&auto=format",
-    rating: 4.9,
-    attendees: 78,
-    maxCapacity: 100,
-    tags: ["party bus", "nightlife", "Miami", "VIP"],
-    featured: true,
-    trending: true,
-    soldOut: false,
-    organizer: "Miami Nightlife Tours",
-  },
-];
+// const eventsData = [
+//   {
+//     id: "party_bus_001",
+//     title: "Miami Party Bus Tour",
+//     description:
+//       "VIP party bus experience through Miami's hottest nightlife spots with LED lights, premium sound system, and celebrity DJ.",
+//     category: "party-bus",
+//     venue: "Miami Party Bus Co.",
+//     address: "South Beach District",
+//     city: "Miami",
+//     date: "2025-06-20",
+//     time: "18:00",
+//     price: { min: 89, max: 149, currency: "USD" },
+//     image:
+//       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=240&fit=crop&auto=format",
+//     rating: 4.9,
+//     attendees: 78,
+//     maxCapacity: 100,
+//     tags: ["party bus", "nightlife", "Miami", "VIP"],
+//     featured: true,
+//     trending: true,
+//     soldOut: false,
+//     organizer: "Miami Nightlife Tours",
+//   },
+// ];
+// const eventsData = [
+//   {
+//     id: "party_bus_001",
+//     title: "Miami Party Bus Tour",
+//     description:
+//       "VIP party bus experience through Miami's hottest nightlife spots with LED lights, premium sound system, and celebrity DJ.",
+//     category: "party-bus",
+//     venue: "Miami Party Bus Co.",
+//     address: "South Beach District",
+//     city: "Miami",
+//     date: "2025-06-20",
+//     time: "18:00",
+//     price: { min: 89, max: 149, currency: "USD" },
+//     image:
+//       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=240&fit=crop&auto=format",
+//     rating: 4.9,
+//     attendees: 78,
+//     maxCapacity: 100,
+//     tags: ["party bus", "nightlife", "Miami", "VIP"],
+//     featured: true,
+//     trending: true,
+//     soldOut: false,
+//     organizer: "Miami Nightlife Tours",
+//   },
+// ];
 
 export default function EventDiscovery() {
   const navigate = useNavigate();
@@ -113,13 +139,55 @@ export default function EventDiscovery() {
     sortBy: "date",
   });
 
-  const { data: events = eventsData, isLoading } = useQuery({
-    queryKey: ["/api/events"],
-    // queryKey: ["/api/events", { filters, search: searchQuery }],
+  // Fetch events from the server using the shared hook
+  const { data: eventsResp, isLoading } = useEvents({
+    page: 1,
+    limit: 50,
+    search: searchQuery,
+    status: true,
+    sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
+    sortOrder: "desc",
   });
 
+  // Map server event shape to local Event shape used by this component
+  const mapEvent = (e: any): Event => ({
+    id: e._id || String(e.event_id ?? e._id),
+    title: e.name_title || "Untitled Event",
+    description: e.description || "",
+    category: (e.event_type_id === 1 ? "festival" : "concert") as any,
+    genre: undefined,
+    artist: undefined,
+    team: undefined,
+    venue: e.venue_name || e.street_address || "",
+    address: e.street_address || "",
+    city: e.city_id ? String(e.city_id) : "",
+    date: e.date || "",
+    time: e.time || "",
+    price: { min: 0, max: 0, currency: "USD" },
+    image: e.event_image || "",
+    rating: 0,
+    attendees: 0,
+    maxCapacity: e.max_capacity || 0,
+    tags: e.tags || [],
+    featured: false,
+    trending: false,
+    soldOut: false,
+    organizer: e.created_by ? String(e.created_by) : "",
+    ticketTypes: [],
+  });
+
+  const events: Event[] =
+    eventsResp && Array.isArray(eventsResp.data)
+      ? eventsResp.data.map(mapEvent)
+      : [];
+
   const { data: recommendations = [] } = useQuery({
-    queryKey: ["/api/event-recommendations"],
+    queryKey: ["/api/event-recommendations", searchQuery],
+    queryFn: async () => {
+      // For now, use the first 4 events as recommendations
+      const evs = events && Array.isArray(events) ? events : [];
+      return evs.slice(0, 4);
+    },
   });
 
   const handleFilterChange = (key: keyof EventFilters, value: string) => {
@@ -216,7 +284,7 @@ export default function EventDiscovery() {
             {/* Create Event Button */}
             <div className="mb-6 text-center">
               <Button
-                onClick={() => setLocation("/create-event")}
+                onClick={() => navigate("/create-event")}
                 className="bg-linear-to-r from-purple-600 to-pink-600 text-white font-semibold px-8 py-3"
                 size="lg"
               >
@@ -485,7 +553,7 @@ export default function EventDiscovery() {
                     </div>
 
                     <Button
-                      onClick={() => setLocation(`/events/booking/${event.id}`)}
+                      onClick={() => navigate(`/events/booking/${event.id}`)}
                       className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
                       disabled={event.soldOut}
                     >
