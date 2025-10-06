@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router";
-import { apiRequest } from "@/lib/queryClient";
+import useCreateEventMutation from "@/mutations/createEvent";
+import { useToast } from "@/hooks/use-toast";
+import VenueSelector from "@/components/venue-selector";
+import CountrySelector from "@/components/country-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import EventCategorySelector from "@/components/event-category-selector";
 import {
   Select,
   SelectContent,
@@ -35,14 +38,13 @@ import {
   X,
   CreditCard,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+// ...existing code...
+import EventTypeSelector from "@/components/event-type-selector";
 
 const createEventSchema = z.object({
   title: z.string().min(1, "Event title is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  eventType: z.enum(["public_event", "private_planning"], {
-    required_error: "Event type is required",
-  }),
+  eventType: z.string().min(1, "Event type is required"),
   category: z.string().min(1, "Category is required"),
   venue: z.string().min(1, "Venue is required"),
   address: z.string().min(1, "Address is required"),
@@ -76,9 +78,9 @@ const createEventSchema = z.object({
 type CreateEventForm = z.infer<typeof createEventSchema>;
 
 export default function CreateEvent() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
+  const createMutation = useCreateEventMutation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [selectedTicketTypes, setSelectedTicketTypes] = useState([
     { type: "General Admission", price: "", benefits: ["Entry to event"] },
   ]);
@@ -122,48 +124,72 @@ export default function CreateEvent() {
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/events", data),
-    onSuccess: (response) => {
+  // Venue selection is handled by the reusable VenueSelector component
+
+  const onSubmit = async (data: CreateEventForm) => {
+    // Map form values to the API payload expected by /api/events/create
+    // Assumptions made:
+    // - country_id/state_id/city_id/event_category_tags_id are not collected
+    //   in the current form, so they default to 1. Replace with real
+    //   lookups if available.
+    // - event_type_id: 1 = public, 2 = private planning
+    // - live_vibes arrays are not collected in this form so send empty arrays
+
+    const payload = {
+      name_title: data.title,
+      event_type_id: data.eventType === "public_event" ? 1 : 2,
+      ticketed_events: data.eventType === "public_event",
+      description: data.description,
+      street_address: data.address,
+      // convert selected venue (string) to number when possible;
+      // if it's not a number keep the original value (could be an _id string)
+      venue_details_id: data.venue,
+      country_id: data.country,
+      state_id: 1,
+      city_id: 1,
+      event_category_tags_id: data.category,
+      tags: data.tags ? data.tags.split(",").map((t) => t.trim()) : [],
+      date: data.date,
+      time: data.time,
+      max_capacity: parseInt(data.maxCapacity) || 0,
+      event_image: data.image || undefined,
+      live_vibes_invite_videos: [],
+      live_vibes_invite_venue_tour: [],
+      live_vibes_invite_music_preview: [],
+      live_vibes_invite_vip_perks: [],
+      status: true,
+    };
+
+    // Include ticket types if provided (convert prices to numbers)
+    if (selectedTicketTypes && selectedTicketTypes.length > 0) {
+      // Attach as `ticket_types` alongside the main payload (backend may ignore if not expected)
+      (payload as any).ticket_types = selectedTicketTypes.map((t) => ({
+        type: t.type,
+        price: parseFloat(t.price) || 0,
+        benefits: t.benefits || [],
+      }));
+    }
+
+    try {
+      await createMutation.mutateAsync(payload);
+
+      // success handling
       toast({
         title: "Event Created Successfully!",
         description: "Ready to send immersive invitations to your guests.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
 
       // Navigate to Interactive Live Vibes Invite system
       setTimeout(() => {
         navigate("/interactive-live-vibes-invite");
       }, 2000);
-    },
-    onError: (error: Error) => {
+    } catch (err: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: err?.message || "Failed to create event",
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: CreateEventForm) => {
-    const eventData = {
-      ...data,
-      price: parseFloat(data.price),
-      maxCapacity: parseInt(data.maxCapacity),
-      tags: data.tags ? data.tags.split(",").map((tag) => tag.trim()) : [],
-      ticketTypes: selectedTicketTypes.map((ticket) => ({
-        ...ticket,
-        price: parseFloat(ticket.price) || 0,
-        available: parseInt(data.maxCapacity),
-      })),
-      organizer: "Current User", // This would come from auth
-      attendees: 0,
-      rating: 0,
-      featured: false,
-      trending: false,
-      soldOut: false,
-    };
-    createMutation.mutate(eventData);
+    }
   };
 
   const addTicketType = () => {
@@ -181,8 +207,9 @@ export default function CreateEvent() {
     const updated = [...selectedTicketTypes];
     if (field === "benefits") {
       updated[index].benefits = value.split(",").map((b) => b.trim());
-    } else {
-      updated[index][field as keyof (typeof updated)[0]] = value;
+    } else if (field === "type" || field === "price") {
+      // both are string fields on the ticket object
+      (updated[index] as any)[field] = value;
     }
     setSelectedTicketTypes(updated);
   };
@@ -201,7 +228,19 @@ export default function CreateEvent() {
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                  // Log full validation errors for debugging
+                  // Use console.group for clearer nested output
+                  console.group("CreateEvent form validation errors");
+                  console.log(errors);
+                  try {
+                    // Also log react-hook-form's formState.errors snapshot
+                    console.log("formState.errors:", form.formState.errors);
+                  } catch (e) {
+                    console.log("Could not read formState.errors", e);
+                  }
+                  console.groupEnd();
+                })}
                 className="space-y-6"
               >
                 {/* Event Type Selection */}
@@ -209,48 +248,22 @@ export default function CreateEvent() {
                   <h3 className="text-xl font-semibold text-white mb-4">
                     Choose Event Type
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card
-                      className={`p-6 cursor-pointer transition-all ${
-                        eventType === "public_event"
-                          ? "bg-purple-500/30 border-purple-400 scale-105"
-                          : "bg-white/5 border-white/20 hover:bg-white/10"
-                      }`}
-                      onClick={() => {
-                        setEventType("public_event");
-                        form.setValue("eventType", "public_event");
-                      }}
-                    >
-                      <div className="text-center">
-                        <DollarSign className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                        <h4 className="text-lg font-semibold text-white mb-2">
-                          Public Ticketed Events
-                        </h4>
-                        <p className="text-purple-200 text-sm">
-                          Concerts, festivals, shows, workshops with ticket
-                          sales
-                        </p>
+                  <FormField
+                    control={form.control}
+                    name="eventType"
+                    render={({ field }) => (
+                      <div>
+                        <EventTypeSelector
+                          value={field.value}
+                          onChange={(val, item) => {
+                            setEventType(val as any);
+                            field.onChange(val);
+                            // optionally prefill or map other fields from the item
+                          }}
+                        />
                       </div>
-                    </Card>
-
-                    {/* <Card 
-                      className={`p-6 cursor-pointer transition-all ${
-                        eventType === "private_planning" 
-                          ? "bg-pink-500/30 border-pink-400 scale-105" 
-                          : "bg-white/5 border-white/20 hover:bg-white/10"
-                      }`}
-                      onClick={() => {
-                        setEventType("private_planning");
-                        form.setValue("eventType", "private_planning");
-                      }}
-                    >
-                      <div className="text-center">
-                        <Users className="w-12 h-12 text-pink-400 mx-auto mb-3" />
-                        <h4 className="text-lg font-semibold text-white mb-2">Private Party Planning</h4>
-                        <p className="text-purple-200 text-sm">Weddings, birthdays, corporate events, private celebrations</p>
-                      </div>
-                    </Card> */}
-                  </div>
+                    )}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -309,90 +322,16 @@ export default function CreateEvent() {
                           <FormLabel className="text-purple-100">
                             Category
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {eventType === "public_event" ? (
-                                <>
-                                  <SelectItem value="concert">
-                                    Concert & Live Music
-                                  </SelectItem>
-                                  <SelectItem value="festival">
-                                    Festival & Fair
-                                  </SelectItem>
-                                  <SelectItem value="workshop">
-                                    Workshop & Class
-                                  </SelectItem>
-                                  <SelectItem value="conference">
-                                    Conference & Seminar
-                                  </SelectItem>
-                                  <SelectItem value="comedy">
-                                    Comedy Show
-                                  </SelectItem>
-                                  <SelectItem value="theater">
-                                    Theater & Performance
-                                  </SelectItem>
-                                  <SelectItem value="sports">
-                                    Sports Event
-                                  </SelectItem>
-                                  <SelectItem value="exhibition">
-                                    Exhibition & Art Show
-                                  </SelectItem>
-                                  <SelectItem value="networking">
-                                    Networking Event
-                                  </SelectItem>
-                                </>
-                              ) : eventType === "private_planning" ? (
-                                <>
-                                  <SelectItem value="wedding">
-                                    Wedding
-                                  </SelectItem>
-                                  <SelectItem value="birthday">
-                                    Birthday Party
-                                  </SelectItem>
-                                  <SelectItem value="anniversary">
-                                    Anniversary
-                                  </SelectItem>
-                                  <SelectItem value="graduation">
-                                    Graduation Party
-                                  </SelectItem>
-                                  <SelectItem value="baby_shower">
-                                    Baby Shower
-                                  </SelectItem>
-                                  <SelectItem value="corporate">
-                                    Corporate Event
-                                  </SelectItem>
-                                  <SelectItem value="reunion">
-                                    Family/School Reunion
-                                  </SelectItem>
-                                  <SelectItem value="holiday">
-                                    Holiday Celebration
-                                  </SelectItem>
-                                  <SelectItem value="engagement">
-                                    Engagement Party
-                                  </SelectItem>
-                                </>
-                              ) : (
-                                <>
-                                  <SelectItem value="party">
-                                    General Party
-                                  </SelectItem>
-                                  <SelectItem value="event">
-                                    General Event
-                                  </SelectItem>
-                                </>
-                              )}
-                              <SelectItem value="virtual">Virtual</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <EventCategorySelector
+                            value={field.value}
+                            onChange={(val) => field.onChange(val)}
+                            className="bg-white/10 border-white/20 text-white"
+                            placeholder={
+                              eventType === "public_event"
+                                ? "Select category"
+                                : "Select category"
+                            }
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -432,15 +371,18 @@ export default function CreateEvent() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-purple-100">
-                            Venue Name
+                            Venue
                           </FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Madison Square Garden"
-                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field}
-                            />
-                          </FormControl>
+                          <VenueSelector
+                            value={field.value}
+                            onChange={(val, venue) => {
+                              field.onChange(val);
+                              // optionally prefill address field from selected venue
+                              if (venue?.address) {
+                                form.setValue("address", venue.address);
+                              }
+                            }}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -474,107 +416,8 @@ export default function CreateEvent() {
                           <FormLabel className="text-purple-100">
                             Country
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                                <SelectValue placeholder="Select country" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="max-h-96 overflow-y-auto">
-                              <SelectItem value="united-states">
-                                United States
-                              </SelectItem>
-                              <SelectItem value="canada">Canada</SelectItem>
-                              <SelectItem value="united-kingdom">
-                                United Kingdom
-                              </SelectItem>
-                              <SelectItem value="france">France</SelectItem>
-                              <SelectItem value="germany">Germany</SelectItem>
-                              <SelectItem value="italy">Italy</SelectItem>
-                              <SelectItem value="spain">Spain</SelectItem>
-                              <SelectItem value="netherlands">
-                                Netherlands
-                              </SelectItem>
-                              <SelectItem value="belgium">Belgium</SelectItem>
-                              <SelectItem value="switzerland">
-                                Switzerland
-                              </SelectItem>
-                              <SelectItem value="austria">Austria</SelectItem>
-                              <SelectItem value="sweden">Sweden</SelectItem>
-                              <SelectItem value="norway">Norway</SelectItem>
-                              <SelectItem value="denmark">Denmark</SelectItem>
-                              <SelectItem value="finland">Finland</SelectItem>
-                              <SelectItem value="ireland">Ireland</SelectItem>
-                              <SelectItem value="portugal">Portugal</SelectItem>
-                              <SelectItem value="greece">Greece</SelectItem>
-                              <SelectItem value="poland">Poland</SelectItem>
-                              <SelectItem value="czech-republic">
-                                Czech Republic
-                              </SelectItem>
-                              <SelectItem value="hungary">Hungary</SelectItem>
-                              <SelectItem value="croatia">Croatia</SelectItem>
-                              <SelectItem value="slovenia">Slovenia</SelectItem>
-                              <SelectItem value="slovakia">Slovakia</SelectItem>
-                              <SelectItem value="estonia">Estonia</SelectItem>
-                              <SelectItem value="latvia">Latvia</SelectItem>
-                              <SelectItem value="lithuania">
-                                Lithuania
-                              </SelectItem>
-                              <SelectItem value="australia">
-                                Australia
-                              </SelectItem>
-                              <SelectItem value="new-zealand">
-                                New Zealand
-                              </SelectItem>
-                              <SelectItem value="japan">Japan</SelectItem>
-                              <SelectItem value="south-korea">
-                                South Korea
-                              </SelectItem>
-                              <SelectItem value="china">China</SelectItem>
-                              <SelectItem value="india">India</SelectItem>
-                              <SelectItem value="singapore">
-                                Singapore
-                              </SelectItem>
-                              <SelectItem value="thailand">Thailand</SelectItem>
-                              <SelectItem value="malaysia">Malaysia</SelectItem>
-                              <SelectItem value="indonesia">
-                                Indonesia
-                              </SelectItem>
-                              <SelectItem value="philippines">
-                                Philippines
-                              </SelectItem>
-                              <SelectItem value="vietnam">Vietnam</SelectItem>
-                              <SelectItem value="brazil">Brazil</SelectItem>
-                              <SelectItem value="argentina">
-                                Argentina
-                              </SelectItem>
-                              <SelectItem value="chile">Chile</SelectItem>
-                              <SelectItem value="colombia">Colombia</SelectItem>
-                              <SelectItem value="peru">Peru</SelectItem>
-                              <SelectItem value="mexico">Mexico</SelectItem>
-                              <SelectItem value="south-africa">
-                                South Africa
-                              </SelectItem>
-                              <SelectItem value="nigeria">Nigeria</SelectItem>
-                              <SelectItem value="kenya">Kenya</SelectItem>
-                              <SelectItem value="egypt">Egypt</SelectItem>
-                              <SelectItem value="morocco">Morocco</SelectItem>
-                              <SelectItem value="israel">Israel</SelectItem>
-                              <SelectItem value="uae">
-                                United Arab Emirates
-                              </SelectItem>
-                              <SelectItem value="saudi-arabia">
-                                Saudi Arabia
-                              </SelectItem>
-                              <SelectItem value="turkey">Turkey</SelectItem>
-                              <SelectItem value="russia">Russia</SelectItem>
-                              <SelectItem value="ukraine">Ukraine</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                          <CountrySelector {...field} />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1142,19 +985,19 @@ export default function CreateEvent() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setLocation("/event-discovery")}
+                    onClick={() => navigate("/event-discovery")}
                     className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
                     Cancel
                   </Button>
-                  <Link href="/enhanced-event/1">
-                    <Button
-                      type="button" // change from submit since it’s navigation, not form submit
-                      className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
-                    >
+
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                    disabled={form.formState.isSubmitting}
+                  >
                       Create Event & Send Invites
-                    </Button>
-                  </Link>
+                  </Button>
                 </div>
               </form>
             </Form>
