@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 
 export default function PlayfulEventDiscovery() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [likedEvents, setLikedEvents] = useState<string[]>([]);
@@ -600,7 +600,7 @@ export default function PlayfulEventDiscovery() {
                                 "View Details clicked for event:",
                                 event.id
                               );
-                              setLocation(`/enhanced-event/${event.id}`);
+                              navigate(`/enhanced-event/${event.id}`);
                             }}
                           >
                             View Details
@@ -615,7 +615,7 @@ export default function PlayfulEventDiscovery() {
                                 "Book Now clicked for event:",
                                 event.id
                               );
-                              setLocation(`/party-booking/${event.id}`);
+                              navigate(`/party-booking/${event.id}`);
                             }}
                           >
                             Book Now

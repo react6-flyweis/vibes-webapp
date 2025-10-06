@@ -3,32 +3,93 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useParams, useLocation } from "wouter";
+import { useParams, useLocation } from "react-router";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Removed badge and separator imports as they're not essential
-import { 
-  Calendar, MapPin, Users, DollarSign, Clock, Plus, X, 
-  ChefHat, Wine, ShoppingCart, CheckCircle, AlertCircle,
-  Edit, Trash2, User, Mail, MessageSquare, Share2, 
-  Music, Vote, Armchair, Send, Phone, Copy, QrCode,
-  Heart, Star, Play, Pause, Volume2, UserPlus, Settings,
-  Wifi, Bluetooth, Smartphone, Globe, Link, Crown,
-  Sparkles, Zap, Camera, Video, Mic, Headphones
+import {
+  Calendar,
+  MapPin,
+  Users,
+  DollarSign,
+  Clock,
+  Plus,
+  X,
+  ChefHat,
+  Wine,
+  ShoppingCart,
+  CheckCircle,
+  AlertCircle,
+  Edit,
+  Trash2,
+  User,
+  Mail,
+  MessageSquare,
+  Share2,
+  Music,
+  Vote,
+  Armchair,
+  Send,
+  Phone,
+  Copy,
+  QrCode,
+  Heart,
+  Star,
+  Play,
+  Pause,
+  Volume2,
+  UserPlus,
+  Settings,
+  Wifi,
+  Bluetooth,
+  Smartphone,
+  Globe,
+  Link,
+  Crown,
+  Sparkles,
+  Zap,
+  Camera,
+  Video,
+  Mic,
+  Headphones,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Simple Badge component replacement
 const Badge = ({ children, variant = "default", className = "" }: any) => (
-  <div className={`px-2 py-1 rounded text-xs inline-flex items-center gap-1 ${
-    variant === "secondary" ? "bg-white/20 text-white/80" : "bg-white/30 text-white"
-  } ${className}`}>
+  <div
+    className={`px-2 py-1 rounded text-xs inline-flex items-center gap-1 ${
+      variant === "secondary"
+        ? "bg-white/20 text-white/80"
+        : "bg-white/30 text-white"
+    } ${className}`}
+  >
     {children}
   </div>
 );
@@ -69,7 +130,9 @@ const guestSchema = z.object({
 const invitationSchema = z.object({
   template: z.string().min(1, "Template is required"),
   message: z.string().min(1, "Message is required"),
-  sendVia: z.array(z.enum(["email", "whatsapp", "sms"])).min(1, "Select at least one method"),
+  sendVia: z
+    .array(z.enum(["email", "whatsapp", "sms"]))
+    .min(1, "Select at least one method"),
   scheduledTime: z.string().optional(),
 });
 
@@ -93,35 +156,35 @@ export default function EventPlanning() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
-  
+
   // Menu and drinks management
   const [showAddMenuItem, setShowAddMenuItem] = useState(false);
   const [showAddDrinkItem, setShowAddDrinkItem] = useState(false);
   const [editingMenuItem, setEditingMenuItem] = useState<any>(null);
   const [editingDrinkItem, setEditingDrinkItem] = useState<any>(null);
-  
+
   // Guest management
   const [showAddGuest, setShowAddGuest] = useState(false);
   const [editingGuest, setEditingGuest] = useState<any>(null);
   const [guestSearchTerm, setGuestSearchTerm] = useState("");
   const [selectedGuests, setSelectedGuests] = useState<string[]>([]);
-  
+
   // Invitation management
   const [showInvitationComposer, setShowInvitationComposer] = useState(false);
   const [invitationTemplate, setInvitationTemplate] = useState("elegant");
   const [invitationPreview, setInvitationPreview] = useState(false);
-  
+
   // Seat selection
   const [showSeatMap, setShowSeatMap] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
   const [seatLayout, setSeatLayout] = useState("round-tables");
-  
+
   // DJ booth and music
   const [showDJBooth, setShowDJBooth] = useState(false);
   const [currentSong, setCurrentSong] = useState<any>(null);
   const [songSuggestions, setSongSuggestions] = useState<any[]>([]);
   const [playlistMode, setPlaylistMode] = useState("auto");
-  
+
   // Vibes Connect
   const [vibesConnectEnabled, setVibesConnectEnabled] = useState(true);
   const [liveVibeFeed, setLiveVibeFeed] = useState<any[]>([]);
@@ -203,14 +266,16 @@ export default function EventPlanning() {
 
   // Create menu item mutation
   const createMenuItemMutation = useMutation({
-    mutationFn: (data: MenuItemForm) => 
+    mutationFn: (data: MenuItemForm) =>
       apiRequest("POST", `/api/events/${eventId}/menu-items`, data),
     onSuccess: () => {
       toast({
         title: "Menu Item Added",
         description: "Your menu item has been added successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "menu-items"],
+      });
       menuForm.reset();
       setShowAddMenuItem(false);
     },
@@ -225,14 +290,16 @@ export default function EventPlanning() {
 
   // Create drink item mutation
   const createDrinkItemMutation = useMutation({
-    mutationFn: (data: DrinkItemForm) => 
+    mutationFn: (data: DrinkItemForm) =>
       apiRequest("POST", `/api/events/${eventId}/drink-items`, data),
     onSuccess: () => {
       toast({
         title: "Drink Item Added",
         description: "Your drink item has been added successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "drink-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "drink-items"],
+      });
       drinkForm.reset();
       setShowAddDrinkItem(false);
     },
@@ -247,28 +314,32 @@ export default function EventPlanning() {
 
   // Update menu item mutation
   const updateMenuItemMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<MenuItemForm> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<MenuItemForm> }) =>
       apiRequest("PUT", `/api/menu-items/${id}`, data),
     onSuccess: () => {
       toast({
         title: "Menu Item Updated",
         description: "Your menu item has been updated successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "menu-items"],
+      });
       setEditingMenuItem(null);
     },
   });
 
   // Update drink item mutation
   const updateDrinkItemMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<DrinkItemForm> }) => 
+    mutationFn: ({ id, data }: { id: number; data: Partial<DrinkItemForm> }) =>
       apiRequest("PUT", `/api/drink-items/${id}`, data),
     onSuccess: () => {
       toast({
         title: "Drink Item Updated",
         description: "Your drink item has been updated successfully!",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "drink-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "drink-items"],
+      });
       setEditingDrinkItem(null);
     },
   });
@@ -278,7 +349,9 @@ export default function EventPlanning() {
     mutationFn: (id: number) => apiRequest("DELETE", `/api/menu-items/${id}`),
     onSuccess: () => {
       toast({ title: "Menu item deleted successfully!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "menu-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "menu-items"],
+      });
     },
   });
 
@@ -286,7 +359,9 @@ export default function EventPlanning() {
     mutationFn: (id: number) => apiRequest("DELETE", `/api/drink-items/${id}`),
     onSuccess: () => {
       toast({ title: "Drink item deleted successfully!" });
-      queryClient.invalidateQueries({ queryKey: ["/api/events", eventId, "drink-items"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/events", eventId, "drink-items"],
+      });
     },
   });
 
@@ -327,13 +402,15 @@ export default function EventPlanning() {
     }
 
     // Calculate from menu and drink items if available
-    const menuCosts = menuItems?.reduce((total: number, item: any) => {
-      return total + (parseInt(item.estimatedCost) || 0);
-    }, 0) || 450;
+    const menuCosts =
+      menuItems?.reduce((total: number, item: any) => {
+        return total + (parseInt(item.estimatedCost) || 0);
+      }, 0) || 450;
 
-    const drinkCosts = drinkItems?.reduce((total: number, item: any) => {
-      return total + (parseInt(item.estimatedCost) || 0);
-    }, 0) || 380;
+    const drinkCosts =
+      drinkItems?.reduce((total: number, item: any) => {
+        return total + (parseInt(item.estimatedCost) || 0);
+      }, 0) || 380;
 
     const totalCosts = menuCosts + drinkCosts + 1020; // venue + other costs
 
@@ -379,12 +456,12 @@ export default function EventPlanning() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => setLocation("/dashboard")}
+            onClick={() => navigate("/dashboard")}
             className="text-white/60 hover:text-white mb-4"
           >
             ← Back to Dashboard
           </Button>
-          
+
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6">
             <div className="flex items-start justify-between">
               <div>
@@ -417,59 +494,63 @@ export default function EventPlanning() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-8 bg-white/10 backdrop-blur-md border border-white/20 text-xs">
-            <TabsTrigger 
-              value="overview" 
+            <TabsTrigger
+              value="overview"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Users className="w-3 h-3 mr-1" />
               Overview
             </TabsTrigger>
-            <TabsTrigger 
-              value="guests" 
+            <TabsTrigger
+              value="guests"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <UserPlus className="w-3 h-3 mr-1" />
               Guests
             </TabsTrigger>
-            <TabsTrigger 
-              value="invitations" 
+            <TabsTrigger
+              value="invitations"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Mail className="w-3 h-3 mr-1" />
               Invites
             </TabsTrigger>
-            <TabsTrigger 
-              value="seats" 
+            <TabsTrigger
+              value="seats"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Armchair className="w-3 h-3 mr-1" />
               Seating
             </TabsTrigger>
-            <TabsTrigger 
-              value="menu" 
+            <TabsTrigger
+              value="menu"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <ChefHat className="w-3 h-3 mr-1" />
               Menu
             </TabsTrigger>
-            <TabsTrigger 
-              value="drinks" 
+            <TabsTrigger
+              value="drinks"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Wine className="w-3 h-3 mr-1" />
               Drinks
             </TabsTrigger>
-            <TabsTrigger 
-              value="dj" 
+            <TabsTrigger
+              value="dj"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Music className="w-3 h-3 mr-1" />
               DJ Booth
             </TabsTrigger>
-            <TabsTrigger 
-              value="vibes" 
+            <TabsTrigger
+              value="vibes"
               className="data-[state=active]:bg-white/20 data-[state=active]:text-white"
             >
               <Sparkles className="w-3 h-3 mr-1" />
@@ -496,10 +577,12 @@ export default function EventPlanning() {
                     <strong>Budget:</strong> {event?.budget || "Not specified"}
                   </div>
                   <div>
-                    <strong>Music:</strong> {event?.musicPreferences || "Not specified"}
+                    <strong>Music:</strong>{" "}
+                    {event?.musicPreferences || "Not specified"}
                   </div>
                   <div>
-                    <strong>Special Requests:</strong> {event?.specialRequests || "None"}
+                    <strong>Special Requests:</strong>{" "}
+                    {event?.specialRequests || "None"}
                   </div>
                 </CardContent>
               </Card>
@@ -561,7 +644,9 @@ export default function EventPlanning() {
             {event?.dietaryRestrictions && (
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white">Dietary Restrictions & Allergies</CardTitle>
+                  <CardTitle className="text-white">
+                    Dietary Restrictions & Allergies
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-white/80">{event.dietaryRestrictions}</p>
@@ -596,19 +681,24 @@ export default function EventPlanning() {
                 </CardHeader>
                 <CardContent>
                   <Form {...menuForm}>
-                    <form onSubmit={menuForm.handleSubmit(onSubmitMenuItem)} className="space-y-4">
+                    <form
+                      onSubmit={menuForm.handleSubmit(onSubmitMenuItem)}
+                      className="space-y-4"
+                    >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={menuForm.control}
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Item Name</FormLabel>
+                              <FormLabel className="text-white">
+                                Item Name
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., Caesar Salad"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -621,17 +711,28 @@ export default function EventPlanning() {
                           name="category"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Category</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormLabel className="text-white">
+                                Category
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="Select category" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="appetizer">Appetizer</SelectItem>
-                                  <SelectItem value="main">Main Course</SelectItem>
-                                  <SelectItem value="dessert">Dessert</SelectItem>
+                                  <SelectItem value="appetizer">
+                                    Appetizer
+                                  </SelectItem>
+                                  <SelectItem value="main">
+                                    Main Course
+                                  </SelectItem>
+                                  <SelectItem value="dessert">
+                                    Dessert
+                                  </SelectItem>
                                   <SelectItem value="sides">Sides</SelectItem>
                                 </SelectContent>
                               </Select>
@@ -645,12 +746,14 @@ export default function EventPlanning() {
                           name="servings"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Servings</FormLabel>
+                              <FormLabel className="text-white">
+                                Servings
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., Serves 8-10"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -663,13 +766,15 @@ export default function EventPlanning() {
                           name="estimatedCost"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Estimated Cost ($)</FormLabel>
+                              <FormLabel className="text-white">
+                                Estimated Cost ($)
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., 25"
                                   type="number"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -682,12 +787,14 @@ export default function EventPlanning() {
                           name="assignedTo"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Assigned To</FormLabel>
+                              <FormLabel className="text-white">
+                                Assigned To
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="Who's making/bringing this?"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -701,12 +808,14 @@ export default function EventPlanning() {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Description</FormLabel>
+                            <FormLabel className="text-white">
+                              Description
+                            </FormLabel>
                             <FormControl>
-                              <Textarea 
+                              <Textarea
                                 placeholder="Optional description or special instructions"
                                 className="bg-white/10 border-white/20 text-white"
-                                {...field} 
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -715,14 +824,17 @@ export default function EventPlanning() {
                       />
 
                       <div className="flex gap-3">
-                        <Button 
-                          type="submit" 
-                          disabled={createMenuItemMutation.isPending || updateMenuItemMutation.isPending}
+                        <Button
+                          type="submit"
+                          disabled={
+                            createMenuItemMutation.isPending ||
+                            updateMenuItemMutation.isPending
+                          }
                           className="bg-green-600 hover:bg-green-700"
                         >
                           {editingMenuItem ? "Update Item" : "Add Item"}
                         </Button>
-                        <Button 
+                        <Button
                           type="button"
                           variant="ghost"
                           onClick={() => {
@@ -744,18 +856,25 @@ export default function EventPlanning() {
             {/* Menu Items List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {menuLoading ? (
-                <div className="col-span-full text-center text-white/60">Loading menu items...</div>
+                <div className="col-span-full text-center text-white/60">
+                  Loading menu items...
+                </div>
               ) : menuItems?.length === 0 ? (
                 <div className="col-span-full text-center text-white/60">
                   No menu items yet. Add your first item!
                 </div>
               ) : (
                 menuItems?.map((item: any) => (
-                  <Card key={item.id} className="bg-white/10 backdrop-blur-md border-white/20">
+                  <Card
+                    key={item.id}
+                    className="bg-white/10 backdrop-blur-md border-white/20"
+                  >
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-white text-lg">{item.name}</CardTitle>
+                          <CardTitle className="text-white text-lg">
+                            {item.name}
+                          </CardTitle>
                           <div className="mt-1 px-2 py-1 bg-white/20 rounded text-xs text-white/80 inline-block capitalize">
                             {item.category}
                           </div>
@@ -775,7 +894,9 @@ export default function EventPlanning() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => deleteMenuItemMutation.mutate(item.id)}
+                            onClick={() =>
+                              deleteMenuItemMutation.mutate(item.id)
+                            }
                             className="text-red-400 hover:text-red-300"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -793,8 +914,8 @@ export default function EventPlanning() {
                       )}
                       {item.estimatedCost && (
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
-                          ${item.estimatedCost}
+                          <DollarSign className="h-3 w-3" />$
+                          {item.estimatedCost}
                         </div>
                       )}
                       {item.assignedTo && (
@@ -803,8 +924,10 @@ export default function EventPlanning() {
                           {item.assignedTo}
                         </div>
                       )}
-                      <Badge 
-                        variant={item.status === "completed" ? "default" : "secondary"}
+                      <Badge
+                        variant={
+                          item.status === "completed" ? "default" : "secondary"
+                        }
                         className="mt-2"
                       >
                         {item.status === "completed" ? (
@@ -842,24 +965,31 @@ export default function EventPlanning() {
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">
-                    {editingDrinkItem ? "Edit Drink Item" : "Add New Drink Item"}
+                    {editingDrinkItem
+                      ? "Edit Drink Item"
+                      : "Add New Drink Item"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Form {...drinkForm}>
-                    <form onSubmit={drinkForm.handleSubmit(onSubmitDrinkItem)} className="space-y-4">
+                    <form
+                      onSubmit={drinkForm.handleSubmit(onSubmitDrinkItem)}
+                      className="space-y-4"
+                    >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={drinkForm.control}
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Drink Name</FormLabel>
+                              <FormLabel className="text-white">
+                                Drink Name
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., Tropical Punch"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -873,16 +1003,25 @@ export default function EventPlanning() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-white">Type</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger className="bg-white/10 border-white/20 text-white">
                                     <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="non-alcoholic">Non-Alcoholic</SelectItem>
-                                  <SelectItem value="alcoholic">Alcoholic</SelectItem>
-                                  <SelectItem value="cocktail">Cocktail</SelectItem>
+                                  <SelectItem value="non-alcoholic">
+                                    Non-Alcoholic
+                                  </SelectItem>
+                                  <SelectItem value="alcoholic">
+                                    Alcoholic
+                                  </SelectItem>
+                                  <SelectItem value="cocktail">
+                                    Cocktail
+                                  </SelectItem>
                                   <SelectItem value="beer">Beer</SelectItem>
                                   <SelectItem value="wine">Wine</SelectItem>
                                 </SelectContent>
@@ -897,12 +1036,14 @@ export default function EventPlanning() {
                           name="quantity"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Quantity</FormLabel>
+                              <FormLabel className="text-white">
+                                Quantity
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., 2 bottles, 1 gallon"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -915,13 +1056,15 @@ export default function EventPlanning() {
                           name="estimatedCost"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-white">Estimated Cost ($)</FormLabel>
+                              <FormLabel className="text-white">
+                                Estimated Cost ($)
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="e.g., 15"
                                   type="number"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -934,12 +1077,14 @@ export default function EventPlanning() {
                           name="assignedTo"
                           render={({ field }) => (
                             <FormItem className="md:col-span-2">
-                              <FormLabel className="text-white">Assigned To</FormLabel>
+                              <FormLabel className="text-white">
+                                Assigned To
+                              </FormLabel>
                               <FormControl>
-                                <Input 
+                                <Input
                                   placeholder="Who's bringing this drink?"
                                   className="bg-white/10 border-white/20 text-white"
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -949,14 +1094,17 @@ export default function EventPlanning() {
                       </div>
 
                       <div className="flex gap-3">
-                        <Button 
-                          type="submit" 
-                          disabled={createDrinkItemMutation.isPending || updateDrinkItemMutation.isPending}
+                        <Button
+                          type="submit"
+                          disabled={
+                            createDrinkItemMutation.isPending ||
+                            updateDrinkItemMutation.isPending
+                          }
                           className="bg-blue-600 hover:bg-blue-700"
                         >
                           {editingDrinkItem ? "Update Item" : "Add Item"}
                         </Button>
-                        <Button 
+                        <Button
                           type="button"
                           variant="ghost"
                           onClick={() => {
@@ -978,19 +1126,29 @@ export default function EventPlanning() {
             {/* Drink Items List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {drinkLoading ? (
-                <div className="col-span-full text-center text-white/60">Loading drink items...</div>
+                <div className="col-span-full text-center text-white/60">
+                  Loading drink items...
+                </div>
               ) : drinkItems?.length === 0 ? (
                 <div className="col-span-full text-center text-white/60">
                   No drink items yet. Add your first item!
                 </div>
               ) : (
                 drinkItems?.map((item: any) => (
-                  <Card key={item.id} className="bg-white/10 backdrop-blur-md border-white/20">
+                  <Card
+                    key={item.id}
+                    className="bg-white/10 backdrop-blur-md border-white/20"
+                  >
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-white text-lg">{item.name}</CardTitle>
-                          <Badge variant="secondary" className="mt-1 capitalize">
+                          <CardTitle className="text-white text-lg">
+                            {item.name}
+                          </CardTitle>
+                          <Badge
+                            variant="secondary"
+                            className="mt-1 capitalize"
+                          >
                             {item.type}
                           </Badge>
                         </div>
@@ -1009,7 +1167,9 @@ export default function EventPlanning() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => deleteDrinkItemMutation.mutate(item.id)}
+                            onClick={() =>
+                              deleteDrinkItemMutation.mutate(item.id)
+                            }
                             className="text-red-400 hover:text-red-300"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -1026,8 +1186,8 @@ export default function EventPlanning() {
                       )}
                       {item.estimatedCost && (
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
-                          ${item.estimatedCost}
+                          <DollarSign className="h-3 w-3" />$
+                          {item.estimatedCost}
                         </div>
                       )}
                       {item.assignedTo && (
@@ -1036,8 +1196,10 @@ export default function EventPlanning() {
                           {item.assignedTo}
                         </div>
                       )}
-                      <Badge 
-                        variant={item.status === "completed" ? "default" : "secondary"}
+                      <Badge
+                        variant={
+                          item.status === "completed" ? "default" : "secondary"
+                        }
                         className="mt-2"
                       >
                         {item.status === "completed" ? (
@@ -1117,25 +1279,33 @@ export default function EventPlanning() {
                     <span>${budgetSummary.menu.toLocaleString()}</span>
                   </div>
                   <div className="w-full bg-white/20 rounded-full h-2">
-                    <div 
-                      className="bg-orange-400 h-2 rounded-full" 
-                      style={{ 
-                        width: budgetSummary.total ? `${(budgetSummary.menu / budgetSummary.total) * 100}%` : '0%' 
+                    <div
+                      className="bg-orange-400 h-2 rounded-full"
+                      style={{
+                        width: budgetSummary.total
+                          ? `${
+                              (budgetSummary.menu / budgetSummary.total) * 100
+                            }%`
+                          : "0%",
                       }}
                     ></div>
                   </div>
                 </div>
-                
+
                 <div>
                   <div className="flex justify-between text-white mb-2">
                     <span>Drinks ({drinkItems?.length || 0} items)</span>
                     <span>${budgetSummary.drinks.toLocaleString()}</span>
                   </div>
                   <div className="w-full bg-white/20 rounded-full h-2">
-                    <div 
-                      className="bg-blue-400 h-2 rounded-full" 
-                      style={{ 
-                        width: budgetSummary.total ? `${(budgetSummary.drinks / budgetSummary.total) * 100}%` : '0%' 
+                    <div
+                      className="bg-blue-400 h-2 rounded-full"
+                      style={{
+                        width: budgetSummary.total
+                          ? `${
+                              (budgetSummary.drinks / budgetSummary.total) * 100
+                            }%`
+                          : "0%",
                       }}
                     ></div>
                   </div>
@@ -1153,7 +1323,8 @@ export default function EventPlanning() {
                   Guest Management
                 </CardTitle>
                 <CardDescription className="text-white/80">
-                  Manage event attendees, track RSVPs, and handle dietary requirements
+                  Manage event attendees, track RSVPs, and handle dietary
+                  requirements
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1177,32 +1348,55 @@ export default function EventPlanning() {
 
                 {/* Guest List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(eventGuests.length > 0 ? eventGuests : mockGuestList).map((guest) => (
-                    <div key={guest.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-white" />
+                  {(eventGuests.length > 0 ? eventGuests : mockGuestList).map(
+                    (guest) => (
+                      <div
+                        key={guest.id}
+                        className="bg-white/5 rounded-lg p-4 border border-white/10"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="text-white font-medium">
+                                {guest.name}
+                              </h4>
+                              <p className="text-white/60 text-sm">
+                                {guest.email}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-white font-medium">{guest.name}</h4>
-                            <p className="text-white/60 text-sm">{guest.email}</p>
-                          </div>
-                        </div>
-                        <Badge variant={guest.rsvpStatus === 'confirmed' ? 'default' : 'secondary'}>
-                          {guest.rsvpStatus}
-                        </Badge>
-                      </div>
-                      <div className="mt-3 flex items-center gap-2">
-                        {guest.dietary?.map((diet) => (
-                          <Badge key={diet} variant="secondary" className="text-xs">
-                            {diet}
+                          <Badge
+                            variant={
+                              guest.rsvpStatus === "confirmed"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {guest.rsvpStatus}
                           </Badge>
-                        ))}
-                        {guest.plusOne && <Badge variant="secondary" className="text-xs">+1</Badge>}
+                        </div>
+                        <div className="mt-3 flex items-center gap-2">
+                          {guest.dietary?.map((diet) => (
+                            <Badge
+                              key={diet}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {diet}
+                            </Badge>
+                          ))}
+                          {guest.plusOne && (
+                            <Badge variant="secondary" className="text-xs">
+                              +1
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1217,7 +1411,8 @@ export default function EventPlanning() {
                   E-Invitations & Sharing
                 </CardTitle>
                 <CardDescription className="text-white/80">
-                  Create beautiful invitations and share via WhatsApp, email, and social media
+                  Create beautiful invitations and share via WhatsApp, email,
+                  and social media
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1231,13 +1426,15 @@ export default function EventPlanning() {
                           key={template.id}
                           className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                             invitationTemplate === template.id
-                              ? 'border-purple-500 bg-purple-500/20'
-                              : 'border-white/20 bg-white/5 hover:border-white/40'
+                              ? "border-purple-500 bg-purple-500/20"
+                              : "border-white/20 bg-white/5 hover:border-white/40"
                           }`}
                           onClick={() => setInvitationTemplate(template.id)}
                         >
                           <div className="aspect-square bg-linear-to-br from-purple-500 to-pink-500 rounded-md mb-2"></div>
-                          <p className="text-white text-sm font-medium">{template.name}</p>
+                          <p className="text-white text-sm font-medium">
+                            {template.name}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -1251,8 +1448,12 @@ export default function EventPlanning() {
                         <div className="w-16 h-16 bg-linear-to-br from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center">
                           <Sparkles className="w-8 h-8 text-white" />
                         </div>
-                        <h2 className="text-white text-xl font-bold">You're Invited!</h2>
-                        <p className="text-white/80">Jordan's 30th Birthday Celebration</p>
+                        <h2 className="text-white text-xl font-bold">
+                          You're Invited!
+                        </h2>
+                        <p className="text-white/80">
+                          Jordan's 30th Birthday Celebration
+                        </p>
                         <div className="space-y-2 text-white/60">
                           <p>📅 Saturday, March 15th at 8:00 PM</p>
                           <p>📍 The Rooftop Lounge, Downtown</p>
@@ -1291,7 +1492,8 @@ export default function EventPlanning() {
                   Seat Selection & Layout
                 </CardTitle>
                 <CardDescription className="text-white/80">
-                  Design seating arrangements and let guests choose their preferred spots
+                  Design seating arrangements and let guests choose their
+                  preferred spots
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1303,8 +1505,12 @@ export default function EventPlanning() {
                     <SelectContent>
                       <SelectItem value="round-tables">Round Tables</SelectItem>
                       <SelectItem value="long-tables">Long Tables</SelectItem>
-                      <SelectItem value="cocktail-style">Cocktail Style</SelectItem>
-                      <SelectItem value="theater-style">Theater Style</SelectItem>
+                      <SelectItem value="cocktail-style">
+                        Cocktail Style
+                      </SelectItem>
+                      <SelectItem value="theater-style">
+                        Theater Style
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -1324,15 +1530,15 @@ export default function EventPlanning() {
                         DJ BOOTH / STAGE
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                       {Array.from({ length: 8 }, (_, i) => (
                         <div
                           key={i}
                           className={`aspect-square rounded-full border-2 flex items-center justify-center text-xs font-medium cursor-pointer transition-all ${
                             selectedSeat === `table-${i + 1}`
-                              ? 'border-purple-500 bg-purple-500/20 text-purple-200'
-                              : 'border-white/20 bg-white/5 text-white/60 hover:border-white/40'
+                              ? "border-purple-500 bg-purple-500/20 text-purple-200"
+                              : "border-white/20 bg-white/5 text-white/60 hover:border-white/40"
                           }`}
                           onClick={() => setSelectedSeat(`table-${i + 1}`)}
                         >
@@ -1370,7 +1576,8 @@ export default function EventPlanning() {
                   DJ Booth & Music Voting
                 </CardTitle>
                 <CardDescription className="text-white/80">
-                  Manage playlist, take song requests, and let guests vote for their favorites
+                  Manage playlist, take song requests, and let guests vote for
+                  their favorites
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1384,24 +1591,37 @@ export default function EventPlanning() {
                           <Music className="w-8 h-8 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-white font-medium">Blinding Lights</h4>
+                          <h4 className="text-white font-medium">
+                            Blinding Lights
+                          </h4>
                           <p className="text-white/60">The Weeknd</p>
                           <div className="mt-2 flex items-center gap-2">
                             <div className="flex-1 bg-white/20 rounded-full h-2">
                               <div className="bg-linear-to-r from-purple-500 to-pink-500 h-2 rounded-full w-1/3"></div>
                             </div>
-                            <span className="text-white/60 text-sm">1:23 / 3:45</span>
+                            <span className="text-white/60 text-sm">
+                              1:23 / 3:45
+                            </span>
                           </div>
                         </div>
                       </div>
                       <div className="mt-4 flex items-center justify-center gap-4">
-                        <Button size="sm" className="bg-white/10 hover:bg-white/20">
+                        <Button
+                          size="sm"
+                          className="bg-white/10 hover:bg-white/20"
+                        >
                           <Play className="w-4 h-4" />
                         </Button>
-                        <Button size="sm" className="bg-white/10 hover:bg-white/20">
+                        <Button
+                          size="sm"
+                          className="bg-white/10 hover:bg-white/20"
+                        >
                           <Pause className="w-4 h-4" />
                         </Button>
-                        <Button size="sm" className="bg-white/10 hover:bg-white/20">
+                        <Button
+                          size="sm"
+                          className="bg-white/10 hover:bg-white/20"
+                        >
                           <Volume2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -1412,19 +1632,35 @@ export default function EventPlanning() {
                   <div className="space-y-4">
                     <h3 className="text-white font-medium">Song Requests</h3>
                     <div className="space-y-3">
-                      {(songRequestsData.length > 0 ? songRequestsData : mockSongRequests).map((song) => (
-                        <div key={song.id} className="bg-white/5 rounded-lg p-3 border border-white/10">
+                      {(songRequestsData.length > 0
+                        ? songRequestsData
+                        : mockSongRequests
+                      ).map((song) => (
+                        <div
+                          key={song.id}
+                          className="bg-white/5 rounded-lg p-3 border border-white/10"
+                        >
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="text-white font-medium text-sm">{song.title}</h4>
-                              <p className="text-white/60 text-xs">{song.artist}</p>
+                              <h4 className="text-white font-medium text-sm">
+                                {song.title}
+                              </h4>
+                              <p className="text-white/60 text-xs">
+                                {song.artist}
+                              </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                              <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
                                 <Heart className="w-3 h-3 mr-1" />
                                 {song.votes}
                               </Button>
-                              <Button size="sm" className="bg-white/10 hover:bg-white/20">
+                              <Button
+                                size="sm"
+                                className="bg-white/10 hover:bg-white/20"
+                              >
                                 <Play className="w-3 h-3" />
                               </Button>
                             </div>
@@ -1459,8 +1695,12 @@ export default function EventPlanning() {
                       <div className="w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full mx-auto flex items-center justify-center">
                         <Zap className="w-8 h-8 text-white" />
                       </div>
-                      <p className="text-white text-lg font-semibold">{vibesData?.mood || "Energetic"}</p>
-                      <p className="text-white/60 text-sm">Energy Level: {vibesData?.energy || 85}%</p>
+                      <p className="text-white text-lg font-semibold">
+                        {vibesData?.mood || "Energetic"}
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        Energy Level: {vibesData?.energy || 85}%
+                      </p>
                     </div>
                   </div>
 
@@ -1470,22 +1710,31 @@ export default function EventPlanning() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-white/60">Guests Present</span>
-                        <span className="text-white">{vibesData?.guestsPresent || 47}/{vibesData?.totalGuests || 50}</span>
+                        <span className="text-white">
+                          {vibesData?.guestsPresent || 47}/
+                          {vibesData?.totalGuests || 50}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-white/60">Dance Floor</span>
-                        <span className="text-white">{vibesData?.danceFloorStatus || "Active"}</span>
+                        <span className="text-white">
+                          {vibesData?.danceFloorStatus || "Active"}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-white/60">Bar Queue</span>
-                        <span className="text-white">{vibesData?.barQueueStatus || "Light"}</span>
+                        <span className="text-white">
+                          {vibesData?.barQueueStatus || "Light"}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <h3 className="text-white font-medium mb-3">Quick Actions</h3>
+                    <h3 className="text-white font-medium mb-3">
+                      Quick Actions
+                    </h3>
                     <div className="space-y-2">
                       <Button className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
                         <Camera className="w-4 h-4 mr-2" />
@@ -1505,16 +1754,23 @@ export default function EventPlanning() {
 
                 {/* Live Feed */}
                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <h3 className="text-white font-medium mb-4">Live Vibe Feed</h3>
+                  <h3 className="text-white font-medium mb-4">
+                    Live Vibe Feed
+                  </h3>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {mockLiveFeed.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-2 bg-white/5 rounded-lg"
+                      >
                         <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                           <User className="w-4 h-4 text-white" />
                         </div>
                         <div className="flex-1">
                           <p className="text-white text-sm">{item.message}</p>
-                          <p className="text-white/60 text-xs">{item.timestamp}</p>
+                          <p className="text-white/60 text-xs">
+                            {item.timestamp}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -1531,29 +1787,69 @@ export default function EventPlanning() {
 
 // Mock data for new features
 const mockGuestList = [
-  { id: 1, name: 'Sarah Johnson', email: 'sarah@example.com', rsvpStatus: 'confirmed', dietary: ['vegetarian'], plusOne: true },
-  { id: 2, name: 'Mike Chen', email: 'mike@example.com', rsvpStatus: 'pending', dietary: ['gluten-free'], plusOne: false },
-  { id: 3, name: 'Emma Rodriguez', email: 'emma@example.com', rsvpStatus: 'confirmed', dietary: [], plusOne: true },
-  { id: 4, name: 'James Wilson', email: 'james@example.com', rsvpStatus: 'declined', dietary: ['vegan'], plusOne: false },
+  {
+    id: 1,
+    name: "Sarah Johnson",
+    email: "sarah@example.com",
+    rsvpStatus: "confirmed",
+    dietary: ["vegetarian"],
+    plusOne: true,
+  },
+  {
+    id: 2,
+    name: "Mike Chen",
+    email: "mike@example.com",
+    rsvpStatus: "pending",
+    dietary: ["gluten-free"],
+    plusOne: false,
+  },
+  {
+    id: 3,
+    name: "Emma Rodriguez",
+    email: "emma@example.com",
+    rsvpStatus: "confirmed",
+    dietary: [],
+    plusOne: true,
+  },
+  {
+    id: 4,
+    name: "James Wilson",
+    email: "james@example.com",
+    rsvpStatus: "declined",
+    dietary: ["vegan"],
+    plusOne: false,
+  },
 ];
 
 const invitationTemplates = [
-  { id: 'elegant', name: 'Elegant' },
-  { id: 'fun', name: 'Fun & Colorful' },
-  { id: 'minimalist', name: 'Minimalist' },
-  { id: 'vintage', name: 'Vintage' },
+  { id: "elegant", name: "Elegant" },
+  { id: "fun", name: "Fun & Colorful" },
+  { id: "minimalist", name: "Minimalist" },
+  { id: "vintage", name: "Vintage" },
 ];
 
 const mockSongRequests = [
-  { id: 1, title: 'Good 4 U', artist: 'Olivia Rodrigo', votes: 12 },
-  { id: 2, title: 'Levitating', artist: 'Dua Lipa', votes: 8 },
-  { id: 3, title: 'Heat Waves', artist: 'Glass Animals', votes: 15 },
-  { id: 4, title: 'Stay', artist: 'The Kid LAROI & Justin Bieber', votes: 6 },
+  { id: 1, title: "Good 4 U", artist: "Olivia Rodrigo", votes: 12 },
+  { id: 2, title: "Levitating", artist: "Dua Lipa", votes: 8 },
+  { id: 3, title: "Heat Waves", artist: "Glass Animals", votes: 15 },
+  { id: 4, title: "Stay", artist: "The Kid LAROI & Justin Bieber", votes: 6 },
 ];
 
 const mockLiveFeed = [
-  { id: 1, message: 'Sarah just arrived! 🎉', timestamp: '2 minutes ago' },
-  { id: 2, message: 'Mike requested "Blinding Lights" 🎵', timestamp: '5 minutes ago' },
-  { id: 3, message: 'Emma posted a photo to the live wall 📸', timestamp: '8 minutes ago' },
-  { id: 4, message: 'Dance floor is getting crowded! 💃', timestamp: '12 minutes ago' },
+  { id: 1, message: "Sarah just arrived! 🎉", timestamp: "2 minutes ago" },
+  {
+    id: 2,
+    message: 'Mike requested "Blinding Lights" 🎵',
+    timestamp: "5 minutes ago",
+  },
+  {
+    id: 3,
+    message: "Emma posted a photo to the live wall 📸",
+    timestamp: "8 minutes ago",
+  },
+  {
+    id: 4,
+    message: "Dance floor is getting crowded! 💃",
+    timestamp: "12 minutes ago",
+  },
 ];

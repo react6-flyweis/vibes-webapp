@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import {
   Brain,
   Globe,
@@ -105,7 +105,7 @@ export default function DemoFeatures() {
         {/* Quick Access Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {features.map((feature) => (
-            <Link key={feature.id} href={feature.path}>
+            <Link key={feature.id} to={feature.path}>
               <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer">
                 <CardHeader className="text-center pb-4">
                   <div
@@ -183,7 +183,7 @@ export default function DemoFeatures() {
                       <p className="text-gray-700 mb-6 text-lg leading-relaxed">
                         {feature.details}
                       </p>
-                      <Link href={feature.path}>
+                      <Link to={feature.path}>
                         <Button size="lg" className="w-full">
                           Experience {feature.name}
                           <ArrowRight className="ml-2 h-5 w-5" />
@@ -209,7 +209,7 @@ export default function DemoFeatures() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link href="/ai-party-designer">
+              <Link to="/ai-party-designer">
                 <div className="p-4 rounded-lg bg-linear-to-br from-blue-50 to-indigo-50 hover:shadow-md transition-shadow cursor-pointer">
                   <Sparkles className="h-8 w-8 text-blue-600 mb-2" />
                   <h3 className="font-semibold text-gray-800">
@@ -221,7 +221,7 @@ export default function DemoFeatures() {
                 </div>
               </Link>
 
-              <Link href="/live-music-voting">
+              <Link to="/live-music-voting">
                 <div className="p-4 rounded-lg bg-linear-to-br from-green-50 to-teal-50 hover:shadow-md transition-shadow cursor-pointer">
                   <Music className="h-8 w-8 text-green-600 mb-2" />
                   <h3 className="font-semibold text-gray-800">
@@ -233,7 +233,7 @@ export default function DemoFeatures() {
                 </div>
               </Link>
 
-              <Link href="/nightclub-experience">
+              <Link to="/nightclub-experience">
                 <div className="p-4 rounded-lg bg-linear-to-br from-purple-50 to-pink-50 hover:shadow-md transition-shadow cursor-pointer">
                   <Heart className="h-8 w-8 text-purple-600 mb-2" />
                   <h3 className="font-semibold text-gray-800">
@@ -245,7 +245,7 @@ export default function DemoFeatures() {
                 </div>
               </Link>
 
-              <Link href="/events/1">
+              <Link to="/events/1">
                 <div className="p-4 rounded-lg bg-linear-to-br from-orange-50 to-red-50 hover:shadow-md transition-shadow cursor-pointer">
                   <Calendar className="h-8 w-8 text-orange-600 mb-2" />
                   <h3 className="font-semibold text-gray-800">
@@ -262,7 +262,7 @@ export default function DemoFeatures() {
 
         {/* Call to Action */}
         <div className="text-center">
-          <Link href="/">
+          <Link to="/">
             <Button
               size="lg"
               className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-3"

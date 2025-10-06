@@ -7,7 +7,7 @@ import {
   NavigationMenuLink,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import type { NavCategory } from "./app-shell-data";
 
 interface DesktopNavProps {
@@ -15,7 +15,7 @@ interface DesktopNavProps {
 }
 
 export default function DesktopNav({ categories }: DesktopNavProps) {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   return (
     <NavigationMenu className="hidden lg:flex grow justify-center mx-4 min-w-0">
@@ -32,7 +32,7 @@ export default function DesktopNav({ categories }: DesktopNavProps) {
                     <a
                       onClick={(e) => {
                         e.preventDefault();
-                        setLocation(item.href);
+                        navigate(item.href);
                       }}
                       href={item.href}
                       className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"

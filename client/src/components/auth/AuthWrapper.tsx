@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/auth-store";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 
 export const AuthWrapper = ({
   children,
@@ -8,13 +8,13 @@ export const AuthWrapper = ({
   children: React.ReactNode;
   requireAuth?: boolean;
 }) => {
-  const [_, setLocation] = useLocation();
+  const navigate = useNavigate();
   // In a real app, you would check for authentication status as well
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   // If we're requiring authentication and the user isn't authenticated, redirect to login
   if (requireAuth && !isAuthenticated()) {
-    setLocation("/get-started");
+    navigate("/get-started");
     return null; // or a loading spinner
   }
 

@@ -1,5 +1,5 @@
 import React, { lazy } from "react";
-import { Switch, Route } from "wouter";
+import { Routes, Route, Navigate } from "react-router";
 import { Layout } from "@/components/layout";
 
 // Lazy-loaded pages (code-splitting)
@@ -167,219 +167,230 @@ const LiveReactionWalls = lazy(() => import("@/pages/live-reaction-walls"));
 const PaymentTest = lazy(() => import("@/pages/payment-test"));
 const GetStarted = lazy(() => import("./pages/auth/get-started"));
 
+const DebugComponent = () => <div>Debug Component</div>;
+
 function DashboardRouter() {
   return (
     <Layout>
-      <Switch>
-        <Route path="/" component={ModernHome} />
-        <Route path="/home" component={ModernHome} />
-        {/* <Route path="/home" component={HomePage} /> */}
-        <Route path="/events/:id" component={EnhancedEventPage} />
-        <Route path="/enhanced-event" component={EnhancedEventPage} />
-        <Route path="/enhanced-event/:id" component={EnhancedEventPage} />
-        <Route path="/ai-party-designer" component={AIPartyDesigner} />
-        <Route path="/ar-space-planner" component={ARSpacePlanner} />
-        <Route path="/livestream-companion" component={LivestreamCompanion} />
-        <Route path="/ai-vibe-analyzer" component={AIVibeAnalyzer} />
+      <Routes>
+        <Route path="/" element={<ModernHome />} />
+        <Route path="/home" element={<ModernHome />} />
+        {/* <Route path="/home" element={<HomePage />} /> */}
+        <Route path="/plan-event/:id" element={<EnhancedEventPage />} />
+        <Route path="/ai-party-designer" element={<AIPartyDesigner />} />
+        <Route path="/ar-space-planner" element={<ARSpacePlanner />} />
+        <Route path="/livestream-companion" element={<LivestreamCompanion />} />
+        <Route path="/ai-vibe-analyzer" element={<AIVibeAnalyzer />} />
         <Route
           path="/sustainability-tracker"
-          component={SustainabilityTracker}
+          element={<SustainabilityTracker />}
         />
-        <Route path="/host-achievements" component={HostAchievements} />
-        <Route path="/smart-scheduling" component={SmartScheduling} />
-        <Route path="/live-music-voting" component={LiveMusicVoting} />
-        <Route path="/nightclub-experience" component={NightclubExperience} />
+        <Route path="/host-achievements" element={<HostAchievements />} />
+        <Route path="/smart-scheduling" element={<SmartScheduling />} />
+        <Route path="/live-music-voting" element={<LiveMusicVoting />} />
+        <Route path="/nightclub-experience" element={<NightclubExperience />} />
         <Route
           path="/interactive-drink-payment"
-          component={InteractiveDrinkPayment}
+          element={<InteractiveDrinkPayment />}
         />
-        <Route path="/drink-payment" component={InteractiveDrinkPayment} />
-        <Route path="/vendor-payment-setup" component={VendorPaymentSetup} />
-        <Route path="/vendor-payments" component={VendorPaymentSetup} />
-        <Route path="/pricing" component={PricingPage} />
-        <Route path="/premium-dashboard" component={PremiumDashboard} />
-        <Route path="/vendor-dashboard" component={VendorDashboard} />
-        <Route path="/corporate" component={CorporateDashboard} />
-        <Route path="/vendor-onboarding" component={VendorOnboarding} />
-        <Route path="/vendors" component={VendorMarketplace} />
-        <Route path="/vendor-marketplace" component={VendorMarketplace} />
-        <Route path="/ai-theme-generator" component={AIThemeGenerator} />
-        <Route path="/guest-matchmaking" component={GuestMatchmaking} />
-        <Route path="/social-groups" component={SocialGroups} />
+        <Route path="/drink-payment" element={<InteractiveDrinkPayment />} />
+        <Route path="/vendor-payment-setup" element={<VendorPaymentSetup />} />
+        <Route path="/vendor-payments" element={<VendorPaymentSetup />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/premium-dashboard" element={<PremiumDashboard />} />
+        <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+        <Route path="/corporate" element={<CorporateDashboard />} />
+        <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
+        <Route path="/vendors" element={<VendorMarketplace />} />
+        <Route path="/vendor-marketplace" element={<VendorMarketplace />} />
+        <Route path="/ai-theme-generator" element={<AIThemeGenerator />} />
+        <Route path="/guest-matchmaking" element={<GuestMatchmaking />} />
+        <Route path="/social-groups" element={<SocialGroups />} />
         <Route
           path="/virtual-meeting-platform"
-          component={VirtualMeetingPlatform}
+          element={<VirtualMeetingPlatform />}
         />
-        <Route path="/seat-tracker" component={InteractiveSeatTracker} />
+        <Route path="/seat-tracker" element={<InteractiveSeatTracker />} />
         <Route
           path="/interactive-seat-tracker"
-          component={InteractiveSeatTracker}
+          element={<InteractiveSeatTracker />}
         />
-        <Route path="/party-hall-decorator" component={PartyHallDecorator} />
-        <Route path="/decorator" component={PartyHallDecorator} />
-        <Route path="/venue-showcase" component={NaturalVenueShowcase} />
+        <Route path="/party-hall-decorator" element={<PartyHallDecorator />} />
+        <Route path="/decorator" element={<PartyHallDecorator />} />
+        <Route path="/venue-showcase" element={<NaturalVenueShowcase />} />
         <Route
           path="/natural-venue-showcase"
-          component={NaturalVenueShowcase}
+          element={<NaturalVenueShowcase />}
         />
-        <Route path="/social-design-studio" component={SocialDesignStudio} />
-        <Route path="/design-studio" component={SocialDesignStudio} />
-        <Route path="/vibe-invite-system" component={VibeInviteSystem} />
+        <Route path="/social-design-studio" element={<SocialDesignStudio />} />
+        <Route path="/design-studio" element={<SocialDesignStudio />} />
+        <Route path="/vibe-invite-system" element={<VibeInviteSystem />} />
         <Route
           path="/complete-invite-workflow"
-          component={CompleteInviteWorkflow}
+          element={<CompleteInviteWorkflow />}
         />
-        <Route path="/evite-templates" component={EviteTemplates} />
-        <Route path="/invites" component={VibeInviteSystem} />
-        <Route path="/e-invitations" component={VibeInviteSystem} />
-        <Route path="/vibeledger-dashboard" component={VibeLedgerDashboard} />
-        <Route path="/ar-preview" component={ARPreview} />
-        <Route path="/vibebot-assistant" component={VibeBotAssistant} />
-        <Route path="/business-promotion" component={BusinessPromotionPage} />
-        <Route path="/vibe-curator" component={VibeCurator} />
-        <Route path="/virtual-party-twin" component={VirtualPartyTwin} />
-        <Route path="/adaptive-environment" component={AdaptiveEnvironment} />
-        <Route path="/vibe-verified-guests" component={VibeVerifiedGuests} />
-        <Route path="/demo" component={DemoFeatures} />
-        <Route path="/checkout" component={Checkout} />
-        <Route path="/test-checkout" component={TestCheckout} />
-        <Route path="/payment-test" component={SimplePaymentTest} />
-        <Route path="/payment-debug" component={PaymentDebug} />
-        <Route path="/stripe-test" component={StripeTest} />
-        <Route path="/working-payment" component={WorkingPayment} />
-        <Route path="/premium" component={PremiumPage} />
-        <Route path="/dj-booth" component={EnhancedDJBooth} />
-        <Route path="/adaptive-music" component={AdaptiveMusicEngine} />
-        <Route path="/ai-video-memory" component={AIVideoMemory} />
-        <Route path="/smart-contract-escrow" component={SmartContractEscrow} />
-        <Route path="/nft-guest-passes" component={NFTGuestPasses} />
-        <Route path="/global-marketplace" component={GlobalPartyMarketplace} />
-        <Route path="/event-dao" component={EventDAO} />
-        <Route path="/ai-vibe-modeling" component={AIVibeModeling} />
-        <Route path="/token-gated-vip" component={TokenGatedVIP} />
-        <Route path="/ar-vr-immersive" component={ARVRImmersive} />
-        <Route path="/sustainability-badges" component={SustainabilityBadges} />
-        <Route path="/vendor-liquidity" component={VendorLiquidity} />
-        <Route path="/branded-micro-events" component={BrandedMicroEvents} />
-        <Route path="/venue-integration" component={VenueIntegration} />
-        <Route path="/event-discovery" component={EventDiscovery} />
-        <Route path="/find-events" component={FindAndBookEvents} />
-        <Route path="/unique-parties" component={UniquePartyExperiences} />
-        <Route path="/create-event" component={CreateEvent} />
-        <Route path="/event-planning/:eventId" component={EventPlanning} />
-        <Route path="/events/:eventId" component={EventDetail} />
-        <Route path="/events/booking/:eventId" component={PartyBooking} />
-        <Route path="/tickets" component={TicketManagement} />
-        <Route path="/digital-twins" component={DigitalTwinSystem} />
+        <Route path="/evite-templates" element={<EviteTemplates />} />
+        <Route path="/invites" element={<VibeInviteSystem />} />
+        <Route path="/e-invitations" element={<VibeInviteSystem />} />
+        <Route path="/vibeledger-dashboard" element={<VibeLedgerDashboard />} />
+        <Route path="/ar-preview" element={<ARPreview />} />
+        <Route path="/vibebot-assistant" element={<VibeBotAssistant />} />
+        <Route path="/business-promotion" element={<BusinessPromotionPage />} />
+        <Route path="/vibe-curator" element={<VibeCurator />} />
+        <Route path="/virtual-party-twin" element={<VirtualPartyTwin />} />
+        <Route path="/adaptive-environment" element={<AdaptiveEnvironment />} />
+        <Route path="/vibe-verified-guests" element={<VibeVerifiedGuests />} />
+        <Route path="/demo" element={<DemoFeatures />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/test-checkout" element={<TestCheckout />} />
+        <Route path="/payment-test" element={<SimplePaymentTest />} />
+        <Route path="/payment-debug" element={<PaymentDebug />} />
+        <Route path="/stripe-test" element={<StripeTest />} />
+        <Route path="/working-payment" element={<WorkingPayment />} />
+        <Route path="/premium" element={<PremiumPage />} />
+        <Route path="/dj-booth" element={<EnhancedDJBooth />} />
+        <Route path="/adaptive-music" element={<AdaptiveMusicEngine />} />
+        <Route path="/ai-video-memory" element={<AIVideoMemory />} />
+        <Route
+          path="/smart-contract-escrow"
+          element={<SmartContractEscrow />}
+        />
+        <Route path="/nft-guest-passes" element={<NFTGuestPasses />} />
+        <Route
+          path="/global-marketplace"
+          element={<GlobalPartyMarketplace />}
+        />
+        <Route path="/event-dao" element={<EventDAO />} />
+        <Route path="/ai-vibe-modeling" element={<AIVibeModeling />} />
+        <Route path="/token-gated-vip" element={<TokenGatedVIP />} />
+        <Route path="/ar-vr-immersive" element={<ARVRImmersive />} />
+        <Route
+          path="/sustainability-badges"
+          element={<SustainabilityBadges />}
+        />
+        <Route path="/vendor-liquidity" element={<VendorLiquidity />} />
+        <Route path="/branded-micro-events" element={<BrandedMicroEvents />} />
+        <Route path="/venue-integration" element={<VenueIntegration />} />
+        <Route path="/event-discovery" element={<EventDiscovery />} />
+        <Route path="/find-events" element={<FindAndBookEvents />} />
+        <Route path="/unique-parties" element={<UniquePartyExperiences />} />
+        <Route path="/create-event" element={<CreateEvent />} />
+        <Route path="/event-planning/:eventId" element={<EventPlanning />} />
+        <Route path="/events/:eventId" element={<EventDetail />} />
+        <Route path="/events/booking/:eventId" element={<PartyBooking />} />
+        <Route path="/tickets" element={<TicketManagement />} />
+        <Route path="/digital-twins" element={<DigitalTwinSystem />} />
         <Route
           path="/staffing-marketplace"
-          component={EnhancedStaffingMarketplace}
+          element={<EnhancedStaffingMarketplace />}
         />
-        <Route path="/catering-marketplace" component={CateringMarketplace} />
-        <Route path="/vibe-mall" component={VibeMall} />
-        <Route path="/pro-host-control" component={ProHostControlPanel} />
-        <Route path="/party-quest" component={PartyQuestGamified} />
-        <Route path="/corporate-dashboard" component={CorporateDashboard} />
-        <Route path="/loyalty-rewards" component={LoyaltyRewards} />
-        <Route path="/professional-tools" component={ProfessionalTools} />
-        <Route path="/playful-discovery" component={PlayfulEventDiscovery} />
+        <Route path="/catering-marketplace" element={<CateringMarketplace />} />
+        <Route path="/vibe-mall" element={<VibeMall />} />
+        <Route path="/pro-host-control" element={<ProHostControlPanel />} />
+        <Route path="/party-quest" element={<PartyQuestGamified />} />
+        <Route path="/corporate-dashboard" element={<CorporateDashboard />} />
+        <Route path="/loyalty-rewards" element={<LoyaltyRewards />} />
+        <Route path="/professional-tools" element={<ProfessionalTools />} />
+        <Route path="/playful-discovery" element={<PlayfulEventDiscovery />} />
         <Route
           path="/event-soundtrack-generator"
-          component={EventSoundtrackGenerator}
+          element={<EventSoundtrackGenerator />}
         />
         <Route
           path="/event-verification-badges"
-          component={EventVerificationBadges}
+          element={<EventVerificationBadges />}
         />
         <Route
           path="/social-story-templates"
-          component={SocialStoryTemplates}
+          element={<SocialStoryTemplates />}
         />
         <Route
           path="/interactive-mood-visualizer"
-          component={InteractiveMoodVisualizer}
+          element={<InteractiveMoodVisualizer />}
         />
         <Route
           path="/gamified-attendance-rewards"
-          component={GamifiedAttendanceRewards}
+          element={<GamifiedAttendanceRewards />}
         />
         <Route
           path="/voice-activated-assistant"
-          component={VoiceActivatedAssistant}
+          element={<VoiceActivatedAssistant />}
         />
         <Route
           path="/interactive-live-vibes-invite"
-          component={InteractiveLiveVibesInvite}
+          element={<InteractiveLiveVibesInvite />}
         />
         <Route
           path="/invite/:invitationId"
-          component={InteractiveLiveVibesInvite}
+          element={<InteractiveLiveVibesInvite />}
         />
         <Route
           path="/complete-invite-workflow"
-          component={CompleteInviteWorkflow}
+          element={<CompleteInviteWorkflow />}
         />
-        <Route path="/vibescard-studio" component={VibesCardStudioNew} />
+        <Route path="/vibescard-studio" element={<VibesCardStudioNew />} />
         <Route
           path="/interactive-design-generator"
-          component={InteractiveDesignGenerator}
+          element={<InteractiveDesignGenerator />}
         />
-        <Route path="/ecosystem-dashboard" component={EcosystemDashboard} />
-        <Route path="/enterprise-suite" component={EnterpriseSuite} />
-        <Route path="/system-overview" component={SystemOverview} />
-        <Route path="/vibe-control" component={VibeControl} />
-        <Route path="/ar-party-overlays" component={ARPartyOverlays} />
+        <Route path="/ecosystem-dashboard" element={<EcosystemDashboard />} />
+        <Route path="/enterprise-suite" element={<EnterpriseSuite />} />
+        <Route path="/system-overview" element={<SystemOverview />} />
+        <Route path="/vibe-control" element={<VibeControl />} />
+        <Route path="/ar-party-overlays" element={<ARPartyOverlays />} />
         <Route
           path="/ai-personalized-recommendations"
-          component={AIPersonalizedRecommendations}
+          element={<AIPersonalizedRecommendations />}
         />
-        <Route path="/ai-party-media-suite" component={AIPartyMediaSuite} />
-        <Route path="/global-vibe-passport" component={GlobalVibePassport} />
+        <Route path="/ai-party-media-suite" element={<AIPartyMediaSuite />} />
+        <Route path="/global-vibe-passport" element={<GlobalVibePassport />} />
         <Route
           path="/collaborative-design-sharing"
-          component={CollaborativeDesignSharing}
+          element={<CollaborativeDesignSharing />}
         />
-        <Route path="/immersive-party-cam" component={ImmersivePartyCam} />
-        <Route path="/in-event-commerce" component={InEventCommerce} />
-        <Route path="/cultural-dna-layer" component={CulturalDNALayer} />
-        <Route path="/ai-dj-companion" component={AIDJCompanion} />
-        <Route path="/dj-companion" component={AIDJCompanion} />
-        <Route path="/smart-drink-concierge" component={SmartDrinkConcierge} />
-        <Route path="/drink-concierge" component={SmartDrinkConcierge} />
-        <Route path="/vibemix" component={AIDJCompanion} />
-        <Route path="/partycast-live" component={PartyCastLive} />
-        <Route path="/partycast" component={PartyCastLive} />
-        <Route path="/livestream" component={PartyCastLive} />
-        <Route path="/smart-entry" component={SmartEntryIdentity} />
-        <Route path="/smart-entry-identity" component={SmartEntryIdentity} />
-        <Route path="/entry-system" component={SmartEntryIdentity} />
-        <Route path="/access-control" component={SmartEntryIdentity} />
+        <Route path="/immersive-party-cam" element={<ImmersivePartyCam />} />
+        <Route path="/in-event-commerce" element={<InEventCommerce />} />
+        <Route path="/cultural-dna-layer" element={<CulturalDNALayer />} />
+        <Route path="/ai-dj-companion" element={<AIDJCompanion />} />
+        <Route path="/dj-companion" element={<AIDJCompanion />} />
+        <Route
+          path="/smart-drink-concierge"
+          element={<SmartDrinkConcierge />}
+        />
+        <Route path="/drink-concierge" element={<SmartDrinkConcierge />} />
+        <Route path="/vibemix" element={<AIDJCompanion />} />
+        <Route path="/partycast-live" element={<PartyCastLive />} />
+        <Route path="/partycast" element={<PartyCastLive />} />
+        <Route path="/livestream" element={<PartyCastLive />} />
+        <Route path="/smart-entry" element={<SmartEntryIdentity />} />
+        <Route path="/smart-entry-identity" element={<SmartEntryIdentity />} />
+        <Route path="/entry-system" element={<SmartEntryIdentity />} />
+        <Route path="/access-control" element={<SmartEntryIdentity />} />
         <Route
           path="/system-interconnection"
-          component={SystemInterconnection}
+          element={<SystemInterconnection />}
         />
-        <Route path="/live-reaction-walls" component={LiveReactionWalls} />
-        <Route path="/reaction-walls" component={LiveReactionWalls} />
-        <Route path="/payment-test" component={PaymentTest} />
+        <Route path="/live-reaction-walls" element={<LiveReactionWalls />} />
+        <Route path="/reaction-walls" element={<LiveReactionWalls />} />
+        <Route path="/payment-test" element={<PaymentTest />} />
 
         {/* Legacy Routes */}
-        <Route path="/login" component={SimpleLoginPage} />
-        <Route path="/profile" component={ProfilePage} />
-        <Route component={NotFound} />
-      </Switch>
+        <Route path="/login" element={<SimpleLoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </Layout>
   );
 }
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/get-started" component={GetStarted} />
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
-      <Route path="/" component={DashboardRouter} />
-      <Route path="/:rest*" component={DashboardRouter} />
-    </Switch>
+    <Routes>
+      <Route path="/get-started" element={<GetStarted />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="*" element={<DashboardRouter />} />
+    </Routes>
   );
 }
 

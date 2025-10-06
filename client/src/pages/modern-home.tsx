@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import FloatingActionButton from "@/components/FloatingActionButton";
-import { 
-  Calendar, 
-  Plus, 
-  Search, 
-  Bell, 
-  MapPin, 
-  Users, 
-  Star, 
-  Zap, 
-  Camera, 
-  ShoppingBag, 
+import {
+  Calendar,
+  Plus,
+  Search,
+  Bell,
+  MapPin,
+  Users,
+  Star,
+  Zap,
+  Camera,
+  ShoppingBag,
   Music,
   Sparkles,
   TrendingUp,
@@ -30,7 +30,7 @@ import {
   Globe,
   Gift,
   Target,
-  Award
+  Award,
 } from "lucide-react";
 import TopBar from "@/components/Topbar/TopBar";
 import HeroSection from "@/components/Hero/Hero";
@@ -84,18 +84,11 @@ interface RecentActivity {
 export default function ModernHome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [notifications, setNotifications] = useState(3);
-  
 
+  const locationObj = useLocation();
+  const location = locationObj.pathname;
 
-
-
-
- const [location] = useLocation(); // ✅ yaha string milega, jaise "/"
-
-  const isHome: boolean = location === "/"; // ✅ directly string compare
-
-
-
+  const isHome: boolean = location === "/";
 
   const quickActions: QuickAction[] = [
     {
@@ -105,7 +98,7 @@ export default function ModernHome() {
       icon: Plus,
       color: "text-purple-600",
       path: "/create-event",
-      gradient: "from-purple-500 to-pink-500"
+      gradient: "from-purple-500 to-pink-500",
     },
     {
       id: "find-events",
@@ -114,7 +107,7 @@ export default function ModernHome() {
       icon: Search,
       color: "text-blue-600",
       path: "/find-events",
-      gradient: "from-blue-500 to-cyan-500"
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
       id: "ai-party-designer",
@@ -123,7 +116,7 @@ export default function ModernHome() {
       icon: Sparkles,
       color: "text-emerald-600",
       path: "/ai-party-designer",
-      gradient: "from-emerald-500 to-teal-500"
+      gradient: "from-emerald-500 to-teal-500",
     },
     {
       id: "vibe-mall",
@@ -132,8 +125,8 @@ export default function ModernHome() {
       icon: ShoppingBag,
       color: "text-orange-600",
       path: "/vibe-mall",
-      gradient: "from-orange-500 to-red-500"
-    }
+      gradient: "from-orange-500 to-red-500",
+    },
   ];
 
   const featuredEvents: FeaturedEvent[] = [
@@ -146,10 +139,11 @@ export default function ModernHome() {
       location: "Skyline Rooftop",
       attendees: 87,
       maxAttendees: 150,
-      image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&h=250&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&h=250&fit=crop&auto=format",
       tags: ["Electronic", "Rooftop", "VIP"],
       price: "$45",
-      featured: true
+      featured: true,
     },
     {
       id: "2",
@@ -160,10 +154,11 @@ export default function ModernHome() {
       location: "Cultural Center",
       attendees: 234,
       maxAttendees: 300,
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=250&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=250&fit=crop&auto=format",
       tags: ["Cultural", "Food", "Music"],
       price: "Free",
-      featured: true
+      featured: true,
     },
     {
       id: "3",
@@ -174,11 +169,12 @@ export default function ModernHome() {
       location: "Tech District",
       attendees: 156,
       maxAttendees: 200,
-      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=250&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=250&fit=crop&auto=format",
       tags: ["Networking", "Tech", "Professional"],
       price: "$25",
-      featured: false
-    }
+      featured: false,
+    },
   ];
 
   const recentActivity: RecentActivity[] = [
@@ -188,7 +184,7 @@ export default function ModernHome() {
       message: "Sarah created 'Birthday Bash 2025'",
       time: "2 hours ago",
       icon: Calendar,
-      color: "text-green-600"
+      color: "text-green-600",
     },
     {
       id: "2",
@@ -196,7 +192,7 @@ export default function ModernHome() {
       message: "15 people RSVP'd to 'Summer Pool Party'",
       time: "4 hours ago",
       icon: Users,
-      color: "text-blue-600"
+      color: "text-blue-600",
     },
     {
       id: "3",
@@ -204,50 +200,49 @@ export default function ModernHome() {
       message: "You earned the 'Party Planner' badge!",
       time: "1 day ago",
       icon: Award,
-      color: "text-purple-600"
-    }
+      color: "text-purple-600",
+    },
   ];
 
   const trendingFeatures = [
     { name: "AR Party Overlays", users: "2.3k", growth: "+24%" },
     { name: "Live Music Voting", users: "1.8k", growth: "+18%" },
     { name: "Smart Entry System", users: "3.1k", growth: "+35%" },
-    { name: "NFT Guest Passes", users: "892", growth: "+12%" }
+    { name: "NFT Guest Passes", users: "892", growth: "+12%" },
   ];
 
   return (
-
     <>
-    {/* <TopBar/> */}
-    {/* <HeroSection/> */}
-    {/* <div className="min-h-screen">
+      {/* <TopBar/> */}
+      {/* <HeroSection/> */}
+      {/* <div className="min-h-screen">
                      <PartySection/>
                      </div> */}
-<div
-  className="min-h-screen "
-  style={{
-    background: "linear-gradient(90deg, #9333EA 0%, #DB2777 50%, #F97316 100%)",
-  }}
->
-  
-<VibesWeddingUI/>
+      <div
+        className="min-h-screen "
+        style={{
+          background:
+            "linear-gradient(90deg, #9333EA 0%, #DB2777 50%, #F97316 100%)",
+        }}
+      >
+        <VibesWeddingUI />
 
-<WeddingDashboard/>
-<FeatureGrid/>
+        <WeddingDashboard />
+        <FeatureGrid />
 
-<StatsSection/>
+        <StatsSection />
 
-<EventIntegrations/>
-<IntegrationHub/>
+        <EventIntegrations />
+        <IntegrationHub />
 
-<WebScrapingSection/>
+        <WebScrapingSection />
 
-<RateLimitingAndAutomation/>
-<DreamWeddingCard/>
-      {location === "/" && <Footer />}
-    
-      {/* Header */}
-      {/* <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-purple-200/50 dark:border-purple-700/50 shadow-lg shadow-purple-500/10">
+        <RateLimitingAndAutomation />
+        <DreamWeddingCard />
+        {location === "/" && <Footer />}
+
+        {/* Header */}
+        {/* <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-purple-200/50 dark:border-purple-700/50 shadow-lg shadow-purple-500/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
@@ -290,8 +285,8 @@ export default function ModernHome() {
         </div>
       </header> */}
 
-      {/* Main Content */}
-      {/* <main className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Main Content */}
+        {/* <main className=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <section className="relative rounded-3xl overflow-hidden bg-linear-to-br from-purple-600 via-pink-500 to-blue-600 shadow-2xl shadow-purple-500/25">
           <div className="absolute inset-0">
             <img 
@@ -601,12 +596,10 @@ export default function ModernHome() {
           </div>
         </section>
       </main> */}
-      
-      {/* Floating Action Button */}
-      {/* <FloatingActionButton /> */}
-    </div>
 
-
+        {/* Floating Action Button */}
+        {/* <FloatingActionButton /> */}
+      </div>
     </>
   );
 }

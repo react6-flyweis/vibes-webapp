@@ -1,4 +1,4 @@
-import { Link, useSearch } from "wouter";
+import { Link, useSearchParams } from "react-router";
 import { ChevronLeft } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { RegisterForm } from "@/components/auth/RegisterForm";
@@ -6,14 +6,14 @@ import { VendorRegisterForm } from "@/components/auth/VendorRegisterForm";
 import { Button } from "@/components/ui/button";
 
 export default function Signup() {
-  const search = useSearch();
-  const isVendor = search.split("=")[1] === "vendor";
+  const [searchParams] = useSearchParams();
+  const isVendor = searchParams.get("role") === "vendor" || false;
 
   return (
     <AuthLayout>
       <div className="flex flex-col">
         <div className="mb-2">
-          <Link href="/get-started">
+          <Link to="/get-started">
             <Button
               variant="ghost"
               className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2"
@@ -32,8 +32,8 @@ export default function Signup() {
           </h1>
           <p className="text-sm text-gray-500 mt-2">
             Already have an account?{" "}
-            <Link href="/login">
-              <a className="text-pink-500 underline">Log in</a>
+            <Link to="/login" className="text-pink-500 underline">
+              Log in
             </Link>
           </p>
         </div>
@@ -42,7 +42,7 @@ export default function Signup() {
 
         <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
-          <Link href="/login">
+          <Link to="/login">
             <Button variant="link">Sign in here</Button>
           </Link>
         </div>

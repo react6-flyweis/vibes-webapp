@@ -32,7 +32,7 @@ import {
   Headphones,
   Palette,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 
 export default function EnterpriseSuite() {
   const [selectedPlan, setSelectedPlan] = useState("professional");
@@ -460,7 +460,7 @@ export default function EnterpriseSuite() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {category.features.map((feature, featureIndex) => (
-                      <Link key={featureIndex} href={feature.path}>
+                      <Link key={featureIndex} to={feature.path}>
                         <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-blue-200 dark:hover:border-blue-800">
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">

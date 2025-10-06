@@ -1,14 +1,46 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Plus, Search, Filter, MapPin, Calendar, Crown, Star, Heart, MessageCircle, Share2, UserPlus } from "lucide-react";
-import { Link } from "wouter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Users,
+  Plus,
+  Search,
+  Filter,
+  MapPin,
+  Calendar,
+  Crown,
+  Star,
+  Heart,
+  MessageCircle,
+  Share2,
+  UserPlus,
+} from "lucide-react";
+import { Link } from "react-router";
 
 export default function SocialGroupsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,12 +54,13 @@ export default function SocialGroupsPage() {
       description: "Weekly gatherings for tech enthusiasts in New York City",
       members: 847,
       category: "Technology",
-      image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
       isPrivate: false,
       nextEvent: "Jan 15, 2025",
       location: "Manhattan",
       tags: ["networking", "startups", "AI"],
-      verified: true
+      verified: true,
     },
     {
       id: 2,
@@ -35,12 +68,13 @@ export default function SocialGroupsPage() {
       description: "Group workouts and wellness events for all fitness levels",
       members: 1203,
       category: "Health & Fitness",
-      image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
       isPrivate: false,
       nextEvent: "Jan 12, 2025",
       location: "Central Park",
       tags: ["fitness", "outdoor", "community"],
-      verified: false
+      verified: false,
     },
     {
       id: 3,
@@ -48,12 +82,13 @@ export default function SocialGroupsPage() {
       description: "Exploring the best restaurants and food experiences",
       members: 692,
       category: "Food & Drink",
-      image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
       isPrivate: false,
       nextEvent: "Jan 18, 2025",
       location: "Brooklyn",
       tags: ["food", "restaurants", "culture"],
-      verified: true
+      verified: true,
     },
     {
       id: 4,
@@ -61,13 +96,14 @@ export default function SocialGroupsPage() {
       description: "Artists, designers, and creators collaborating on projects",
       members: 356,
       category: "Arts & Culture",
-      image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
+      image:
+        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=300&h=200&fit=crop&auto=format",
       isPrivate: true,
       nextEvent: "Jan 20, 2025",
       location: "SoHo",
       tags: ["art", "design", "creativity"],
-      verified: false
-    }
+      verified: false,
+    },
   ];
 
   const categories = [
@@ -77,14 +113,16 @@ export default function SocialGroupsPage() {
     { value: "food", label: "Food & Drink" },
     { value: "arts", label: "Arts & Culture" },
     { value: "business", label: "Business & Networking" },
-    { value: "sports", label: "Sports & Recreation" }
+    { value: "sports", label: "Sports & Recreation" },
   ];
 
-  const filteredGroups = groups.filter(group => {
-    const matchesSearch = group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         group.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || 
-                           group.category.toLowerCase().includes(selectedCategory.toLowerCase());
+  const filteredGroups = groups.filter((group) => {
+    const matchesSearch =
+      group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      group.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" ||
+      group.category.toLowerCase().includes(selectedCategory.toLowerCase());
     return matchesSearch && matchesCategory;
   });
 
@@ -97,7 +135,8 @@ export default function SocialGroupsPage() {
             Social Groups
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Connect with like-minded people and create unforgettable experiences together
+            Connect with like-minded people and create unforgettable experiences
+            together
           </p>
         </div>
 
@@ -113,7 +152,10 @@ export default function SocialGroupsPage() {
                 className="pl-10"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="w-full md:w-64">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filter by category" />
@@ -147,7 +189,10 @@ export default function SocialGroupsPage() {
                   </div>
                   <div>
                     <Label htmlFor="groupDescription">Description</Label>
-                    <Textarea id="groupDescription" placeholder="Describe your group..." />
+                    <Textarea
+                      id="groupDescription"
+                      placeholder="Describe your group..."
+                    />
                   </div>
                   <div>
                     <Label htmlFor="groupCategory">Category</Label>
@@ -157,7 +202,10 @@ export default function SocialGroupsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.slice(1).map((category) => (
-                          <SelectItem key={category.value} value={category.value}>
+                          <SelectItem
+                            key={category.value}
+                            value={category.value}
+                          >
                             {category.label}
                           </SelectItem>
                         ))}
@@ -165,14 +213,14 @@ export default function SocialGroupsPage() {
                     </Select>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="flex-1"
                       onClick={() => setShowCreateDialog(false)}
                     >
                       Cancel
                     </Button>
-                    <Button 
+                    <Button
                       className="flex-1 bg-linear-to-r from-purple-600 to-blue-600"
                       onClick={() => setShowCreateDialog(false)}
                     >
@@ -188,10 +236,13 @@ export default function SocialGroupsPage() {
         {/* Groups Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGroups.map((group) => (
-            <Card key={group.id} className="overflow-hidden hover:shadow-xl transition-shadow bg-white dark:bg-gray-800">
+            <Card
+              key={group.id}
+              className="overflow-hidden hover:shadow-xl transition-shadow bg-white dark:bg-gray-800"
+            >
               <div className="relative">
-                <img 
-                  src={group.image} 
+                <img
+                  src={group.image}
                   alt={group.name}
                   className="w-full h-48 object-cover"
                 />
@@ -210,7 +261,7 @@ export default function SocialGroupsPage() {
                   )}
                 </div>
               </div>
-              
+
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -220,7 +271,7 @@ export default function SocialGroupsPage() {
                     </CardDescription>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
@@ -231,7 +282,7 @@ export default function SocialGroupsPage() {
                     {group.location}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {group.tags.map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs">
@@ -240,7 +291,7 @@ export default function SocialGroupsPage() {
                   ))}
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
@@ -248,15 +299,18 @@ export default function SocialGroupsPage() {
                     Next event: {group.nextEvent}
                   </div>
                 </div>
-                
+
                 <div className="flex gap-2">
-                  <Link href={`/groups/${group.id}`} className="flex-1">
+                  <Link to={`/groups/${group.id}`} className="flex-1">
                     <Button variant="outline" className="w-full">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       View Details
                     </Button>
                   </Link>
-                  <Button size="sm" className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                  <Button
+                    size="sm"
+                    className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  >
                     <UserPlus className="h-4 w-4 mr-2" />
                     Join
                   </Button>
@@ -284,13 +338,16 @@ export default function SocialGroupsPage() {
             Ready to get started?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/virtual-meeting-platform">
-              <Button size="lg" className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+            <Link to="/virtual-meeting-platform">
+              <Button
+                size="lg"
+                className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
                 <Calendar className="h-5 w-5 mr-2" />
                 Join Virtual Meetings
               </Button>
             </Link>
-            <Link href="/create-event">
+            <Link to="/create-event">
               <Button variant="outline" size="lg">
                 <Plus className="h-5 w-5 mr-2" />
                 Create Your Event

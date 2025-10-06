@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 
 export default function Login() {
@@ -9,7 +9,7 @@ export default function Login() {
     <AuthLayout>
       {/* Top back link */}
       <div className="mb-2">
-        <Link href="/">
+        <Link to="/">
           <Button
             variant="ghost"
             className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2"
@@ -29,8 +29,8 @@ export default function Login() {
         </h1>
         <p className="text-sm text-gray-500 mt-2">
           Don't have an account?{" "}
-          <Link href="/signup">
-            <a className="text-pink-500 underline">Sign Up</a>
+          <Link to="/signup" className="text-pink-500 underline">
+            Sign Up
           </Link>
         </p>
       </div>
@@ -38,7 +38,7 @@ export default function Login() {
       <LoginForm />
       <div className="mt-5 text-sm text-gray-600">
         Don't have an account?{" "}
-        <Link href="/auth/signup">
+        <Link to="/auth/signup">
           <Button
             variant="link"
             className="text-purple-600 hover:text-purple-700 p-0"

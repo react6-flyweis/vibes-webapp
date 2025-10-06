@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link } from "wouter";
+import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import {
   useVerifyOtpMutation,
   useResendOtpMutation,
 } from "@/hooks/useAuthMutations";
+import { useAuthStore } from "@/store/auth-store";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -38,6 +39,7 @@ export function LoginForm() {
   const [otpEmail, setOtpEmail] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -52,6 +54,12 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
+      // ensure the store knows whether to persist to localStorage (remember) or sessionStorage
+      try {
+        useAuthStore.getState().setRemember(!!data.rememberMe);
+      } catch (e) {
+        // ignore storage errors
+      }
       const res = await loginMutation.mutateAsync(data);
 
       // Backend returns OTP sent response with nextStep verify-otp
@@ -75,7 +83,7 @@ export function LoginForm() {
         title: "Welcome back!",
         description: "You've successfully logged into Vibes.",
       });
-      window.location.href = "/";
+      navigate("/");
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -96,7 +104,7 @@ export function LoginForm() {
       await verifyMutation.mutateAsync({ email: otpEmail, otp: code });
       toast({ title: "Logged in", description: "Verification successful." });
       setShowOtp(false);
-      window.location.href = "/";
+      navigate("/");
     } catch (err: any) {
       toast({
         title: "Verification failed",
@@ -211,7 +219,7 @@ export function LoginForm() {
           )}
         />
 
-        <Link href="/auth/forgot-password">
+        <Link to="/auth/forgot-password">
           <Button
             variant="link"
             className="text-sm text-purple-600 hover:text-purple-700 p-0"

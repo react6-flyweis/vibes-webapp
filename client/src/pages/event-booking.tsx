@@ -1,17 +1,29 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { useRoute } from "wouter";
-import { 
-  Ticket, 
-  CreditCard, 
+import { useParams } from "react-router";
+import {
+  Ticket,
+  CreditCard,
   MapPin,
   Calendar,
   Clock,
@@ -28,7 +40,7 @@ import {
   Bell,
   Heart,
   UserPlus,
-  Smartphone
+  Smartphone,
 } from "lucide-react";
 
 interface TicketType {
@@ -40,7 +52,7 @@ interface TicketType {
   benefits: string[];
   available: number;
   maxPerUser: number;
-  category: 'general' | 'vip' | 'premium' | 'early_bird';
+  category: "general" | "vip" | "premium" | "early_bird";
 }
 
 interface Event {
@@ -84,27 +96,30 @@ interface BookingData {
 }
 
 export default function EventBooking() {
-  const [, params] = useRoute("/events/booking/:eventId");
-  const eventId = params?.eventId;
+  const { eventId } = useParams<{ eventId: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  const [selectedTickets, setSelectedTickets] = useState<Record<string, number>>({});
+
+  const [selectedTickets, setSelectedTickets] = useState<
+    Record<string, number>
+  >({});
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [personalInfo, setPersonalInfo] = useState({
     email: "",
     phone: "",
     firstName: "",
-    lastName: ""
+    lastName: "",
   });
   const [promoCode, setPromoCode] = useState("");
   const [usePoints, setUsePoints] = useState(false);
-  const [step, setStep] = useState<'tickets' | 'seats' | 'checkout' | 'confirmation'>('tickets');
+  const [step, setStep] = useState<
+    "tickets" | "seats" | "checkout" | "confirmation"
+  >("tickets");
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery({
     queryKey: [`/api/events/booking/${eventId}`],
-    enabled: !!eventId
+    enabled: !!eventId,
   });
 
   const { data: userProfile } = useQuery({
@@ -113,7 +128,7 @@ export default function EventBooking() {
 
   const { data: seatingChart } = useQuery({
     queryKey: [`/api/events/seating/${eventId}`],
-    enabled: !!eventId && step === 'seats'
+    enabled: !!eventId && step === "seats",
   });
 
   // Create booking mutation
@@ -124,9 +139,10 @@ export default function EventBooking() {
     onSuccess: (data) => {
       toast({
         title: "Booking Successful!",
-        description: "Your tickets have been booked. Check your email for confirmation.",
+        description:
+          "Your tickets have been booked. Check your email for confirmation.",
       });
-      setStep('confirmation');
+      setStep("confirmation");
       queryClient.invalidateQueries({ queryKey: ["/api/user/bookings"] });
     },
     onError: (error: any) => {
@@ -159,23 +175,25 @@ export default function EventBooking() {
   });
 
   const handleTicketQuantityChange = (ticketId: string, quantity: number) => {
-    setSelectedTickets(prev => ({
+    setSelectedTickets((prev) => ({
       ...prev,
-      [ticketId]: quantity
+      [ticketId]: quantity,
     }));
   };
 
   const calculateSubtotal = () => {
     if (!event) return 0;
-    
+
     let subtotal = 0;
     Object.entries(selectedTickets).forEach(([ticketId, quantity]) => {
-      const ticket = event.ticketTypes.find((t: TicketType) => t.id === ticketId);
+      const ticket = event.ticketTypes.find(
+        (t: TicketType) => t.id === ticketId
+      );
       if (ticket) {
         subtotal += ticket.price * quantity;
       }
     });
-    
+
     return subtotal;
   };
 
@@ -206,16 +224,16 @@ export default function EventBooking() {
       .map(([typeId, quantity]) => ({
         typeId,
         quantity,
-        seatNumbers: selectedSeats.slice(0, quantity)
+        seatNumbers: selectedSeats.slice(0, quantity),
       }));
 
     const bookingData: BookingData = {
       eventId: eventId!,
       tickets,
       personalInfo,
-      paymentMethod: 'stripe',
+      paymentMethod: "stripe",
       promoCode: promoCode || undefined,
-      loyaltyPoints: usePoints ? userProfile?.loyaltyPoints : undefined
+      loyaltyPoints: usePoints ? userProfile?.loyaltyPoints : undefined,
     };
 
     bookingMutation.mutate(bookingData);
@@ -223,11 +241,16 @@ export default function EventBooking() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'general': return 'text-blue-600 bg-blue-100';
-      case 'vip': return 'text-purple-600 bg-purple-100';
-      case 'premium': return 'text-gold-600 bg-yellow-100';
-      case 'early_bird': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "general":
+        return "text-blue-600 bg-blue-100";
+      case "vip":
+        return "text-purple-600 bg-purple-100";
+      case "premium":
+        return "text-gold-600 bg-yellow-100";
+      case "early_bird":
+        return "text-green-600 bg-green-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
@@ -246,7 +269,9 @@ export default function EventBooking() {
           <CardContent className="p-8 text-center">
             <AlertTriangle className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Event Not Found</h2>
-            <p className="text-gray-300">The event you're looking for doesn't exist or has been removed.</p>
+            <p className="text-gray-300">
+              The event you're looking for doesn't exist or has been removed.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -260,25 +285,35 @@ export default function EventBooking() {
         <div className="flex justify-center mb-8">
           <div className="flex items-center space-x-4">
             {[
-              { key: 'tickets', label: 'Select Tickets', icon: Ticket },
-              { key: 'seats', label: 'Choose Seats', icon: MapPin },
-              { key: 'checkout', label: 'Checkout', icon: CreditCard },
-              { key: 'confirmation', label: 'Confirmation', icon: CheckCircle }
+              { key: "tickets", label: "Select Tickets", icon: Ticket },
+              { key: "seats", label: "Choose Seats", icon: MapPin },
+              { key: "checkout", label: "Checkout", icon: CreditCard },
+              { key: "confirmation", label: "Confirmation", icon: CheckCircle },
             ].map((stepItem, index) => {
               const IconComponent = stepItem.icon;
               const isActive = step === stepItem.key;
-              const isCompleted = ['tickets', 'seats', 'checkout', 'confirmation'].indexOf(step) > index;
-              
+              const isCompleted =
+                ["tickets", "seats", "checkout", "confirmation"].indexOf(step) >
+                index;
+
               return (
                 <div key={stepItem.key} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                    isActive ? 'border-blue-400 bg-blue-400' :
-                    isCompleted ? 'border-green-400 bg-green-400' :
-                    'border-gray-400 bg-transparent'
-                  }`}>
+                  <div
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                      isActive
+                        ? "border-blue-400 bg-blue-400"
+                        : isCompleted
+                        ? "border-green-400 bg-green-400"
+                        : "border-gray-400 bg-transparent"
+                    }`}
+                  >
                     <IconComponent className="h-5 w-5 text-white" />
                   </div>
-                  <span className={`ml-2 text-sm ${isActive ? 'text-blue-400' : 'text-gray-300'}`}>
+                  <span
+                    className={`ml-2 text-sm ${
+                      isActive ? "text-blue-400" : "text-gray-300"
+                    }`}
+                  >
                     {stepItem.label}
                   </span>
                   {index < 3 && <div className="w-8 h-px bg-gray-400 ml-4" />}
@@ -294,8 +329,8 @@ export default function EventBooking() {
             {/* Event Header */}
             <Card className="mb-6 bg-white/10 backdrop-blur-sm border-white/20">
               <div className="relative">
-                <img 
-                  src={event.image} 
+                <img
+                  src={event.image}
                   alt={event.title}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
@@ -324,10 +359,12 @@ export default function EventBooking() {
             </Card>
 
             {/* Step Content */}
-            {step === 'tickets' && (
+            {step === "tickets" && (
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white">Select Your Tickets</CardTitle>
+                  <CardTitle className="text-white">
+                    Select Your Tickets
+                  </CardTitle>
                   <CardDescription className="text-blue-100">
                     Choose the ticket type and quantity
                   </CardDescription>
@@ -335,19 +372,32 @@ export default function EventBooking() {
                 <CardContent>
                   <div className="space-y-4">
                     {event.ticketTypes?.map((ticket: TicketType) => (
-                      <div key={ticket.id} className="p-4 border border-white/20 rounded-lg">
+                      <div
+                        key={ticket.id}
+                        className="p-4 border border-white/20 rounded-lg"
+                      >
                         <div className="flex justify-between items-start mb-3">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-white">{ticket.name}</h3>
-                              <Badge className={getCategoryColor(ticket.category)}>
-                                {ticket.category.replace('_', ' ')}
+                              <h3 className="font-semibold text-white">
+                                {ticket.name}
+                              </h3>
+                              <Badge
+                                className={getCategoryColor(ticket.category)}
+                              >
+                                {ticket.category.replace("_", " ")}
                               </Badge>
                             </div>
-                            <p className="text-blue-100 text-sm mb-2">{ticket.description}</p>
+                            <p className="text-blue-100 text-sm mb-2">
+                              {ticket.description}
+                            </p>
                             <div className="flex flex-wrap gap-1">
                               {ticket.benefits.map((benefit, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
+                                <Badge
+                                  key={index}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
                                   {benefit}
                                 </Badge>
                               ))}
@@ -362,30 +412,52 @@ export default function EventBooking() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-blue-100">{ticket.available} available</p>
+                            <p className="text-xs text-blue-100">
+                              {ticket.available} available
+                            </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
-                          <Select 
-                            value={selectedTickets[ticket.id]?.toString() || "0"}
-                            onValueChange={(value) => handleTicketQuantityChange(ticket.id, parseInt(value))}
+                          <Select
+                            value={
+                              selectedTickets[ticket.id]?.toString() || "0"
+                            }
+                            onValueChange={(value) =>
+                              handleTicketQuantityChange(
+                                ticket.id,
+                                parseInt(value)
+                              )
+                            }
                           >
                             <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {Array.from({ length: Math.min(ticket.maxPerUser + 1, ticket.available + 1) }, (_, i) => (
-                                <SelectItem key={i} value={i.toString()}>
-                                  {i === 0 ? 'None' : `${i} ticket${i > 1 ? 's' : ''}`}
-                                </SelectItem>
-                              ))}
+                              {Array.from(
+                                {
+                                  length: Math.min(
+                                    ticket.maxPerUser + 1,
+                                    ticket.available + 1
+                                  ),
+                                },
+                                (_, i) => (
+                                  <SelectItem key={i} value={i.toString()}>
+                                    {i === 0
+                                      ? "None"
+                                      : `${i} ticket${i > 1 ? "s" : ""}`}
+                                  </SelectItem>
+                                )
+                              )}
                             </SelectContent>
                           </Select>
-                          
+
                           {selectedTickets[ticket.id] > 0 && (
                             <div className="text-green-400 font-semibold">
-                              ${(ticket.price * selectedTickets[ticket.id]).toFixed(2)}
+                              $
+                              {(
+                                ticket.price * selectedTickets[ticket.id]
+                              ).toFixed(2)}
                             </div>
                           )}
                         </div>
@@ -394,8 +466,8 @@ export default function EventBooking() {
                   </div>
 
                   <div className="mt-6 flex justify-end">
-                    <Button 
-                      onClick={() => setStep('seats')}
+                    <Button
+                      onClick={() => setStep("seats")}
                       disabled={getTotalTickets() === 0}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
@@ -406,10 +478,12 @@ export default function EventBooking() {
               </Card>
             )}
 
-            {step === 'seats' && (
+            {step === "seats" && (
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle className="text-white">Choose Your Seats</CardTitle>
+                  <CardTitle className="text-white">
+                    Choose Your Seats
+                  </CardTitle>
                   <CardDescription className="text-blue-100">
                     Select {getTotalTickets()} seat(s) for your tickets
                   </CardDescription>
@@ -419,32 +493,42 @@ export default function EventBooking() {
                     <div className="bg-linear-to-b from-purple-600 to-purple-800 p-4 rounded text-center mb-4">
                       <h3 className="text-white font-semibold">STAGE</h3>
                     </div>
-                    
+
                     {/* Interactive Seat Map */}
                     <div className="grid grid-cols-10 gap-1 max-w-md mx-auto">
                       {Array.from({ length: 100 }, (_, i) => {
                         const seatNumber = `A${i + 1}`;
                         const isSelected = selectedSeats.includes(seatNumber);
                         const isOccupied = Math.random() > 0.7; // Simulate occupied seats
-                        
+
                         return (
                           <button
                             key={seatNumber}
                             onClick={() => {
                               if (isOccupied) return;
-                              
+
                               if (isSelected) {
-                                setSelectedSeats(prev => prev.filter(s => s !== seatNumber));
-                              } else if (selectedSeats.length < getTotalTickets()) {
-                                setSelectedSeats(prev => [...prev, seatNumber]);
+                                setSelectedSeats((prev) =>
+                                  prev.filter((s) => s !== seatNumber)
+                                );
+                              } else if (
+                                selectedSeats.length < getTotalTickets()
+                              ) {
+                                setSelectedSeats((prev) => [
+                                  ...prev,
+                                  seatNumber,
+                                ]);
                               }
                             }}
                             disabled={isOccupied}
                             className={`
                               w-6 h-6 rounded text-xs font-semibold transition-colors
-                              ${isOccupied ? 'bg-red-500 cursor-not-allowed' :
-                                isSelected ? 'bg-blue-500 text-white' :
-                                'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                              ${
+                                isOccupied
+                                  ? "bg-red-500 cursor-not-allowed"
+                                  : isSelected
+                                  ? "bg-blue-500 text-white"
+                                  : "bg-gray-300 hover:bg-gray-400 text-gray-800"
                               }
                             `}
                           >
@@ -471,15 +555,15 @@ export default function EventBooking() {
                   </div>
 
                   <div className="flex justify-between">
-                    <Button 
+                    <Button
                       variant="outline"
-                      onClick={() => setStep('tickets')}
+                      onClick={() => setStep("tickets")}
                       className="border-white/20 text-white hover:bg-white/10"
                     >
                       Back to Tickets
                     </Button>
-                    <Button 
-                      onClick={() => setStep('checkout')}
+                    <Button
+                      onClick={() => setStep("checkout")}
                       disabled={selectedSeats.length !== getTotalTickets()}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
@@ -490,7 +574,7 @@ export default function EventBooking() {
               </Card>
             )}
 
-            {step === 'checkout' && (
+            {step === "checkout" && (
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="text-white">Checkout</CardTitle>
@@ -502,42 +586,72 @@ export default function EventBooking() {
                   <div className="space-y-6">
                     {/* Personal Information */}
                     <div>
-                      <h3 className="font-semibold text-white mb-4">Personal Information</h3>
+                      <h3 className="font-semibold text-white mb-4">
+                        Personal Information
+                      </h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="firstName" className="text-blue-100">First Name</Label>
+                          <Label htmlFor="firstName" className="text-blue-100">
+                            First Name
+                          </Label>
                           <Input
                             id="firstName"
                             value={personalInfo.firstName}
-                            onChange={(e) => setPersonalInfo(prev => ({ ...prev, firstName: e.target.value }))}
+                            onChange={(e) =>
+                              setPersonalInfo((prev) => ({
+                                ...prev,
+                                firstName: e.target.value,
+                              }))
+                            }
                             className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="lastName" className="text-blue-100">Last Name</Label>
+                          <Label htmlFor="lastName" className="text-blue-100">
+                            Last Name
+                          </Label>
                           <Input
                             id="lastName"
                             value={personalInfo.lastName}
-                            onChange={(e) => setPersonalInfo(prev => ({ ...prev, lastName: e.target.value }))}
+                            onChange={(e) =>
+                              setPersonalInfo((prev) => ({
+                                ...prev,
+                                lastName: e.target.value,
+                              }))
+                            }
                             className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="email" className="text-blue-100">Email</Label>
+                          <Label htmlFor="email" className="text-blue-100">
+                            Email
+                          </Label>
                           <Input
                             id="email"
                             type="email"
                             value={personalInfo.email}
-                            onChange={(e) => setPersonalInfo(prev => ({ ...prev, email: e.target.value }))}
+                            onChange={(e) =>
+                              setPersonalInfo((prev) => ({
+                                ...prev,
+                                email: e.target.value,
+                              }))
+                            }
                             className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="phone" className="text-blue-100">Phone</Label>
+                          <Label htmlFor="phone" className="text-blue-100">
+                            Phone
+                          </Label>
                           <Input
                             id="phone"
                             value={personalInfo.phone}
-                            onChange={(e) => setPersonalInfo(prev => ({ ...prev, phone: e.target.value }))}
+                            onChange={(e) =>
+                              setPersonalInfo((prev) => ({
+                                ...prev,
+                                phone: e.target.value,
+                              }))
+                            }
                             className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
                           />
                         </div>
@@ -546,7 +660,9 @@ export default function EventBooking() {
 
                     {/* Promo Code */}
                     <div>
-                      <h3 className="font-semibold text-white mb-4">Promo Code</h3>
+                      <h3 className="font-semibold text-white mb-4">
+                        Promo Code
+                      </h3>
                       <div className="flex gap-2">
                         <Input
                           placeholder="Enter promo code"
@@ -554,7 +670,7 @@ export default function EventBooking() {
                           onChange={(e) => setPromoCode(e.target.value)}
                           className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
                         />
-                        <Button 
+                        <Button
                           onClick={() => promoMutation.mutate(promoCode)}
                           disabled={!promoCode || promoMutation.isPending}
                           variant="outline"
@@ -568,7 +684,9 @@ export default function EventBooking() {
                     {/* Loyalty Points */}
                     {userProfile?.loyaltyPoints > 0 && (
                       <div>
-                        <h3 className="font-semibold text-white mb-4">Loyalty Points</h3>
+                        <h3 className="font-semibold text-white mb-4">
+                          Loyalty Points
+                        </h3>
                         <div className="flex items-center gap-2">
                           <input
                             type="checkbox"
@@ -578,7 +696,9 @@ export default function EventBooking() {
                             className="rounded"
                           />
                           <label htmlFor="usePoints" className="text-blue-100">
-                            Use {userProfile.loyaltyPoints} loyalty points (${(userProfile.loyaltyPoints * 0.01).toFixed(2)} value)
+                            Use {userProfile.loyaltyPoints} loyalty points ($
+                            {(userProfile.loyaltyPoints * 0.01).toFixed(2)}{" "}
+                            value)
                           </label>
                         </div>
                       </div>
@@ -586,16 +706,20 @@ export default function EventBooking() {
                   </div>
 
                   <div className="flex justify-between mt-6">
-                    <Button 
+                    <Button
                       variant="outline"
-                      onClick={() => setStep('seats')}
+                      onClick={() => setStep("seats")}
                       className="border-white/20 text-white hover:bg-white/10"
                     >
                       Back to Seats
                     </Button>
-                    <Button 
+                    <Button
                       onClick={handleBooking}
-                      disabled={bookingMutation.isPending || !personalInfo.email || !personalInfo.firstName}
+                      disabled={
+                        bookingMutation.isPending ||
+                        !personalInfo.email ||
+                        !personalInfo.firstName
+                      }
                       className="bg-green-600 hover:bg-green-700"
                     >
                       {bookingMutation.isPending ? (
@@ -615,21 +739,27 @@ export default function EventBooking() {
               </Card>
             )}
 
-            {step === 'confirmation' && (
+            {step === "confirmation" && (
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-8 text-center">
                   <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-white mb-2">Booking Confirmed!</h2>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Booking Confirmed!
+                  </h2>
                   <p className="text-blue-100 mb-6">
-                    Your tickets have been booked successfully. You'll receive a confirmation email shortly.
+                    Your tickets have been booked successfully. You'll receive a
+                    confirmation email shortly.
                   </p>
-                  
+
                   <div className="flex justify-center gap-4">
                     <Button className="bg-blue-600 hover:bg-blue-700">
                       <Download className="h-4 w-4 mr-2" />
                       Download Tickets
                     </Button>
-                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                    <Button
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
                       <Smartphone className="h-4 w-4 mr-2" />
                       Add to Wallet
                     </Button>
@@ -650,14 +780,20 @@ export default function EventBooking() {
                   {Object.entries(selectedTickets)
                     .filter(([_, quantity]) => quantity > 0)
                     .map(([ticketId, quantity]) => {
-                      const ticket = event.ticketTypes.find((t: TicketType) => t.id === ticketId);
+                      const ticket = event.ticketTypes.find(
+                        (t: TicketType) => t.id === ticketId
+                      );
                       if (!ticket) return null;
-                      
+
                       return (
                         <div key={ticketId} className="flex justify-between">
                           <div>
-                            <div className="text-white font-medium">{ticket.name}</div>
-                            <div className="text-blue-100 text-sm">Qty: {quantity}</div>
+                            <div className="text-white font-medium">
+                              {ticket.name}
+                            </div>
+                            <div className="text-blue-100 text-sm">
+                              Qty: {quantity}
+                            </div>
                           </div>
                           <div className="text-white font-semibold">
                             ${(ticket.price * quantity).toFixed(2)}
@@ -665,34 +801,36 @@ export default function EventBooking() {
                         </div>
                       );
                     })}
-                  
+
                   {selectedSeats.length > 0 && (
                     <div className="pt-2 border-t border-white/20">
-                      <div className="text-white font-medium mb-1">Selected Seats</div>
+                      <div className="text-white font-medium mb-1">
+                        Selected Seats
+                      </div>
                       <div className="text-blue-100 text-sm">
-                        {selectedSeats.join(', ')}
+                        {selectedSeats.join(", ")}
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="pt-2 border-t border-white/20 space-y-2">
                     <div className="flex justify-between text-white">
                       <span>Subtotal</span>
                       <span>${calculateSubtotal().toFixed(2)}</span>
                     </div>
-                    
+
                     {calculateDiscount() > 0 && (
                       <div className="flex justify-between text-green-400">
                         <span>Discount ({promoMutation.data?.discount}%)</span>
                         <span>-${calculateDiscount().toFixed(2)}</span>
                       </div>
                     )}
-                    
+
                     <div className="flex justify-between text-white">
                       <span>Platform Fee (7%)</span>
                       <span>${calculatePlatformFee().toFixed(2)}</span>
                     </div>
-                    
+
                     <div className="pt-2 border-t border-white/20">
                       <div className="flex justify-between text-lg font-semibold text-white">
                         <span>Total</span>
@@ -705,24 +843,24 @@ export default function EventBooking() {
                 {/* Social Actions */}
                 <div className="mt-6 pt-4 border-t border-white/20">
                   <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="flex-1 border-white/20 text-white hover:bg-white/10"
                     >
                       <Heart className="h-4 w-4 mr-1" />
                       Save
                     </Button>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="flex-1 border-white/20 text-white hover:bg-white/10"
                     >
                       <Share2 className="h-4 w-4 mr-1" />
                       Share
                     </Button>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="flex-1 border-white/20 text-white hover:bg-white/10"
                     >

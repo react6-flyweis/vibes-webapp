@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+// import { Link } from "react-router";
 import {
   Card,
   CardContent,
@@ -1249,7 +1249,7 @@ export default function EviteTemplates() {
             Our AI-powered design studio can create a unique template just for your event.
           </p>
           <Button asChild variant="outline">
-            <Link href="/interactive-design-generator">
+            <Link to="/interactive-design-generator">
               <Sparkles className="w-4 h-4 mr-2" />
               Create Custom Template
             </Link>

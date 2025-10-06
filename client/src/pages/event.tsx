@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import HeroSection from "@/components/hero-section";
@@ -48,29 +48,22 @@ export default function EventPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
-      <HeroSection 
-        event={event} 
-        stats={eventStats} 
-      />
-      
+
+      <HeroSection event={event} stats={eventStats} />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <MenuBuilder 
+            <MenuBuilder
               eventId={eventId}
               activeCategory={activeCategory}
               onCategoryChange={setActiveCategory}
               onAddItem={() => setIsAddItemModalOpen(true)}
             />
           </div>
-          
+
           <div>
-            <EventSidebar 
-              event={event} 
-              eventId={eventId}
-              stats={eventStats}
-            />
+            <EventSidebar event={event} eventId={eventId} stats={eventStats} />
           </div>
         </div>
       </div>

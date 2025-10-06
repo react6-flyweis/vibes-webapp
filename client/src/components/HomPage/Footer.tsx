@@ -1,23 +1,23 @@
 import React from "react";
 import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
-import { useLocation } from "wouter";
+import { useLocation } from "react-router";
 
 const Footer = () => {
+  const locationObj = useLocation();
+  const location = locationObj.pathname;
 
-  const [location] = useLocation(); // ✅ yaha string milega, jaise "/"
-
-  const isHome: boolean = location === "/"; // ✅ directly string compare
+  const isHome: boolean = location === "/";
   return (
- <footer
+    <footer
       className={`relative w-full h-auto md:h-[275px] bg-linear-to-r from-slate-900 to-gray-900 overflow-hidden 
       ${isHome ? "rounded-t-[60px]" : ""}`}
-    >      {/* Background blur effects */}
+    >
+      {" "}
+      {/* Background blur effects */}
       <div className="absolute w-[647px] h-[639px] -right-[200px] -top-16 bg-gray-400 opacity-30 rounded-full blur-[192px]"></div>
       <div className="absolute w-[647px] h-[639px] -left-[313px] -top-[320px] bg-gray-400 opacity-30 rounded-full blur-[192px]"></div>
-
       {/* Main content */}
       <div className="relative z-10 h-full flex flex-col md:flex-row items-center justify-between px-6 md:px-[75px] py-8 md:py-0 text-center md:text-left gap-8 md:gap-0">
-        
         {/* Left side - Brand */}
         <div className="flex flex-col items-center md:items-start">
           <h1
@@ -58,12 +58,10 @@ const Footer = () => {
           </a>
         </div>
       </div>
-
       {/* Center - Copyright (large screen same position, mobile still centered) */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm md:text-lg font-light">
         © cr.camayo 2025
       </div>
-
       {/* Left dot pattern */}
       <div className="hidden md:block absolute -left-28 top-28">
         <div className="grid grid-cols-5 gap-4">
@@ -75,7 +73,6 @@ const Footer = () => {
           ))}
         </div>
       </div>
-
       {/* Right dot pattern */}
       <div className="hidden md:block absolute right-72 -bottom-2">
         <div className="grid grid-cols-5 gap-4">

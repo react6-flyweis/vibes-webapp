@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,13 +35,13 @@ export default function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">
+          <Link to="/profile">
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/premium">
+          <Link to="/premium">
             <Crown className="mr-2 h-4 w-4" />
             <span>Upgrade to Premium</span>
           </Link>

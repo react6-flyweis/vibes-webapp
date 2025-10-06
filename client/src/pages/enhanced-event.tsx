@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import { useState } from "react";
@@ -23,8 +23,8 @@ import SettingsTab from "@/components/enhanced-event/SettingsTab";
 import SocialMediaSharing from "@/components/social-media-sharing";
 
 export default function EnhancedEventPage() {
-  const { id } = useParams();
-  const eventId = id ? parseInt(id as string) : 1; // Default to event 1 if no ID provided
+  const { id: eventId } = useParams();
+
   const [activeCategory, setActiveCategory] = useState("drinks");
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isInviteCardOpen, setIsInviteCardOpen] = useState(false);

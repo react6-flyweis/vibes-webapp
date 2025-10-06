@@ -5,13 +5,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, Heart, ArrowRight } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Sparkles,
+  Heart,
+  ArrowRight,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function LoginPage() {
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [signupData, setSignupData] = useState({
@@ -19,13 +28,13 @@ export default function LoginPage() {
     email: "",
     fullName: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const { toast } = useToast();
 
   const loginMutation = useMutation({
     mutationFn: async (data: { username: string; password: string }) => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return { success: true, user: data };
     },
     onSuccess: (response, variables) => {
@@ -34,23 +43,23 @@ export default function LoginPage() {
         username: variables.username,
         email: variables.username + "@vibes.com",
         fullName: variables.username,
-        subscriptionTier: "free"
+        subscriptionTier: "free",
       };
-      localStorage.setItem('vibes_user', JSON.stringify(userData));
-      
+      localStorage.setItem("vibes_user", JSON.stringify(userData));
+
       toast({
         title: "Welcome back!",
-        description: "You're now logged in to your event planning dashboard!"
+        description: "You're now logged in to your event planning dashboard!",
       });
-      setLocation("/");
+      navigate("/");
     },
     onError: () => {
       toast({
         title: "Login Failed",
         description: "Please check your credentials and try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const signupMutation = useMutation({
@@ -59,7 +68,7 @@ export default function LoginPage() {
         throw new Error("Passwords don't match");
       }
       // Simulate successful signup for demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return { success: true, user: data };
     },
     onSuccess: (response, variables) => {
@@ -69,23 +78,25 @@ export default function LoginPage() {
         username: variables.username,
         email: variables.email,
         fullName: variables.fullName,
-        subscriptionTier: "free"
+        subscriptionTier: "free",
       };
-      localStorage.setItem('vibes_user', JSON.stringify(userData));
-      
+      localStorage.setItem("vibes_user", JSON.stringify(userData));
+
       toast({
         title: "🎊 Account Created!",
-        description: "Welcome to Vibes! Your event planning journey begins now!"
+        description:
+          "Welcome to Vibes! Your event planning journey begins now!",
       });
-      setLocation("/");
+      navigate("/");
     },
     onError: (error: any) => {
       toast({
         title: "Signup Failed",
-        description: error.message || "Please try again with different details.",
-        variant: "destructive"
+        description:
+          error.message || "Please try again with different details.",
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const handleLogin = (e: React.FormEvent) => {
@@ -94,7 +105,7 @@ export default function LoginPage() {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -107,7 +118,7 @@ export default function LoginPage() {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -115,7 +126,7 @@ export default function LoginPage() {
       toast({
         title: "Password Mismatch",
         description: "Passwords don't match. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -160,7 +171,12 @@ export default function LoginPage() {
                         type="text"
                         placeholder="Enter your username"
                         value={loginData.username}
-                        onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            username: e.target.value,
+                          })
+                        }
                         className="pl-10"
                       />
                     </div>
@@ -175,7 +191,12 @@ export default function LoginPage() {
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
                         value={loginData.password}
-                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            password: e.target.value,
+                          })
+                        }
                         className="pl-10 pr-10"
                       />
                       <button
@@ -183,7 +204,11 @@ export default function LoginPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -215,7 +240,12 @@ export default function LoginPage() {
                         type="text"
                         placeholder="Enter your full name"
                         value={signupData.fullName}
-                        onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            fullName: e.target.value,
+                          })
+                        }
                         className="pl-10"
                       />
                     </div>
@@ -230,7 +260,12 @@ export default function LoginPage() {
                         type="email"
                         placeholder="Enter your email"
                         value={signupData.email}
-                        onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            email: e.target.value,
+                          })
+                        }
                         className="pl-10"
                       />
                     </div>
@@ -245,7 +280,12 @@ export default function LoginPage() {
                         type="text"
                         placeholder="Choose a username"
                         value={signupData.username}
-                        onChange={(e) => setSignupData({ ...signupData, username: e.target.value })}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            username: e.target.value,
+                          })
+                        }
                         className="pl-10"
                       />
                     </div>
@@ -260,7 +300,12 @@ export default function LoginPage() {
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a password"
                         value={signupData.password}
-                        onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            password: e.target.value,
+                          })
+                        }
                         className="pl-10 pr-10"
                       />
                       <button
@@ -268,7 +313,11 @@ export default function LoginPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -282,7 +331,12 @@ export default function LoginPage() {
                         type={showPassword ? "text" : "password"}
                         placeholder="Confirm your password"
                         value={signupData.confirmPassword}
-                        onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         className="pl-10"
                       />
                     </div>
@@ -293,12 +347,15 @@ export default function LoginPage() {
                     className="w-full bg-linear-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
                     disabled={signupMutation.isPending}
                   >
-                    {signupMutation.isPending ? "Creating Account..." : "Create Account"}
+                    {signupMutation.isPending
+                      ? "Creating Account..."
+                      : "Create Account"}
                   </Button>
                 </form>
 
                 <div className="text-xs text-center text-gray-600 dark:text-gray-400">
-                  By creating an account, you agree to our Terms of Service and Privacy Policy
+                  By creating an account, you agree to our Terms of Service and
+                  Privacy Policy
                 </div>
               </TabsContent>
             </Tabs>
@@ -307,7 +364,8 @@ export default function LoginPage() {
 
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Experience the future of event planning with AI-powered themes, guest matchmaking, and AR previews!
+            Experience the future of event planning with AI-powered themes,
+            guest matchmaking, and AR previews!
           </p>
         </div>
       </div>

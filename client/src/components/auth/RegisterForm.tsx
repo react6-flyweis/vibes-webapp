@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -262,7 +262,7 @@ export function RegisterForm() {
                     className="text-sm text-gray-600 dark:text-gray-400"
                   >
                     I agree to the{" "}
-                    <Link href="/terms">
+                    <Link to="/terms">
                       <Button
                         variant="link"
                         className="text-purple-600 hover:text-purple-700 p-0 h-auto text-sm underline"
@@ -271,7 +271,7 @@ export function RegisterForm() {
                       </Button>
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy">
+                    <Link to="/privacy">
                       <Button
                         variant="link"
                         className="text-purple-600 hover:text-purple-700 p-0 h-auto text-sm underline"

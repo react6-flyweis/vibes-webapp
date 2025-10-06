@@ -18,7 +18,7 @@ import {
   Volume2,
   Star
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 
 interface VideoMemory {
   id: number;
@@ -200,7 +200,7 @@ export default function AIVideoMemory() {
                   <div className="text-center py-8 text-party-gray">
                     <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No events available for video generation</p>
-                    <Link href="/events/1">
+                    <Link to="/events/1">
                       <Button className="mt-4 bg-party-coral hover:bg-party-coral/90">
                         View Sample Event
                       </Button>
@@ -210,7 +210,7 @@ export default function AIVideoMemory() {
                   <div className="text-center py-8 text-party-gray">
                     <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No events available for video generation</p>
-                    <Link href="/events/1">
+                    <Link to="/events/1">
                       <Button className="mt-4 bg-party-coral hover:bg-party-coral/90">
                         View Sample Event
                       </Button>

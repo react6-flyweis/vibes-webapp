@@ -1,7 +1,7 @@
 import { Button } from "../ui/button";
 import UserMenu from "../UserMenu";
 import LogoHeart from "./LogoHeart";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { useAuthStore } from "@/store/auth-store";
 import { LogOutIcon } from "lucide-react";
 
@@ -22,10 +22,10 @@ const Topbar: React.FC = () => {
           {!isAuthenticated ? (
             <>
               <Button asChild variant="outline">
-                <Link href="/login">Login</Link>
+                <Link to="/login">Login</Link>
               </Button>
               <Button asChild className="bg-gradient-cta">
-                <Link href="/signup">Sign Up</Link>
+                <Link to="/signup">Sign Up</Link>
               </Button>
             </>
           ) : (

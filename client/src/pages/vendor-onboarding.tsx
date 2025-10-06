@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import {
   Form,
   FormControl,
@@ -193,7 +193,7 @@ const calendarOptions = [
 ];
 
 export default function VendorOnboarding() {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const totalSteps = 4;

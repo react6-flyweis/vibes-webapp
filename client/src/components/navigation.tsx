@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, NavLink } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -32,7 +32,6 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function Navigation() {
-  const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const coreNavigationItems = [
@@ -119,10 +118,7 @@ export default function Navigation() {
     { path: "/system-overview", label: "System Overview", icon: Monitor },
   ];
 
-  const isActive = (path: string) => {
-    if (path === "/") return location === "/";
-    return location.startsWith(path);
-  };
+  // active state is now determined by NavLink from react-router
 
   return (
     <>
@@ -130,7 +126,7 @@ export default function Navigation() {
       <nav className="hidden md:flex items-center justify-between p-4 bg-[#111827] text-black dark:bg-gray-900 border-b border-[#111827] dark:border-gray-700 sticky top-0 z-40 backdrop-blur-xs ">
            
         <div className="flex items-center space-x-8">
-          <Link href="/">
+          <Link to="/">
              
             <div className="flex items-center space-x-2">
                
@@ -147,21 +143,23 @@ export default function Navigation() {
           <div className="flex items-center space-x-1">
              
             {coreNavigationItems.map((item) => (
-              <Link key={item.path} href={item.path}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "flex items-center space-x-2", // Default state: White background
-                    "bg-white text-gray-800",
-                    "hover:bg-blue-600 hover:text-white",
-                    isActive(item.path) && "bg-blue-600 text-white"
-                  )}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>               
-                </Button>
-              </Link>
+              <NavLink key={item.path} to={item.path} end={item.path === "/"}>
+                {({ isActive }) => (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "flex items-center space-x-2",
+                      "bg-white text-gray-800",
+                      "hover:bg-blue-600 hover:text-white",
+                      isActive && "bg-blue-600 text-white"
+                    )}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Button>
+                )}
+              </NavLink>
             ))}
             {/* AI Features Dropdown */}           
             <DropdownMenu>
@@ -180,7 +178,7 @@ export default function Navigation() {
                 {aiFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
-                      href={item.path}
+                      to={item.path}
                       className="flex items-center space-x-2 w-full"
                     >
                       <item.icon className="w-4 h-4" />     {" "}
@@ -207,7 +205,7 @@ export default function Navigation() {
                 {experienceFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
-                      href={item.path}
+                      to={item.path}
                       className="flex items-center space-x-2 w-full"
                     >
                       <item.icon className="w-4 h-4" />     {" "}
@@ -234,7 +232,7 @@ export default function Navigation() {
                 {platformFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
-                      href={item.path}
+                      to={item.path}
                       className="flex items-center space-x-2 w-full"
                     >
                       <item.icon className="w-4 h-4" />
@@ -249,35 +247,37 @@ export default function Navigation() {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             {businessItems.map((item) => (
-              <Link key={item.path} href={item.path}>
+              <Link key={item.path} to={item.path}>
                 <Button
                   variant="outline"
                   size="sm"
                   className="flex items-center space-x-2"
                 >
                   <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>               
+                  <span>{item.label}</span>
                 </Button>
               </Link>
             ))}
           </div>
 
-          <Link href="/profile">
-            <Button
-              variant={isActive("/profile") ? "default" : "ghost"}
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </Button>
-          </Link>
+          <NavLink to="/profile">
+            {({ isActive }) => (
+              <Button
+                variant={isActive ? "default" : "ghost"}
+                size="sm"
+                className="flex items-center space-x-2"
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </Button>
+            )}
+          </NavLink>
         </div>
       </nav>
       {/* Mobile Navigation */}
       <nav className="md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-linear-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />             
@@ -305,41 +305,45 @@ export default function Navigation() {
           <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="p-4 space-y-2">
               {coreNavigationItems.map((item) => (
-                <Link key={item.path} href={item.path}>
-                  <Button
-                    variant={isActive(item.path) ? "default" : "ghost"}
-                    className="w-full justify-start space-x-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>                 
-                  </Button>
-                </Link>
+                <NavLink key={item.path} to={item.path} end={item.path === "/"}>
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className="w-full justify-start space-x-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Button>
+                  )}
+                </NavLink>
               ))}
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
                 {businessItems.map((item) => (
-                  <Link key={item.path} href={item.path}>
+                  <Link key={item.path} to={item.path}>
                     <Button
                       variant="outline"
                       className="w-full justify-start space-x-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <item.icon className="w-4 h-4" />
-                      <span>{item.label}</span>                   
+                      <span>{item.label}</span>
                     </Button>
                   </Link>
                 ))}
                  
-                <Link href="/profile">
-                  <Button
-                    variant={isActive("/profile") ? "default" : "ghost"}
-                    className="w-full justify-start space-x-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <User className="w-4 h-4" /> <span>Profile</span>   
-                  </Button>
-                </Link>
+                <NavLink to="/profile">
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className="w-full justify-start space-x-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4" /> <span>Profile</span>
+                    </Button>
+                  )}
+                </NavLink>
               </div>
             </div>
           </div>

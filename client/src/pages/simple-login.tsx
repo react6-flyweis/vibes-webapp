@@ -4,12 +4,20 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 
 export default function SimpleLoginPage() {
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [signupData, setSignupData] = useState({
@@ -17,7 +25,7 @@ export default function SimpleLoginPage() {
     email: "",
     fullName: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const { toast } = useToast();
 
@@ -28,15 +36,15 @@ export default function SimpleLoginPage() {
       username: loginData.username || "demo_user",
       email: (loginData.username || "demo") + "@vibes.com",
       fullName: loginData.username || "Demo User",
-      subscriptionTier: "free"
+      subscriptionTier: "free",
     };
-    localStorage.setItem('vibes_user', JSON.stringify(userData));
-    
+    localStorage.setItem("vibes_user", JSON.stringify(userData));
+
     toast({
       title: "Welcome back!",
-      description: "You're now logged in to your event planning dashboard!"
+      description: "You're now logged in to your event planning dashboard!",
     });
-    setLocation("/");
+    navigate("/");
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -45,7 +53,7 @@ export default function SimpleLoginPage() {
       toast({
         title: "Password Mismatch",
         description: "Passwords don't match. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -55,15 +63,16 @@ export default function SimpleLoginPage() {
       username: signupData.username,
       email: signupData.email,
       fullName: signupData.fullName,
-      subscriptionTier: "free"
+      subscriptionTier: "free",
     };
-    localStorage.setItem('vibes_user', JSON.stringify(userData));
-    
+    localStorage.setItem("vibes_user", JSON.stringify(userData));
+
     toast({
       title: "Account Created!",
-      description: "Welcome to Vibes! Your account has been created successfully."
+      description:
+        "Welcome to Vibes! Your account has been created successfully.",
     });
-    setLocation("/");
+    navigate("/");
   };
 
   const quickDemo = () => {
@@ -72,15 +81,15 @@ export default function SimpleLoginPage() {
       username: "demo_user",
       email: "demo@vibes.com",
       fullName: "Demo User",
-      subscriptionTier: "free"
+      subscriptionTier: "free",
     };
-    localStorage.setItem('vibes_user', JSON.stringify(userData));
-    
+    localStorage.setItem("vibes_user", JSON.stringify(userData));
+
     toast({
       title: "Demo Access Granted!",
-      description: "Explore all the revolutionary features of Vibes."
+      description: "Explore all the revolutionary features of Vibes.",
     });
-    setLocation("/");
+    navigate("/");
   };
 
   return (
@@ -93,12 +102,14 @@ export default function SimpleLoginPage() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Welcome to Vibes</h1>
-          <p className="text-gray-600 mt-2">Your ultimate event planning companion</p>
+          <p className="text-gray-600 mt-2">
+            Your ultimate event planning companion
+          </p>
         </div>
 
         {/* Quick Demo Access */}
         <div className="mb-6">
-          <Button 
+          <Button
             onClick={quickDemo}
             className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg py-3"
           >
@@ -107,7 +118,8 @@ export default function SimpleLoginPage() {
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-center text-sm text-gray-500 mt-2">
-            Explore all features including AI Vibe Curator, Virtual Party Twin, and more!
+            Explore all features including AI Vibe Curator, Virtual Party Twin,
+            and more!
           </p>
         </div>
 
@@ -125,17 +137,25 @@ export default function SimpleLoginPage() {
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-xs">
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-gray-100">
-              <TabsTrigger value="login" className="data-[state=active]:bg-white">
+              <TabsTrigger
+                value="login"
+                className="data-[state=active]:bg-white"
+              >
                 Sign In
               </TabsTrigger>
-              <TabsTrigger value="signup" className="data-[state=active]:bg-white">
+              <TabsTrigger
+                value="signup"
+                className="data-[state=active]:bg-white"
+              >
                 Sign Up
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <CardHeader className="space-y-1 pb-4">
-                <CardTitle className="text-xl text-center">Sign in to your account</CardTitle>
+                <CardTitle className="text-xl text-center">
+                  Sign in to your account
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -149,7 +169,12 @@ export default function SimpleLoginPage() {
                         placeholder="Enter your username"
                         className="pl-10"
                         value={loginData.username}
-                        onChange={(e) => setLoginData({...loginData, username: e.target.value})}
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            username: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -163,7 +188,12 @@ export default function SimpleLoginPage() {
                         placeholder="Enter your password"
                         className="pl-10 pr-10"
                         value={loginData.password}
-                        onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            password: e.target.value,
+                          })
+                        }
                       />
                       <button
                         type="button"
@@ -174,7 +204,10 @@ export default function SimpleLoginPage() {
                       </button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
                     Sign In
                   </Button>
                 </form>
@@ -183,7 +216,9 @@ export default function SimpleLoginPage() {
 
             <TabsContent value="signup">
               <CardHeader className="space-y-1 pb-4">
-                <CardTitle className="text-xl text-center">Create your account</CardTitle>
+                <CardTitle className="text-xl text-center">
+                  Create your account
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSignup} className="space-y-4">
@@ -197,7 +232,12 @@ export default function SimpleLoginPage() {
                         placeholder="Enter your full name"
                         className="pl-10"
                         value={signupData.fullName}
-                        onChange={(e) => setSignupData({...signupData, fullName: e.target.value})}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            fullName: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -212,7 +252,12 @@ export default function SimpleLoginPage() {
                         placeholder="Enter your email"
                         className="pl-10"
                         value={signupData.email}
-                        onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            email: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -227,7 +272,12 @@ export default function SimpleLoginPage() {
                         placeholder="Choose a username"
                         className="pl-10"
                         value={signupData.username}
-                        onChange={(e) => setSignupData({...signupData, username: e.target.value})}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            username: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -242,7 +292,12 @@ export default function SimpleLoginPage() {
                         placeholder="Create a password"
                         className="pl-10 pr-10"
                         value={signupData.password}
-                        onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            password: e.target.value,
+                          })
+                        }
                         required
                       />
                       <button
@@ -264,12 +319,20 @@ export default function SimpleLoginPage() {
                         placeholder="Confirm your password"
                         className="pl-10"
                         value={signupData.confirmPassword}
-                        onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+                  <Button
+                    type="submit"
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                  >
                     Create Account
                   </Button>
                 </form>

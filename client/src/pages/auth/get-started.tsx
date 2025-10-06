@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import userIcon from "@/assets/icons/user.svg";
 import vendorIcon from "@/assets/icons/vendor.svg";
 
 export default function GetStarted() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const choose = (role: string) => {
-    setLocation(`/signup?role=${encodeURIComponent(role)}`);
+    navigate(`/signup?role=${encodeURIComponent(role)}`);
   };
 
   return (

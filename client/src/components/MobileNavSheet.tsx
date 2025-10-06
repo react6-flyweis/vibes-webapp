@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useLocation, Link } from "wouter";
+import { useNavigate } from "react-router";
 import type { NavCategory } from "./app-shell-data";
 import { Menu } from "lucide-react";
 
@@ -17,7 +17,7 @@ interface MobileNavSheetProps {
 }
 
 export default function MobileNavSheet({ categories }: MobileNavSheetProps) {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   return (
     <Sheet>
@@ -45,7 +45,7 @@ export default function MobileNavSheet({ categories }: MobileNavSheetProps) {
                     key={item.href}
                     onClick={(e) => {
                       e.preventDefault();
-                      setLocation(item.href);
+                      navigate(item.href);
                     }}
                     href={item.href}
                     className="block w-full"

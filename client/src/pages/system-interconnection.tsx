@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Card,
@@ -740,14 +740,14 @@ export default function SystemInterconnection() {
               </div>
               <div className="flex gap-3 mt-4 md:mt-0">
                 <Button variant="secondary" asChild>
-                  <Link href="/smart-entry">Start with Smart Entry</Link>
+                  <Link to="/smart-entry">Start with Smart Entry</Link>
                 </Button>
                 <Button
                   variant="outline"
                   className="text-white border-white hover:bg-white hover:text-purple-600"
                   asChild
                 >
-                  <Link href="/">Back to Dashboard</Link>
+                  <Link to="/">Back to Dashboard</Link>
                 </Button>
               </div>
             </div>
@@ -792,7 +792,7 @@ export default function SystemInterconnection() {
                 </div>
               </div>
               <Button asChild className="w-full">
-                <Link href={selectedFeature.path}>
+                <Link to={selectedFeature.path}>
                   Launch {selectedFeature.name}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>

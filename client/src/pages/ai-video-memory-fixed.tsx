@@ -1,24 +1,30 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Video, 
-  Camera, 
-  Music, 
-  Heart, 
-  Download, 
-  Share2, 
-  Play, 
+import {
+  Video,
+  Camera,
+  Music,
+  Heart,
+  Download,
+  Share2,
+  Play,
   Sparkles,
   Clock,
   Users,
   Volume2,
-  Star
+  Star,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 
 export default function AIVideoMemory() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -27,19 +33,19 @@ export default function AIVideoMemory() {
 
   // Fetch user's events
   const { data: events } = useQuery({
-    queryKey: ['/api/events/user'],
+    queryKey: ["/api/events/user"],
     retry: false,
   });
 
   // Fetch video memories
   const { data: videoMemories, isLoading } = useQuery({
-    queryKey: ['/api/video-memories'],
+    queryKey: ["/api/video-memories"],
     retry: false,
   });
 
   // Fetch event highlights for selected event
   const { data: highlights } = useQuery({
-    queryKey: ['/api/events', selectedEventId, 'highlights'],
+    queryKey: ["/api/events", selectedEventId, "highlights"],
     enabled: !!selectedEventId,
     retry: false,
   });
@@ -47,20 +53,21 @@ export default function AIVideoMemory() {
   // Generate video memory mutation
   const generateVideoMutation = useMutation({
     mutationFn: async (eventId: number) => {
-      const response = await fetch('/api/video-memories/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/video-memories/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ eventId }),
       });
-      if (!response.ok) throw new Error('Failed to generate video');
+      if (!response.ok) throw new Error("Failed to generate video");
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Video Generation Started",
-        description: "Your AI after-movie is being created! This usually takes 3-5 minutes.",
+        description:
+          "Your AI after-movie is being created! This usually takes 3-5 minutes.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/video-memories'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/video-memories"] });
     },
     onError: () => {
       toast({
@@ -78,7 +85,7 @@ export default function AIVideoMemory() {
       <div className="absolute top-10 left-10 w-32 h-32 bg-party-pink rounded-full opacity-20 animate-bounce-gentle"></div>
       <div className="absolute top-40 right-20 w-24 h-24 bg-party-yellow rounded-full opacity-30 animate-party-wiggle"></div>
       <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-party-turquoise rounded-full opacity-15 animate-pulse-slow"></div>
-      
+
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
@@ -86,7 +93,9 @@ export default function AIVideoMemory() {
           <h1 className="text-5xl font-bold bg-linear-to-r from-white to-yellow-200 bg-clip-text text-transparent">
             AI Video Memory Generator
           </h1>
-          <p className="text-white/90 mt-2 text-xl">Create epic after-movies with AI magic</p>
+          <p className="text-white/90 mt-2 text-xl">
+            Create epic after-movies with AI magic
+          </p>
         </div>
 
         {/* Feature Description */}
@@ -97,7 +106,8 @@ export default function AIVideoMemory() {
               Post-Event Magic
             </CardTitle>
             <CardDescription className="text-white/90 text-lg">
-              AI automatically creates stunning after-movies from your event highlights
+              AI automatically creates stunning after-movies from your event
+              highlights
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -105,17 +115,25 @@ export default function AIVideoMemory() {
               <div className="text-center">
                 <Camera className="w-12 h-12 text-party-yellow mx-auto mb-3" />
                 <h3 className="font-bold text-lg mb-2">Best Photos & Videos</h3>
-                <p className="text-white/80 text-sm">AI selects the most engaging moments</p>
+                <p className="text-white/80 text-sm">
+                  AI selects the most engaging moments
+                </p>
               </div>
               <div className="text-center">
                 <Music className="w-12 h-12 text-party-turquoise mx-auto mb-3" />
                 <h3 className="font-bold text-lg mb-2">Top Song Requests</h3>
-                <p className="text-white/80 text-sm">Features the crowd's favorite tracks</p>
+                <p className="text-white/80 text-sm">
+                  Features the crowd's favorite tracks
+                </p>
               </div>
               <div className="text-center">
                 <Heart className="w-12 h-12 text-party-pink mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">Crowd Energy Highlights</h3>
-                <p className="text-white/80 text-sm">Captures peak excitement moments</p>
+                <h3 className="font-bold text-lg mb-2">
+                  Crowd Energy Highlights
+                </h3>
+                <p className="text-white/80 text-sm">
+                  Captures peak excitement moments
+                </p>
               </div>
             </div>
           </CardContent>
@@ -126,8 +144,12 @@ export default function AIVideoMemory() {
           <div className="space-y-6">
             <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
-                <CardTitle className="text-party-dark">Generate New Video Memory</CardTitle>
-                <CardDescription>Select an event to create an AI after-movie</CardDescription>
+                <CardTitle className="text-party-dark">
+                  Generate New Video Memory
+                </CardTitle>
+                <CardDescription>
+                  Select an event to create an AI after-movie
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {Array.isArray(events) && events.length > 0 ? (
@@ -136,15 +158,19 @@ export default function AIVideoMemory() {
                       key={event.id}
                       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         selectedEventId === event.id
-                          ? 'border-party-coral bg-party-coral/10'
-                          : 'border-gray-200 hover:border-party-coral/50'
+                          ? "border-party-coral bg-party-coral/10"
+                          : "border-gray-200 hover:border-party-coral/50"
                       }`}
                       onClick={() => setSelectedEventId(event.id)}
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-semibold text-party-dark">{event.title}</h3>
-                          <p className="text-sm text-party-gray">{event.date}</p>
+                          <h3 className="font-semibold text-party-dark">
+                            {event.title}
+                          </h3>
+                          <p className="text-sm text-party-gray">
+                            {event.date}
+                          </p>
                           <div className="flex gap-2 mt-2">
                             <Badge variant="secondary" className="text-xs">
                               <Users className="w-3 h-3 mr-1" />
@@ -163,7 +189,7 @@ export default function AIVideoMemory() {
                   <div className="text-center py-8 text-party-gray">
                     <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No events available for video generation</p>
-                    <Link href="/events/1">
+                    <Link to="/events/1">
                       <Button className="mt-4 bg-party-coral hover:bg-party-coral/90">
                         View Sample Event
                       </Button>
@@ -173,7 +199,9 @@ export default function AIVideoMemory() {
 
                 {selectedEventId && (
                   <Button
-                    onClick={() => generateVideoMutation.mutate(selectedEventId)}
+                    onClick={() =>
+                      generateVideoMutation.mutate(selectedEventId)
+                    }
                     disabled={generateVideoMutation.isPending}
                     className="w-full bg-party-gradient-2 hover:scale-105 transition-transform"
                   >
@@ -197,8 +225,12 @@ export default function AIVideoMemory() {
             {highlights && (
               <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
                 <CardHeader>
-                  <CardTitle className="text-party-dark">Event Highlights Preview</CardTitle>
-                  <CardDescription>What will be included in your video</CardDescription>
+                  <CardTitle className="text-party-dark">
+                    Event Highlights Preview
+                  </CardTitle>
+                  <CardDescription>
+                    What will be included in your video
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-3 gap-4 text-center">
@@ -218,7 +250,9 @@ export default function AIVideoMemory() {
                       <div className="text-2xl font-bold text-party-pink">
                         {(highlights as any)?.crowdMoments?.length || 0}
                       </div>
-                      <div className="text-sm text-party-gray">Energy Peaks</div>
+                      <div className="text-sm text-party-gray">
+                        Energy Peaks
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -230,8 +264,12 @@ export default function AIVideoMemory() {
           <div>
             <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
               <CardHeader>
-                <CardTitle className="text-party-dark">Your Video Memories</CardTitle>
-                <CardDescription>AI-generated after-movies from your events</CardDescription>
+                <CardTitle className="text-party-dark">
+                  Your Video Memories
+                </CardTitle>
+                <CardDescription>
+                  AI-generated after-movies from your events
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -255,14 +293,23 @@ export default function AIVideoMemory() {
                             </div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-party-dark">{memory.eventTitle}</h3>
+                            <h3 className="font-semibold text-party-dark">
+                              {memory.eventTitle}
+                            </h3>
                             <div className="flex items-center gap-2 mt-1">
-                              <Badge 
-                                variant={memory.status === 'ready' ? 'default' : 'secondary'}
+                              <Badge
+                                variant={
+                                  memory.status === "ready"
+                                    ? "default"
+                                    : "secondary"
+                                }
                                 className="text-xs"
                               >
-                                {memory.status === 'ready' ? 'Ready' : 
-                                 memory.status === 'generating' ? 'Generating...' : 'Error'}
+                                {memory.status === "ready"
+                                  ? "Ready"
+                                  : memory.status === "generating"
+                                  ? "Generating..."
+                                  : "Error"}
                               </Badge>
                               <span className="text-sm text-party-gray flex items-center">
                                 <Clock className="w-3 h-3 mr-1" />
@@ -272,10 +319,12 @@ export default function AIVideoMemory() {
                             <div className="flex gap-4 mt-2 text-xs text-party-gray">
                               <span>{memory.highlights.bestPhotos} photos</span>
                               <span>{memory.highlights.topSongs} songs</span>
-                              <span>Energy: {memory.highlights.energyScore}/10</span>
+                              <span>
+                                Energy: {memory.highlights.energyScore}/10
+                              </span>
                             </div>
                           </div>
-                          {memory.status === 'ready' && (
+                          {memory.status === "ready" && (
                             <div className="flex gap-2">
                               <Button size="sm" variant="outline">
                                 <Download className="w-4 h-4" />
@@ -293,7 +342,9 @@ export default function AIVideoMemory() {
                   <div className="text-center py-8 text-party-gray">
                     <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No video memories generated yet</p>
-                    <p className="text-sm mt-1">Select an event above to create your first AI after-movie</p>
+                    <p className="text-sm mt-1">
+                      Select an event above to create your first AI after-movie
+                    </p>
                   </div>
                 )}
               </CardContent>

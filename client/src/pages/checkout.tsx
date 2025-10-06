@@ -1,21 +1,27 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
   CardElement,
   useStripe,
-  useElements
+  useElements,
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, CreditCard, Shield, CheckCircle } from "lucide-react";
 import Navigation from "@/components/navigation";
 
 // Load Stripe with live keys
-const STRIPE_PUBLIC_KEY = 'pk_live_51QkIm6IG3GnT9n5tpNarRKMvaTv1NR9N9jodV2tjkQsW5O9G3qfCBWaaImKjQcnV4bbdI8B9NACqdRQYu93Jeh4O00TG13FGss';
+const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
 interface CheckoutFormProps {
@@ -48,8 +54,8 @@ function CheckoutForm({ amount, planName, onSuccess }: CheckoutFormProps) {
         },
         body: JSON.stringify({
           amount,
-          currency: "usd"
-        })
+          currency: "usd",
+        }),
       });
 
       if (!response.ok) {
@@ -75,7 +81,7 @@ function CheckoutForm({ amount, planName, onSuccess }: CheckoutFormProps) {
           billing_details: {
             name: "Vibes Customer",
           },
-        }
+        },
       });
 
       if (result.error) {
@@ -94,7 +100,8 @@ function CheckoutForm({ amount, planName, onSuccess }: CheckoutFormProps) {
     } catch (error: any) {
       toast({
         title: "Payment Error",
-        description: error.message || "An error occurred during payment processing.",
+        description:
+          error.message || "An error occurred during payment processing.",
         variant: "destructive",
       });
     } finally {
@@ -122,9 +129,9 @@ function CheckoutForm({ amount, planName, onSuccess }: CheckoutFormProps) {
       <div className="bg-gray-50 p-4 rounded-lg">
         <CardElement options={cardStyle} />
       </div>
-      
-      <Button 
-        type="submit" 
+
+      <Button
+        type="submit"
         disabled={!stripe || isProcessing}
         className="w-full"
         size="lg"
@@ -143,7 +150,7 @@ function CheckoutForm({ amount, planName, onSuccess }: CheckoutFormProps) {
 }
 
 export default function Checkout() {
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [planDetails, setPlanDetails] = useState<{
     name: string;
     price: number;
@@ -158,7 +165,7 @@ export default function Checkout() {
     const ticketType = urlParams.get("ticketType");
     const quantity = urlParams.get("quantity");
     const price = urlParams.get("price");
-    
+
     // Handle event booking
     if (eventId && ticketType && quantity && price) {
       setPlanDetails({
@@ -169,12 +176,12 @@ export default function Checkout() {
           "Digital ticket",
           "Email confirmation",
           "Customer support",
-          "Mobile ticket access"
-        ]
+          "Mobile ticket access",
+        ],
       });
       return;
     }
-    
+
     // Handle subscription plans
     switch (plan) {
       case "premium":
@@ -187,8 +194,8 @@ export default function Checkout() {
             "Advanced analytics",
             "Custom branding",
             "Priority support",
-            "Export capabilities"
-          ]
+            "Export capabilities",
+          ],
         });
         break;
       case "enterprise":
@@ -201,18 +208,18 @@ export default function Checkout() {
             "Advanced integrations",
             "Custom workflows",
             "Dedicated support",
-            "SLA guarantee"
-          ]
+            "SLA guarantee",
+          ],
         });
         break;
       default:
-        setLocation("/pricing");
+        navigate("/pricing");
         return;
     }
-  }, [setLocation]);
+  }, [navigate]);
 
   const handlePaymentSuccess = () => {
-    setLocation("/premium");
+    navigate("/premium");
   };
 
   if (!planDetails) {
@@ -222,23 +229,24 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
       <Navigation />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => setLocation("/pricing")}
+            onClick={() => navigate("/pricing")}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Pricing
           </Button>
-          
+
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Complete Your Purchase
           </h1>
           <p className="text-gray-600">
-            Upgrade to {planDetails.name} and unlock powerful features for your events.
+            Upgrade to {planDetails.name} and unlock powerful features for your
+            events.
           </p>
         </div>
 
@@ -256,7 +264,7 @@ export default function Checkout() {
                 <span className="font-medium">{planDetails.name} Plan</span>
                 <span className="font-bold">${planDetails.price}/month</span>
               </div>
-              
+
               <div className="border-t pt-4">
                 <h4 className="font-medium mb-3">What's included:</h4>
                 <ul className="space-y-2">
@@ -268,7 +276,7 @@ export default function Checkout() {
                   ))}
                 </ul>
               </div>
-              
+
               <div className="border-t pt-4 flex justify-between items-center text-lg font-bold">
                 <span>Total</span>
                 <span>${planDetails.price}/month</span>
@@ -295,11 +303,9 @@ export default function Checkout() {
                   onSuccess={handlePaymentSuccess}
                 />
               </Elements>
-              
+
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500 mb-2">
-                  Secured by Stripe
-                </p>
+                <p className="text-sm text-gray-500 mb-2">Secured by Stripe</p>
                 <div className="flex justify-center items-center space-x-4 text-xs text-gray-400">
                   <span>🔒 SSL Encrypted</span>
                   <span>•</span>

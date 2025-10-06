@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,7 +133,7 @@ export default function CreateEvent() {
 
       // Navigate to Interactive Live Vibes Invite system
       setTimeout(() => {
-        setLocation("/interactive-live-vibes-invite");
+        navigate("/interactive-live-vibes-invite");
       }, 2000);
     },
     onError: (error: Error) => {

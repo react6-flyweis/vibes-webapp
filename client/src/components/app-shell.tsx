@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SearchActions from "./SearchActions";
@@ -20,7 +20,9 @@ interface AppShellProps {
 // navigationItems and quickActions are now imported from app-shell-data
 
 export function AppShell({ children }: AppShellProps) {
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
+  const locationObj = useLocation();
+  const location = locationObj.pathname;
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -50,19 +52,19 @@ export function AppShell({ children }: AppShellProps) {
             break;
           case "n":
             e.preventDefault();
-            setLocation("/create-event");
+            navigate("/create-event");
             break;
           case "d":
             e.preventDefault();
-            setLocation("/vibescard-studio");
+            navigate("/vibescard-studio");
             break;
           case "v":
             e.preventDefault();
-            setLocation("/natural-venue-showcase");
+            navigate("/natural-venue-showcase");
             break;
           case "a":
             e.preventDefault();
-            setLocation("/vibebot-assistant");
+            navigate("/vibebot-assistant");
             break;
         }
       }
@@ -84,7 +86,7 @@ export function AppShell({ children }: AppShellProps) {
             <div className="flex gap-5">
               <div className="flex items-center space-x-4">
                 <Link
-                  href="/"
+                  to="/"
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                 >
                   <div className="w-8 h-8 bg-linear-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
@@ -139,7 +141,7 @@ export function AppShell({ children }: AppShellProps) {
               <DropdownMenuSeparator />
               {quickActions.map((action) => (
                 <DropdownMenuItem key={action.name} asChild>
-                  <Link href={action.href}>
+                  <Link to={action.href}>
                     <action.icon className="mr-2 h-4 w-4" />
                     <span>{action.name}</span>
                     <Badge variant="outline" className="ml-auto text-xs">

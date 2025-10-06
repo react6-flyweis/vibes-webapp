@@ -1,14 +1,26 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { 
-  Search, 
+import { useNavigate } from "react-router";
+import {
+  Search,
   Filter,
   MapPin,
   Calendar,
@@ -27,7 +39,7 @@ import {
   Camera,
   Book,
   Coffee,
-  ShoppingBag
+  ShoppingBag,
 } from "lucide-react";
 
 interface Event {
@@ -62,17 +74,17 @@ const categoryIcons = {
   education: Book,
   food: Coffee,
   shopping: ShoppingBag,
-  default: Calendar
+  default: Calendar,
 };
 
 const regions = [
   "All Regions",
   "North America",
-  "Europe", 
+  "Europe",
   "Asia",
   "South America",
   "Africa",
-  "Oceania"
+  "Oceania",
 ];
 
 const categories = [
@@ -85,7 +97,7 @@ const categories = [
   "Photography",
   "Education",
   "Food & Drink",
-  "Shopping"
+  "Shopping",
 ];
 
 const priceRanges = [
@@ -95,11 +107,11 @@ const priceRanges = [
   "$25 - $50",
   "$50 - $100",
   "$100 - $200",
-  "Over $200"
+  "Over $200",
 ];
 
 export default function FindAndBookEvents() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
@@ -109,21 +121,26 @@ export default function FindAndBookEvents() {
 
   // Fetch events
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ["/api/events/discover", { 
-      category: selectedCategory,
-      location: selectedRegion,
-      priceRange: selectedPriceRange,
-      sortBy,
-      search: searchQuery
-    }]
+    queryKey: [
+      "/api/events/discover",
+      {
+        category: selectedCategory,
+        location: selectedRegion,
+        priceRange: selectedPriceRange,
+        sortBy,
+        search: searchQuery,
+      },
+    ],
   });
 
   const handleBookEvent = (eventId: string) => {
-    setLocation(`/events/booking/${eventId}`);
+    navigate(`/events/booking/${eventId}`);
   };
 
   const getCategoryIcon = (category: string) => {
-    const IconComponent = categoryIcons[category.toLowerCase() as keyof typeof categoryIcons] || categoryIcons.default;
+    const IconComponent =
+      categoryIcons[category.toLowerCase() as keyof typeof categoryIcons] ||
+      categoryIcons.default;
     return IconComponent;
   };
 
@@ -134,13 +151,17 @@ export default function FindAndBookEvents() {
   };
 
   const filteredEvents = events.filter((event: Event) => {
-    const matchesSearch = !searchQuery || 
+    const matchesSearch =
+      !searchQuery ||
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.venue.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      event.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      );
 
-    const matchesCategory = selectedCategory === "All Categories" || 
+    const matchesCategory =
+      selectedCategory === "All Categories" ||
       event.category.toLowerCase() === selectedCategory.toLowerCase();
 
     return matchesSearch && matchesCategory;
@@ -184,7 +205,10 @@ export default function FindAndBookEvents() {
               <div className="grid md:grid-cols-4 gap-4">
                 <div>
                   <Label className="text-blue-100 mb-2 block">Category</Label>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                  >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -200,7 +224,10 @@ export default function FindAndBookEvents() {
 
                 <div>
                   <Label className="text-blue-100 mb-2 block">Region</Label>
-                  <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                  <Select
+                    value={selectedRegion}
+                    onValueChange={setSelectedRegion}
+                  >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -215,8 +242,13 @@ export default function FindAndBookEvents() {
                 </div>
 
                 <div>
-                  <Label className="text-blue-100 mb-2 block">Price Range</Label>
-                  <Select value={selectedPriceRange} onValueChange={setSelectedPriceRange}>
+                  <Label className="text-blue-100 mb-2 block">
+                    Price Range
+                  </Label>
+                  <Select
+                    value={selectedPriceRange}
+                    onValueChange={setSelectedPriceRange}
+                  >
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -276,22 +308,35 @@ export default function FindAndBookEvents() {
                 .filter((event: Event) => event.featured)
                 .slice(0, 2)
                 .map((event: Event) => (
-                  <Card key={event.id} className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden">
+                  <Card
+                    key={event.id}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden"
+                  >
                     <div className="relative">
-                      <img 
-                        src={event.image} 
+                      <img
+                        src={event.image}
                         alt={event.title}
                         className="w-full h-48 object-cover"
                       />
                       <div className="absolute inset-0 bg-black/40" />
                       <div className="absolute top-4 left-4">
-                        <Badge className="bg-yellow-500 text-black">Featured</Badge>
+                        <Badge className="bg-yellow-500 text-black">
+                          Featured
+                        </Badge>
                       </div>
                       <div className="absolute top-4 right-4 flex gap-2">
-                        <Button size="sm" variant="ghost" className="bg-black/20 hover:bg-black/40">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="bg-black/20 hover:bg-black/40"
+                        >
                           <Heart className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="ghost" className="bg-black/20 hover:bg-black/40">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="bg-black/20 hover:bg-black/40"
+                        >
                           <Share2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -304,7 +349,9 @@ export default function FindAndBookEvents() {
                       <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-blue-400" />
-                          <span>{new Date(event.date).toLocaleDateString()}</span>
+                          <span>
+                            {new Date(event.date).toLocaleDateString()}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-blue-400" />
@@ -316,10 +363,12 @@ export default function FindAndBookEvents() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-blue-400" />
-                          <span>{event.attendees}/{event.maxCapacity}</span>
+                          <span>
+                            {event.attendees}/{event.maxCapacity}
+                          </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <div>
                           <div className="flex items-center gap-1 mb-1">
@@ -330,7 +379,7 @@ export default function FindAndBookEvents() {
                             {getPriceDisplay(event.price)}
                           </div>
                         </div>
-                        <Button 
+                        <Button
                           onClick={() => handleBookEvent(event.id)}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
@@ -351,12 +400,15 @@ export default function FindAndBookEvents() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event: Event) => {
               const CategoryIcon = getCategoryIcon(event.category);
-              
+
               return (
-                <Card key={event.id} className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/15 transition-all">
+                <Card
+                  key={event.id}
+                  className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/15 transition-all"
+                >
                   <div className="relative">
-                    <img 
-                      src={event.image} 
+                    <img
+                      src={event.image}
                       alt={event.title}
                       className="w-full h-40 object-cover"
                     />
@@ -369,7 +421,9 @@ export default function FindAndBookEvents() {
                         </Badge>
                       )}
                       {event.soldOut && (
-                        <Badge className="bg-gray-500 text-white">Sold Out</Badge>
+                        <Badge className="bg-gray-500 text-white">
+                          Sold Out
+                        </Badge>
                       )}
                     </div>
                     <div className="absolute top-3 right-3">
@@ -379,11 +433,13 @@ export default function FindAndBookEvents() {
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <CardContent className="p-4">
                     <h3 className="font-bold text-white mb-1">{event.title}</h3>
-                    <p className="text-blue-100 text-sm mb-3 line-clamp-2">{event.description}</p>
-                    
+                    <p className="text-blue-100 text-sm mb-3 line-clamp-2">
+                      {event.description}
+                    </p>
+
                     <div className="space-y-2 text-xs mb-4">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3 text-blue-400" />
@@ -393,22 +449,30 @@ export default function FindAndBookEvents() {
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3 w-3 text-blue-400" />
-                        <span className="line-clamp-1">{event.venue}, {event.city}</span>
+                        <span className="line-clamp-1">
+                          {event.venue}, {event.city}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Users className="h-3 w-3 text-blue-400" />
-                        <span>{event.attendees}/{event.maxCapacity} attending</span>
+                        <span>
+                          {event.attendees}/{event.maxCapacity} attending
+                        </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 mb-4">
                       {event.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {tag}
                         </Badge>
                       ))}
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="flex items-center gap-1 mb-1">
@@ -419,7 +483,7 @@ export default function FindAndBookEvents() {
                           {getPriceDisplay(event.price)}
                         </div>
                       </div>
-                      <Button 
+                      <Button
                         onClick={() => handleBookEvent(event.id)}
                         disabled={event.soldOut}
                         size="sm"
@@ -440,11 +504,13 @@ export default function FindAndBookEvents() {
         {filteredEvents.length === 0 && (
           <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-center p-8">
             <Search className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Events Found</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No Events Found
+            </h3>
             <p className="text-blue-100 mb-4">
               Try adjusting your search criteria or explore different categories
             </p>
-            <Button 
+            <Button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedCategory("All Categories");

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { quickActions } from "./app-shell-data";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 
 interface CommandPaletteProps {
   open: boolean;
@@ -20,7 +20,7 @@ export default function CommandPalette({
   open,
   onOpenChange,
 }: CommandPaletteProps) {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -33,7 +33,7 @@ export default function CommandPalette({
               <CommandItem
                 key={action.href}
                 onSelect={() => {
-                  setLocation(action.href);
+                  navigate(action.href);
                   onOpenChange(false);
                 }}
               >

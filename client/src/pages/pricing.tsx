@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router";
 import Navigation from "@/components/navigation";
 import {
   Card,
@@ -17,13 +17,13 @@ import { apiRequest } from "@/lib/queryClient";
 
 const PricingPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [location, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const handleSubscribe = (tier: string) => {
     if (tier === "free") return;
-    setLocation(`/checkout?plan=${tier}`);
+    navigate(`/checkout?plan=${tier}`);
   };
 
   const plans = [

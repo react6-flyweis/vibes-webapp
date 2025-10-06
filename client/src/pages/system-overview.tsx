@@ -35,7 +35,7 @@ import {
   Grid3X3,
   List,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 
 export default function SystemOverview() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -745,7 +745,7 @@ export default function SystemOverview() {
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {categoryFeatures.map((feature) => (
-                          <Link key={feature.id} href={feature.path}>
+                          <Link key={feature.id} to={feature.path}>
                             <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
                               <CardContent className="p-4">
                                 <div className="flex justify-between items-start mb-2">
@@ -792,7 +792,7 @@ export default function SystemOverview() {
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredFeatures.map((feature) => (
-                  <Link key={feature.id} href={feature.path}>
+                  <Link key={feature.id} to={feature.path}>
                     <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-blue-200">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
@@ -828,7 +828,7 @@ export default function SystemOverview() {
             ) : (
               <div className="space-y-2">
                 {filteredFeatures.map((feature) => (
-                  <Link key={feature.id} href={feature.path}>
+                  <Link key={feature.id} to={feature.path}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">

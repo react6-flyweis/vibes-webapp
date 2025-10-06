@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  Search, 
-  ShoppingBag, 
-  Sparkles, 
-  X, 
-  Camera, 
+import {
+  Plus,
+  Search,
+  ShoppingBag,
+  Sparkles,
+  X,
+  Camera,
   Music,
   Calendar,
   Users,
   Palette,
-  Zap
+  Zap,
 } from "lucide-react";
 
 interface QuickAction {
@@ -36,7 +36,7 @@ export default function FloatingActionButton() {
       icon: Plus,
       path: "/create-event",
       color: "bg-purple-500 hover:bg-purple-600",
-      description: "Plan your perfect party"
+      description: "Plan your perfect party",
     },
     {
       id: "find-events",
@@ -44,7 +44,7 @@ export default function FloatingActionButton() {
       icon: Search,
       path: "/find-events",
       color: "bg-blue-500 hover:bg-blue-600",
-      description: "Discover amazing parties"
+      description: "Discover amazing parties",
     },
     {
       id: "ai-designer",
@@ -52,7 +52,7 @@ export default function FloatingActionButton() {
       icon: Sparkles,
       path: "/ai-party-designer",
       color: "bg-emerald-500 hover:bg-emerald-600",
-      description: "AI-powered event planning"
+      description: "AI-powered event planning",
     },
     {
       id: "vibe-mall",
@@ -60,7 +60,7 @@ export default function FloatingActionButton() {
       icon: ShoppingBag,
       path: "/vibe-mall",
       color: "bg-orange-500 hover:bg-orange-600",
-      description: "Shop party essentials"
+      description: "Shop party essentials",
     },
     {
       id: "ar-camera",
@@ -68,7 +68,7 @@ export default function FloatingActionButton() {
       icon: Camera,
       path: "/immersive-party-cam",
       color: "bg-pink-500 hover:bg-pink-600",
-      description: "360° party recording"
+      description: "360° party recording",
     },
     {
       id: "music-voting",
@@ -76,8 +76,8 @@ export default function FloatingActionButton() {
       icon: Music,
       path: "/live-music-voting",
       color: "bg-green-500 hover:bg-green-600",
-      description: "Control the playlist"
-    }
+      description: "Control the playlist",
+    },
   ];
 
   const toggleMenu = () => {
@@ -96,19 +96,25 @@ export default function FloatingActionButton() {
               style={{
                 transform: `translateY(${isOpen ? 0 : 20}px)`,
                 opacity: isOpen ? 1 : 0,
-                transitionDelay: `${index * 50}ms`
+                transitionDelay: `${index * 50}ms`,
               }}
             >
-              <Link href={action.path}>
+              <Link to={action.path}>
                 <Card className="group hover:shadow-lg transition-all duration-200 cursor-pointer border-0 bg-white dark:bg-slate-800 w-56">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <div
+                        className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
+                      >
                         <action.icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-slate-900 dark:text-white text-sm">{action.label}</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{action.description}</p>
+                        <h4 className="font-medium text-slate-900 dark:text-white text-sm">
+                          {action.label}
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {action.description}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -124,19 +130,19 @@ export default function FloatingActionButton() {
                 <Zap className="w-8 h-8 mx-auto mb-2" />
                 <h4 className="font-medium text-sm mb-1">Explore More</h4>
                 <div className="grid grid-cols-3 gap-2 mt-3">
-                  <Link href="/global-vibe-passport">
+                  <Link to="/global-vibe-passport">
                     <div className="text-center group cursor-pointer">
                       <Users className="w-5 h-5 mx-auto mb-1 group-hover:scale-110 transition-transform" />
                       <p className="text-xs">Passport</p>
                     </div>
                   </Link>
-                  <Link href="/vibes-card-studio">
+                  <Link to="/vibes-card-studio">
                     <div className="text-center group cursor-pointer">
                       <Palette className="w-5 h-5 mx-auto mb-1 group-hover:scale-110 transition-transform" />
                       <p className="text-xs">Design</p>
                     </div>
                   </Link>
-                  <Link href="/system-overview">
+                  <Link to="/system-overview">
                     <div className="text-center group cursor-pointer">
                       <Calendar className="w-5 h-5 mx-auto mb-1 group-hover:scale-110 transition-transform" />
                       <p className="text-xs">System</p>
@@ -153,9 +159,9 @@ export default function FloatingActionButton() {
       <Button
         onClick={toggleMenu}
         className={`w-14 h-14 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 ${
-          isOpen 
-            ? 'bg-red-500 hover:bg-red-600 rotate-45' 
-            : 'bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+          isOpen
+            ? "bg-red-500 hover:bg-red-600 rotate-45"
+            : "bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
         }`}
         size="lg"
       >

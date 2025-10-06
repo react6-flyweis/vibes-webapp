@@ -1,8 +1,30 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Users, Calendar, ArrowRight, Zap, Heart, Trophy, Star, Store, Crown, Building2, PartyPopper, Music, Video, Leaf } from "lucide-react";
-import { Link } from "wouter";
+import {
+  Sparkles,
+  Users,
+  Calendar,
+  ArrowRight,
+  Zap,
+  Heart,
+  Trophy,
+  Star,
+  Store,
+  Crown,
+  Building2,
+  PartyPopper,
+  Music,
+  Video,
+  Leaf,
+} from "lucide-react";
+import { Link } from "react-router";
 
 export default function NewHomePage() {
   return (
@@ -18,17 +40,26 @@ export default function NewHomePage() {
               </span>
             </h1>
             <p className="mt-6 max-w-3xl mx-auto text-xl text-gray-500 dark:text-gray-300">
-              Create unforgettable experiences with our intelligent collaborative platform. From intimate gatherings to grand celebrations, we make event planning effortless and fun.
+              Create unforgettable experiences with our intelligent
+              collaborative platform. From intimate gatherings to grand
+              celebrations, we make event planning effortless and fun.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/events/1">
-                <Button size="lg" className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
+              <Link to="/events/1">
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
+                >
                   <Calendar className="mr-2 h-5 w-5" />
                   Start Planning
                 </Button>
               </Link>
-              <Link href="/ai-theme-generator">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 px-8 py-3">
+              <Link to="/ai-theme-generator">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 px-8 py-3"
+                >
                   <Sparkles className="mr-2 h-5 w-5" />
                   Try AI Themes
                 </Button>
@@ -46,7 +77,8 @@ export default function NewHomePage() {
               Everything you need in one place
             </h2>
             <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
-              Powerful tools designed to make event planning simple and enjoyable
+              Powerful tools designed to make event planning simple and
+              enjoyable
             </p>
           </div>
 
@@ -66,9 +98,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Complete event blueprints with menu plans, vendor matches, decoration schemes, and timeline management.
+                  Complete event blueprints with menu plans, vendor matches,
+                  decoration schemes, and timeline management.
                 </CardDescription>
-                <Link href="/ai-party-designer">
+                <Link to="/ai-party-designer">
                   <Button className="w-full group-hover:bg-blue-600">
                     Design Party
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -92,9 +125,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Real-time club discovery, digital check-in, live social feeds, and DJ interactions for the ultimate nightlife.
+                  Real-time club discovery, digital check-in, live social feeds,
+                  and DJ interactions for the ultimate nightlife.
                 </CardDescription>
-                <Link href="/nightclub-experience">
+                <Link to="/nightclub-experience">
                   <Button className="w-full group-hover:bg-purple-600">
                     Explore Nightlife
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -118,9 +152,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Real-time song suggestions and voting system that lets guests shape the music with DJ integration.
+                  Real-time song suggestions and voting system that lets guests
+                  shape the music with DJ integration.
                 </CardDescription>
-                <Link href="/live-music-voting">
+                <Link to="/live-music-voting">
                   <Button className="w-full group-hover:bg-green-600">
                     Vote on Music
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -144,9 +179,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Virtual venue design with drag-and-drop furniture, guest flow analysis, and immersive AR previews.
+                  Virtual venue design with drag-and-drop furniture, guest flow
+                  analysis, and immersive AR previews.
                 </CardDescription>
-                <Link href="/ar-space-planner">
+                <Link to="/ar-space-planner">
                   <Button className="w-full group-hover:bg-indigo-600">
                     Plan Space
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -170,9 +206,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Real-time sentiment analysis from guest communications with smart recommendations and mood tracking.
+                  Real-time sentiment analysis from guest communications with
+                  smart recommendations and mood tracking.
                 </CardDescription>
-                <Link href="/ai-vibe-analyzer">
+                <Link to="/ai-vibe-analyzer">
                   <Button className="w-full group-hover:bg-pink-600">
                     Analyze Vibes
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -196,9 +233,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  AI-powered calendar integration that finds optimal times across all timezones with availability sync.
+                  AI-powered calendar integration that finds optimal times
+                  across all timezones with availability sync.
                 </CardDescription>
-                <Link href="/smart-scheduling">
+                <Link to="/smart-scheduling">
                   <Button className="w-full group-hover:bg-teal-600">
                     Schedule Smart
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -218,13 +256,16 @@ export default function NewHomePage() {
                     Eco-Friendly
                   </Badge>
                 </div>
-                <CardTitle className="text-xl">Sustainability Tracker</CardTitle>
+                <CardTitle className="text-xl">
+                  Sustainability Tracker
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Carbon footprint monitoring, eco-vendor matching, and green certification for sustainable events.
+                  Carbon footprint monitoring, eco-vendor matching, and green
+                  certification for sustainable events.
                 </CardDescription>
-                <Link href="/sustainability-tracker">
+                <Link to="/sustainability-tracker">
                   <Button className="w-full group-hover:bg-green-600">
                     Go Green
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -248,9 +289,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Badge system, leaderboards, challenges, and rewards that gamify event hosting for engagement.
+                  Badge system, leaderboards, challenges, and rewards that
+                  gamify event hosting for engagement.
                 </CardDescription>
-                <Link href="/host-achievements">
+                <Link to="/host-achievements">
                   <Button className="w-full group-hover:bg-yellow-600">
                     View Achievements
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -274,9 +316,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Interactive streaming with real-time chat, polls, donations, and hybrid event support for virtual guests.
+                  Interactive streaming with real-time chat, polls, donations,
+                  and hybrid event support for virtual guests.
                 </CardDescription>
-                <Link href="/livestream-companion">
+                <Link to="/livestream-companion">
                   <Button className="w-full group-hover:bg-red-600">
                     Start Streaming
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -294,14 +337,20 @@ export default function NewHomePage() {
                   </div>
                   <Badge variant="outline">Essential</Badge>
                 </div>
-                <CardTitle className="text-xl">Collaborative Planning</CardTitle>
+                <CardTitle className="text-xl">
+                  Collaborative Planning
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Plan together with friends and family. Manage menus, tasks, guest lists, and budgets in one workspace.
+                  Plan together with friends and family. Manage menus, tasks,
+                  guest lists, and budgets in one workspace.
                 </CardDescription>
-                <Link href="/events/1">
-                  <Button variant="outline" className="w-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900">
+                <Link to="/events/1">
+                  <Button
+                    variant="outline"
+                    className="w-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900"
+                  >
                     Start Planning
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -322,10 +371,14 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Discover trusted DJs, venues, caterers, and decorators. Compare services and book directly.
+                  Discover trusted DJs, venues, caterers, and decorators.
+                  Compare services and book directly.
                 </CardDescription>
-                <Link href="/vendors">
-                  <Button variant="outline" className="w-full group-hover:bg-orange-50 dark:group-hover:bg-orange-900">
+                <Link to="/vendors">
+                  <Button
+                    variant="outline"
+                    className="w-full group-hover:bg-orange-50 dark:group-hover:bg-orange-900"
+                  >
                     Browse Vendors
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -376,7 +429,7 @@ export default function NewHomePage() {
               Join our marketplace and grow your business
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="group hover:shadow-xl transition-all duration-300">
               <CardHeader>
@@ -389,9 +442,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  List your services in our trusted marketplace. Connect with clients and grow your event business.
+                  List your services in our trusted marketplace. Connect with
+                  clients and grow your event business.
                 </CardDescription>
-                <Link href="/vendor-onboarding">
+                <Link to="/vendor-onboarding">
                   <Button className="w-full">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -411,9 +465,10 @@ export default function NewHomePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base">
-                  Boost your visibility with targeted ads. Reach more clients and showcase your services effectively.
+                  Boost your visibility with targeted ads. Reach more clients
+                  and showcase your services effectively.
                 </CardDescription>
-                <Link href="/business-promotion">
+                <Link to="/business-promotion">
                   <Button variant="outline" className="w-full">
                     Start Advertising
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -432,17 +487,25 @@ export default function NewHomePage() {
             Ready to create something amazing?
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
-            Join thousands of happy event planners who trust Vibes to bring their visions to life.
+            Join thousands of happy event planners who trust Vibes to bring
+            their visions to life.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/events/1">
-              <Button size="lg" className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
+            <Link to="/events/1">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
+              >
                 <Star className="mr-2 h-5 w-5" />
                 Start Free Today
               </Button>
             </Link>
-            <Link href="/vendors">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-3">
+            <Link to="/vendors">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto px-8 py-3"
+              >
                 <Store className="mr-2 h-5 w-5" />
                 Browse Vendors
               </Button>
