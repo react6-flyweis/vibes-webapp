@@ -32,7 +32,7 @@ export default function OtpVerificationDialog({
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    setValues(["", "", "", ""]);
+    setValues(["", "", "", "", "", ""]);
     setSecondsLeft(30);
   }, [open]);
 
@@ -110,7 +110,7 @@ export default function OtpVerificationDialog({
               value={v}
               onChange={(e) => handleChange(e.target.value.trim(), i)}
               onKeyDown={(e) => handleKeyDown(e, i)}
-              className="w-20 h-20 text-center text-2xl rounded-xl border-gray-200"
+              className="size-12 text-center text-2xl rounded-xl border-gray-200"
               inputMode="numeric"
               autoFocus={i === 0}
               maxLength={1}
