@@ -167,8 +167,6 @@ const LiveReactionWalls = lazy(() => import("@/pages/live-reaction-walls"));
 const PaymentTest = lazy(() => import("@/pages/payment-test"));
 const GetStarted = lazy(() => import("./pages/auth/get-started"));
 
-const DebugComponent = () => <div>Debug Component</div>;
-
 function DashboardRouter() {
   return (
     <Layout>

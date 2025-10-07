@@ -1,9 +1,8 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import { useAuthStore } from "../store/auth-store";
+import { useAuthStore } from "@/store/auth-store";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || "";
-console.log("API Base URL:", baseURL);
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL,
