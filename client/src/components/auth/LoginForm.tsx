@@ -54,14 +54,7 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      // ensure the store knows whether to persist to localStorage (remember) or sessionStorage
-      try {
-        useAuthStore.getState().setRemember(!!data.rememberMe);
-      } catch (e) {
-        // ignore storage errors
-      }
       const res = await loginMutation.mutateAsync(data);
-
       // Backend returns OTP sent response with nextStep verify-otp
       if (
         res &&
@@ -101,7 +94,12 @@ export function LoginForm() {
 
   const handleVerify = async (code: string) => {
     try {
-      await verifyMutation.mutateAsync({ email: otpEmail, otp: code });
+      const remember = form.getValues("rememberMe") || false;
+      await verifyMutation.mutateAsync({
+        email: otpEmail,
+        otp: code,
+        remember,
+      });
       toast({ title: "Logged in", description: "Verification successful." });
       setShowOtp(false);
       navigate("/");

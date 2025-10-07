@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, axiosInstance } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/auth-store";
 
 type LoginData = {
@@ -31,67 +31,40 @@ export type VerifyResponse = {
   timestamp: string;
 };
 
-export function useLoginMutation(
-  options?: UseMutationOptions<LoginResponse, unknown, LoginData>
-) {
-  return useMutation<LoginResponse, unknown, LoginData>({
-    mutationFn: async (data: LoginData) => {
-      return await apiRequest<LoginResponse>("/api/users/login", "POST", data);
-    },
-    ...options,
+export function useLoginMutation() {
+  return useMutation({
+    mutationFn: (data: LoginData) =>
+      axiosInstance.post<LoginResponse>("/api/users/login", data),
   });
 }
 
-export function useVerifyOtpMutation(
-  options?: UseMutationOptions<
-    VerifyResponse,
-    unknown,
-    { email?: string | undefined; otp: string }
-  >
-) {
-  // preserve any user-provided onSuccess to call after our handler
-  const userOnSuccess = options?.onSuccess as any;
+export function useVerifyOtpMutation() {
+  return useMutation({
+    mutationFn: async (data: {
+      email?: string | undefined;
+      otp: string;
+      remember?: boolean;
+    }) => axiosInstance.post<VerifyResponse>("/api/users/verify-otp", data),
 
-  return useMutation<
-    VerifyResponse,
-    unknown,
-    { email?: string | undefined; otp: string }
-  >({
-    mutationFn: async (data) => {
-      return await apiRequest<VerifyResponse>(
-        "/api/users/verify-otp",
-        "POST",
-        data
-      );
-    },
     onSuccess: (res: any, variables: any, context: any) => {
       try {
-        console.log(res);
         const auth = useAuthStore.getState();
         const token = res?.data?.accessToken;
         const user = res?.data?.user;
-        if (token) {
-          auth.setToken(token);
-        }
-        if (user) {
-          auth.setUser(user);
-        }
+        console.log("Storing token and user in auth store via login", {
+          token,
+          user,
+          remember: variables?.remember,
+        });
+        // call the store's login helper honoring remember flag passed from caller
+        auth.login &&
+          auth.login(user || null, token || null, !!variables?.remember);
         // Mark store as hydrated so consumers relying on isHydrated can proceed
         auth.setIsHydrated && auth.setIsHydrated(true);
       } catch (e) {
         // swallow any errors setting store
       }
-
-      // call user-provided onSuccess if present
-      if (typeof userOnSuccess === "function") {
-        try {
-          userOnSuccess(res, variables, context);
-        } catch (e) {
-          // ignore
-        }
-      }
     },
-    ...options,
   });
 }
 
