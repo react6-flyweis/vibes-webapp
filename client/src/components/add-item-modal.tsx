@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,11 +41,16 @@ type AddItemForm = z.infer<typeof addItemSchema>;
 interface AddItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  eventId: number;
+  eventId: string | number;
   defaultCategory?: string;
 }
 
-export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory = "drinks" }: AddItemModalProps) {
+export default function AddItemModal({
+  isOpen,
+  onClose,
+  eventId,
+  defaultCategory = "drinks",
+}: AddItemModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -62,16 +66,24 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
 
   const addItemMutation = useMutation({
     mutationFn: async (data: AddItemForm) => {
-      const response = await apiRequest("POST", `/api/events/${eventId}/menu-items`, {
-        ...data,
-        contributorId: 2, // Using user 2 as current user for demo
-        imageUrl: data.imageUrl || undefined,
-      });
+      const response = await apiRequest(
+        "POST",
+        `/api/events/${eventId}/menu-items`,
+        {
+          ...data,
+          contributorId: 2, // Using user 2 as current user for demo
+          imageUrl: data.imageUrl || undefined,
+        }
+      );
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/menu-items`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/events/${eventId}/stats`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/events/${eventId}/menu-items`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/events/${eventId}/stats`],
+      });
       toast({
         title: "Success",
         description: "Menu item added successfully!",
@@ -98,7 +110,7 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
         <DialogHeader>
           <DialogTitle className="party-dark">Add New Item</DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -122,10 +134,10 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
                 <FormItem>
                   <FormLabel className="party-dark">Description</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Brief description..." 
+                    <Textarea
+                      placeholder="Brief description..."
                       rows={3}
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -139,7 +151,10 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="party-dark">Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
@@ -148,7 +163,9 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
                     <SelectContent>
                       <SelectItem value="drinks">Drinks</SelectItem>
                       <SelectItem value="food">Food</SelectItem>
-                      <SelectItem value="entertainment">Entertainment</SelectItem>
+                      <SelectItem value="entertainment">
+                        Entertainment
+                      </SelectItem>
                       <SelectItem value="decorations">Decorations</SelectItem>
                     </SelectContent>
                   </Select>
@@ -162,9 +179,14 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="party-dark">Image URL (Optional)</FormLabel>
+                  <FormLabel className="party-dark">
+                    Image URL (Optional)
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
+                    <Input
+                      placeholder="https://example.com/image.jpg"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -172,16 +194,16 @@ export default function AddItemModal({ isOpen, onClose, eventId, defaultCategory
             />
 
             <div className="flex space-x-3 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={onClose}
                 className="flex-1"
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={addItemMutation.isPending}
                 className="flex-1 bg-party-coral hover:bg-red-500 text-white"
               >
