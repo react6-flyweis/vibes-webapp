@@ -1,12 +1,12 @@
 import { useParams } from "react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Send, Share2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useEventByIdQuery } from "@/queries/events";
 import HeroSection from "@/components/hero-section";
 import MenuBuilder from "@/components/menu-builder";
 import EventSidebar from "@/components/event-sidebar";
@@ -25,138 +25,21 @@ import SocialMediaSharing from "@/components/social-media-sharing";
 export default function EnhancedEventPage() {
   const { id: eventId } = useParams();
 
-  const [activeCategory, setActiveCategory] = useState("drinks");
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
-  const [isInviteCardOpen, setIsInviteCardOpen] = useState(false);
   const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const [newMessage, setNewMessage] = useState("");
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDescription, setNewTaskDescription] = useState("");
-  const [newBudgetItem, setNewBudgetItem] = useState("");
-  const [newBudgetCategory, setNewBudgetCategory] = useState("");
-  const [newBudgetCost, setNewBudgetCost] = useState("");
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: event = {} as any, isLoading: eventLoading } = useQuery<any>({
-    queryKey: [`/api/events/${eventId}`],
+  const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
+  console.log("Event data:", event);
+
+  // Fetch event plan map details from the master API
+  const { data: planMap, isLoading: planMapLoading } = useQuery<any>({
+    queryKey: [`/api/master/plan-event-map/event/${eventId}`],
+    queryFn: async () =>
+      apiRequest("GET", `/api/master/plan-event-map/event/${eventId}`),
+    enabled: !!eventId,
   });
 
-  const { data: stats, isLoading: statsLoading } = useQuery<any>({
-    queryKey: [`/api/events/${eventId}/stats`],
-  });
-
-  const { data: tasks = [] } = useQuery<any[]>({
-    queryKey: [`/api/events/${eventId}/tasks`],
-  });
-
-  const { data: budgetData = {} as any } = useQuery<any>({
-    queryKey: [`/api/events/${eventId}/budget`],
-  });
-
-  // Transform budget data into array format for the UI
-  const budget = budgetData.categories
-    ? Object.entries(budgetData.categories).map(
-        ([category, data]: [string, any]) => ({
-          id: category,
-          itemName: category.charAt(0).toUpperCase() + category.slice(1),
-          category: category,
-          estimatedCost: data.budgeted || 0,
-          actualCost: data.spent || 0,
-        })
-      )
-    : [];
-
-  const { data: budgetSummary = {} } = useQuery({
-    queryKey: [`/api/events/${eventId}/budget/summary`],
-  });
-
-  const { data: messages = [] } = useQuery<any[]>({
-    queryKey: [`/api/events/${eventId}/messages`],
-  });
-
-  const { data: photos = [] } = useQuery<any[]>({
-    queryKey: [`/api/events/${eventId}/photos`],
-  });
-
-  // Mutations
-  const sendMessageMutation = useMutation({
-    mutationFn: async (messageData: { message: string; userId: number }) => {
-      return apiRequest("POST", `/api/events/${eventId}/messages`, messageData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/messages`],
-      });
-      setNewMessage("");
-      toast({ title: "Message sent!" });
-    },
-  });
-
-  const createTaskMutation = useMutation({
-    mutationFn: async (taskData: {
-      title: string;
-      description?: string;
-      createdById: number;
-    }) => {
-      return apiRequest("POST", `/api/events/${eventId}/tasks`, taskData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/tasks`],
-      });
-      setNewTaskTitle("");
-      setNewTaskDescription("");
-      toast({ title: "Task created!" });
-    },
-  });
-
-  const updateTaskMutation = useMutation({
-    mutationFn: async ({
-      taskId,
-      completed,
-    }: {
-      taskId: number;
-      completed: boolean;
-    }) => {
-      return apiRequest("PATCH", `/api/tasks/${taskId}`, { completed });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/tasks`],
-      });
-      toast({ title: "Task updated!" });
-    },
-  });
-
-  const createBudgetItemMutation = useMutation({
-    mutationFn: async (budgetData: {
-      itemName: string;
-      category: string;
-      estimatedCost: number;
-    }) => {
-      return apiRequest(
-        "POST",
-        `/api/events/${eventId}/budget-items`,
-        budgetData
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/budget`],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/budget/summary`],
-      });
-      setNewBudgetItem("");
-      setNewBudgetCategory("");
-      setNewBudgetCost("");
-      toast({ title: "Budget item added!" });
-    },
-  });
-
-  if (eventLoading || statsLoading) {
+  if (eventLoading || planMapLoading || !eventId || !event) {
     return (
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
         <Navigation />
@@ -170,12 +53,12 @@ export default function EnhancedEventPage() {
     );
   }
 
-  const formatCurrency = (cents: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(cents / 100);
-  };
+  // const formatCurrency = (cents: number) => {
+  //   return new Intl.NumberFormat("en-US", {
+  //     style: "currency",
+  //     currency: "USD",
+  //   }).format(cents / 100);
+  // };
 
   const getTimeUntilEvent = () => {
     if (!event.date) return null;
@@ -189,38 +72,7 @@ export default function EnhancedEventPage() {
     return "Event passed";
   };
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      sendMessageMutation.mutate({
-        message: newMessage,
-        userId: 1, // In a real app, this would be the current user's ID
-      });
-    }
-  };
-
-  const handleCreateTask = () => {
-    if (newTaskTitle.trim()) {
-      createTaskMutation.mutate({
-        title: newTaskTitle,
-        description: newTaskDescription,
-        createdById: 1, // In a real app, this would be the current user's ID
-      });
-    }
-  };
-
-  const handleCreateBudgetItem = () => {
-    if (newBudgetItem.trim() && newBudgetCategory && newBudgetCost) {
-      createBudgetItemMutation.mutate({
-        itemName: newBudgetItem,
-        category: newBudgetCategory,
-        estimatedCost: Math.round(parseFloat(newBudgetCost) * 100), // Convert to cents
-      });
-    }
-  };
-
-  const handleToggleTask = (taskId: number, completed: boolean) => {
-    updateTaskMutation.mutate({ taskId, completed: !completed });
-  };
+  // Chat UI and logic moved into ChatTab component
 
   return (
     <div className="min-h-screen bg-[#0C111F]">
@@ -228,8 +80,8 @@ export default function EnhancedEventPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Header
+          stats={""}
           event={event}
-          stats={stats}
           getTimeUntilEvent={getTimeUntilEvent}
         />
 
@@ -263,62 +115,29 @@ export default function EnhancedEventPage() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div className="lg:col-span-3">
-                <HeroSection event={event} stats={stats} />
-                <MenuBuilder
-                  eventId={eventId}
-                  activeCategory={activeCategory}
-                  onCategoryChange={setActiveCategory}
-                  onAddItem={() => setIsAddItemModalOpen(true)}
-                />
+                <HeroSection event={event} />
+                <MenuBuilder eventId={eventId} />
               </div>
               <div className="lg:col-span-1">
-                <EventSidebar event={event} eventId={eventId} stats={stats} />
+                <EventSidebar event={event} eventId={eventId} />
               </div>
             </div>
           </TabsContent>
 
           <TabsContent value="menu" className="space-y-6">
-            <MenuBuilder
-              eventId={eventId}
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-              onAddItem={() => setIsAddItemModalOpen(true)}
-            />
+            <MenuBuilder eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="tasks" className="space-y-6">
-            <TasksTab
-              tasks={tasks}
-              newTaskTitle={newTaskTitle}
-              setNewTaskTitle={setNewTaskTitle}
-              newTaskDescription={newTaskDescription}
-              setNewTaskDescription={setNewTaskDescription}
-              onCreateTask={handleCreateTask}
-              onToggleTask={handleToggleTask}
-            />
+            <TasksTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="chat" className="space-y-6">
-            <ChatTab
-              messages={messages}
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              onSendMessage={handleSendMessage}
-            />
+            <ChatTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="budget" className="space-y-6">
-            <BudgetTab
-              budget={budget}
-              budgetSummary={budgetSummary}
-              newBudgetItem={newBudgetItem}
-              setNewBudgetItem={setNewBudgetItem}
-              newBudgetCategory={newBudgetCategory}
-              setNewBudgetCategory={setNewBudgetCategory}
-              newBudgetCost={newBudgetCost}
-              setNewBudgetCost={setNewBudgetCost}
-              onCreateBudgetItem={handleCreateBudgetItem}
-            />
+            <BudgetTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="venue" className="space-y-6">
@@ -326,11 +145,11 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="photos" className="space-y-6">
-            <PhotosTab photos={photos} />
+            <PhotosTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="guests" className="space-y-6">
-            <GuestsTab eventId={eventId} stats={stats} />
+            <GuestsTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
@@ -348,7 +167,6 @@ export default function EnhancedEventPage() {
           <Share2 className="h-6 w-6" />
         </Button>
         <Button
-          onClick={() => setIsInviteCardOpen(true)}
           className="bg-party-coral hover:bg-red-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
           size="icon"
         >
@@ -356,12 +174,7 @@ export default function EnhancedEventPage() {
         </Button>
       </div>
 
-      <AddItemModal
-        isOpen={isAddItemModalOpen}
-        onClose={() => setIsAddItemModalOpen(false)}
-        eventId={eventId}
-        defaultCategory={activeCategory}
-      />
+      {/* AddItemModal is now managed inside MenuBuilder */}
 
       <SocialMediaSharing
         event={event}
