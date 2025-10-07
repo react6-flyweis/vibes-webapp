@@ -1,7 +1,7 @@
-import type { Event } from "@shared/schema";
+import { EventData } from "@/queries/events";
 
 interface HeroSectionProps {
-  event: Event;
+  event: EventData;
   stats?: {
     confirmedCount: number;
     totalItems: number;
@@ -33,7 +33,7 @@ export default function HeroSection({ event, stats }: HeroSectionProps) {
         {/* Event Title & Description */}
         <div className="text-center text-white mb-8 px-2 sm:px-4">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            {event.title}
+            {event.name_title}
           </h2>
           <p className="text-base sm:text-lg md:text-xl">{event.description}</p>
         </div>
