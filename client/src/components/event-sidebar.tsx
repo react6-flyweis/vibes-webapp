@@ -15,10 +15,11 @@ import {
 import GuestInviteModal from "@/components/guest-invite-modal";
 import BulkInviteModal from "@/components/bulk-invite-modal";
 import { useNavigate } from "react-router";
-import type { Event } from "@shared/schema";
+import { EventData } from "@/queries/events";
+import { formatDate } from "@/lib/formatDate";
 
 interface EventSidebarProps {
-  event: Event;
+  event: EventData;
   eventId: number;
   stats?: {
     confirmedCount: number;
@@ -36,7 +37,7 @@ export default function EventSidebar({
   const [isBulkInviteModalOpen, setIsBulkInviteModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { data: participants = [] } = useQuery({
+  const { data: participants } = useQuery({
     queryKey: [`/api/events/${eventId}/participants`],
   });
 
@@ -60,22 +61,21 @@ export default function EventSidebar({
           <div className="flex items-center space-x-3">
             <Calendar className="party-coral h-5 w-5" />
             <div>
-              <p className="text-sm font-medium">{event.date}</p>
+              <p className="text-sm font-medium">{formatDate(event.date)}</p>
               <p className="text-xs party-gray">{event.time}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <MapPin className="party-coral h-5 w-5" />
             <div>
-              <p className="text-sm font-medium">{event.location}</p>
-              <p className="text-xs party-gray">{event.address}</p>
+              <p className="text-xs party-gray">{event.street_address}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <Users className="party-coral h-5 w-5" />
             <div>
               <p className="text-sm font-medium">
-                {stats?.confirmedCount || 0} of {event.maxAttendees} people
+                {stats?.confirmedCount || 0} of {event.max_capacity} people
               </p>
               <p className="text-xs party-gray">RSVP'd</p>
             </div>
