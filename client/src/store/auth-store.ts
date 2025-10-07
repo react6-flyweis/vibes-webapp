@@ -2,16 +2,10 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { persist } from "zustand/middleware";
 
-type StorageType = "local" | "session";
+import { createJSONStorage } from "zustand/middleware";
 
 const STORAGE_KEY = "homvill_auth";
-const STORAGE_TYPE_KEY = "homvill_auth_persist_type"; // values: 'local' | 'session'
-
-interface MinimalStorage {
-  getItem(name: string): string | null;
-  setItem(name: string, value: string): void;
-  removeItem(name: string): void;
-}
+const REMEMBERED_KEY = "homvill_auth_remembered";
 
 interface AuthState {
   isHydrated: boolean;
@@ -19,7 +13,11 @@ interface AuthState {
   token: string | null;
   user: unknown | null;
   remember: boolean;
-  setRemember: (val?: boolean) => void;
+  login: (
+    user: unknown | null,
+    token: string | null,
+    remember?: boolean
+  ) => void;
   setToken: (token: string | null) => void;
   clearToken: () => void;
   setUser: (user: unknown | null) => void;
@@ -27,67 +25,6 @@ interface AuthState {
   logout: () => void;
   isAuthenticated: () => boolean;
 }
-
-function getStorageByType(type: StorageType): MinimalStorage {
-  try {
-    if (typeof window === "undefined") throw new Error("no window");
-    if (type === "local") return window.localStorage;
-    return window.sessionStorage;
-  } catch (err) {
-    // fallback to sessionStorage-like in-memory if storage isn't available
-    const store: Record<string, string> = {};
-    return {
-      getItem(name: string) {
-        return Object.prototype.hasOwnProperty.call(store, name)
-          ? store[name]
-          : null;
-      },
-      setItem(name: string, value: string) {
-        store[name] = value;
-      },
-      removeItem(name: string) {
-        delete store[name];
-      },
-    };
-  }
-}
-
-// custom storage wrapper that delegates to chosen storage at call time
-const customStorage: MinimalStorage = {
-  getItem: (name: string) => {
-    try {
-      const type =
-        (typeof window !== "undefined" &&
-          window.localStorage.getItem(STORAGE_TYPE_KEY)) ||
-        "session";
-      return getStorageByType(type as StorageType).getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (name: string, value: string) => {
-    try {
-      const type =
-        (typeof window !== "undefined" &&
-          window.localStorage.getItem(STORAGE_TYPE_KEY)) ||
-        "session";
-      return getStorageByType(type as StorageType).setItem(name, value);
-    } catch {
-      // noop
-    }
-  },
-  removeItem: (name: string) => {
-    try {
-      const type =
-        (typeof window !== "undefined" &&
-          window.localStorage.getItem(STORAGE_TYPE_KEY)) ||
-        "session";
-      return getStorageByType(type as StorageType).removeItem(name);
-    } catch {
-      // noop
-    }
-  },
-};
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -103,33 +40,6 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       // remember controls whether we persist to localStorage (true) or sessionStorage (false)
       remember: false,
-      setRemember(val = false) {
-        // when toggling remember, migrate existing persisted entry to the other storage type
-        try {
-          const currentType =
-            (typeof window !== "undefined" &&
-              window.localStorage.getItem(STORAGE_TYPE_KEY)) ||
-            "session";
-          const newType = val ? "local" : "session";
-          if (currentType !== newType) {
-            const from = getStorageByType(currentType as StorageType);
-            const to = getStorageByType(newType as StorageType);
-            const existing = from.getItem(STORAGE_KEY);
-            if (existing != null) {
-              to.setItem(STORAGE_KEY, existing);
-              from.removeItem(STORAGE_KEY);
-            }
-            if (typeof window !== "undefined") {
-              window.localStorage.setItem(STORAGE_TYPE_KEY, newType);
-            }
-          }
-        } catch (e) {
-          // ignore storage migration errors
-        }
-        set((state: AuthState) => {
-          state.remember = !!val;
-        });
-      },
       setToken(token: string | null) {
         set((state: AuthState) => {
           state.token = token;
@@ -145,6 +55,29 @@ export const useAuthStore = create<AuthState>()(
           state.user = user;
         });
       },
+      login(user: unknown | null, token: string | null, remember = false) {
+        try {
+          set((state: AuthState) => {
+            state.user = user;
+            state.token = token;
+            state.remember = !!remember;
+          });
+
+          // persist remembered session into localStorage if requested
+          if (remember && typeof window !== "undefined") {
+            try {
+              window.localStorage.setItem(
+                REMEMBERED_KEY,
+                JSON.stringify({ token, user, remember: true })
+              );
+            } catch (e) {
+              // ignore localStorage errors
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      },
       clearUser() {
         set((state: AuthState) => {
           state.user = null;
@@ -153,23 +86,9 @@ export const useAuthStore = create<AuthState>()(
       // fully clear auth state and persisted storage
       logout() {
         try {
-          // remove persisted entry from both storages to be safe
           if (typeof window !== "undefined") {
-            try {
-              window.localStorage.removeItem(STORAGE_KEY);
-            } catch (e) {
-              // ignore
-            }
-            try {
-              window.sessionStorage.removeItem(STORAGE_KEY);
-            } catch (e) {
-              // ignore
-            }
-            try {
-              window.localStorage.removeItem(STORAGE_TYPE_KEY);
-            } catch (e) {
-              // ignore
-            }
+            window.localStorage.removeItem(REMEMBERED_KEY);
+            window.sessionStorage.removeItem(STORAGE_KEY);
           }
         } catch (e) {
           // noop
@@ -187,15 +106,49 @@ export const useAuthStore = create<AuthState>()(
     })),
     {
       name: STORAGE_KEY,
-      // use our custom storage wrapper so we can delegate to session/local based on flag
-      // PersistOptions typing expects `storage` — cast to any to avoid type mismatch
-      storage: customStorage as unknown as any,
+      // persist into sessionStorage by default
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined" ? window.sessionStorage : ({} as Storage)
+      ),
+      // only persist full auth when remember === true; otherwise persist just the flag
+      partialize: (state: Partial<AuthState>) => {
+        if ((state as any).remember) {
+          const { isHydrated, setIsHydrated, ...rest } = state as any;
+          return rest;
+        }
+        return { remember: !!(state as any).remember } as Partial<AuthState>;
+      },
       onRehydrateStorage: () => (state, error) => {
-        // if there was an error during rehydration, still mark hydrated so app can proceed
+        // after rehydration mark hydrated
         state && state.setIsHydrated && state.setIsHydrated(true);
         if (error) {
-          // optionally log or handle the error here
-          // console.error('authStore rehydrate error', error);
+          // optionally log
+        }
+        try {
+          if (typeof window !== "undefined") {
+            const hasToken = (state && (state as any).token) || null;
+            if (!hasToken) {
+              const remembered = window.localStorage.getItem(REMEMBERED_KEY);
+              if (remembered) {
+                try {
+                  const parsed = JSON.parse(remembered);
+                  // restore token/user and remember flag
+                  // restore via login so the remember flag and any side-effects happen through the existing login action
+                  state &&
+                    state.login &&
+                    state.login(
+                      (parsed && parsed.user) || null,
+                      (parsed && parsed.token) || null,
+                      true
+                    );
+                } catch (e) {
+                  // ignore parse errors
+                }
+              }
+            }
+          }
+        } catch (e) {
+          // ignore
         }
       },
     }
