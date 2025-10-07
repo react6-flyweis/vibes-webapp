@@ -14,12 +14,33 @@ export type Drink = {
   updated_at?: string | null;
 };
 
+export type Food = {
+  _id?: string;
+  food_name: string;
+  food_price?: number;
+  food_color?: string;
+  food_type?: string;
+  brand_name?: string;
+  status?: boolean;
+  food_id?: number;
+};
+
 export function useDrinksQuery() {
   return useQuery({
     queryKey: ["/api/master/drinks/getAll"],
     queryFn: () =>
       axiosInstance
         .get<IResponseList<Drink>>("/api/master/drinks/getAll")
+        .then((res) => res.data),
+  });
+}
+
+export function useFoodQuery() {
+  return useQuery({
+    queryKey: ["/api/master/food/getAll"],
+    queryFn: () =>
+      axiosInstance
+        .get<IResponseList<Food>>("/api/master/food/getAll")
         .then((res) => res.data),
   });
 }
