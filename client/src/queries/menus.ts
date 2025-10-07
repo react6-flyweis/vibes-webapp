@@ -25,6 +25,16 @@ export type Food = {
   food_id?: number;
 };
 
+export type Entertainment = {
+  _id?: string;
+  entertainment_name: string;
+  entertainment_price?: number;
+  entertainment_type?: string;
+  brand_name?: string;
+  status?: boolean;
+  entertainment_id?: number;
+};
+
 export function useDrinksQuery() {
   return useQuery({
     queryKey: ["/api/master/drinks/getAll"],
@@ -41,6 +51,16 @@ export function useFoodQuery() {
     queryFn: () =>
       axiosInstance
         .get<IResponseList<Food>>("/api/master/food/getAll")
+        .then((res) => res.data),
+  });
+}
+
+export function useEntertainmentQuery() {
+  return useQuery({
+    queryKey: ["/api/master/entertainment/getAll"],
+    queryFn: () =>
+      axiosInstance
+        .get<IResponseList<Entertainment>>("/api/master/entertainment/getAll")
         .then((res) => res.data),
   });
 }
