@@ -35,6 +35,16 @@ export type Entertainment = {
   entertainment_id?: number;
 };
 
+export type Decorations = {
+  _id?: string;
+  decorations_name: string;
+  decorations_price?: number;
+  decorations_type?: string;
+  brand_name?: string;
+  status?: boolean;
+  decorations_id?: number;
+};
+
 export function useDrinksQuery() {
   return useQuery({
     queryKey: ["/api/master/drinks/getAll"],
@@ -61,6 +71,16 @@ export function useEntertainmentQuery() {
     queryFn: () =>
       axiosInstance
         .get<IResponseList<Entertainment>>("/api/master/entertainment/getAll")
+        .then((res) => res.data),
+  });
+}
+
+export function useDecorationsQuery() {
+  return useQuery({
+    queryKey: ["/api/master/decorations/getAll"],
+    queryFn: () =>
+      axiosInstance
+        .get<IResponseList<Decorations>>("/api/master/decorations/getAll")
         .then((res) => res.data),
   });
 }
