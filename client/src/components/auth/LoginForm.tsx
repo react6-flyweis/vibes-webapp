@@ -58,12 +58,10 @@ export function LoginForm() {
       // Backend returns OTP sent response with nextStep verify-otp
       if (
         res &&
-        res.data &&
-        (res.data.nextStep === "verify-otp" || res.data.otp)
+        res.data.data &&
+        (res.data.data.nextStep === "verify-otp" || res.data.data.otp)
       ) {
-        setOtpEmail(
-          (res.data && (res.data.email || form.getValues("email"))) || undefined
-        );
+        setOtpEmail((res.data && form.getValues("email")) || undefined);
         setShowOtp(true);
         toast({
           title: "Enter verification code",
