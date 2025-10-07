@@ -1,6 +1,6 @@
-import type { FC, ReactNode } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { Link } from 'wouter'; // 🔗 wouter import
+import type { FC, ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router";
 
 // Define the structure for each feature item within a card
 interface Feature {
@@ -21,7 +21,7 @@ interface FeatureCardProps {
   description: string;
   features: Feature[];
   buttonText: string;
-  buttonLink?: string; // 🔗 add optional link
+  buttonLink?: string;
   gradientClasses: string;
   borderClass: string;
   buttonClasses: string;
@@ -81,7 +81,7 @@ const FeatureCard: FC<FeatureCardProps> = ({
       {/* Action Button as Link */}
       {buttonLink ? (
         <Link
-          href={buttonLink}
+          to={buttonLink}
           className={`mt-auto flex w-full items-center justify-center rounded-lg py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 ${buttonClasses}`}
         >
           {buttonText}
