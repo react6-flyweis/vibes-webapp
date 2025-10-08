@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/lib/queryClient";
 import { IResponseList } from "@/types";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 // API response wrapper used by the server
 
@@ -24,20 +24,20 @@ export type EventTask = {
   event_tasks_id?: number;
 };
 
-export const tasksQueryKey = (eventId: string | number) =>
-  [`/api/events/${eventId}/tasks`] as const;
+export const tasksQueryKey = (eventId: string) =>
+  [`/api/master/event-tasks/event/${eventId}`] as const;
 
-async function fetchEventTasks(eventId: string | number) {
+async function fetchEventTasks(eventId: string) {
   const res = await axiosInstance.get<IResponseList<EventTask>>(
-    `/api/events/${eventId}/tasks`
+    `/api/master/event-tasks/event/${eventId}`
   );
   return res.data.data;
 }
 
-export function useEventTasks(eventId?: string | number) {
+export function useEventTasks(eventId: string) {
   return useQuery({
-    queryKey: tasksQueryKey(eventId ?? ""),
-    queryFn: async () => fetchEventTasks(eventId as string | number),
+    queryKey: tasksQueryKey(eventId),
+    queryFn: () => fetchEventTasks(eventId),
     enabled: !!eventId,
   });
 }
