@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import EventTypeSelector from "@/components/event-type-select";
 import { Input } from "@/components/ui/input";
 import ThemeSelector from "@/components/theme-selector";
+import DressCodeSelector from "@/components/dress-code-selector";
 
 // EventTypeSelector extracted to its own file
 
@@ -19,6 +20,13 @@ export default function SettingsTab({ event }: any) {
   const [selectedEventType, setSelectedEventType] = useState<
     string | undefined
   >();
+  const [selectedDressCode, setSelectedDressCode] = useState<
+    string | undefined
+  >(
+    event?.dressCodeId
+      ? String(event.dressCodeId)
+      : event?.dressCode ?? undefined
+  );
 
   return (
     <Card>
@@ -49,9 +57,9 @@ export default function SettingsTab({ event }: any) {
 
           <div>
             <label className="block text-sm font-medium mb-2">Dress Code</label>
-            <Input
-              placeholder="Enter dress code..."
-              defaultValue={event.dressCode}
+            <DressCodeSelector
+              value={selectedDressCode}
+              onChange={(v) => setSelectedDressCode(v)}
             />
           </div>
 
