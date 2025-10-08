@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,94 +21,93 @@ import {
   Mail,
   Search,
   Filter,
-  MoreHorizontal,
-  MessageSquare,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { useGuestsByEvent, Guest } from "@/queries/guests";
 import GuestInviteModal from "@/components/guest-invite-modal";
 
 interface GuestManagementPanelProps {
   eventId: string;
 }
 
-export default function GuestManagementPanel({
-  eventId,
-}: GuestManagementPanelProps) {
+export function GuestManagementPanel({ eventId }: GuestManagementPanelProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { data: guests = [], isLoading: participantsLoading } =
+    useGuestsByEvent(eventId);
 
-  const { data: participants = [], isLoading: participantsLoading } = useQuery({
-    queryKey: [`/api/events/${eventId}/participants`],
-  });
+  const invitations: any[] = [];
+  const invitationsLoading = false;
 
-  const { data: invitations = [], isLoading: invitationsLoading } = useQuery({
-    queryKey: [`/api/events/${eventId}/invitations`],
-  });
+  // const updateRSVP = useMutation({
+  //   mutationFn: async ({
+  //     participantId,
+  //     status,
+  //   }: {
+  //     participantId: number;
+  //     status: string;
+  //   }) => {
+  //     return await apiRequest(
+  //       `/api/events/${eventId}/participants/${participantId}/rsvp`,
+  //       "PATCH",
+  //       { status }
+  //     );
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({
+  //       queryKey: [`/api/events/${eventId}/participants`],
+  //     });
+  //     toast({
+  //       title: "RSVP Updated",
+  //       description: "Guest status has been updated successfully.",
+  //     });
+  //   },
+  //   onError: () => {
+  //     toast({
+  //       title: "Update Failed",
+  //       description: "Failed to update RSVP status.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  const updateRSVP = useMutation({
-    mutationFn: async ({
-      participantId,
-      status,
-    }: {
-      participantId: number;
-      status: string;
-    }) => {
-      return await apiRequest(
-        `/api/events/${eventId}/participants/${participantId}/rsvp`,
-        "PATCH",
-        { status }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/participants`],
-      });
-      toast({
-        title: "RSVP Updated",
-        description: "Guest status has been updated successfully.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Update Failed",
-        description: "Failed to update RSVP status.",
-        variant: "destructive",
-      });
-    },
-  });
+  // const sendReminder = useMutation({
+  //   mutationFn: async (email: string) => {
+  //     return await apiRequest(`/api/events/${eventId}/reminder`, "POST", {
+  //       email,
+  //     });
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Reminder Sent",
+  //       description: "RSVP reminder has been sent successfully.",
+  //     });
+  //   },
+  //   onError: () => {
+  //     toast({
+  //       title: "Reminder Failed",
+  //       description: "Failed to send reminder.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  const sendReminder = useMutation({
-    mutationFn: async (email: string) => {
-      return await apiRequest(`/api/events/${eventId}/reminder`, "POST", {
-        email,
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Reminder Sent",
-        description: "RSVP reminder has been sent successfully.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Reminder Failed",
-        description: "Failed to send reminder.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const filteredParticipants = Array.isArray(participants)
-    ? participants.filter((p: any) => {
+  const filteredParticipants: Guest[] = Array.isArray(guests)
+    ? guests.filter((p: any) => {
+        const name = (p.name || "").toLowerCase();
+        const email = (p.email || "").toLowerCase();
         const matchesSearch =
-          p.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+          name.includes(searchTerm.toLowerCase()) ||
+          email.includes(searchTerm.toLowerCase());
+        // guest.status in API is boolean; map filter values accordingly
         const matchesStatus =
-          statusFilter === "all" || p.status === statusFilter;
+          statusFilter === "all" ||
+          (statusFilter === "confirmed" && p.status === true) ||
+          (statusFilter === "declined" && p.status === false) ||
+          (statusFilter === "pending" && p.status === null);
         return matchesSearch && matchesStatus;
       })
     : [];
@@ -140,16 +139,16 @@ export default function GuestManagementPanel({
   };
 
   const rsvpStats = {
-    confirmed: Array.isArray(participants)
-      ? participants.filter((p: any) => p.status === "confirmed").length
+    confirmed: Array.isArray(guests)
+      ? guests.filter((p: any) => p.status === true).length
       : 0,
-    pending: Array.isArray(participants)
-      ? participants.filter((p: any) => p.status === "pending").length
+    pending: Array.isArray(guests)
+      ? guests.filter((p: any) => p.status === null).length
       : 0,
-    declined: Array.isArray(participants)
-      ? participants.filter((p: any) => p.status === "declined").length
+    declined: Array.isArray(guests)
+      ? guests.filter((p: any) => p.status === false).length
       : 0,
-    total: Array.isArray(participants) ? participants.length : 0,
+    total: Array.isArray(guests) ? guests.length : 0,
   };
 
   if (participantsLoading || invitationsLoading) {
@@ -275,70 +274,42 @@ export default function GuestManagementPanel({
               <div className="space-y-2">
                 {filteredParticipants.map((participant: any) => (
                   <div
-                    key={participant.id}
+                    key={participant._id || participant.guest_id}
                     className="flex items-center justify-between p-4 border rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
                       <img
                         src={
-                          participant.user?.avatar ||
+                          participant.img ||
+                          participant.image ||
                           "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32"
                         }
-                        alt={participant.user?.name || "Guest"}
+                        alt={participant.name || "Guest"}
                         className="w-10 h-10 rounded-full"
                       />
                       <div>
                         <p className="font-medium">
-                          {participant.user?.name || "Guest"}
+                          {participant.name || "Guest"}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {participant.user?.email || participant.email}
+                          {participant.email}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-3">
-                      <Badge className={getStatusColor(participant.status)}>
-                        {getStatusIcon(participant.status)}
+                      <Badge
+                        className={getStatusColor(String(participant.status))}
+                      >
+                        {getStatusIcon(String(participant.status))}
                         <span className="ml-1 capitalize">
-                          {participant.status}
+                          {participant.status === true
+                            ? "confirmed"
+                            : participant.status === false
+                            ? "declined"
+                            : "pending"}
                         </span>
                       </Badge>
-
-                      <Select
-                        value={participant.status}
-                        onValueChange={(status) =>
-                          updateRSVP.mutate({
-                            participantId: participant.id,
-                            status,
-                          })
-                        }
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="declined">Declined</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      {participant.status === "pending" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            sendReminder.mutate(
-                              participant.user?.email || participant.email
-                            )
-                          }
-                          disabled={sendReminder.isPending}
-                        >
-                          <MessageSquare className="h-4 w-4 mr-1" />
-                          Remind
-                        </Button>
-                      )}
                     </div>
                   </div>
                 ))}
