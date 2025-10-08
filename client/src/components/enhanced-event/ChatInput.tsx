@@ -2,8 +2,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Send } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "@/lib/queryClient";
+import { useSendEventMessage } from "@/mutations/sendEventMessage";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import {
@@ -16,12 +15,8 @@ import {
 
 export default function ChatInput({ eventId }: { eventId?: string }) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const sendMessageMutation = useMutation({
-    mutationFn: (payload) =>
-      axiosInstance.post(`/api/master/event-discussion-chat/create`, payload),
-  });
+  const sendMessageMutation = useSendEventMessage({ eventId });
 
   const form = useForm<{ message: string }>({ defaultValues: { message: "" } });
 
@@ -36,10 +31,6 @@ export default function ChatInput({ eventId }: { eventId?: string }) {
         status: true,
       } as any;
       await sendMessageMutation.mutateAsync(payload);
-
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/messages`],
-      });
 
       form.reset();
       toast({ title: "Message sent!" });
@@ -60,7 +51,7 @@ export default function ChatInput({ eventId }: { eventId?: string }) {
                 <Input
                   placeholder="Type your message..."
                   {...field}
-                  onKeyPress={(e: any) => {
+                  onKeyDown={(e: any) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
                       form.handleSubmit(onSubmit)();
