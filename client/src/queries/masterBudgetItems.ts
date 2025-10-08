@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
-import { IResponseList } from "@/types";
+import { IResponse, IResponseList } from "@/types";
 
 export type MasterBudgetItem = {
   item_id: number;
@@ -32,6 +32,24 @@ export function useMasterBudgetItems() {
     queryKey: ["/api/master/budget-items/all"],
     queryFn: () => fetchMasterBudgetItems(),
     select: (data) => data.data,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export const fetchMasterBudgetItemsById = async (id?: number | null) => {
+  if (!id && id !== 0) return null;
+  const res = await axiosInstance.get<IResponse<MasterBudgetTemplate>>(
+    `/api/master/budget-items/get/${id}`
+  );
+  return res.data;
+};
+
+export function useMasterBudgetItemsById(id?: number | null) {
+  return useQuery({
+    queryKey: [`/api/master/budget-items/get/${id}`],
+    queryFn: () => fetchMasterBudgetItemsById(id),
+    enabled: typeof id !== "undefined" && id !== null,
+    select: (data) => data?.data,
     staleTime: 1000 * 60 * 5,
   });
 }
