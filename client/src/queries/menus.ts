@@ -2,47 +2,47 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
 import { IResponseList } from "@/types";
 
-export type Drink = {
-  _id?: string;
+export type IDrink = {
+  _id: string;
   drinks_name: string;
-  drinks_price?: number;
-  drinks_color?: string;
-  brand_name?: string;
-  status?: boolean;
-  drinks_id?: number;
-  created_at?: string;
-  updated_at?: string | null;
+  drinks_price: number;
+  drinks_color: string;
+  brand_name: string;
+  status: boolean;
+  drinks_id: number;
+  created_at: string;
+  updated_at: string | null;
 };
 
-export type Food = {
-  _id?: string;
+export type IFood = {
+  _id: string;
   food_name: string;
-  food_price?: number;
-  food_color?: string;
-  food_type?: string;
-  brand_name?: string;
-  status?: boolean;
-  food_id?: number;
+  food_price: number;
+  food_color: string;
+  food_type: string;
+  brand_name: string;
+  status: boolean;
+  food_id: number;
 };
 
-export type Entertainment = {
-  _id?: string;
+export type IEntertainment = {
+  _id: string;
   entertainment_name: string;
-  entertainment_price?: number;
-  entertainment_type?: string;
-  brand_name?: string;
-  status?: boolean;
-  entertainment_id?: number;
+  entertainment_price: number;
+  entertainment_type: string;
+  brand_name: string;
+  status: boolean;
+  entertainment_id: number;
 };
 
-export type Decorations = {
-  _id?: string;
+export type IDecorations = {
+  _id: string;
   decorations_name: string;
-  decorations_price?: number;
-  decorations_type?: string;
-  brand_name?: string;
-  status?: boolean;
-  decorations_id?: number;
+  decorations_price: number;
+  decorations_type: string;
+  brand_name: string;
+  status: boolean;
+  decorations_id: number;
 };
 
 export function useDrinksQuery() {
@@ -50,7 +50,7 @@ export function useDrinksQuery() {
     queryKey: ["/api/master/drinks/getAll"],
     queryFn: () =>
       axiosInstance
-        .get<IResponseList<Drink>>("/api/master/drinks/getAll")
+        .get<IResponseList<IDrink>>("/api/master/drinks/getAll")
         .then((res) => res.data),
   });
 }
@@ -60,7 +60,7 @@ export function useFoodQuery() {
     queryKey: ["/api/master/food/getAll"],
     queryFn: () =>
       axiosInstance
-        .get<IResponseList<Food>>("/api/master/food/getAll")
+        .get<IResponseList<IFood>>("/api/master/food/getAll")
         .then((res) => res.data),
   });
 }
@@ -70,7 +70,7 @@ export function useEntertainmentQuery() {
     queryKey: ["/api/master/entertainment/getAll"],
     queryFn: () =>
       axiosInstance
-        .get<IResponseList<Entertainment>>("/api/master/entertainment/getAll")
+        .get<IResponseList<IEntertainment>>("/api/master/entertainment/getAll")
         .then((res) => res.data),
   });
 }
@@ -80,7 +80,7 @@ export function useDecorationsQuery() {
     queryKey: ["/api/master/decorations/getAll"],
     queryFn: () =>
       axiosInstance
-        .get<IResponseList<Decorations>>("/api/master/decorations/getAll")
+        .get<IResponseList<IDecorations>>("/api/master/decorations/getAll")
         .then((res) => res.data),
   });
 }
