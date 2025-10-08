@@ -1,16 +1,14 @@
 import { useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import { useState } from "react";
+import { usePlanEventMapsByEventQuery } from "@/queries/planEventMaps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Send, Share2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useEventByIdQuery } from "@/queries/events";
 import HeroSection from "@/components/hero-section";
 import MenuBuilder from "@/components/menu-builder";
 import EventSidebar from "@/components/event-sidebar";
-import AddItemModal from "@/components/add-item-modal";
 
 import Header from "@/components/enhanced-event/Header";
 import TasksTab from "@/components/enhanced-event/TasksTab";
@@ -29,17 +27,11 @@ export default function EnhancedEventPage() {
   const [activeTab, setActiveTab] = useState("overview");
 
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
-  console.log("Event data:", event);
 
-  // Fetch event plan map details from the master API
-  const { data: planMap, isLoading: planMapLoading } = useQuery<any>({
-    queryKey: [`/api/master/plan-event-map/event/${eventId}`],
-    queryFn: async () =>
-      apiRequest("GET", `/api/master/plan-event-map/event/${eventId}`),
-    enabled: !!eventId,
-  });
+  const { data: planMap, isLoading: planMapLoading } =
+    usePlanEventMapsByEventQuery(eventId);
 
-  if (eventLoading || planMapLoading || !eventId || !event) {
+  if (eventLoading || !eventId || !event || planMapLoading || !planMap) {
     return (
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
         <Navigation />
@@ -116,7 +108,7 @@ export default function EnhancedEventPage() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div className="lg:col-span-3">
                 <HeroSection event={event} />
-                <MenuBuilder eventId={eventId} />
+                <MenuBuilder planMap={planMap?.[0]} eventId={eventId} />
               </div>
               <div className="lg:col-span-1">
                 <EventSidebar event={event} eventId={eventId} />
@@ -125,7 +117,7 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="menu" className="space-y-6">
-            <MenuBuilder eventId={eventId} />
+            <MenuBuilder planMap={planMap?.[0]} eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="tasks" className="space-y-6">
@@ -137,11 +129,11 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="budget" className="space-y-6">
-            <BudgetTab eventId={eventId} />
+            <BudgetTab eventId={eventId} planMap={planMap?.[0]} />
           </TabsContent>
 
           <TabsContent value="venue" className="space-y-6">
-            <VenueTab />
+            <VenueTab eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="photos" className="space-y-6">
