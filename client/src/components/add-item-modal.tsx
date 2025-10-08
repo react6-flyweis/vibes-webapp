@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,14 +25,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { apiRequest } from "@/lib/queryClient";
+import useCreateMasterMenuItem from "@/mutations/createMasterMenuItem";
 import { useToast } from "@/hooks/use-toast";
 
 const addItemSchema = z.object({
   name: z.string().min(1, "Item name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
+  description: z.string().optional().or(z.literal("")),
+  category: z.enum(["drinks", "food", "entertainment", "decorations"]),
   imageUrl: z.string().url().optional().or(z.literal("")),
+  price: z.coerce.number().min(0).optional(),
+  color: z.string().optional().or(z.literal("")),
+  type: z.string().optional().or(z.literal("")),
+  brandName: z.string().optional().or(z.literal("")),
+  status: z.boolean().optional(),
 });
 
 type AddItemForm = z.infer<typeof addItemSchema>;
@@ -42,7 +46,7 @@ interface AddItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   eventId: string | number;
-  defaultCategory?: string;
+  defaultCategory?: "drinks" | "food" | "entertainment" | "decorations";
 }
 
 export default function AddItemModal({
@@ -51,7 +55,6 @@ export default function AddItemModal({
   eventId,
   defaultCategory = "drinks",
 }: AddItemModalProps) {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<AddItemForm>({
@@ -61,47 +64,53 @@ export default function AddItemModal({
       description: "",
       category: defaultCategory,
       imageUrl: "",
+      price: undefined,
+      color: "",
+      type: "",
+      brandName: "",
+      status: true,
     },
   });
 
-  const addItemMutation = useMutation({
-    mutationFn: async (data: AddItemForm) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/events/${eventId}/menu-items`,
-        {
-          ...data,
-          contributorId: 2, // Using user 2 as current user for demo
-          imageUrl: data.imageUrl || undefined,
-        }
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/menu-items`],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/stats`],
-      });
+  const selectedCategory = form.watch("category");
+  const showPrice = ["drinks", "food", "entertainment", "decorations"].includes(
+    selectedCategory
+  );
+  const showColor =
+    selectedCategory === "drinks" || selectedCategory === "food";
+  const showType = ["food", "entertainment", "decorations"].includes(
+    selectedCategory
+  );
+  const showBrand = ["drinks", "food", "entertainment", "decorations"].includes(
+    selectedCategory
+  );
+
+  const createMasterItem = useCreateMasterMenuItem({
+    // keep these empty; we'll handle UI side-effects in the component so
+    // the component can invalidate queries tied to the eventId
+  });
+
+  const onSubmit = async (data: AddItemForm) => {
+    try {
+      const payload = { ...(data as any), eventId };
+      const res = await createMasterItem.mutateAsync(payload as any);
+
       toast({
         title: "Success",
         description: "Menu item added successfully!",
       });
       form.reset();
       onClose();
-    },
-    onError: () => {
+      return res;
+    } catch (err: any) {
       toast({
         title: "Error",
-        description: "Failed to add menu item. Please try again.",
+        description:
+          err?.message || "Failed to add menu item. Please try again.",
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: AddItemForm) => {
-    addItemMutation.mutate(data);
+      throw err;
+    }
   };
 
   return (
@@ -193,6 +202,82 @@ export default function AddItemModal({
               )}
             />
 
+            <div className="grid grid-cols-2 gap-3">
+              {showPrice && (
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="party-dark">Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {showColor && (
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="party-dark">Color</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Red" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {showType && (
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="party-dark">Type</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., Italian / Music / Birthday"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {showBrand && (
+                <FormField
+                  control={form.control}
+                  name="brandName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="party-dark">Brand Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Brand" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
             <div className="flex space-x-3 pt-4">
               <Button
                 type="button"
@@ -204,10 +289,10 @@ export default function AddItemModal({
               </Button>
               <Button
                 type="submit"
-                disabled={addItemMutation.isPending}
+                disabled={createMasterItem.isPending}
                 className="flex-1 bg-party-coral hover:bg-red-500 text-white"
               >
-                {addItemMutation.isPending ? "Adding..." : "Add Item"}
+                {createMasterItem.isPending ? "Adding..." : "Add Item"}
               </Button>
             </div>
           </form>
