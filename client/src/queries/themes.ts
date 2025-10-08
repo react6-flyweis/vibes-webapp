@@ -20,6 +20,7 @@ export function useThemesQuery() {
       axiosInstance.get<IResponseList<EventTheme>>(
         "/api/master/event-theme/getAll"
       ),
+    select: (res) => res.data.data,
     staleTime: 1000 * 60 * 5,
   });
 }

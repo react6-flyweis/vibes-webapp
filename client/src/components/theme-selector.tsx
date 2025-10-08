@@ -21,9 +21,7 @@ export default function ThemeSelector({
   className,
   placeholder = "Select theme",
 }: Props) {
-  const { data, isLoading, isError } = useThemesQuery();
-
-  const themes = Array.isArray(data) ? data : [];
+  const { data: themes, isLoading, isError } = useThemesQuery();
 
   return (
     <Select
@@ -51,7 +49,7 @@ export default function ThemeSelector({
             Error loading themes
           </SelectItem>
         )}
-        {!isLoading && !isError && themes.length === 0 && (
+        {!isLoading && !isError && themes?.length === 0 && (
           <SelectItem value="__vibes_theme_none" disabled>
             No themes found
           </SelectItem>
@@ -59,7 +57,7 @@ export default function ThemeSelector({
 
         {!isLoading &&
           !isError &&
-          themes.map((t) => (
+          themes?.map((t) => (
             <SelectItem
               key={t.event_theme_id ?? t._id}
               value={String(t.event_theme_id ?? t._id)}
