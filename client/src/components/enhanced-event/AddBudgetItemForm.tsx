@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -10,13 +10,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import CategorySelector from "@/components/category-selector";
+import ItemsSelector from "@/components/items-selector";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Plus } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -25,62 +20,120 @@ import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   eventId?: string;
+  templateId?: number | undefined;
 };
 
 type FormValues = {
-  itemName: string;
   category: string;
-  cost: string; // dollars as string from input
+  cost: string;
+  masterItem?: string; // selected master item _id
 };
 
-export default function AddBudgetItemForm({ eventId }: Props) {
+type LocalItem = {
+  id: number; // temporary client id
+  itemName: string;
+  category: string; // category id or value from CategorySelector
+  cost: string; // as entered (dollars)
+  masterItem?: string; // master item _id if chosen
+};
+
+export default function AddBudgetItemForm({ eventId, templateId }: Props) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [items, setItems] = useState<LocalItem[]>([]);
 
   const form = useForm<FormValues>({
     defaultValues: {
-      itemName: "",
+      masterItem: "",
       category: "",
       cost: "",
     },
   });
 
   const mutation = useMutation({
-    mutationFn: async (payload: any) =>
-      axiosInstance.post(`/api/master/budget-items/create`, payload),
+    mutationFn: async ({
+      url,
+      payload,
+      method,
+    }: {
+      url: string;
+      payload: any;
+      method: "PUT" | "POST";
+    }) => axiosInstance.request({ url, method, data: payload }),
     onSuccess: () => {
       if (eventId) {
         queryClient.invalidateQueries({
           queryKey: [`/api/events/${eventId}/budget`],
         });
-        queryClient.invalidateQueries({
-          queryKey: [`/api/events/${eventId}/budget/summary`],
-        });
       }
+      // also invalidate master templates list in case UI depends on it
+      queryClient.invalidateQueries({ queryKey: [`/api/master/budget-items`] });
       form.reset();
-      toast({ title: "Budget item added!" });
+      setItems([]);
+      toast({ title: "Budget items saved!" });
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    if (!eventId) {
-      toast({ title: "Missing event ID", variant: "destructive" });
+  // Add item locally to the items array (does not call API)
+  const onAddLocal = async (values: FormValues) => {
+    const masterId = values.masterItem;
+    if (!masterId) {
+      toast({ title: "Select an item", variant: "destructive" });
       return;
     }
 
-    const payload = {
-      eventId,
-      itemName: values.itemName.trim(),
+    // Do not resolve master item here — ItemsSelector owns fetching.
+    const name = masterId || "Selected item";
+    const defaultPrice = "0";
+
+    const newItem: LocalItem = {
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      itemName: name,
       category: values.category,
-      estimatedCost: Math.round(parseFloat(values.cost || "0") * 100),
+      cost: values.cost || defaultPrice,
+      masterItem: masterId,
     };
 
+    setItems((s) => [...s, newItem]);
+    // clear form values for next entry
+    form.reset();
+  };
+
+  // Save all local items using the create endpoint in the format the API expects
+  const onSaveAll = async () => {
+    if (items.length === 0) {
+      toast({ title: "No items to save", variant: "destructive" });
+      return;
+    }
+
+    // Map local items to API payload shape
+    const itemsPayload = items.map((it) => ({
+      // If user picked a master item, prefer sending its id (string _id or numeric items_id)
+      item_id: it.masterItem ?? it.id,
+      category_id: parseInt(String(it.category)) || it.category,
+      // price should be a number in dollars (e.g. 175.0)
+      price: parseFloat(it.cost) || 0,
+    }));
+
+    // Choose endpoint and payload shape based on whether a template id was passed in
+    const url = templateId
+      ? `/api/master/budget-items/update`
+      : `/api/master/budget-items/create`;
+
+    const payload = templateId
+      ? { id: templateId, items: itemsPayload, status: true }
+      : { items: itemsPayload, status: true };
+
     try {
-      await mutation.mutateAsync(payload);
+      await mutation.mutateAsync({
+        url,
+        payload,
+        method: templateId ? "PUT" : "POST",
+      });
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err?.message || "Failed to add item",
+        description: err?.message || "Failed to save items",
         variant: "destructive",
       });
     }
@@ -89,18 +142,23 @@ export default function AddBudgetItemForm({ eventId }: Props) {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onAddLocal)}
         className="border rounded-lg p-4 bg-gray-50"
       >
         <h4 className="font-medium mb-3">Add Budget Item</h4>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <FormField
             control={form.control}
-            name="itemName"
+            name="masterItem"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Item name..." {...field} />
+                  <ItemsSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Pick an existing item"
+                    className="w-full"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,27 +171,19 @@ export default function AddBudgetItemForm({ eventId }: Props) {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="food">Food</SelectItem>
-                      <SelectItem value="drinks">Drinks</SelectItem>
-                      <SelectItem value="entertainment">
-                        Entertainment
-                      </SelectItem>
-                      <SelectItem value="decorations">Decorations</SelectItem>
-                      <SelectItem value="rentals">Rentals</SelectItem>
-                      <SelectItem value="venue">Venue</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <CategorySelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Category"
+                    className="w-full"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/* masterItem selector moved to first column (replaced free-text name) */}
 
           <FormField
             control={form.control}
@@ -153,17 +203,56 @@ export default function AddBudgetItemForm({ eventId }: Props) {
             )}
           />
 
-          <div className="flex items-center">
-            <LoadingButton
-              isLoading={form.formState.isSubmitting}
-              type="submit"
-            >
+          <div className="flex items-center space-x-2">
+            <LoadingButton isLoading={false} type="submit">
               <Plus className="w-4 h-4 mr-2" />
               Add
+            </LoadingButton>
+
+            <LoadingButton
+              isLoading={mutation.isPending}
+              type="button"
+              onClick={onSaveAll}
+              className="bg-blue-600"
+            >
+              Save All ({items.length})
             </LoadingButton>
           </div>
         </div>
       </form>
+
+      {/* Items preview list */}
+      {items.length > 0 && (
+        <div className="mt-4 border rounded-lg p-3 bg-white">
+          <h5 className="font-medium mb-2">Items to save ({items.length})</h5>
+          <div className="space-y-2">
+            {items.map((it) => {
+              return (
+                <div
+                  key={it.id}
+                  className="flex items-center justify-between p-2 border rounded"
+                >
+                  <div>
+                    <div className="font-medium">{it.itemName}</div>
+                    <div className="text-sm text-muted-foreground">{`Category: ${it.category} • Price: $${it.cost}`}</div>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setItems((s) => s.filter((item) => item.id !== it.id))
+                      }
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </Form>
   );
 }
