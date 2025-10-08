@@ -9,13 +9,6 @@ import {
 } from "@/components/ui/select";
 import { FormControl } from "@/components/ui/form";
 
-type Category = {
-  _id: string;
-  category_name: string;
-  emozi?: string;
-  category_id?: number;
-};
-
 type Props = {
   value?: string;
   onChange: (value: string) => void;
@@ -29,9 +22,7 @@ export default function CategorySelector({
   className,
   placeholder = "Select category",
 }: Props) {
-  const { data, isLoading, isError } = useCategoriesQuery();
-
-  const categories: Category[] = Array.isArray(data) ? data : [];
+  const { data: categories, isLoading, isError } = useCategoriesQuery();
 
   return (
     <Select
@@ -64,7 +55,7 @@ export default function CategorySelector({
             Error loading categories
           </SelectItem>
         )}
-        {!isLoading && !isError && categories.length === 0 && (
+        {!isLoading && !isError && categories?.length === 0 && (
           <SelectItem value="__vibes_cat_none" disabled>
             No categories found
           </SelectItem>
@@ -72,7 +63,7 @@ export default function CategorySelector({
 
         {!isLoading &&
           !isError &&
-          categories.map((c) => (
+          categories?.map((c) => (
             <SelectItem key={c.category_id} value={String(c.category_id)}>
               {c.emozi ? `${c.emozi} ` : ""}
               {c.category_name}

@@ -1,22 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { axiosInstance } from "@/lib/queryClient";
+import { IResponseList } from "@/types";
 
 export type Category = {
   _id: string;
-  category_name: string;
-  emozi?: string;
+  categorytxt?: string;
+  category_name?: string;
+  emozi?: string | null;
+  status?: boolean;
+  createdBy?: number;
+  createdAt?: string;
+  updatedBy?: number | null;
+  updatedAt?: string | null;
+  item_category_id?: number;
   category_id?: number;
 };
 
-export const fetchCategories = async (): Promise<Category[]> => {
-  const resp = await apiRequest("/api/master/category/getAll", "GET");
-  return (resp && resp.data) || [];
-};
-
 export function useCategoriesQuery() {
-  return useQuery<Category[]>({
+  return useQuery({
     queryKey: ["categories"],
-    queryFn: fetchCategories,
+    queryFn: () =>
+      axiosInstance.get<IResponseList<Category>>("/api/master/category/getAll"),
+    select: (res) => res.data.data,
     staleTime: 1000 * 60 * 5,
   });
 }
