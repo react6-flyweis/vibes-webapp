@@ -57,7 +57,7 @@ export default function CreateTaskForm({
       await createMutation.mutateAsync({
         taskTitle: trimmed,
         description: values.description,
-        eventId,
+        event_id: eventId,
       });
 
       toast({ title: "Task created!" });
