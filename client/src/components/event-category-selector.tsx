@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormControl } from "@/components/ui/form";
 
 type Props = {
   value?: string;
@@ -39,17 +38,13 @@ export default function EventCategorySelector({
       defaultValue={value}
       value={value}
     >
-      <FormControl>
-        <SelectTrigger
-          className={className || "bg-white/10 border-white/20 text-white"}
-        >
-          <SelectValue
-            placeholder={
-              isLoading ? "Loading event categories..." : placeholder
-            }
-          />
-        </SelectTrigger>
-      </FormControl>
+      <SelectTrigger
+        className={className || "bg-white/10 border-white/20 text-white"}
+      >
+        <SelectValue
+          placeholder={isLoading ? "Loading event categories..." : placeholder}
+        />
+      </SelectTrigger>
 
       <SelectContent>
         {isLoading && (
