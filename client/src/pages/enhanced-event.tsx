@@ -133,7 +133,7 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="venue" className="space-y-6">
-            <VenueTab eventId={eventId} />
+            <VenueTab planMap={planMap?.[0]} eventId={eventId} />
           </TabsContent>
 
           <TabsContent value="photos" className="space-y-6">
