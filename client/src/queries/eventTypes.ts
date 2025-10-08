@@ -19,6 +19,7 @@ export function useEventTypesQuery() {
     queryKey: ["eventTypes"],
     queryFn: () =>
       axiosInstance.get<IResponseList<EventType>>("/api/event-types/getAll"),
+    select: (res) => res.data.data,
     staleTime: 1000 * 60 * 5,
   });
 }
