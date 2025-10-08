@@ -20,7 +20,7 @@ import { formatDate } from "@/lib/formatDate";
 
 interface EventSidebarProps {
   event: EventData;
-  eventId: number;
+  eventId: string;
   stats?: {
     confirmedCount: number;
     totalItems: number;
@@ -37,7 +37,7 @@ export default function EventSidebar({
   const [isBulkInviteModalOpen, setIsBulkInviteModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { data: participants } = useQuery({
+  const { data: participants = [] } = useQuery({
     queryKey: [`/api/events/${eventId}/participants`],
   });
 
