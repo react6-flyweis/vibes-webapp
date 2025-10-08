@@ -22,15 +22,14 @@ export default function EventTypeSelector({
   className,
   placeholder = "Select event type",
 }: Props) {
-  const { data, isLoading, isError } = useEventTypesQuery();
-  const types: EventType[] = Array.isArray(data?.data) ? data!.data : [];
+  const { data: types, isLoading, isError } = useEventTypesQuery();
 
   return (
     <Select
       value={value}
       onValueChange={(val) => {
         if (typeof val !== "string") return;
-        const found = types.find(
+        const found = types?.find(
           (t) => String(t.event_type_id ?? t._id) === String(val)
         );
         onChange?.(val, found);
@@ -53,7 +52,7 @@ export default function EventTypeSelector({
           </SelectItem>
         )}
 
-        {!isLoading && !isError && types.length === 0 && (
+        {!isLoading && !isError && types?.length === 0 && (
           <SelectItem value="__vibes_event_type_none" disabled>
             No event types found
           </SelectItem>
@@ -61,7 +60,7 @@ export default function EventTypeSelector({
 
         {!isLoading &&
           !isError &&
-          types.map((t) => (
+          types?.map((t) => (
             <SelectItem
               key={t._id ?? t.event_type_id}
               value={String(t.event_type_id ?? t._id)}
