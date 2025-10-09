@@ -275,7 +275,7 @@ function DashboardRouter() {
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/event-planning/:eventId" element={<EventPlanning />} />
         <Route path="/events/:eventId" element={<EventDetail />} />
-        <Route path="/events/booking/:eventId" element={<PartyBooking />} />
+        <Route path="/events/booking/:eventId" element={<EventBooking />} />
         <Route path="/tickets" element={<TicketManagement />} />
         <Route path="/digital-twins" element={<DigitalTwinSystem />} />
         <Route
