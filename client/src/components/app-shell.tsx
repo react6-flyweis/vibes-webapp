@@ -58,10 +58,10 @@ export function AppShell({ children }: AppShellProps) {
             e.preventDefault();
             navigate("/vibescard-studio");
             break;
-          case "v":
-            e.preventDefault();
-            navigate("/natural-venue-showcase");
-            break;
+          // case "v":
+          //   e.preventDefault();
+          //   navigate("/natural-venue-showcase");
+          //   break;
           case "a":
             e.preventDefault();
             navigate("/vibebot-assistant");
