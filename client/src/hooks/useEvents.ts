@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { axiosInstance } from "@/lib/queryClient";
+import { IResponseList } from "@/types";
 
 export interface FetchEventsParams {
   page?: number;
@@ -16,9 +17,10 @@ export interface FetchEventsParams {
   sortOrder?: "asc" | "desc";
 }
 
-export interface ServerEvent {
+export interface IEvent {
   _id: string;
   name_title: string;
+  event_type_id?: number;
   description?: string;
   venue_name?: string;
   street_address?: string;
@@ -31,6 +33,10 @@ export interface ServerEvent {
   time?: string;
   max_capacity?: number;
   event_image?: string;
+  live_vibes_invite_videos?: string[];
+  live_vibes_invite_venue_tour?: string[];
+  live_vibes_invite_music_preview?: string[];
+  live_vibes_invite_vip_perks?: string[];
   status?: boolean;
   created_by?: number;
   updated_by?: number | null;
@@ -38,17 +44,19 @@ export interface ServerEvent {
   updated_at?: string;
   ticketed_events?: boolean;
   event_id?: number;
+  venue_details_id?: number;
+  venue_details?: {
+    _id: string;
+    name: string;
+    address?: string;
+    capacity?: number;
+    type?: string;
+    map?: string;
+    venue_details_id?: number;
+  };
 }
 
-export interface EventsResponse {
-  success: boolean;
-  message?: string;
-  data: ServerEvent[];
-}
-
-export async function fetchEvents(
-  params: FetchEventsParams = {}
-): Promise<EventsResponse> {
+export async function fetchEvents(params: FetchEventsParams = {}) {
   const query = new URLSearchParams();
   const {
     page = 1,
@@ -85,7 +93,7 @@ export async function fetchEvents(
   if (sortOrder) query.set("sortOrder", sortOrder);
 
   const url = `/api/events/getAll?${query.toString()}`;
-  return apiRequest<EventsResponse>(url, "GET");
+  return axiosInstance.get<IResponseList<IEvent>>(url);
 }
 
 export function useEvents(params: FetchEventsParams = {}) {
@@ -93,5 +101,6 @@ export function useEvents(params: FetchEventsParams = {}) {
   return useQuery({
     queryKey: key,
     queryFn: () => fetchEvents(params),
+    select: (data) => data.data.data,
   });
 }
