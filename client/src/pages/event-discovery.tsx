@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { IEvent, useEvents } from "@/hooks/useEvents";
+import useDebounce from "@/hooks/useDebounce";
+import EventCard from "@/components/event-card/EventCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,18 +16,7 @@ import {
 } from "@/components/ui/select";
 import EventCategorySelector from "@/components/event-category-selector";
 import CountrySelector from "@/components/country-selector";
-import { Badge } from "@/components/ui/badge";
-import {
-  Calendar,
-  MapPin,
-  Search,
-  Star,
-  Users,
-  Plus,
-  Clock,
-  DollarSign,
-  Filter,
-} from "lucide-react";
+import { Calendar, MapPin, Search, Plus } from "lucide-react";
 
 // interface Event {
 //   id: string;
@@ -141,11 +131,13 @@ export default function EventDiscovery() {
     sortBy: "date",
   });
 
-  // Fetch events from the server using the shared hook
+  const debouncedSearch = useDebounce(searchQuery, 350);
+
+  // Fetch events from the server using the shared hook (debounced search)
   const { data: events, isLoading } = useEvents({
     page: 1,
     limit: 50,
-    search: searchQuery,
+    search: debouncedSearch,
     status: true,
     sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
     sortOrder: "desc",
@@ -168,13 +160,7 @@ export default function EventDiscovery() {
     setSearchQuery(query);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
+  // Don't unmount the search/filter UI while loading — show skeletons in the events grid instead
 
   return (
     <div className="min-h-screen bg-linear-to-br from-indigo-900 to-purple-900 text-white">
@@ -190,7 +176,7 @@ export default function EventDiscovery() {
           </p>
         </div>
 
-        {/* Enhanced Search Interface */}
+        {/* Search Card (already present above) */}
         <Card className="mb-8 bg-white/10 backdrop-blur-sm border-white/20">
           <CardContent className="p-6">
             {/* Primary Search - Category and Location First */}
@@ -203,7 +189,7 @@ export default function EventDiscovery() {
                 <EventCategorySelector
                   value={filters.category}
                   onChange={(value) => handleFilterChange("category", value)}
-                  className="h-12"
+                  className="h-12 bg-white/10 border-white/20 text-white"
                   placeholder="Choose event type..."
                 />
               </div>
@@ -321,52 +307,6 @@ export default function EventDiscovery() {
           </CardContent>
         </Card>
 
-        {/* AI Recommendations Section */}
-        {/* <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-purple-100">
-            Recommended for You
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.isArray(recommendations) &&
-              recommendations.slice(0, 4).map((event: Event) => (
-                <Card
-                  key={event.id}
-                  className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer"
-                >
-                  <div className="relative">
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-full h-40 object-cover"
-                    />
-                    {event.featured && (
-                      <Badge className="absolute top-2 left-2 bg-yellow-500 text-black">
-                        Featured
-                      </Badge>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-white truncate">
-                      {event.title}
-                    </h3>
-                    <p className="text-purple-200 text-sm">{event.venue}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-green-400 font-medium">
-                        ${event.price.min}+
-                      </span>
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-purple-200 text-sm ml-1">
-                          {event.rating}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-        </div> */}
-
         {/* All Events Grid */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -377,178 +317,28 @@ export default function EventDiscovery() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events?.map((event) => (
-              <Card
-                key={event.event_id}
-                className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300 cursor-pointer group"
-              >
-                <div className="relative">
-                  <img
-                    src={event.event_image}
-                    alt={event.name_title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  {/* {event.featured && (
-                      <Badge className="absolute top-3 left-3 bg-yellow-500 text-black font-medium">
-                        Featured
-                      </Badge>
-                    )} */}
-
-                  <Badge className="absolute top-3 right-3 bg-red-500 text-white">
-                    Trending
-                  </Badge>
-
-                  {/* {event.soldOut && (
-                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                        <Badge className="bg-red-600 text-white text-lg px-6 py-2">
-                          SOLD OUT
-                        </Badge>
-                      </div>
-                    )} */}
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="mb-3">
-                    <Badge
-                      variant="outline"
-                      className="text-purple-300 border-purple-300 mb-2"
-                    >
-                      {event.event_category_tags_id}
-                    </Badge>
-                    <h3 className="text-xl font-bold text-white mb-1 line-clamp-2">
-                      {event.name_title}
-                    </h3>
-                    {/* {event.artist && (
-                        <p className="text-purple-300 font-medium">
-                          {event.artist}
-                        </p>
-                      )}
-                      {event.team && (
-                        <p className="text-purple-300 font-medium">
-                          {event.team}
-                        </p>
-                      )} */}
-                  </div>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-purple-200">
-                      <MapPin className="h-4 w-4 mr-2 shrink-0" />
-                      <span className="text-sm truncate">
-                        {event.venue_details?.name},{" "}
-                        {event.venue_details?.address}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center text-purple-200">
-                      <Calendar className="h-4 w-4 mr-2 shrink-0" />
-                      <span className="text-sm">{event.date}</span>
-                    </div>
-
-                    <div className="flex items-center text-purple-200">
-                      <Clock className="h-4 w-4 mr-2 shrink-0" />
-                      <span className="text-sm">{event.time}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <DollarSign className="h-4 w-4 text-green-400 mr-1" />
-                      <span className="text-green-400 font-bold">
-                        {/* {event.price.min === event.price.max
-                            ? `$${event.price.min}`
-                            : `$${event.price.min} - $${event.price.max}`} */}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                        <span className="text-purple-200 text-sm">
-                          0{/* {event.rating} */}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 text-blue-400 mr-1" />
-                        <span className="text-purple-200 text-sm">
-                          0{/* {event.attendees} */}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {event.tags?.slice(0, 3).map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="text-xs bg-purple-800/50 text-purple-200 border-purple-600"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <Button
-                    onClick={() =>
-                      navigate(`/events/booking/${event.event_id}`)
-                    }
-                    className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
-                    // disabled={event.soldOut}
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <Card
+                    key={`skeleton-${i}`}
+                    className="bg-white/5 backdrop-blur-sm border-white/10"
                   >
-                    Book Now
-                    {/* {event.soldOut ? "Sold Out" : "Book Now"} */}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardContent className="p-4">
+                      <div className="h-40 bg-white/10 rounded-md mb-4 animate-pulse" />
+                      <div className="h-4 bg-white/10 rounded w-3/4 mb-2 animate-pulse" />
+                      <div className="h-3 bg-white/10 rounded w-1/2 mb-2 animate-pulse" />
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="h-8 bg-white/10 rounded w-1/3 animate-pulse" />
+                        <div className="h-8 bg-white/10 rounded w-1/4 animate-pulse" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              : events?.map((event) => (
+                  <EventCard key={event.event_id} event={event as IEvent} />
+                ))}
           </div>
         </div>
-
-        {/* Trending Events */}
-        {/* <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-purple-100">
-            Trending Now
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-            {/* {events?
-                // .filter((e) => e.trending) */}
-        {/* {events?.slice(0, 3).map((event) => (
-              <Card
-                key={event.id}
-                className="bg-white/10  border-none  overflow-hidden"
-              >
-                <div className="relative">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-32 object-cover"
-                  />
-                  <Badge className="absolute top-2 right-2 bg-red-500 text-white">
-                    🔥 Trending
-                  </Badge>
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-bold text-white mb-2">{event.title}</h3>
-                  <p className="text-purple-200 text-sm mb-2">{event.venue}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-400 font-medium">
-                      ${event.price.min}+
-                    </span>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 text-blue-400 mr-1" />
-                      <span className="text-purple-200 text-sm">
-                        {event.attendees} going
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>  */}
       </div>
     </div>
   );
