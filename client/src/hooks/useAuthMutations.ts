@@ -46,11 +46,11 @@ export function useVerifyOtpMutation() {
       remember?: boolean;
     }) => axiosInstance.post<VerifyResponse>("/api/users/verify-otp", data),
 
-    onSuccess: (res: any, variables: any, context: any) => {
+    onSuccess: (res, variables) => {
       try {
         const auth = useAuthStore.getState();
-        const token = res?.data?.accessToken;
-        const user = res?.data?.user;
+        const token = res?.data?.data.accessToken;
+        const user = res?.data?.data.user;
         console.log("Storing token and user in auth store via login", {
           token,
           user,
