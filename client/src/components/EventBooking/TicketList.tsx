@@ -1,10 +1,13 @@
 import React from "react";
 import TicketItem from "./TicketItem";
-import { useAllEventEntryTicketsQuery } from "@/queries/tickets";
+import {
+  EventEntryTicket,
+  useAllEventEntryTicketsQuery,
+} from "@/queries/tickets";
 
 interface Props {
   selectedTickets: Record<string, number>;
-  onChange: (ticketId: string, qty: number) => void;
+  onChange: (ticket: EventEntryTicket, qty: number) => void;
 }
 
 export default function TicketList({ selectedTickets, onChange }: Props) {
@@ -30,7 +33,7 @@ export default function TicketList({ selectedTickets, onChange }: Props) {
           key={t.event_entry_tickets_id}
           ticket={t}
           value={selectedTickets[t.event_entry_tickets_id] || 0}
-          onChange={(qty) => onChange(t.event_entry_tickets_id, qty)}
+          onChange={(qty) => onChange(t, qty)}
         />
       ))}
     </div>
