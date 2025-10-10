@@ -21,6 +21,7 @@ import { useCreateTicketOrder } from "@/mutations/createTicketOrder";
 import CheckoutForm from "@/components/EventBooking/CheckoutForm";
 import OrderSummary from "@/components/EventBooking/OrderSummary";
 import EventHeader from "@/components/EventBooking/EventHeader";
+import { EventEntryTicket } from "@/queries/tickets";
 
 export default function EventBooking() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -29,6 +30,10 @@ export default function EventBooking() {
 
   const [selectedTickets, setSelectedTickets] = useState<
     Record<string, number>
+  >({});
+  // store full ticket details keyed by ticket id
+  const [selectedTicketDetails, setSelectedTicketDetails] = useState<
+    Record<string, EventEntryTicket>
   >({});
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [personalInfo, setPersonalInfo] = useState({
@@ -109,11 +114,28 @@ export default function EventBooking() {
     },
   });
 
-  const handleTicketQuantityChange = (ticketId: string, quantity: number) => {
+  const handleTicketQuantityChange = (
+    ticket: EventEntryTicket,
+    quantity: number
+  ) => {
+    const ticketId = ticket.event_entry_tickets_id;
     setSelectedTickets((prev) => ({
       ...prev,
       [ticketId]: quantity,
     }));
+
+    // also store/remove full ticket details using event data if available
+
+    setSelectedTicketDetails((prev) => {
+      const next = { ...prev };
+      if (quantity > 0 && ticket) {
+        next[ticketId] = ticket;
+      } else {
+        // remove if quantity is zero
+        delete next[ticketId];
+      }
+      return next;
+    });
   };
 
   const getTotalTickets = () => {
@@ -341,6 +363,7 @@ export default function EventBooking() {
               <CardContent>
                 <OrderSummary
                   selectedTickets={selectedTickets}
+                  selectedTicketDetails={selectedTicketDetails}
                   selectedSeats={selectedSeats}
                   promo={
                     promoMutation.data
