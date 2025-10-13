@@ -1,7 +1,11 @@
 import React from "react";
 import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 
-export default function MockupPreview({ elements, platform }: any) {
+export default function MockupPreview({
+  elements,
+  platform,
+  previewImage,
+}: any) {
   const backgroundElement = elements.find(
     (el: any) => el.type === "background"
   );
@@ -29,7 +33,7 @@ export default function MockupPreview({ elements, platform }: any) {
         </div>
 
         <div
-          className="relative rounded-lg overflow-hidden"
+          className="relative rounded-lg overflow-hidden bg-black"
           style={{
             aspectRatio: platform?.aspectRatio || "16:9",
             maxWidth: "300px",
@@ -39,38 +43,55 @@ export default function MockupPreview({ elements, platform }: any) {
             filter: backgroundElement?.style.filter || "none",
           }}
         >
-          <div
-            className="absolute border-2 border-yellow-400 border-dashed opacity-30"
-            style={{
-              top: `${
-                (platform?.specs.safeZones.top / platform?.dimensions.height) *
-                100
-              }%`,
-              left: `${
-                (platform?.specs.safeZones.left / platform?.dimensions.width) *
-                100
-              }%`,
-              right: `${
-                (platform?.specs.safeZones.right / platform?.dimensions.width) *
-                100
-              }%`,
-              bottom: `${
-                (platform?.specs.safeZones.bottom /
-                  platform?.dimensions.height) *
-                100
-              }%`,
-            }}
-          />
+          {previewImage ? (
+            // render the captured stage snapshot
+            <img
+              src={previewImage}
+              alt="preview"
+              className="w-full h-full object-cover"
+              style={{ display: "block" }}
+            />
+          ) : (
+            <>
+              <div
+                className="absolute border-2 border-yellow-400 border-dashed opacity-30"
+                style={{
+                  top: `${
+                    (platform?.specs.safeZones.top /
+                      platform?.dimensions.height) *
+                    100
+                  }%`,
+                  left: `${
+                    (platform?.specs.safeZones.left /
+                      platform?.dimensions.width) *
+                    100
+                  }%`,
+                  right: `${
+                    (platform?.specs.safeZones.right /
+                      platform?.dimensions.width) *
+                    100
+                  }%`,
+                  bottom: `${
+                    (platform?.specs.safeZones.bottom /
+                      platform?.dimensions.height) *
+                    100
+                  }%`,
+                }}
+              />
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 text-center">
-            <h2 className="text-lg font-bold mb-2 line-clamp-2">{mainTitle}</h2>
-            <p className="text-sm opacity-90 line-clamp-2">{subtitle}</p>
-            {textElements.length > 2 && (
-              <p className="text-xs opacity-75 mt-1 line-clamp-1">
-                {textElements[2]?.content}
-              </p>
-            )}
-          </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 text-center">
+                <h2 className="text-lg font-bold mb-2 line-clamp-2">
+                  {mainTitle}
+                </h2>
+                <p className="text-sm opacity-90 line-clamp-2">{subtitle}</p>
+                {textElements.length > 2 && (
+                  <p className="text-xs opacity-75 mt-1 line-clamp-1">
+                    {textElements[2]?.content}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex items-center justify-between mt-3 text-white">
