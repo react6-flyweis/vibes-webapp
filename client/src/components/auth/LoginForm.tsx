@@ -24,7 +24,7 @@ import {
   useVerifyOtpMutation,
   useResendOtpMutation,
 } from "@/hooks/useAuthMutations";
-import { useAuthStore } from "@/store/auth-store";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -63,8 +63,9 @@ export function LoginForm() {
       ) {
         setOtpEmail((res.data && form.getValues("email")) || undefined);
         setShowOtp(true);
+        console.log("OTP sent:", res.data);
         toast({
-          title: "Enter verification code",
+          title: `Enter verification code ${res.data.data.otp}`,
           description: "A one-time code was sent to your email.",
         });
         return;
@@ -75,12 +76,12 @@ export function LoginForm() {
         description: "You've successfully logged into Vibes.",
       });
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
+      const message = extractApiErrorMessage(error);
       toast({
         title: "Login Failed",
-        description:
-          error?.message || "Invalid email or password. Please try again.",
+        description: message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     }
