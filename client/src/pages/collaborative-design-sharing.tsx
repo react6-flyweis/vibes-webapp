@@ -2,65 +2,26 @@ import { useState } from "react";
 import {
   Heart,
   Share2,
-  Download,
-  Eye,
   Users,
   Star,
-  Filter,
-  Search,
-  Plus,
   Palette,
-  Clock,
-  Zap,
-  Copy,
-  Edit3,
   Globe,
-  Lock,
-  ChevronDown,
-  MoreHorizontal,
-  Flag,
   Bookmark,
   Award,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import CommunityDesignCard from "@/components/CommunityDesignCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
+import RemixDialog from "@/components/design-community/RemixDialog";
+import CollaborationDialog from "@/components/design-community/CollaborationDialog";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type {
-  SharedDesign,
-  DesignComment,
-  CollaborationInvite,
-} from "@/types/designs";
+import type { SharedDesign, CollaborationInvite } from "@/types/designs";
 
 // Tabs (extracted)
 import DiscoverTab from "@/components/design-community/DiscoverTab";
@@ -77,16 +38,6 @@ export default function CollaborativeDesignSharing() {
   // const [showShareDialog, setShowShareDialog] = useState(false);
   const [showRemixDialog, setShowRemixDialog] = useState(false);
   const [showCollabDialog, setShowCollabDialog] = useState(false);
-  const [newComment, setNewComment] = useState("");
-  const [remixTitle, setRemixTitle] = useState("");
-  const [remixDescription, setRemixDescription] = useState("");
-  const [remixType, setRemixType] = useState<"full" | "partial" | "inspired">(
-    "full"
-  );
-  const [collaboratorEmail, setCollaboratorEmail] = useState("");
-  const [collaboratorRole, setCollaboratorRole] = useState<"editor" | "viewer">(
-    "viewer"
-  );
 
   const { toast } = useToast();
 
@@ -190,9 +141,6 @@ export default function CollaborativeDesignSharing() {
         description: `Your remix "${data.title}" is now available in your designs`,
       });
       setShowRemixDialog(false);
-      setRemixTitle("");
-      setRemixDescription("");
-      setRemixType("full");
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
       // Open the remix in design editor
@@ -223,23 +171,7 @@ export default function CollaborativeDesignSharing() {
     },
   });
 
-  const addCommentMutation = useMutation({
-    mutationFn: async (data: { designId: string; content: string }) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${data.designId}/comments`,
-        data
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      setNewComment("");
-      toast({
-        title: "Comment Added",
-        description: "Your feedback has been posted",
-      });
-    },
-  });
+  // Comment creation is handled inside DesignDetailsDialog now.
 
   const inviteCollaboratorMutation = useMutation({
     mutationFn: async (data: {
@@ -261,7 +193,6 @@ export default function CollaborativeDesignSharing() {
           data.invitation?.inviteeEmail || "the specified email"
         }`,
       });
-      setCollaboratorEmail("");
       setShowCollabDialog(false);
       // Refresh collaboration data
       queryClient.invalidateQueries({ queryKey: ["/api/designs/invites"] });
@@ -305,7 +236,7 @@ export default function CollaborativeDesignSharing() {
     },
   });
 
-  const designs: SharedDesign[] = sharedDesigns || [
+  const designs: SharedDesign[] = (sharedDesigns as SharedDesign[]) || [
     {
       id: "design-neon-nights",
       title: "Neon Nights Party Invitation",
@@ -668,6 +599,11 @@ export default function CollaborativeDesignSharing() {
   //   },
   // ];
 
+  const invites: CollaborationInvite[] = [];
+
+  // Bookmark mutation isn't implemented in this build; provide a harmless stub
+  const bookmarkDesignMutation = { mutate: (id: string) => {} };
+
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -833,19 +769,40 @@ export default function CollaborativeDesignSharing() {
           </TabsList>
 
           <TabsContent value="discover" className="space-y-6">
-            <DiscoverTab />
+            <DiscoverTab
+              designs={designs}
+              setSelectedDesign={setSelectedDesign}
+              setShowRemixDialog={setShowRemixDialog}
+              shareDesignMutation={shareDesignMutation}
+              likeDesignMutation={likeDesignMutation}
+              bookmarkDesignMutation={bookmarkDesignMutation}
+              downloadDesignMutation={downloadDesignMutation}
+            />
           </TabsContent>
 
           <TabsContent value="my-designs" className="space-y-6">
-            <MyDesignsTab />
+            <MyDesignsTab
+              myDesignsList={designs}
+              setSelectedDesign={setSelectedDesign}
+              setShowCollabDialog={setShowCollabDialog}
+              shareDesignMutation={shareDesignMutation}
+            />
           </TabsContent>
 
           <TabsContent value="collaborations" className="space-y-6">
-            <CollaborationsTab />
+            <CollaborationsTab
+              collaborationsList={designs.filter(
+                (d) => d.collaboration?.isCollaborative
+              )}
+            />
           </TabsContent>
 
           <TabsContent value="bookmarks" className="space-y-6">
-            <BookmarksTab />
+            <BookmarksTab
+              designs={designs}
+              bookmarkDesignMutation={bookmarkDesignMutation}
+              downloadDesignMutation={downloadDesignMutation}
+            />
           </TabsContent>
         </Tabs>
 
@@ -861,303 +818,13 @@ export default function CollaborativeDesignSharing() {
                 if (!design) return null;
 
                 return (
-                  <>
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl">
-                        {design.title}
-                      </DialogTitle>
-                      <DialogDescription className="text-gray-400">
-                        {design.description}
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Preview Images */}
-                      <div className="space-y-4">
-                        <img
-                          src={design.previewImages[0]}
-                          alt={design.title}
-                          className="w-full h-64 object-cover rounded-lg"
-                        />
-                        <div className="grid grid-cols-3 gap-2">
-                          {design.previewImages.slice(1).map((img, index) => (
-                            <img
-                              key={index}
-                              src={img}
-                              alt={`Preview ${index + 2}`}
-                              className="w-full h-20 object-cover rounded"
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Design Info */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={design.creator.avatar} />
-                            <AvatarFallback>
-                              {design.creator.name[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                {design.creator.name}
-                              </span>
-                              {design.creator.verified && (
-                                <Badge className="bg-blue-500 text-white text-xs">
-                                  ✓
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-400">
-                              {design.creator.followers} followers
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-400">Category:</span>
-                            <span className="ml-2 text-white">
-                              {design.category}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">Difficulty:</span>
-                            <span className="ml-2 text-white capitalize">
-                              {design.difficulty}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">Time:</span>
-                            <span className="ml-2 text-white">
-                              {design.timeToComplete} minutes
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">License:</span>
-                            <span className="ml-2 text-white capitalize">
-                              {design.license}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <span className="text-gray-400 text-sm">
-                            Tools used:
-                          </span>
-                          <div className="flex flex-wrap gap-1">
-                            {design.tools.map((tool) => (
-                              <Badge
-                                key={tool}
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                {tool}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <span className="text-gray-400 text-sm">
-                            Color palette:
-                          </span>
-                          <div className="flex gap-2">
-                            {design.colors.map((color) => (
-                              <div
-                                key={color}
-                                className="w-6 h-6 rounded border border-white/20"
-                                style={{ backgroundColor: color }}
-                                title={color}
-                              />
-                            ))}
-                          </div>
-                        </div>
-
-                        {design.isRemix && design.originalDesign && (
-                          <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
-                            <div className="flex items-center gap-2 text-orange-400 text-sm">
-                              <Copy className="h-4 w-4" />
-                              <span>
-                                Remix of "{design.originalDesign.title}" by{" "}
-                                {design.originalDesign.creator}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-4 gap-2 text-center p-3 bg-white/5 rounded-lg">
-                          <div>
-                            <div className="text-lg font-bold text-white">
-                              {design.stats.views}
-                            </div>
-                            <div className="text-xs text-gray-400">Views</div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-white">
-                              {design.stats.likes}
-                            </div>
-                            <div className="text-xs text-gray-400">Likes</div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-white">
-                              {design.stats.downloads}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              Downloads
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-white">
-                              {design.stats.remixes}
-                            </div>
-                            <div className="text-xs text-gray-400">Remixes</div>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => likeDesignMutation.mutate(design.id)}
-                            className={`flex-1 ${
-                              design.isLiked
-                                ? "bg-red-500/20 border-red-500 text-red-400"
-                                : "bg-white/10"
-                            }`}
-                            variant="outline"
-                          >
-                            <Heart
-                              className={`h-4 w-4 mr-2 ${
-                                design.isLiked ? "fill-current" : ""
-                              }`}
-                            />
-                            {design.isLiked ? "Liked" : "Like"}
-                          </Button>
-                          <Button
-                            onClick={() =>
-                              downloadDesignMutation.mutate(design.id)
-                            }
-                            className="flex-1 bg-violet-600 hover:bg-violet-700"
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download
-                          </Button>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => setShowRemixDialog(true)}
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Create Remix
-                          </Button>
-                          <Button
-                            onClick={() =>
-                              shareDesignMutation.mutate(design.id)
-                            }
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <Share2 className="h-4 w-4 mr-2" />
-                            Share
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Comments Section */}
-                    <div className="mt-6 space-y-4">
-                      <h3 className="text-xl font-semibold">
-                        Comments ({comments.length})
-                      </h3>
-
-                      <div className="flex gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" />
-                          <AvatarFallback>You</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-2">
-                          <Textarea
-                            placeholder="Share your thoughts on this design..."
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                          />
-                          <Button
-                            onClick={() =>
-                              addCommentMutation.mutate({
-                                designId: design.id,
-                                content: newComment,
-                              })
-                            }
-                            disabled={!newComment.trim()}
-                            size="sm"
-                            className="bg-purple-600 hover:bg-purple-700"
-                          >
-                            Post Comment
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {comments.map((comment) => (
-                          <div
-                            key={comment.id}
-                            className="flex gap-3 p-3 bg-white/5 rounded-lg"
-                          >
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={comment.author.avatar} />
-                              <AvatarFallback>
-                                {comment.author.name[0]}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-white">
-                                  {comment.author.name}
-                                </span>
-                                <span className="text-xs text-gray-400">
-                                  {formatTimeAgo(comment.createdAt)}
-                                </span>
-                              </div>
-                              <p className="text-gray-300 text-sm">
-                                {comment.content}
-                              </p>
-                              <div className="flex items-center gap-4 mt-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className={`text-xs ${
-                                    comment.isLiked
-                                      ? "text-red-400"
-                                      : "text-gray-400"
-                                  }`}
-                                >
-                                  <Heart
-                                    className={`h-3 w-3 mr-1 ${
-                                      comment.isLiked ? "fill-current" : ""
-                                    }`}
-                                  />
-                                  {comment.likes}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-xs text-gray-400"
-                                >
-                                  Reply
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
+                  <DesignDetailsDialog
+                    design={design}
+                    onLike={() => likeDesignMutation.mutate(design.id)}
+                    onDownload={() => downloadDesignMutation.mutate(design.id)}
+                    onOpenRemix={() => setShowRemixDialog(true)}
+                    onShare={() => shareDesignMutation.mutate(design.id)}
+                  />
                 );
               })()}
             </DialogContent>
@@ -1166,203 +833,33 @@ export default function CollaborativeDesignSharing() {
 
         {/* Remix Dialog */}
         <Dialog open={showRemixDialog} onOpenChange={setShowRemixDialog}>
-          <DialogContent className="bg-black/90 border-purple-500/20 text-white">
-            <DialogHeader>
-              <DialogTitle>Create a Remix</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Create your own version of this design with your unique twist
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="remix-title">Remix Title</Label>
-                <Input
-                  id="remix-title"
-                  value={remixTitle}
-                  onChange={(e) => setRemixTitle(e.target.value)}
-                  placeholder="Give your remix a name..."
-                  className="bg-white/10 border-white/20 text-white"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="remix-type">Remix Type</Label>
-                <Select
-                  value={remixType}
-                  onValueChange={(value: "full" | "partial" | "inspired") =>
-                    setRemixType(value)
-                  }
-                >
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue placeholder="Choose remix type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black border-purple-500/20">
-                    <SelectItem
-                      value="full"
-                      className="text-white hover:bg-purple-500/20"
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">Full Remix</span>
-                        <span className="text-xs text-gray-400">
-                          Copy entire design and customize freely
-                        </span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem
-                      value="partial"
-                      className="text-white hover:bg-purple-500/20"
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">Partial Remix</span>
-                        <span className="text-xs text-gray-400">
-                          Use specific elements as inspiration
-                        </span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem
-                      value="inspired"
-                      className="text-white hover:bg-purple-500/20"
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">Inspired By</span>
-                        <span className="text-xs text-gray-400">
-                          Create new design inspired by concepts
-                        </span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="remix-description">Description</Label>
-                <Textarea
-                  id="remix-description"
-                  value={remixDescription}
-                  onChange={(e) => setRemixDescription(e.target.value)}
-                  placeholder="Describe what makes your remix unique..."
-                  className="bg-white/10 border-white/20 text-white"
-                  rows={3}
-                />
-              </div>
-
-              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <Zap className="h-4 w-4 text-purple-400 mt-1" />
-                  <div className="text-sm">
-                    <p className="text-purple-300 font-medium">
-                      Remix Features
-                    </p>
-                    <ul className="text-gray-400 text-xs space-y-1 mt-1">
-                      <li>
-                        • Attribution to original creator automatically added
-                      </li>
-                      <li>• Full design editor access with all tools</li>
-                      <li>• Export in multiple formats (PNG, SVG, PDF)</li>
-                      <li>• Share your remix with the community</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowRemixDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() =>
-                  selectedDesign &&
-                  remixDesignMutation.mutate({
-                    designId: selectedDesign,
-                    title: remixTitle,
-                    description: remixDescription,
-                    remixType: remixType,
-                  })
-                }
-                disabled={!remixTitle.trim()}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Create Remix
-              </Button>
-            </DialogFooter>
-          </DialogContent>
+          <RemixDialog
+            onCreate={(payload) =>
+              selectedDesign &&
+              remixDesignMutation.mutate({
+                designId: selectedDesign,
+                title: payload.title,
+                description: payload.description,
+                remixType: payload.remixType,
+              })
+            }
+            onCancel={() => setShowRemixDialog(false)}
+          />
         </Dialog>
 
         {/* Collaboration Dialog */}
         <Dialog open={showCollabDialog} onOpenChange={setShowCollabDialog}>
-          <DialogContent className="bg-black/90 border-purple-500/20 text-white">
-            <DialogHeader>
-              <DialogTitle>Invite Collaborators</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Invite others to collaborate on your design project
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="collaborator-email">Email Address</Label>
-                <Input
-                  id="collaborator-email"
-                  type="email"
-                  value={collaboratorEmail}
-                  onChange={(e) => setCollaboratorEmail(e.target.value)}
-                  placeholder="teammate@example.com"
-                  className="bg-white/10 border-white/20 text-white"
-                />
-              </div>
-              <div>
-                <Label htmlFor="collaborator-role">Permission Level</Label>
-                <Select
-                  value={collaboratorRole}
-                  onValueChange={(value: "editor" | "viewer") =>
-                    setCollaboratorRole(value)
-                  }
-                >
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">
-                      Viewer - Can view and comment
-                    </SelectItem>
-                    <SelectItem value="editor">
-                      Editor - Can edit and modify
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowCollabDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() =>
-                  selectedDesign &&
-                  inviteCollaboratorMutation.mutate({
-                    designId: selectedDesign,
-                    email: collaboratorEmail,
-                    role: collaboratorRole,
-                  })
-                }
-                disabled={!collaboratorEmail.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Send Invitation
-              </Button>
-            </DialogFooter>
-          </DialogContent>
+          <CollaborationDialog
+            onSend={(payload) =>
+              selectedDesign &&
+              inviteCollaboratorMutation.mutate({
+                designId: selectedDesign,
+                email: payload.email,
+                role: payload.role,
+              })
+            }
+            onCancel={() => setShowCollabDialog(false)}
+          />
         </Dialog>
       </div>
     </div>
