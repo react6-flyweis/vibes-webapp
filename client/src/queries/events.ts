@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
-import { IResponse } from "@/types";
+import { IResponse, IResponseList } from "@/types";
 
 // EventData represents the shape returned by the events API.
 // Fields are typed based on a sample API response; many fields are optional
@@ -51,5 +51,22 @@ export function useEventByIdQuery(eventId?: string | null) {
     enabled: !!eventId,
     select: (data) => data?.data,
     staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+// Fetch events the current user can plan/manage (by auth)
+export const fetchEventsByAuth = async () => {
+  const res = await axiosInstance.get<IResponseList<EventData>>(
+    "/api/events/getByAuth"
+  );
+  return res.data;
+};
+
+export function useEventsByAuthQuery() {
+  return useQuery({
+    queryKey: ["/api/events/getByAuth"],
+    queryFn: fetchEventsByAuth,
+    select: (data) => data?.data,
+    staleTime: 1000 * 60 * 2,
   });
 }
