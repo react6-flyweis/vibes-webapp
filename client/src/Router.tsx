@@ -9,6 +9,7 @@ const HomePage = lazy(() => import("@/pages/home"));
 const ModernHome = lazy(() => import("@/pages/modern-home"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const EventPlanning = lazy(() => import("@/pages/event-planning"));
+const EventPlanningAuth = lazy(() => import("@/pages/event-planning-auth"));
 const EnhancedEventPage = lazy(() => import("@/pages/enhanced-event"));
 const BusinessPromotionPage = lazy(() => import("@/pages/business-promotion"));
 const VendorOnboarding = lazy(() => import("@/pages/vendor-onboarding"));
@@ -174,6 +175,8 @@ function DashboardRouter() {
         <Route path="/" element={<ModernHome />} />
         <Route path="/home" element={<ModernHome />} />
         {/* <Route path="/home" element={<HomePage />} /> */}
+
+        <Route path="/plan-event/" element={<EventPlanningAuth />} />
         <Route path="/plan-event/:id" element={<EnhancedEventPage />} />
         <Route path="/ai-party-designer" element={<AIPartyDesigner />} />
         <Route path="/ar-space-planner" element={<ARSpacePlanner />} />
