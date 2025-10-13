@@ -75,7 +75,7 @@ export const navigationItems: NavCategory[] = [
       },
       {
         name: "Play My Event",
-        href: "/enhanced-event/1",
+        href: "/plan-event/",
         icon: Calendar,
         description: "Book and manage tickets",
       },
