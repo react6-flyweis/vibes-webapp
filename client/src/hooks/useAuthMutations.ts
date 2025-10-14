@@ -78,3 +78,34 @@ export function useResendOtpMutation(
     ...options,
   });
 }
+
+// Create user / signup mutation for the new endpoint
+export function useCreateUserMutation(
+  options?: UseMutationOptions<
+    unknown,
+    unknown,
+    {
+      name: string;
+      email: string;
+      password: string;
+      agreePrivacyPolicy: boolean;
+    }
+  >
+) {
+  return useMutation<
+    unknown,
+    unknown,
+    {
+      name: string;
+      email: string;
+      password: string;
+      agreePrivacyPolicy: boolean;
+    }
+  >({
+    mutationFn: async (data) => {
+      // Using axiosInstance to keep consistency with other auth mutations
+      return await axiosInstance.post("/api/users/create", data);
+    },
+    ...options,
+  });
+}
