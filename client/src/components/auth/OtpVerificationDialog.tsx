@@ -98,7 +98,7 @@ export default function OtpVerificationDialog({
         <DialogHeader className="text-center">
           <DialogTitle className="text-3xl font-bold">Verification</DialogTitle>
           <p className="text-sm text-muted-foreground mt-2">
-            Enter your 4 digits code that you received on your email.
+            Enter your 6 digits code that you received on your email.
           </p>
         </DialogHeader>
 
