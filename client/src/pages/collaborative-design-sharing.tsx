@@ -770,13 +770,8 @@ export default function CollaborativeDesignSharing() {
 
           <TabsContent value="discover" className="space-y-6">
             <DiscoverTab
-              designs={designs}
               setSelectedDesign={setSelectedDesign}
               setShowRemixDialog={setShowRemixDialog}
-              shareDesignMutation={shareDesignMutation}
-              likeDesignMutation={likeDesignMutation}
-              bookmarkDesignMutation={bookmarkDesignMutation}
-              downloadDesignMutation={downloadDesignMutation}
             />
           </TabsContent>
 
