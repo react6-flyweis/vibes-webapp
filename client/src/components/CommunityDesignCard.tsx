@@ -22,27 +22,84 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { toast } from "@/hooks/use-toast";
+
 type SharedDesign = any;
 
 type Props = {
   design: SharedDesign;
   onViewDetails: (id: string) => void;
   onCreateRemix: (id: string) => void;
-  onShare: (id: string) => void;
-  onLike: (id: string) => void;
-  onBookmark: (id: string) => void;
-  onDownload: (id: string) => void;
 };
 
 export default function CommunityDesignCard({
   design,
   onViewDetails,
   onCreateRemix,
-  onShare,
-  onLike,
-  onBookmark,
-  onDownload,
 }: Props) {
+  const likeMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/like`, "POST");
+      return res;
+    },
+    onSuccess: () => {
+      toast({ title: "Design Liked", description: "Added to your favorites" });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/master/community-designs/getAll"],
+      });
+    },
+  });
+
+  const bookmarkMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/bookmark`, "POST");
+      return res;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Design Bookmarked",
+        description: "Saved for later reference",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/master/community-designs/getAll"],
+      });
+    },
+  });
+
+  const shareMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/share`, "POST");
+      return res;
+    },
+    onSuccess: (data: any) => {
+      try {
+        void navigator.clipboard.writeText(
+          data?.shareUrl ?? window.location.href
+        );
+      } catch (e) {
+        // ignore
+      }
+      toast({
+        title: "Share Link Created",
+        description: "Design link copied to clipboard",
+      });
+    },
+  });
+
+  const downloadMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/download`, "POST");
+      return res;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Download Started",
+        description: "Design files are being prepared",
+      });
+    },
+  });
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
@@ -140,10 +197,12 @@ export default function CommunityDesignCard({
                 <Copy className="w-4 h-4 mr-2" />
                 Create Remix
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onShare(design.id)}>
+              <DropdownMenuItem onClick={() => shareMutation.mutate(design.id)}>
                 <Share2 className="w-4 h-4 mr-2" />
                 Share Design
               </DropdownMenuItem>
+
+              {/* Mutations: like, bookmark, download, share */}
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-400">
                 <Flag className="w-4 h-4 mr-2" />
@@ -211,7 +270,7 @@ export default function CommunityDesignCard({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => onLike(design.id)}
+            onClick={() => likeMutation.mutate(design.id)}
             className={`flex-1 ${
               design.isLiked
                 ? "bg-red-500/20 border-red-500 text-red-400"
@@ -226,7 +285,7 @@ export default function CommunityDesignCard({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => onBookmark(design.id)}
+            onClick={() => bookmarkMutation.mutate(design.id)}
             className={`flex-1 ${
               design.isBookmarked
                 ? "bg-yellow-500/20 border-yellow-500 text-yellow-400"
@@ -242,7 +301,7 @@ export default function CommunityDesignCard({
           </Button>
           <Button
             size="sm"
-            onClick={() => onDownload(design.id)}
+            onClick={() => downloadMutation.mutate(design.id)}
             className="bg-violet-600 hover:bg-violet-700"
           >
             <Download className="h-3 w-3" />
