@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,46 +10,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CommunityDesignCard from "@/components/CommunityDesignCard";
-import type { SharedDesign } from "@/types/designs";
+import { useCommunityDesignsQuery } from "@/queries/communityDesigns";
 
 interface Props {
-  designs: SharedDesign[];
   setSelectedDesign: (id: string | null) => void;
   setShowRemixDialog: (v: boolean) => void;
-  shareDesignMutation: any;
-  likeDesignMutation: any;
-  bookmarkDesignMutation: any;
-  downloadDesignMutation: any;
 }
 
 export default function DiscoverTab({
-  designs,
   setSelectedDesign,
   setShowRemixDialog,
-  shareDesignMutation,
-  likeDesignMutation,
-  bookmarkDesignMutation,
-  downloadDesignMutation,
 }: Props) {
-  const [localCategory, setLocalCategory] = useState("all");
-  const [localSortBy, setLocalSortBy] = useState("trending");
-  const [localSearch, setLocalSearch] = useState("");
+  // Use community designs from the API
+  const { data: designs = [], isLoading } = useCommunityDesignsQuery();
+  const [category, setCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("trending");
+  const [search, setSearch] = useState("");
 
-  const filteredDesignsLocal = (designs || []).filter((design) => {
-    const matchesCategory =
-      localCategory === "all" || design.category === localCategory;
+  const filteredDesigns = (designs || []).filter((design) => {
+    const matchesCategory = category === "all" || design.category === category;
     const matchesSearch =
-      localSearch === "" ||
-      design.title.toLowerCase().includes(localSearch.toLowerCase()) ||
-      design.description.toLowerCase().includes(localSearch.toLowerCase()) ||
+      search === "" ||
+      design.title.toLowerCase().includes(search.toLowerCase()) ||
+      design.description.toLowerCase().includes(search.toLowerCase()) ||
       design.tags.some((tag) =>
-        tag.toLowerCase().includes(localSearch.toLowerCase())
+        tag.toLowerCase().includes(search.toLowerCase())
       );
     return matchesCategory && matchesSearch;
   });
 
-  const sortedDesignsLocal = [...filteredDesignsLocal].sort((a, b) => {
-    switch (localSortBy) {
+  const sortedDesigns = [...filteredDesigns].sort((a, b) => {
+    switch (sortBy) {
       case "trending":
         return (
           b.stats.views +
@@ -79,17 +70,14 @@ export default function DiscoverTab({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="Search designs, creators, or tags..."
-                  value={localSearch}
-                  onChange={(e) => setLocalSearch(e.target.value)}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
                 />
               </div>
             </div>
 
-            <Select
-              value={localCategory}
-              onValueChange={(v) => setLocalCategory(v)}
-            >
+            <Select value={category} onValueChange={(v) => setCategory(v)}>
               <SelectTrigger className="w-48 bg-white/10 border-white/20 text-white">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -104,10 +92,7 @@ export default function DiscoverTab({
               </SelectContent>
             </Select>
 
-            <Select
-              value={localSortBy}
-              onValueChange={(v) => setLocalSortBy(v)}
-            >
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v)}>
               <SelectTrigger className="w-48 bg-white/10 border-white/20 text-white">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -122,23 +107,64 @@ export default function DiscoverTab({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedDesignsLocal.map((design) => (
-          <CommunityDesignCard
-            key={design.id}
-            design={design}
-            onViewDetails={(id) => setSelectedDesign(id)}
-            onCreateRemix={(id) => {
-              setSelectedDesign(id);
-              setShowRemixDialog(true);
-            }}
-            onShare={(id) => shareDesignMutation.mutate(id)}
-            onLike={(id) => likeDesignMutation.mutate(id)}
-            onBookmark={(id) => bookmarkDesignMutation.mutate(id)}
-            onDownload={(id) => downloadDesignMutation.mutate(id)}
-          />
-        ))}
-      </div>
+      {/* Results grid / Loading / Empty state */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="animate-pulse rounded-lg border border-white/10 bg-black/30 p-4 flex flex-col gap-3"
+              aria-hidden
+            >
+              <div className="h-40 bg-white/5 rounded-md" />
+              <div className="h-4 w-3/4 bg-white/5 rounded" />
+              <div className="h-3 w-1/2 bg-white/5 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : sortedDesigns.length === 0 ? (
+        <div className="col-span-full">
+          <Card className="border-dashed border-white/10 bg-black/30">
+            <CardContent className="text-center py-12">
+              <h3 className="text-lg font-semibold text-white mb-2">
+                No designs found
+              </h3>
+              <p className="text-sm text-gray-300 max-w-xl mx-auto">
+                We couldn't find any community designs matching your search or
+                filters. Try clearing filters or searching for something else.
+              </p>
+
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategory("all");
+                    setSortBy("trending");
+                    setSearch("");
+                  }}
+                  className="inline-flex items-center px-4 py-2 mt-3 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                >
+                  Clear filters
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedDesigns.map((design) => (
+            <CommunityDesignCard
+              key={design.id}
+              design={design}
+              onViewDetails={(id) => setSelectedDesign(id)}
+              onCreateRemix={(id) => {
+                setSelectedDesign(id);
+                setShowRemixDialog(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 }
