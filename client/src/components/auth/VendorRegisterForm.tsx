@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/form";
 
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useCreateUserMutation } from "@/hooks/useAuthMutations";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
+import { useNavigate } from "react-router";
 
 const vendorSchema = z.object({
   businessName: z.string().min(1, "Please enter your business name"),
@@ -46,6 +48,7 @@ type VendorForm = z.infer<typeof vendorSchema>;
 export function VendorRegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<VendorForm>({
     resolver: zodResolver(vendorSchema),
@@ -60,34 +63,53 @@ export function VendorRegisterForm() {
     },
   });
 
-  const signupMutation = useMutation({
-    mutationFn: async (data: VendorForm) => {
-      // attach role=vendor so backend knows this is a vendor
-      return await apiRequest("/api/auth/signup", "POST", {
-        ...data,
-        role: "vendor",
-      });
-    },
-    onSuccess: () => {
+  // Use the centralized hook which posts to /api/users/create
+  const createUserMutation = useCreateUserMutation();
+
+  const onSubmit = async (data: VendorForm) => {
+    // Map vendor form fields to API payload
+    const payload = {
+      name: data.contactPersonName,
+      email: data.email,
+      password: data.password,
+      agreePrivacyPolicy: !!data.agreeToTerms,
+      business_name: data.businessName,
+      business_category_id: getCategoryId(data.businessCategory),
+    };
+
+    try {
+      // Await the mutation so we can handle success inline
+      await createUserMutation.mutateAsync(payload);
+
       toast({
         title: "Vendor Account Created!",
         description:
           "Welcome to Vibes! Please check your email to verify your vendor account.",
       });
-      window.location.href = "/auth/login";
-    },
-    onError: (error: any) => {
+      navigate("/login");
+    } catch (error: any) {
       console.error("Vendor signup error:", error);
+      const message = extractApiErrorMessage(error);
       toast({
         title: "Registration Failed",
-        description:
-          error?.message || "Unable to create account. Please try again.",
+        description: message || "Unable to create account. Please try again.",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
-  const onSubmit = (data: VendorForm) => signupMutation.mutate(data);
+  // Helper function to map category name to ID
+  const getCategoryId = (category: string): number => {
+    const categoryMap: Record<string, number> = {
+      "Beverage & Liquor": 1,
+      Catering: 2,
+      Entertainment: 3,
+      Venue: 4,
+      Decor: 5,
+      Other: 6,
+    };
+    return categoryMap[category] || 6; // Default to "Other"
+  };
 
   const getPasswordStrength = (password: string) => {
     let score = 0;
@@ -143,7 +165,7 @@ export function VendorRegisterForm() {
                 <Input
                   placeholder="My Awesome Company"
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-10 px-4"
                 />
               </FormControl>
@@ -164,7 +186,7 @@ export function VendorRegisterForm() {
                 <Input
                   placeholder="Jane Doe"
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-10 px-4"
                 />
               </FormControl>
@@ -184,7 +206,7 @@ export function VendorRegisterForm() {
               <FormControl>
                 <select
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="w-full rounded-xl border border-gray-200 h-10 px-4 text-sm"
                 >
                   <option value="">Select a category</option>
@@ -211,7 +233,7 @@ export function VendorRegisterForm() {
                   type="email"
                   placeholder="you@business.com"
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-10 px-4"
                 />
               </FormControl>
@@ -232,7 +254,7 @@ export function VendorRegisterForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     {...field}
-                    disabled={signupMutation.isPending}
+                    disabled={createUserMutation.isPending}
                     className="rounded-xl border-gray-200 h-10 px-4"
                   />
                   <button
@@ -356,13 +378,13 @@ export function VendorRegisterForm() {
           />
         </div>
 
-        <Button
+        <LoadingButton
           type="submit"
           className="w-full rounded bg-gradient-cta text-white text-xl py-3 shadow-2xl "
-          disabled={signupMutation.isPending}
+          isLoading={createUserMutation.isPending}
         >
           Sign up as vendor
-        </Button>
+        </LoadingButton>
       </form>
     </Form>
   );
