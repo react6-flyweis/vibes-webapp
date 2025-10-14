@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/form";
 
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useCreateUserMutation } from "@/hooks/useAuthMutations";
+import { LoadingButton } from "../ui/loading-button";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -44,6 +45,7 @@ type SignupForm = z.infer<typeof signupSchema>;
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -56,31 +58,39 @@ export function RegisterForm() {
     },
   });
 
-  const signupMutation = useMutation({
-    mutationFn: async (data: SignupForm) => {
-      return await apiRequest("/api/auth/signup", "POST", data);
-    },
-    onSuccess: () => {
+  // prefer the centralized hook which posts to /api/users/create
+  // keep mutation options empty so this hook remains generic; handle UI side-effects in the submit handler
+  const createUserMutation = useCreateUserMutation();
+
+  const onSubmit = async (data: SignupForm) => {
+    // map local form fields to API payload
+    const payload = {
+      name: data.username,
+      email: data.email,
+      password: data.password,
+      agreePrivacyPolicy: !!data.agreeToTerms,
+    };
+
+    try {
+      // await the mutation so we can handle success inline
+      const res = await createUserMutation.mutateAsync(payload);
+
       toast({
         title: "Account Created!",
         description:
           "Welcome to Vibes! Please check your email to verify your account.",
       });
-      // redirect to login
-      window.location.href = "/auth/login";
-    },
-    onError: (error: any) => {
-      console.error("Signup error:", error);
+      navigate("/login");
+    } catch (error: any) {
+      console.error("Create user mutateAsync error:", error);
+      const message = extractApiErrorMessage(error);
       toast({
         title: "Registration Failed",
-        description:
-          error?.message || "Unable to create account. Please try again.",
+        description: message || "An error occurred during registration.",
         variant: "destructive",
       });
-    },
-  });
-
-  const onSubmit = (data: SignupForm) => signupMutation.mutate(data);
+    }
+  };
 
   // Password strength checker
   const getPasswordStrength = (password: string) => {
@@ -125,7 +135,7 @@ export function RegisterForm() {
                 <Input
                   placeholder="yourusername"
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-12 px-4"
                 />
               </FormControl>
@@ -145,7 +155,7 @@ export function RegisterForm() {
                   type="email"
                   placeholder="you@example.com"
                   {...field}
-                  disabled={signupMutation.isPending}
+                  disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-12 px-4"
                 />
               </FormControl>
@@ -169,7 +179,7 @@ export function RegisterForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Create a strong password"
                       {...field}
-                      disabled={signupMutation.isPending}
+                      disabled={createUserMutation.isPending}
                       className="rounded-xl border-gray-200 h-12 px-4"
                     />
                     <button
@@ -312,13 +322,13 @@ export function RegisterForm() {
           />
         </div>
 
-        <Button
+        <LoadingButton
           type="submit"
           className="w-full rounded bg-gradient-cta text-white text-xl py-3 shadow-2xl "
-          disabled={signupMutation.isPending}
+          isLoading={createUserMutation.isPending}
         >
           Sign up
-        </Button>
+        </LoadingButton>
       </form>
     </Form>
   );
