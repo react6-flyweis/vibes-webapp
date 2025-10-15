@@ -31,28 +31,31 @@ export function ContentTab({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Event Information</CardTitle>
+        <CardTitle className="text-sm">Event Information</CardTitle>{" "}
       </CardHeader>
       <CardContent className="space-y-4">
+        <div>
+          <Label htmlFor="hostName">Host Name(s)</Label>
+          <Input
+            id="hostName"
+            value={hostName}
+            onChange={(e) => setHostName(e.target.value)}
+            placeholder="e.g., Sarah & Michael"
+          />
+          <p className="text-xs text-gray-400 mt-1">Names of hosts or couple</p>
+        </div>
+
         <div>
           <Label htmlFor="eventTitle">Event Title</Label>
           <Input
             id="eventTitle"
             value={eventTitle}
             onChange={(e) => setEventTitle(e.target.value)}
-            placeholder="Enter event title"
+            placeholder="e.g., Wedding Celebration"
           />
-        </div>
-
-        <div>
-          <Label htmlFor="eventMessage">Message</Label>
-          <Textarea
-            id="eventMessage"
-            value={eventMessage}
-            onChange={(e) => setEventMessage(e.target.value)}
-            placeholder="Event description or message"
-            rows={3}
-          />
+          <p className="text-xs text-gray-400 mt-1">
+            Main event title or headline
+          </p>
         </div>
 
         <div>
@@ -63,6 +66,9 @@ export function ContentTab({
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
           />
+          <p className="text-xs text-gray-400 mt-1">
+            When the event takes place
+          </p>
         </div>
 
         <div>
@@ -71,18 +77,23 @@ export function ContentTab({
             id="eventLocation"
             value={eventLocation}
             onChange={(e) => setEventLocation(e.target.value)}
-            placeholder="Event location"
+            placeholder="e.g., Grand Ballroom, The Plaza Hotel"
           />
+          <p className="text-xs text-gray-400 mt-1">Event venue or address</p>
         </div>
 
         <div>
-          <Label htmlFor="hostName">Host Name</Label>
-          <Input
-            id="hostName"
-            value={hostName}
-            onChange={(e) => setHostName(e.target.value)}
-            placeholder="Your name"
+          <Label htmlFor="eventMessage">Message / Description</Label>
+          <Textarea
+            id="eventMessage"
+            value={eventMessage}
+            onChange={(e) => setEventMessage(e.target.value)}
+            placeholder="e.g., Join us for a day of love and laughter..."
+            rows={4}
           />
+          <p className="text-xs text-gray-400 mt-1">
+            Invitation message or event description
+          </p>
         </div>
       </CardContent>
     </Card>
