@@ -16,6 +16,8 @@ import {
   Crown,
   Briefcase,
   Layout,
+  Shield,
+  Share,
   // Zap,
   // Settings,
   // Bell,
@@ -128,15 +130,6 @@ export const navigationItems: NavCategory[] = [
       },
     ],
   },
-  //   {
-  //     title: "Venues & Spaces",
-  //     items: [
-  //       { name: "Venue Showcase", href: "/natural-venue-showcase", icon: MapPin, description: "Immersive venue tours" },
-  //       { name: "Seat Tracker", href: "/interactive-seat-tracker", icon: Armchair, description: "Smart seating management" },
-  //       { name: "AR Space Planner", href: "/ar-space-planner", icon: Zap, description: "Augmented reality planning" },
-  //       { name: "Virtual Party Twin", href: "/virtual-party-twin", icon: Globe, description: "Digital event replica" },
-  //     ],
-  //   },
   {
     title: "Marketplace",
     items: [
@@ -160,6 +153,48 @@ export const navigationItems: NavCategory[] = [
       },
     ],
   },
+];
+export const vendorNavigationItems: NavCategory[] = [
+  // Vibes fund
+  //  vibesfund
+  // fundraising
+  //  crowdfunding
+  // Social media outreach
+  {
+    title: "Vibes Fund",
+    items: [
+      {
+        name: "vibesfund",
+        href: "/vibes-fund",
+        icon: Heart,
+      },
+      {
+        name: "Fundraising",
+        href: "/fundraising",
+        icon: Heart,
+      },
+      {
+        name: "Crowdfunding",
+        href: "/crowdfunding",
+        icon: Heart,
+      },
+      {
+        name: "Social Media Outreach",
+        href: "/social-media-outreach",
+        icon: Share,
+      },
+    ],
+  },
+  //   {
+  //     title: "Venues & Spaces",
+  //     items: [
+  //       { name: "Venue Showcase", href: "/natural-venue-showcase", icon: MapPin, description: "Immersive venue tours" },
+  //       { name: "Seat Tracker", href: "/interactive-seat-tracker", icon: Armchair, description: "Smart seating management" },
+  //       { name: "AR Space Planner", href: "/ar-space-planner", icon: Zap, description: "Augmented reality planning" },
+  //       { name: "Virtual Party Twin", href: "/virtual-party-twin", icon: Globe, description: "Digital event replica" },
+  //     ],
+  //   },
+
   // {
   //   title: "AI Features",
   //   items: [
@@ -293,6 +328,36 @@ export const navigationItems: NavCategory[] = [
       //   icon: Database,
       //   description: "Comprehensive Enterprise Resource Planning Platform",
       // },
+    ],
+  },
+  // Vibes launchfund
+  // - Financial management
+  //  - security trus
+  // - Backer experience
+  //  - Campaign management
+  {
+    title: "Vibes LaunchFund",
+    items: [
+      {
+        name: "Financial Management",
+        href: "/financial-management",
+        icon: Star,
+      },
+      {
+        name: "Security Trust",
+        href: "/security-trust",
+        icon: Shield,
+      },
+      {
+        name: "Backer Experience",
+        href: "/backer-experience",
+        icon: Users,
+      },
+      {
+        name: "Campaign Management",
+        href: "/campaign-management",
+        icon: TrendingUp,
+      },
     ],
   },
   //   {
