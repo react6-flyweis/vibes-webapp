@@ -75,8 +75,8 @@ export function Sidebar({
   return (
     <div
       className={`${
-        collapsed ? "w-16" : "w-80"
-      } bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-300 flex flex-col transition-all duration-300`}
+        collapsed ? "w-16" : "w-[23%]"
+      } bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-300 flex flex-col transition-all duration-300 shrink-0`}
     >
       {/* Sidebar Header */}
       <div className="p-4 dark:border-gray-700 border-gray-300 border-b mb-1">
