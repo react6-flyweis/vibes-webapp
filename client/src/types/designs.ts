@@ -1,5 +1,5 @@
 export interface SharedDesign {
-  id: string;
+  id: number;
   title: string;
   description: string;
   creator: {
