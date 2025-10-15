@@ -8,14 +8,22 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useNavigate } from "react-router";
-import type { NavCategory } from "./app-shell-data";
+import {
+  navigationItems,
+  vendorNavigationItems,
+  type NavCategory,
+} from "./app-shell-data";
+import { useAuthStore } from "@/store/auth-store";
 
-interface DesktopNavProps {
-  categories: NavCategory[];
-}
-
-export default function DesktopNav({ categories }: DesktopNavProps) {
+export default function DesktopNav() {
   const navigate = useNavigate();
+
+  const user = useAuthStore((s) => s.user);
+
+  const categories: NavCategory[] = [
+    ...navigationItems,
+    ...(user?.role_id === 3 ? vendorNavigationItems : []),
+  ];
 
   return (
     <NavigationMenu className="hidden lg:flex grow justify-center mx-4 min-w-0">
