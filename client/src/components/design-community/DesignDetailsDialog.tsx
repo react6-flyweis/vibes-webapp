@@ -252,7 +252,7 @@ export default function DesignDetailsDialog({
       </div>
 
       {/* Comments Section */}
-      <div className="mt-6 space-y-4">
+      {/* <div className="mt-6 space-y-4">
         <h3 className="text-xl font-semibold">Comments ({comments.length})</h3>
 
         <div className="flex gap-3">
@@ -307,7 +307,7 @@ export default function DesignDetailsDialog({
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </>
   );
 }
