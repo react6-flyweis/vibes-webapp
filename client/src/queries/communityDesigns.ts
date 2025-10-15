@@ -34,7 +34,7 @@ async function fetchCommunityDesigns() {
 
 function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
   return {
-    id: item._id,
+    id: item.community_designs_id,
     title: item.title ?? "",
     description: item.sub_title ?? "",
     creator: {
@@ -98,6 +98,24 @@ export function useCommunityDesignsQuery() {
     queryKey: ["/api/master/community-designs/getAll"],
     queryFn: fetchCommunityDesigns,
     select: (res) => (res?.data ?? []).map(mapToSharedDesign),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+async function fetchDesignsByTab(tabId: number | string) {
+  const res = await axiosInstance.get<IResponseList<CommunityDesignApiItem>>(
+    `/api/master/design-tabs-map/getDesignsByTabId/${tabId}`
+  );
+  return res.data;
+}
+
+export function useDesignsByTabQuery(tabId: number | string | undefined) {
+  return useQuery({
+    queryKey: ["/api/master/design-tabs-map/getDesignsByTabId", tabId],
+    queryFn: () => fetchDesignsByTab(tabId ?? ""),
+    enabled: typeof tabId !== "undefined" && tabId !== null && tabId !== "",
+    select: (res: IResponseList<CommunityDesignApiItem> | undefined) =>
+      (res?.data ?? []).map(mapToSharedDesign),
     staleTime: 1000 * 60 * 2,
   });
 }
