@@ -1,8 +1,9 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useCreateDesign } from "@/api/designs";
+import { useCreateDesign, createDesignTabMap } from "@/mutations/designs";
 import Navigation from "@/components/navigation";
 import PublishDialog from "@/components/PublishDialog";
 
@@ -12,22 +13,24 @@ import { Toolbar } from "@/features/vibescard-studio/components/Toolbar";
 import { PropertiesPanel } from "@/features/vibescard-studio/components/PropertiesPanel";
 
 import { useDesignElements } from "@/features/vibescard-studio/hooks/useDesignElements";
-import { useEventDetails } from "@/features/vibescard-studio/hooks/useEventDetails";
 import { useTemplate } from "@/features/vibescard-studio/hooks/useTemplate";
 
 import {
   saveDesignData,
   calculateZoomLevel,
   exportDesignToPNG,
+  preloadImagesForExport,
+  waitForImagesToLoad,
 } from "@/features/vibescard-studio/utils/helpers";
 
 export default function VibesCardStudioNew() {
   const { toast } = useToast();
   const stageRef = useRef<any>(null);
+  const navigate = useNavigate();
 
   // Canvas state
-  const [canvasSize] = useState({ width: 800, height: 600 });
-  const [zoom, setZoom] = useState(100);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 1027 });
+  const [zoom, setZoom] = useState(50);
   const [gridVisible, setGridVisible] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
 
@@ -59,28 +62,96 @@ export default function VibesCardStudioNew() {
     canvasSize
   );
 
-  const {
-    eventTitle,
-    setEventTitle,
-    eventMessage,
-    setEventMessage,
-    eventDate,
-    setEventDate,
-    eventLocation,
-    setEventLocation,
-    hostName,
-    setHostName,
-    eventDetails,
-  } = useEventDetails();
+  const [eventTitle, setEventTitle] = useState("New Design");
+  const [eventMessage, setEventMessage] = useState("You're Invited!");
+  const [eventDate, setEventDate] = useState("2025-12-25T18:00");
+  const [eventLocation, setEventLocation] = useState(
+    "Grand Ballroom, The Plaza Hotel"
+  );
+  const [hostName, setHostName] = useState("Sarah & Michael");
 
   const { selectedTemplate, applyTemplate } = useTemplate();
+
+  // Sync event details with elements that have dataField mappings
+  useEffect(() => {
+    const eventDetailsMap = {
+      title: eventTitle,
+      message: eventMessage,
+      date: eventDate,
+      location: eventLocation,
+      hostName: hostName,
+    };
+
+    // Update elements that have dataField mappings
+    setElements((prevElements) =>
+      prevElements.map((element) => {
+        if (element.dataField && eventDetailsMap[element.dataField]) {
+          return {
+            ...element,
+            content: {
+              ...element.content,
+              text: eventDetailsMap[element.dataField],
+            },
+          };
+        }
+        return element;
+      })
+    );
+  }, [
+    eventTitle,
+    eventMessage,
+    eventDate,
+    eventLocation,
+    hostName,
+    setElements,
+  ]);
 
   // Template application handler
   const handleApplyTemplate = useCallback(
     (template: any) => {
-      applyTemplate(template, setElements, setColorScheme, setSelectedElement);
+      // Show toast that template is being applied
+      toast({
+        title: "Applying Template",
+        description: "Loading template elements...",
+      });
+
+      // Clear selection and reset zoom for better UX
+      setSelectedElement(null);
+      setZoom(50);
+
+      // Prepare event details
+      const eventDetailsData = {
+        title: eventTitle,
+        message: eventMessage,
+        date: eventDate,
+        location: eventLocation,
+        hostName: hostName,
+      };
+
+      // Apply the template with event details
+      applyTemplate(
+        template,
+        setElements,
+        setColorScheme,
+        setSelectedElement,
+        setCanvasSize,
+        eventDetailsData
+      );
     },
-    [applyTemplate, setElements, setColorScheme, setSelectedElement]
+    [
+      applyTemplate,
+      setElements,
+      setColorScheme,
+      setSelectedElement,
+      setCanvasSize,
+      toast,
+      setZoom,
+      eventTitle,
+      eventMessage,
+      eventDate,
+      eventLocation,
+      hostName,
+    ]
   );
 
   // Zoom handlers
@@ -99,7 +170,13 @@ export default function VibesCardStudioNew() {
         elements,
         colorScheme,
         canvasSize,
-        eventDetails,
+        {
+          title: eventTitle,
+          message: eventMessage,
+          date: eventDate,
+          location: eventLocation,
+          hostName: hostName,
+        },
         selectedTemplate
       );
       return await apiRequest("POST", "/api/vibescard-designs", designData);
@@ -121,11 +198,34 @@ export default function VibesCardStudioNew() {
 
   // Community design create mutation (for export + publish)
   const createDesignMutation = useCreateDesign({
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // data is the response from the create design API - expect it to include the created id
       toast({
         title: "Design Published",
         description: "Your design has been published to the community.",
       });
+
+      try {
+        const createdId = data?.data?.community_designs_id || 0;
+        await createDesignTabMap({
+          tabs_id: 2,
+          community_designs_id: createdId,
+          status: true,
+        });
+        // Redirect to collaborative design sharing page after successful publish
+        try {
+          navigate("/collaborative-design-sharing");
+        } catch (err) {
+          console.warn("Navigation after publish failed:", err);
+        }
+      } catch (err) {
+        console.error("Failed to map design to tab:", err);
+        toast({
+          title: "Mapping Failed",
+          description: "Design was published but mapping to tabs failed.",
+          variant: "destructive",
+        });
+      }
     },
     onError: () => {
       toast({
@@ -137,21 +237,51 @@ export default function VibesCardStudioNew() {
   });
 
   // Export handler
-  const handleExport = useCallback(() => {
+  const handleExport = useCallback(async () => {
     try {
-      exportDesignToPNG(stageRef);
+      // Show loading toast
+      toast({
+        title: "Preparing Export",
+        description: "Loading images and preparing canvas...",
+      });
+
+      console.log("Starting export process with elements:", elements.length);
+
+      // First, wait for all current images to load
+      await waitForImagesToLoad(elements);
+
+      // Preload and convert external images to base64
+      const updatedElements = await preloadImagesForExport(elements);
+
+      // Update the elements state with base64 images
+      setElements(updatedElements);
+
+      console.log("Elements updated with base64 images");
+
+      // Wait for React to re-render and Konva to update
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log("Attempting export...");
+      await exportDesignToPNG(stageRef);
+
       toast({
         title: "Export Success",
         description: "Your invitation has been downloaded",
       });
     } catch (error) {
+      console.error("Export error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unable to export design. Please try again.";
+
       toast({
         title: "Export Failed",
-        description: "Unable to export design. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
-  }, [stageRef, toast]);
+  }, [stageRef, toast, elements, setElements]);
 
   // Save dialog state for publishing/exporting to community
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -168,8 +298,32 @@ export default function VibesCardStudioNew() {
 
   const handlePublish = useCallback(async () => {
     try {
+      // Show loading toast
+      toast({
+        title: "Preparing Design",
+        description: "Loading images and preparing canvas...",
+      });
+
+      console.log("Starting publish process with elements:", elements.length);
+
+      // First, wait for all current images to load
+      await waitForImagesToLoad(elements);
+
+      // Preload and convert external images to base64
+      const updatedElements = await preloadImagesForExport(elements);
+
+      // Update the elements state with base64 images
+      setElements(updatedElements);
+
+      console.log("Elements updated with base64 images");
+
+      // Wait for React to re-render and Konva to update
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log("Attempting to generate image for publish...");
+
       // Export to dataURL (reuse helper which returns dataURL)
-      const dataURL = exportDesignToPNG(stageRef);
+      const dataURL = await exportDesignToPNG(stageRef);
 
       if (!dataURL) {
         toast({
@@ -178,6 +332,51 @@ export default function VibesCardStudioNew() {
           variant: "destructive",
         });
         return;
+      }
+
+      // Build design JSON so it can be loaded/edited later.
+      // Prefer Konva's stage.toJSON() when available (captures Konva node state),
+      // otherwise fall back to the structured saveDesignData object.
+      let designJsonString = "";
+      try {
+        const stage = stageRef?.current;
+        if (stage && typeof stage.toJSON === "function") {
+          designJsonString = stage.toJSON();
+        } else {
+          const designJsonObject = saveDesignData(
+            elements,
+            colorScheme,
+            canvasSize,
+            {
+              title: eventTitle,
+              message: eventMessage,
+              date: eventDate,
+              location: eventLocation,
+              hostName: hostName,
+            },
+            selectedTemplate
+          );
+          designJsonString = JSON.stringify(designJsonObject);
+        }
+      } catch (e) {
+        console.warn(
+          "Failed to generate stage JSON, falling back to saveDesignData",
+          e
+        );
+        const designJsonObject = saveDesignData(
+          elements,
+          colorScheme,
+          canvasSize,
+          {
+            title: eventTitle,
+            message: eventMessage,
+            date: eventDate,
+            location: eventLocation,
+            hostName: hostName,
+          },
+          selectedTemplate
+        );
+        designJsonString = JSON.stringify(designJsonObject);
       }
 
       const payload = {
@@ -193,15 +392,22 @@ export default function VibesCardStudioNew() {
               .map((t) => t.trim())
               .filter(Boolean)
           : [],
+        design_json_data: designJsonString,
         status: true,
       } as any;
 
       createDesignMutation.mutate(payload);
       setShowSaveDialog(false);
     } catch (err) {
+      console.error("Publish error:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while publishing";
+
       toast({
         title: "Publish Error",
-        description: "An error occurred while publishing",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -212,6 +418,8 @@ export default function VibesCardStudioNew() {
     publishTags,
     createDesignMutation,
     toast,
+    elements,
+    setElements,
   ]);
 
   // Get selected element object
@@ -266,7 +474,7 @@ export default function VibesCardStudioNew() {
         />
 
         {/* Main Canvas Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Toolbar */}
           <Toolbar
             eventTitle={eventTitle}
@@ -292,7 +500,13 @@ export default function VibesCardStudioNew() {
             zoom={zoom}
             gridVisible={gridVisible}
             colorScheme={colorScheme}
-            eventDetails={eventDetails}
+            eventDetails={{
+              title: eventTitle,
+              message: eventMessage,
+              date: eventDate,
+              location: eventLocation,
+              hostName: hostName,
+            }}
           />
         </div>
 
