@@ -98,7 +98,7 @@ export function AppShell({ children }: AppShellProps) {
                 </Link>
               </div>
 
-              <DesktopNav categories={navigationItems} />
+              <DesktopNav />
             </div>
 
             {/* Search and Actions */}
