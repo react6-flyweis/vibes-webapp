@@ -14,14 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
-import RemixDialog from "@/components/design-community/RemixDialog";
-import CollaborationDialog from "@/components/design-community/CollaborationDialog";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { SharedDesign, CollaborationInvite } from "@/types/designs";
+import type { CollaborationInvite } from "@/types/designs";
 
 // Tabs (extracted)
 import DiscoverTab from "@/components/design-community/DiscoverTab";
@@ -31,20 +25,14 @@ import BookmarksTab from "@/components/design-community/BookmarksTab";
 
 export default function CollaborativeDesignSharing() {
   const [selectedTab, setSelectedTab] = useState("discover");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("trending");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDesign, setSelectedDesign] = useState<string | null>(null);
-  // const [showShareDialog, setShowShareDialog] = useState(false);
-  const [showRemixDialog, setShowRemixDialog] = useState(false);
-  const [showCollabDialog, setShowCollabDialog] = useState(false);
+  // Dialogs are now managed inside individual cards/tabs
 
   const { toast } = useToast();
 
-  const { data: sharedDesigns } = useQuery({
-    queryKey: ["/api/designs/shared", selectedCategory, sortBy, searchQuery],
-    refetchInterval: 30000,
-  });
+  // const { data: sharedDesigns } = useQuery({
+  //   queryKey: ["/api/designs/shared", selectedCategory, sortBy, searchQuery],
+  //   refetchInterval: 30000,
+  // });
 
   // const { data: myDesigns } = useQuery({
   //   queryKey: ["/api/designs/my-designs"],
@@ -67,21 +55,21 @@ export default function CollaborativeDesignSharing() {
   //   refetchInterval: 30000,
   // });
 
-  const likeDesignMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${designId}/like`
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Design Liked",
-        description: "Added to your favorites",
-      });
-    },
-  });
+  // const likeDesignMutation = useMutation({
+  //   mutationFn: async (designId: string) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/${designId}/like`
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Design Liked",
+  //       description: "Added to your favorites",
+  //     });
+  //   },
+  // });
 
   // const bookmarkDesignMutation = useMutation({
   //   mutationFn: async (designId: string) => {
@@ -99,316 +87,142 @@ export default function CollaborativeDesignSharing() {
   //   },
   // });
 
-  const downloadDesignMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${designId}/download`
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Download Started",
-        description: "Design files are being prepared",
-      });
-    },
-  });
+  // const downloadDesignMutation = useMutation({
+  //   mutationFn: async (designId: string) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/${designId}/download`
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Download Started",
+  //       description: "Design files are being prepared",
+  //     });
+  //   },
+  // });
 
-  const remixDesignMutation = useMutation({
-    mutationFn: async (data: {
-      designId: string;
-      title: string;
-      description: string;
-      remixType: "full" | "partial" | "inspired";
-      modifications?: {
-        colors?: string[];
-        elements?: any[];
-        layout?: any;
-        customizations?: any;
-      };
-    }) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${data.designId}/remix`,
-        data
-      );
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Remix Created Successfully",
-        description: `Your remix "${data.title}" is now available in your designs`,
-      });
-      setShowRemixDialog(false);
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
-      // Open the remix in design editor
-      window.open(`/design-editor/${data.id}`, "_blank");
-    },
-    onError: (error) => {
-      toast({
-        title: "Remix Creation Failed",
-        description: "Unable to create remix. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // const remixDesignMutation = useMutation({
+  //   mutationFn: async (data: {
+  //     designId: string;
+  //     title: string;
+  //     description: string;
+  //     remixType: "full" | "partial" | "inspired";
+  //     modifications?: {
+  //       colors?: string[];
+  //       elements?: any[];
+  //       layout?: any;
+  //       customizations?: any;
+  //     };
+  //   }) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/${data.designId}/remix`,
+  //       data
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: (data) => {
+  //     toast({
+  //       title: "Remix Created Successfully",
+  //       description: `Your remix "${data.title}" is now available in your designs`,
+  //     });
+  //     setShowRemixDialog(false);
+  //     // Invalidate queries to refresh data
+  //     queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
+  //     // Open the remix in design editor
+  //     window.open(`/design-editor/${data.id}`, "_blank");
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Remix Creation Failed",
+  //       description: "Unable to create remix. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  const shareDesignMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${designId}/share`
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Share Link Created",
-        description: "Design link copied to clipboard",
-      });
-    },
-  });
+  // const shareDesignMutation = useMutation({
+  //   mutationFn: async (designId: string) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/${designId}/share`
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Share Link Created",
+  //       description: "Design link copied to clipboard",
+  //     });
+  //   },
+  // });
 
-  // Comment creation is handled inside DesignDetailsDialog now.
+  // // Comment creation is handled inside DesignDetailsDialog now.
 
-  const inviteCollaboratorMutation = useMutation({
-    mutationFn: async (data: {
-      designId: string;
-      email: string;
-      role: string;
-    }) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/${data.designId}/invite`,
-        data
-      );
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Invitation Sent",
-        description: `Collaborator invitation sent to ${
-          data.invitation?.inviteeEmail || "the specified email"
-        }`,
-      });
-      setShowCollabDialog(false);
-      // Refresh collaboration data
-      queryClient.invalidateQueries({ queryKey: ["/api/designs/invites"] });
-      queryClient.invalidateQueries({
-        queryKey: ["/api/designs/collaborations"],
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Invitation Failed",
-        description:
-          "Unable to send collaboration invitation. Please check the email address and try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // const inviteCollaboratorMutation = useMutation({
+  //   mutationFn: async (data: {
+  //     designId: string;
+  //     email: string;
+  //     role: string;
+  //   }) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/${data.designId}/invite`,
+  //       data
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: (data) => {
+  //     toast({
+  //       title: "Invitation Sent",
+  //       description: `Collaborator invitation sent to ${
+  //         data.invitation?.inviteeEmail || "the specified email"
+  //       }`,
+  //     });
+  //     setShowCollabDialog(false);
+  //     // Refresh collaboration data
+  //     queryClient.invalidateQueries({ queryKey: ["/api/designs/invites"] });
+  //     queryClient.invalidateQueries({
+  //       queryKey: ["/api/designs/collaborations"],
+  //     });
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Invitation Failed",
+  //       description:
+  //         "Unable to send collaboration invitation. Please check the email address and try again.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  const handleInviteResponse = useMutation({
-    mutationFn: async (data: {
-      inviteId: string;
-      action: "accept" | "decline";
-    }) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/designs/invites/${data.inviteId}/respond`,
-        data
-      );
-      return response.json();
-    },
-    onSuccess: (_, variables) => {
-      toast({
-        title:
-          variables.action === "accept"
-            ? "Invitation Accepted"
-            : "Invitation Declined",
-        description:
-          variables.action === "accept"
-            ? "You can now collaborate on this design"
-            : "Invitation declined",
-      });
-    },
-  });
-
-  const designs: SharedDesign[] = (sharedDesigns as SharedDesign[]) || [
-    {
-      id: "design-neon-nights",
-      title: "Neon Nights Party Invitation",
-      description:
-        "A vibrant, cyberpunk-inspired invitation template perfect for nightclub events and electronic music parties.",
-      creator: {
-        id: "creator-alex",
-        name: "Alex Chen",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-        verified: true,
-        followers: 1247,
-      },
-      category: "invitation",
-      tags: ["neon", "cyberpunk", "nightclub", "electronic", "futuristic"],
-      thumbnail:
-        "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400",
-      previewImages: [
-        "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800",
-        "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?w=800",
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
-      ],
-      createdAt: "2025-01-24T10:30:00Z",
-      updatedAt: "2025-01-24T15:45:00Z",
-      stats: {
-        views: 2847,
-        likes: 456,
-        downloads: 189,
-        remixes: 23,
-        shares: 67,
-      },
-      isLiked: false,
-      isBookmarked: true,
-      visibility: "public",
-      license: "free",
-      difficulty: "intermediate",
-      timeToComplete: 45,
-      tools: ["Photoshop", "Illustrator", "Figma"],
-      colors: ["#ff0080", "#00ffff", "#ffff00", "#ff4000", "#8000ff"],
-      isRemix: false,
-      collaboration: {
-        isCollaborative: true,
-        collaborators: [
-          {
-            id: "creator-alex",
-            name: "Alex Chen",
-            avatar:
-              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-            role: "owner",
-          },
-          {
-            id: "collab-sarah",
-            name: "Sarah Kim",
-            avatar:
-              "https://images.unsplash.com/photo-1494790108755-2616b612b1c5?w=150",
-            role: "editor",
-          },
-        ],
-        inviteCode: "NEON2025",
-      },
-    },
-    {
-      id: "design-minimalist-wedding",
-      title: "Elegant Minimalist Wedding Suite",
-      description:
-        "Clean, sophisticated wedding invitation and decoration templates with modern typography and subtle gold accents.",
-      creator: {
-        id: "creator-emma",
-        name: "Emma Rodriguez",
-        avatar:
-          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-        verified: true,
-        followers: 892,
-      },
-      category: "invitation",
-      tags: ["wedding", "minimalist", "elegant", "typography", "gold"],
-      thumbnail:
-        "https://images.unsplash.com/photo-1519741497674-611481863552?w=400",
-      previewImages: [
-        "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
-        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800",
-      ],
-      createdAt: "2025-01-23T14:20:00Z",
-      updatedAt: "2025-01-24T09:15:00Z",
-      stats: {
-        views: 1923,
-        likes: 321,
-        downloads: 156,
-        remixes: 18,
-        shares: 89,
-      },
-      isLiked: true,
-      isBookmarked: false,
-      visibility: "public",
-      license: "premium",
-      difficulty: "beginner",
-      timeToComplete: 30,
-      tools: ["Canva", "InDesign", "Figma"],
-      colors: ["#ffffff", "#f8f8f8", "#d4af37", "#333333"],
-      isRemix: false,
-      collaboration: {
-        isCollaborative: false,
-        collaborators: [
-          {
-            id: "creator-emma",
-            name: "Emma Rodriguez",
-            avatar:
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-            role: "owner",
-          },
-        ],
-      },
-    },
-    {
-      id: "design-tropical-vibes",
-      title: "Tropical Summer Vibes (Remix)",
-      description:
-        "A vibrant remix of the classic summer party theme with enhanced tropical elements and animated backgrounds.",
-      creator: {
-        id: "creator-mike",
-        name: "Mike Johnson",
-        avatar:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-        verified: false,
-        followers: 234,
-      },
-      category: "theme",
-      tags: ["tropical", "summer", "beach", "animated", "colorful"],
-      thumbnail:
-        "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=400",
-      previewImages: [
-        "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800",
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800",
-      ],
-      createdAt: "2025-01-22T16:45:00Z",
-      updatedAt: "2025-01-23T11:30:00Z",
-      stats: {
-        views: 1456,
-        likes: 198,
-        downloads: 87,
-        remixes: 12,
-        shares: 34,
-      },
-      isLiked: false,
-      isBookmarked: false,
-      visibility: "public",
-      license: "free",
-      difficulty: "advanced",
-      timeToComplete: 60,
-      tools: ["After Effects", "Photoshop", "Figma"],
-      colors: ["#ff6b35", "#f7931e", "#ffd23f", "#06ffa5", "#1fb3d3"],
-      isRemix: true,
-      originalDesign: {
-        id: "design-summer-original",
-        title: "Classic Summer Party Theme",
-        creator: "Emma Rodriguez",
-      },
-      collaboration: {
-        isCollaborative: true,
-        collaborators: [
-          {
-            id: "creator-mike",
-            name: "Mike Johnson",
-            avatar:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-            role: "owner",
-          },
-        ],
-        inviteCode: "TROPICAL25",
-      },
-    },
-  ];
+  // const handleInviteResponse = useMutation({
+  //   mutationFn: async (data: {
+  //     inviteId: string;
+  //     action: "accept" | "decline";
+  //   }) => {
+  //     const response = await apiRequest(
+  //       "POST",
+  //       `/api/designs/invites/${data.inviteId}/respond`,
+  //       data
+  //     );
+  //     return response.json();
+  //   },
+  //   onSuccess: (_, variables) => {
+  //     toast({
+  //       title:
+  //         variables.action === "accept"
+  //           ? "Invitation Accepted"
+  //           : "Invitation Declined",
+  //       description:
+  //         variables.action === "accept"
+  //           ? "You can now collaborate on this design"
+  //           : "Invitation declined",
+  //     });
+  //   },
+  // });
 
   // const myDesignsList: SharedDesign[] = myDesigns || [
   //   {
@@ -702,12 +516,12 @@ export default function CollaborativeDesignSharing() {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() =>
-                        handleInviteResponse.mutate({
-                          inviteId: invite.id,
-                          action: "accept",
-                        })
-                      }
+                      // onClick={() =>
+                      //   handleInviteResponse.mutate({
+                      //     inviteId: invite.id,
+                      //     action: "accept",
+                      //   })
+                      // }
                       className="bg-green-600 hover:bg-green-700"
                     >
                       Accept
@@ -715,12 +529,12 @@ export default function CollaborativeDesignSharing() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() =>
-                        handleInviteResponse.mutate({
-                          inviteId: invite.id,
-                          action: "decline",
-                        })
-                      }
+                      // onClick={() =>
+                      //   handleInviteResponse.mutate({
+                      //     inviteId: invite.id,
+                      //     action: "decline",
+                      //   })
+                      // }
                     >
                       Decline
                     </Button>
@@ -769,93 +583,26 @@ export default function CollaborativeDesignSharing() {
           </TabsList>
 
           <TabsContent value="discover" className="space-y-6">
-            <DiscoverTab
-              setSelectedDesign={setSelectedDesign}
-              setShowRemixDialog={setShowRemixDialog}
-            />
+            <DiscoverTab />
           </TabsContent>
 
           <TabsContent value="my-designs" className="space-y-6">
-            <MyDesignsTab
-              myDesignsList={designs}
-              setSelectedDesign={setSelectedDesign}
-              setShowCollabDialog={setShowCollabDialog}
-              shareDesignMutation={shareDesignMutation}
-            />
+            <MyDesignsTab />
           </TabsContent>
 
           <TabsContent value="collaborations" className="space-y-6">
-            <CollaborationsTab
-              collaborationsList={designs.filter(
-                (d) => d.collaboration?.isCollaborative
-              )}
-            />
+            <CollaborationsTab />
           </TabsContent>
 
           <TabsContent value="bookmarks" className="space-y-6">
-            <BookmarksTab
-              designs={designs}
-              bookmarkDesignMutation={bookmarkDesignMutation}
-              downloadDesignMutation={downloadDesignMutation}
-            />
+            <BookmarksTab />
           </TabsContent>
         </Tabs>
 
         {/* Design Details Modal */}
-        {selectedDesign && (
-          <Dialog
-            open={!!selectedDesign}
-            onOpenChange={() => setSelectedDesign(null)}
-          >
-            <DialogContent className="max-w-4xl bg-black/90 border-purple-500/20 text-white">
-              {(() => {
-                const design = designs.find((d) => d.id === selectedDesign);
-                if (!design) return null;
+        {/* Design Details Modal is now handled within individual cards/tabs */}
 
-                return (
-                  <DesignDetailsDialog
-                    design={design}
-                    onLike={() => likeDesignMutation.mutate(design.id)}
-                    onDownload={() => downloadDesignMutation.mutate(design.id)}
-                    onOpenRemix={() => setShowRemixDialog(true)}
-                    onShare={() => shareDesignMutation.mutate(design.id)}
-                  />
-                );
-              })()}
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {/* Remix Dialog */}
-        <Dialog open={showRemixDialog} onOpenChange={setShowRemixDialog}>
-          <RemixDialog
-            onCreate={(payload) =>
-              selectedDesign &&
-              remixDesignMutation.mutate({
-                designId: selectedDesign,
-                title: payload.title,
-                description: payload.description,
-                remixType: payload.remixType,
-              })
-            }
-            onCancel={() => setShowRemixDialog(false)}
-          />
-        </Dialog>
-
-        {/* Collaboration Dialog */}
-        <Dialog open={showCollabDialog} onOpenChange={setShowCollabDialog}>
-          <CollaborationDialog
-            onSend={(payload) =>
-              selectedDesign &&
-              inviteCollaboratorMutation.mutate({
-                designId: selectedDesign,
-                email: payload.email,
-                role: payload.role,
-              })
-            }
-            onCancel={() => setShowCollabDialog(false)}
-          />
-        </Dialog>
+        {/* Remix & Collaboration dialogs are handled within individual cards/tabs */}
       </div>
     </div>
   );
