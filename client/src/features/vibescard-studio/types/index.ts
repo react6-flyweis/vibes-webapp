@@ -10,6 +10,7 @@ export interface DesignElement {
   zIndex: number;
   content: any;
   style: any;
+  dataField?: "title" | "message" | "date" | "location" | "hostName"; // Maps to EventDetails fields
 }
 
 export interface Template {
@@ -19,6 +20,10 @@ export interface Template {
   thumbnail: string;
   premium: boolean;
   elements: DesignElement[];
+  // optional explicit palette for UI previews
+  palette?: string[];
+  // optional preview image path
+  preview?: string;
   style: any;
 }
 
