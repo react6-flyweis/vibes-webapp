@@ -22,14 +22,14 @@ export function PropertiesPanel({
 }: PropertiesPanelProps) {
   if (!selectedElement) {
     return (
-      <div className="w-80 bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-700 p-4 flex items-center justify-center">
+      <div className="w-[25%] bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-700 p-4 flex items-center justify-center shrink-0">
         <p className="text-sm text-gray-400">Select an element to edit</p>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-700 overflow-y-auto">
+    <div className="w-[25%] bg-[#1F2937] text-white dark:bg-gray-800 dark:border-gray-700 overflow-y-auto shrink-0">
       <div className="p-4">
         <Card className="bg-[#0A0A0A] text-white">
           <CardHeader className="pb-3">
