@@ -23,18 +23,83 @@ interface KonvaCanvasProps {
   stageRef?: React.RefObject<any>;
 }
 
-// Image component wrapper to handle loading
+// Image component wrapper to handle loading with CORS support
 function ImageElement({ src, ...props }: any) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = src;
-    img.onload = () => setImage(img);
+    const loadImage = (
+      imgSrc: string,
+      onSuccess: (img: HTMLImageElement) => void,
+      onError: () => void
+    ) => {
+      const img = new Image();
+
+      // Enable CORS for external images (images from other domains)
+      if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) {
+        img.crossOrigin = "anonymous";
+      }
+
+      img.onload = () => onSuccess(img);
+      img.onerror = onError;
+      img.src = imgSrc;
+
+      return img;
+    };
+
+    // Try multiple path resolution strategies
+    const pathsToTry: string[] = [];
+
+    pathsToTry.push(src);
+
+    let currentAttempt = 0;
+    let currentImage: HTMLImageElement | null = null;
+
+    const tryNextPath = () => {
+      if (currentAttempt >= pathsToTry.length) {
+        console.error(
+          "All image load attempts failed for:",
+          src,
+          "Tried paths:",
+          pathsToTry
+        );
+        setError(true);
+        return;
+      }
+
+      const pathToTry = pathsToTry[currentAttempt];
+      currentAttempt++;
+
+      currentImage = loadImage(
+        pathToTry,
+        (img) => {
+          setImage(img);
+          setError(false);
+        },
+        () => {
+          console.warn(
+            `Image load failed for path: ${pathToTry}, trying next...`
+          );
+          tryNextPath();
+        }
+      );
+    };
+
+    tryNextPath();
+
     return () => {
-      img.onload = null;
+      if (currentImage) {
+        currentImage.onload = null;
+        currentImage.onerror = null;
+      }
     };
   }, [src]);
+
+  if (error && !image) {
+    // Return a placeholder rectangle if image fails to load
+    return <Rect {...props} fill="#e5e7eb" stroke="#9ca3af" strokeWidth={2} />;
+  }
 
   if (!image) return null;
   return <KonvaImage image={image} {...props} />;
@@ -106,6 +171,32 @@ export function KonvaCanvas({
     });
   };
 
+  // Helper function to get dynamic text based on dataField
+  const getDynamicText = (element: DesignElement): string => {
+    if (element.dataField) {
+      const fieldValue = eventDetails[element.dataField];
+      if (fieldValue) {
+        // Format date if it's the date field
+        if (element.dataField === "date") {
+          try {
+            const dateObj = new Date(fieldValue);
+            return dateObj.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            });
+          } catch {
+            return fieldValue;
+          }
+        }
+        return fieldValue;
+      }
+    }
+    return element.content?.text || "Click to edit";
+  };
+
   // Render individual element based on type
   const renderElement = (element: DesignElement) => {
     const isSelected = selectedElement === element.id;
@@ -133,11 +224,41 @@ export function KonvaCanvas({
     };
 
     switch (element.type) {
-      case "text":
+      case "text": {
+        const rawStops = element.style?.fillLinearGradientColorStops;
+        // compute scaled start/end points in pixels relative to the element
+        const startPoint = element.style?.fillLinearGradientStartPoint || {
+          x: 0,
+          y: 0,
+        };
+        const endPoint = element.style?.fillLinearGradientEndPoint || {
+          x: 0,
+          y: element.height * elementScale,
+        };
+
+        // normalize color stops to a flat array [offset, color, offset, color, ...]
+        let normalizedStops: Array<number | string> | undefined = undefined;
+        if (Array.isArray(rawStops) && rawStops.length > 0) {
+          normalizedStops = rawStops.map((s: any) => {
+            // keep strings (colors) as-is, coerce numeric-like to numbers
+            if (typeof s === "number") return s;
+            if (typeof s === "string" && !isNaN(Number(s))) return Number(s);
+            return s;
+          });
+        }
+
+        // If we have normalizedStops, do not pass a solid `fill` so Konva uses the gradient
+        const fillProp = normalizedStops
+          ? undefined
+          : element.style?.color || colorScheme.text;
+
+        // Get the text to display - either from dataField mapping or content
+        const displayText = getDynamicText(element);
+
         return (
           <Text
             {...commonProps}
-            text={element.content?.text || "Click to edit"}
+            text={displayText}
             fontSize={(element.style?.fontSize || 18) * elementScale}
             fontFamily={element.style?.fontFamily || "Inter"}
             fontStyle={
@@ -145,12 +266,23 @@ export function KonvaCanvas({
                 ? "bold"
                 : element.style?.fontStyle || "normal"
             }
-            fill={element.style?.color || colorScheme.text}
+            {...(fillProp ? { fill: fillProp } : {})}
             align={element.style?.textAlign || "left"}
             verticalAlign="middle"
             wrap="word"
+            {...(normalizedStops
+              ? {
+                  fillLinearGradientStartPoint: {
+                    x: startPoint.x,
+                    y: startPoint.y,
+                  },
+                  fillLinearGradientEndPoint: { x: endPoint.x, y: endPoint.y },
+                  fillLinearGradientColorStops: normalizedStops,
+                }
+              : {})}
           />
         );
+      }
 
       case "logo":
         return (
@@ -191,7 +323,6 @@ export function KonvaCanvas({
                 1,
                 colorMatches[colorMatches.length - 1],
               ]}
-              listening={false}
             />
           );
         }
@@ -201,7 +332,6 @@ export function KonvaCanvas({
           <Rect
             {...commonProps}
             fill={colorMatches?.[0] || bgStyle || "#ffffff"}
-            listening={false}
           />
         );
 
@@ -243,9 +373,9 @@ export function KonvaCanvas({
   };
 
   return (
-    <div className="flex-1 bg-[#111827] dark:bg-gray-900 p-8 overflow-auto flex items-center justify-center">
+    <div className="flex-1 bg-[#111827] dark:bg-gray-900 p-8 overflow-auto flex items-start justify-center min-h-0">
       <div
-        className="relative rounded-lg shadow-2xl"
+        className="relative rounded-lg shadow-2xl flex-shrink-0"
         style={{
           width: canvasSize.width * scale,
           height: canvasSize.height * scale,
@@ -289,6 +419,7 @@ export function KonvaCanvas({
                       1,
                       colorMatches[colorMatches.length - 1],
                     ]}
+                    listening={false}
                   />
                 );
               }
@@ -301,6 +432,7 @@ export function KonvaCanvas({
                   width={canvasSize.width * scale}
                   height={canvasSize.height * scale}
                   fill={colorMatches?.[0] || bgColor || "#ffffff"}
+                  listening={false}
                 />
               );
             })()}
@@ -378,71 +510,6 @@ export function KonvaCanvas({
               />
             )}
           </Layer>
-
-          {/* Event Details Overlay Layer */}
-          {(eventDetails.title ||
-            eventDetails.message ||
-            eventDetails.date ||
-            eventDetails.location) && (
-            <Layer listening={false}>
-              <Group
-                x={canvasSize.width * scale * 0.5}
-                y={canvasSize.height * scale * 0.5}
-              >
-                {eventDetails.title && (
-                  <Text
-                    text={eventDetails.title}
-                    fontSize={32 * scale}
-                    fontFamily="sans-serif"
-                    fontStyle="bold"
-                    fill={colorScheme.text}
-                    align="center"
-                    x={-200 * scale}
-                    y={-100 * scale}
-                    width={400 * scale}
-                  />
-                )}
-                {eventDetails.message && (
-                  <Text
-                    text={eventDetails.message}
-                    fontSize={16 * scale}
-                    fontFamily="sans-serif"
-                    fill={colorScheme.text}
-                    align="center"
-                    x={-200 * scale}
-                    y={-40 * scale}
-                    width={400 * scale}
-                    wrap="word"
-                  />
-                )}
-                {eventDetails.date && (
-                  <Text
-                    text={new Date(eventDetails.date).toLocaleDateString()}
-                    fontSize={18 * scale}
-                    fontFamily="sans-serif"
-                    fontStyle="bold"
-                    fill={colorScheme.primary}
-                    align="center"
-                    x={-200 * scale}
-                    y={20 * scale}
-                    width={400 * scale}
-                  />
-                )}
-                {eventDetails.location && (
-                  <Text
-                    text={eventDetails.location}
-                    fontSize={16 * scale}
-                    fontFamily="sans-serif"
-                    fill={colorScheme.text}
-                    align="center"
-                    x={-200 * scale}
-                    y={50 * scale}
-                    width={400 * scale}
-                  />
-                )}
-              </Group>
-            </Layer>
-          )}
         </Stage>
       </div>
     </div>
