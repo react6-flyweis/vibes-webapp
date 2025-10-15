@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Template, DesignElement, ColorScheme } from "../types";
+import { Template, DesignElement, ColorScheme, EventDetails } from "../types";
 import { useToast } from "@/hooks/use-toast";
 
 export function useTemplate() {
@@ -13,11 +13,55 @@ export function useTemplate() {
       setColorScheme: (
         scheme: ColorScheme | ((prev: ColorScheme) => ColorScheme)
       ) => void,
-      setSelectedElement: (id: string | null) => void
+      setSelectedElement: (id: string | null) => void,
+      setCanvasSize?: (size: { width: number; height: number }) => void,
+      eventDetails?: EventDetails
     ) => {
-      setSelectedTemplate(template.id);
-      setElements(template.elements || []);
+      // Clear the stage first
       setSelectedElement(null);
+      setElements([]);
+
+      // Small delay to ensure clean state before applying template
+      setTimeout(() => {
+        setSelectedTemplate(template.id);
+
+        // If event details are provided, populate them into template elements
+        let templateElements = template.elements || [];
+        if (eventDetails) {
+          const eventDetailsMap = {
+            title: eventDetails.title,
+            message: eventDetails.message,
+            date: eventDetails.date,
+            location: eventDetails.location,
+            hostName: eventDetails.hostName,
+          };
+
+          templateElements = templateElements.map((element) => {
+            if (element.dataField && eventDetailsMap[element.dataField]) {
+              return {
+                ...element,
+                content: {
+                  ...element.content,
+                  text: eventDetailsMap[element.dataField],
+                },
+              };
+            }
+            return element;
+          });
+        }
+
+        setElements(templateElements);
+      }, 50);
+
+      // If template provides a canvas size, apply it
+      try {
+        const canvasSize = template.style?.canvasSize;
+        if (canvasSize && setCanvasSize) {
+          setCanvasSize(canvasSize);
+        }
+      } catch (err) {
+        // ignore
+      }
 
       // Extract colors from template background or first background element
       const backgroundElement = template.elements?.find(
