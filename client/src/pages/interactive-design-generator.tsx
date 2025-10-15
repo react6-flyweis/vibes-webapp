@@ -63,6 +63,8 @@ export default function InteractiveDesignGenerator() {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [storyPrompt, setStoryPrompt] = useState("");
   const [generatedStory, setGeneratedStory] = useState("");
+  const [clientImageUrl, setClientImageUrl] = useState<string | null>(null);
+  const [isClientGenerating, setIsClientGenerating] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [designElements, setDesignElements] = useState<any[]>([]);
   const [moodIntensity, setMoodIntensity] = useState([70]);
@@ -600,6 +602,143 @@ export default function InteractiveDesignGenerator() {
     },
   });
 
+  // Client-side generation using VITE_OPENAI_API_KEY (embeds at build time)
+  const clientGenerateStoryAndImage = async (prompt: string) => {
+    const key = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!key) {
+      toast({
+        title: "VITE_OPENAI_API_KEY missing",
+        description:
+          "Set VITE_OPENAI_API_KEY in your .env and restart the dev server.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsClientGenerating(true);
+    setClientImageUrl(null);
+    try {
+      // Chat completion
+      const chatResp = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a creative storyteller that writes immersive short stories tailored to mood and style.",
+              },
+              {
+                role: "user",
+                content: `Prompt: ${prompt}\nMood: ${currentMood}\nStyle: ${designStyle}\nColors: ${colorPalette.join(
+                  ", "
+                )}`,
+              },
+            ],
+            max_tokens: 500,
+            temperature: 0.85,
+          }),
+        }
+      );
+
+      if (!chatResp.ok) {
+        let errMsg = "Chat generation failed";
+        try {
+          const j = await chatResp.json();
+          errMsg = j?.error?.message || JSON.stringify(j);
+        } catch (e) {
+          errMsg = await chatResp.text();
+        }
+        throw new Error(errMsg || "Chat generation failed");
+      }
+
+      const chatData = await chatResp.json();
+      const storyText = (
+        (chatData.choices &&
+          chatData.choices[0] &&
+          chatData.choices[0].message &&
+          chatData.choices[0].message.content) ||
+        chatData.choices?.[0]?.text ||
+        ""
+      ).toString();
+      setGeneratedStory(storyText.trim());
+
+      // Image generation
+      const imagePrompt = `${designStyle} ${currentMood} themed poster for: ${prompt}. Use colors: ${colorPalette.join(
+        ", "
+      )}. High resolution, vibrant composition, centered subject.`;
+
+      const imgResp = await fetch(
+        "https://api.openai.com/v1/images/generations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-image-1",
+            prompt: imagePrompt,
+            size: "1024x1024",
+            n: 1,
+          }),
+        }
+      );
+
+      if (!imgResp.ok) {
+        let errMsg = "Image generation failed";
+        try {
+          const j = await imgResp.json();
+          errMsg = j?.error?.message || JSON.stringify(j);
+        } catch (e) {
+          errMsg = await imgResp.text();
+        }
+        throw new Error(errMsg || "Image generation failed");
+      }
+
+      const imgData = await imgResp.json();
+      // API may return either a URL or base64 in b64_json
+      const imgEntry = imgData.data?.[0] || null;
+      if (imgEntry?.b64_json) {
+        setClientImageUrl(`data:image/png;base64,${imgEntry.b64_json}`);
+      } else if (imgEntry?.url) {
+        setClientImageUrl(imgEntry.url);
+      }
+
+      // Unlock achievement locally and share
+      unlockAchievement("story_teller");
+      shareContentWithGroup({
+        type: "story",
+        content: storyText,
+        mood: currentMood,
+        style: designStyle,
+        timestamp: new Date().toISOString(),
+      });
+      toast({
+        title: "Generated",
+        description: "Story and image generated in-browser.",
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: "Generation failed",
+        description: error?.message || "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setIsClientGenerating(false);
+    }
+  };
+
+  // -- Client-side OpenAI helpers (user-supplied key) --
+
   const addCollaborator = (collaborator: any) => {
     setCollaborators((prev) => [...prev, collaborator]);
     unlockAchievement("collaborator");
@@ -1061,10 +1200,10 @@ export default function InteractiveDesignGenerator() {
 
                   <Button
                     className="w-full"
-                    onClick={() => generateStory.mutate(storyPrompt)}
-                    disabled={generateStory.isPending || !storyPrompt.trim()}
+                    onClick={() => clientGenerateStoryAndImage(storyPrompt)}
+                    disabled={isClientGenerating || !storyPrompt.trim()}
                   >
-                    {generateStory.isPending ? (
+                    {isClientGenerating ? (
                       <>
                         <Sparkles className="h-4 w-4 mr-2 animate-spin" />
                         Generating...
@@ -1094,6 +1233,15 @@ export default function InteractiveDesignGenerator() {
                           {generatedStory}
                         </p>
                       </div>
+                      {clientImageUrl && (
+                        <div className="pt-2">
+                          <img
+                            src={clientImageUrl}
+                            alt="Generated"
+                            className="w-full max-w-sm mx-auto rounded shadow"
+                          />
+                        </div>
+                      )}
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm">
                           <Heart className="h-4 w-4 mr-2" />
