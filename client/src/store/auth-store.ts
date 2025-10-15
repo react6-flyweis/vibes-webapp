@@ -7,20 +7,39 @@ import { createJSONStorage } from "zustand/middleware";
 const STORAGE_KEY = "homvill_auth";
 const REMEMBERED_KEY = "homvill_auth_remembered";
 
+export interface User {
+  agreePrivacyPolicy?: boolean;
+  Fixed_role_id?: number;
+  _id?: string;
+  name?: string;
+  mobile?: string;
+  email?: string;
+  address?: string;
+  country_id?: number;
+  state_id?: number;
+  city_id?: number;
+  role_id?: number;
+  online_status?: boolean;
+  gender?: string;
+  status?: boolean;
+  created_by?: number | null;
+  updated_by?: number | null;
+  created_on?: string;
+  updated_on?: string;
+  user_id?: number;
+  [key: string]: any;
+}
+
 interface AuthState {
   isHydrated: boolean;
   setIsHydrated: (val: boolean) => void;
   token: string | null;
-  user: unknown | null;
+  user: User | null;
   remember: boolean;
-  login: (
-    user: unknown | null,
-    token: string | null,
-    remember?: boolean
-  ) => void;
+  login: (user: User | null, token: string | null, remember?: boolean) => void;
   setToken: (token: string | null) => void;
   clearToken: () => void;
-  setUser: (user: unknown | null) => void;
+  setUser: (user: User | null) => void;
   clearUser: () => void;
   logout: () => void;
   isAuthenticated: () => boolean;
@@ -50,12 +69,12 @@ export const useAuthStore = create<AuthState>()(
           state.token = null;
         });
       },
-      setUser(user: unknown | null) {
+      setUser(user: User | null) {
         set((state: AuthState) => {
           state.user = user;
         });
       },
-      login(user: unknown | null, token: string | null, remember = false) {
+      login(user: User | null, token: string | null, remember = false) {
         try {
           set((state: AuthState) => {
             state.user = user;
