@@ -12,15 +12,7 @@ import {
 import CommunityDesignCard from "@/components/CommunityDesignCard";
 import { useCommunityDesignsQuery } from "@/queries/communityDesigns";
 
-interface Props {
-  setSelectedDesign: (id: string | null) => void;
-  setShowRemixDialog: (v: boolean) => void;
-}
-
-export default function DiscoverTab({
-  setSelectedDesign,
-  setShowRemixDialog,
-}: Props) {
+export default function DiscoverTab() {
   // Use community designs from the API
   const { data: designs = [], isLoading } = useCommunityDesignsQuery();
   const [category, setCategory] = useState("all");
@@ -153,15 +145,7 @@ export default function DiscoverTab({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedDesigns.map((design) => (
-            <CommunityDesignCard
-              key={design.id}
-              design={design}
-              onViewDetails={(id) => setSelectedDesign(id)}
-              onCreateRemix={(id) => {
-                setSelectedDesign(id);
-                setShowRemixDialog(true);
-              }}
-            />
+            <CommunityDesignCard key={design.id} design={design} />
           ))}
         </div>
       )}
