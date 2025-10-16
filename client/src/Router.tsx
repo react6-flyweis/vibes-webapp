@@ -19,9 +19,6 @@ const PremiumDashboard = lazy(() => import("@/pages/premium-dashboard"));
 const VendorDashboard = lazy(() => import("@/pages/vendor-dashboard"));
 const CorporateDashboard = lazy(() => import("@/pages/corporate-dashboard"));
 const StaffingMarketplace = lazy(() => import("@/pages/staffing-marketplace"));
-const EnhancedStaffingMarketplace = lazy(
-  () => import("@/pages/enhanced-staffing-marketplace")
-);
 const CateringMarketplace = lazy(() => import("@/pages/catering-marketplace"));
 const AIThemeGenerator = lazy(() => import("@/pages/ai-theme-generator"));
 const AIPartyDesigner = lazy(() => import("@/pages/ai-party-designer"));
@@ -280,10 +277,7 @@ function DashboardRouter() {
         <Route path="/events/booking/:eventId" element={<EventBooking />} />
         <Route path="/tickets" element={<TicketManagement />} />
         <Route path="/digital-twins" element={<DigitalTwinSystem />} />
-        <Route
-          path="/staffing-marketplace"
-          element={<EnhancedStaffingMarketplace />}
-        />
+        <Route path="/staffing-marketplace" element={<StaffingMarketplace />} />
         <Route path="/catering-marketplace" element={<CateringMarketplace />} />
         <Route path="/vibe-mall" element={<VibeMall />} />
         <Route path="/pro-host-control" element={<ProHostControlPanel />} />
