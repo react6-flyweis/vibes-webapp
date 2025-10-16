@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -12,21 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ChefHat,
-  Star,
-  MapPin,
-  Clock,
-  DollarSign,
-  Search,
-  Filter,
-  Users,
-  Utensils,
-  ShoppingCart,
-  Calendar,
-} from "lucide-react";
+import { ChefHat, Search, Utensils, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCateringMarketplacesQuery } from "@/queries/cateringMarketplaces";
+import { useCreateCateringBooking } from "@/queries/cateringBookings";
+import CateringCategorySelector from "@/components/CateringCategorySelector";
+import CateringVendorCard from "@/components/CateringVendorCard";
+import EventDetailsDialog from "@/components/EventDetailsDialog";
+import MenuServicesDialog from "@/components/MenuServicesDialog";
+import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 
 interface CateringMenu {
   id: string;
@@ -51,7 +42,6 @@ interface CateringMenu {
 
 export default function CateringMarketplace() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCuisine, setSelectedCuisine] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,66 +55,135 @@ export default function CateringMarketplace() {
     specialInstructions: "",
   });
 
-  const { data: cateringMenus = [], isLoading } = useQuery<CateringMenu[]>({
-    queryKey: [
-      "/api/catering/menus",
-      selectedCategory,
-      selectedCuisine,
-      searchQuery,
-    ],
-  });
+  const { data: marketplaces = [], isLoading: isLoadingMarketplaces } =
+    useCateringMarketplacesQuery();
 
-  const { data: categories = [] } = useQuery<any[]>({
-    queryKey: ["/api/catering/categories"],
-  });
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeVendorId, setActiveVendorId] = useState<string | null>(null);
+  const [menuDialogOpen, setMenuDialogOpen] = useState(false);
+  const [menuInitialValues, setMenuInitialValues] = useState<any>(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [confirmPayload, setConfirmPayload] = useState<{
+    guestCount: number;
+    pricePerPerson: number;
+  } | null>(null);
+  const [eventDetails, setEventDetails] = useState<any>(null);
+  const [menuDetails, setMenuDetails] = useState<any>(null);
 
-  const { data: cuisines = [] } = useQuery<any[]>({
-    queryKey: ["/api/catering/cuisines"],
-  });
-
-  const orderMutation = useMutation({
-    mutationFn: async (orderData: any) => {
-      return await apiRequest("POST", "/api/catering/orders", orderData);
-    },
+  const bookingMutation = useCreateCateringBooking({
     onSuccess: () => {
       toast({
-        title: "Order Placed Successfully",
-        description: "The caterer will confirm your order within 24 hours.",
+        title: "Booking Created",
+        description: "The caterer will contact you shortly.",
       });
-      setSelectedMenu(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/catering/orders"] });
+      // reset local state
+      setEventDetails(null);
+      setMenuDetails(null);
     },
-    onError: (error: any) => {
+    onError: (err) => {
       toast({
-        title: "Order Failed",
-        description: error.message,
+        title: "Booking Error",
+        description: String(err),
         variant: "destructive",
       });
     },
   });
 
-  const filteredMenus = cateringMenus.filter((menu: CateringMenu) => {
-    const matchesCategory =
-      selectedCategory === "all" || menu.category === selectedCategory;
-    const matchesCuisine =
-      selectedCuisine === "all" || menu.cuisine === selectedCuisine;
-    const matchesSearch =
-      menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      menu.chef.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      menu.items.some((item) =>
-        item.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    return matchesCategory && matchesCuisine && matchesSearch;
-  });
+  const handleBookClick = (vendorId: string) => {
+    setActiveVendorId(vendorId);
+    setDialogOpen(true);
+  };
+
+  const handleDialogSubmit = (payload: any) => {
+    // Close details dialog and open Menu & Services dialog next
+    setDialogOpen(false);
+    setEventDetails(payload);
+    setMenuInitialValues({
+      cuisine: "Italian",
+      specialPreferences: "",
+      pricePerPerson: "",
+    });
+    setMenuDialogOpen(true);
+    // keep activeVendorId until menu dialog completes
+  };
+
+  const handleMenuSubmit = (vals: any) => {
+    // open confirm dialog with calculated totals
+    const guestCount =
+      parseInt(eventDetails?.guestCount || vals.guestCount || "0") || 0;
+    const pricePerPerson = parseFloat(vals.pricePerPerson || "0") || 0;
+    setMenuDetails(vals);
+    setConfirmPayload({ guestCount, pricePerPerson });
+    setMenuDialogOpen(false);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirm = (payment?: any) => {
+    // Prepare payload according to API spec
+    if (!activeVendorId || !eventDetails || !menuDetails || !confirmPayload) {
+      toast({
+        title: "Missing data",
+        description: "Please complete event and menu details.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      event_name: eventDetails.eventName || "",
+      event_address: eventDetails.eventAddress || "",
+      event_type_id:
+        typeof eventDetails.eventType === "number" ? eventDetails.eventType : 1,
+      catering_marketplace_id: Number(activeVendorId) || 0,
+      event_to_date:
+        eventDetails.endDate ||
+        eventDetails.startDate ||
+        new Date().toISOString(),
+      event_from_date: eventDetails.startDate || new Date().toISOString(),
+      event_to_time: eventDetails.endTime || "23:00",
+      event_from_time: eventDetails.startTime || "18:00",
+      guest_count: confirmPayload.guestCount || 0,
+      amount: Math.round(
+        (confirmPayload.guestCount || 0) * (confirmPayload.pricePerPerson || 0)
+      ),
+    };
+
+    // call booking API
+    bookingMutation.mutate(payload as any);
+
+    setConfirmDialogOpen(false);
+    setActiveVendorId(null);
+  };
+
+  // const orderMutation = useMutation({
+  //   mutationFn: async (orderData: any) => {
+  //     return await apiRequest("POST", "/api/catering/orders", orderData);
+  //   },
+  //   onSuccess: () => {
+  //     toast({
+  //       title: "Order Placed Successfully",
+  //       description: "The caterer will confirm your order within 24 hours.",
+  //     });
+  //     setSelectedMenu(null);
+  //     queryClient.invalidateQueries({ queryKey: ["/api/catering/orders"] });
+  //   },
+  //   onError: (error: any) => {
+  //     toast({
+  //       title: "Order Failed",
+  //       description: error.message,
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
   const handleOrder = () => {
     if (!selectedMenu) return;
 
-    orderMutation.mutate({
-      menuId: selectedMenu.id,
-      ...orderDetails,
-      totalCost: calculateOrderCost(),
-    });
+    // orderMutation.mutate({
+    //   menuId: selectedMenu.id,
+    //   ...orderDetails,
+    //   totalCost: calculateOrderCost(),
+    // });
   };
 
   const calculateOrderCost = () => {
@@ -149,14 +208,6 @@ export default function CateringMarketplace() {
         return <Utensils className="h-4 w-4" />;
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-orange-900 via-red-900 to-pink-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-900 py-10">
@@ -188,23 +239,10 @@ export default function CateringMarketplace() {
                     />
                   </div>
                 </div>
-                <Select
+                <CateringCategorySelector
                   value={selectedCategory}
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="w-48 ">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category: any) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={setSelectedCategory}
+                />
                 <Select
                   value={selectedCuisine}
                   onValueChange={setSelectedCuisine}
@@ -214,11 +252,6 @@ export default function CateringMarketplace() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Cuisines</SelectItem>
-                    {cuisines.map((cuisine: any) => (
-                      <SelectItem key={cuisine.id} value={cuisine.id}>
-                        {cuisine.name}
-                      </SelectItem>
-                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -226,168 +259,67 @@ export default function CateringMarketplace() {
           </Card>
         </div>
 
-        {/* Featured Menus */}
-        {filteredMenus.filter((menu: CateringMenu) => menu.featured).length >
-          0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Featured This Week
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMenus
-                .filter((menu: CateringMenu) => menu.featured)
-                .slice(0, 3)
-                .map((menu: CateringMenu) => (
-                  <Card
-                    key={menu.id}
-                    className="bg-linear-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border-yellow-300/30"
-                  >
-                    <CardHeader className="pb-3">
-                      <Badge className="w-fit bg-yellow-500/20 text-yellow-200 border-yellow-300">
-                        Featured
-                      </Badge>
-                      <CardTitle className="text-white text-lg">
-                        {menu.name}
-                      </CardTitle>
-                      <p className="text-orange-200">by Chef {menu.chef}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex flex-wrap gap-1">
-                          <Badge
-                            variant="outline"
-                            className="text-xs border-orange-300 text-orange-200"
-                          >
-                            {menu.cuisine}
-                          </Badge>
-                          {menu.dietary.slice(0, 2).map((diet, index) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className="text-xs border-green-300 text-green-200"
-                            >
-                              {diet}
-                            </Badge>
-                          ))}
-                        </div>
-
-                        <p className="text-orange-100 text-sm line-clamp-2">
-                          {menu.description}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1 text-white font-semibold">
-                            <DollarSign className="h-4 w-4" />$
-                            {menu.pricePerPerson}/person
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                            <span className="text-white">{menu.rating}</span>
-                          </div>
-                        </div>
-
-                        <Button
-                          onClick={() => setSelectedMenu(menu)}
-                          className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                        >
-                          Order Now
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* All Menus Grid */}
+        {/* Catering Vendors / Marketplaces */}
         <div className="mb-8 max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-white mb-4">
-            All Catering Menus
+            Catering Vendors
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMenus.map((menu: CateringMenu) => (
-              <Card
-                key={menu.id}
-                className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-white text-lg">
-                        {menu.name}
-                      </CardTitle>
-                      <p className="text-orange-200">by Chef {menu.chef}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {getCategoryIcon(menu.category)}
-                        <span className="text-orange-200 text-sm">
-                          {menu.cuisine}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-white font-semibold">
-                          {menu.rating}
-                        </span>
-                      </div>
-                      <div className="text-orange-200 text-sm">
-                        {menu.reviews} reviews
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap gap-1">
-                      {menu.dietary.slice(0, 3).map((diet, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="text-xs border-green-300 text-green-200"
-                        >
-                          {diet}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <p className="text-orange-100 text-sm line-clamp-2">
-                      {menu.description}
-                    </p>
-
-                    <div className="flex items-center gap-2 text-orange-200 text-sm">
-                      <MapPin className="h-4 w-4" />
-                      {menu.location}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-orange-200 text-sm">
-                      <Clock className="h-4 w-4" />
-                      {menu.preparationTime} prep time
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-white font-semibold">
-                        <DollarSign className="h-4 w-4" />${menu.pricePerPerson}
-                        /person
-                      </div>
-                      <div className="text-orange-200 text-sm">
-                        Min {menu.minOrder} people
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={() => setSelectedMenu(menu)}
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                    >
-                      Order Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {isLoadingMarketplaces
+              ? [1, 2, 3].map((i) => (
+                  <CateringVendorCard
+                    key={`vendor-skel-${i}`}
+                    skeleton
+                    onBook={handleBookClick}
+                  />
+                ))
+              : marketplaces.map((vendor: any) => (
+                  <CateringVendorCard
+                    key={vendor._id}
+                    vendor={vendor}
+                    onBook={handleBookClick}
+                  />
+                ))}
           </div>
         </div>
+
+        <EventDetailsDialog
+          open={dialogOpen}
+          vendorName={
+            marketplaces.find((m: any) => m._id === activeVendorId)?.name
+          }
+          vendorPhone={
+            marketplaces.find((m: any) => m._id === activeVendorId)?.mobile_no
+          }
+          onClose={() => setDialogOpen(false)}
+          onSubmit={handleDialogSubmit}
+        />
+
+        <MenuServicesDialog
+          open={menuDialogOpen}
+          initial={menuInitialValues}
+          onBack={() => setDialogOpen(true)}
+          onClose={() => setMenuDialogOpen(false)}
+          onSubmit={handleMenuSubmit}
+        />
+
+        <PriceConfirmationDialog
+          open={confirmDialogOpen}
+          onOpenChange={(open) => setConfirmDialogOpen(open)}
+          priceEstimate={parseFloat(
+            (
+              (confirmPayload?.guestCount || 0) *
+              (confirmPayload?.pricePerPerson || 0) *
+              1.15
+            ).toFixed(2)
+          )}
+          onConfirm={(payment) => handleConfirm(payment)}
+          onPrevious={() => {
+            // go back to menu dialog
+            setConfirmDialogOpen(false);
+            setMenuDialogOpen(true);
+          }}
+        />
 
         {/* Order Modal */}
         {selectedMenu && (
@@ -575,15 +507,15 @@ export default function CateringMarketplace() {
                   <Button
                     onClick={handleOrder}
                     disabled={
-                      orderMutation.isPending ||
                       !orderDetails.guestCount ||
                       parseInt(orderDetails.guestCount) < selectedMenu.minOrder
                     }
                     className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
                   >
-                    {orderMutation.isPending
+                    {/* {orderMutation.isPending
                       ? "Placing Order..."
-                      : "Place Order"}
+                      : "Place Order"} */}
+                    Place Order
                   </Button>
                 </div>
               </CardContent>
