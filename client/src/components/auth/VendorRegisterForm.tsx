@@ -75,6 +75,7 @@ export function VendorRegisterForm() {
       agreePrivacyPolicy: !!data.agreeToTerms,
       business_name: data.businessName,
       business_category_id: getCategoryId(data.businessCategory),
+      role_id: 3, // Vendor role
     };
 
     try {
