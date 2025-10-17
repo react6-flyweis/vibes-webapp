@@ -163,6 +163,7 @@ const SystemInterconnection = lazy(
 const LiveReactionWalls = lazy(() => import("@/pages/live-reaction-walls"));
 const PaymentTest = lazy(() => import("@/pages/payment-test"));
 const GetStarted = lazy(() => import("./pages/auth/get-started"));
+const VibesBusiness = lazy(() => import("@/pages/vibes-business"));
 
 function DashboardRouter() {
   return (
@@ -367,6 +368,7 @@ function DashboardRouter() {
         <Route path="/live-reaction-walls" element={<LiveReactionWalls />} />
         <Route path="/reaction-walls" element={<LiveReactionWalls />} />
         <Route path="/payment-test" element={<PaymentTest />} />
+        <Route path="/vibes-business" element={<VibesBusiness />} />
 
         {/* Legacy Routes */}
         <Route path="/login" element={<SimpleLoginPage />} />
