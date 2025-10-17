@@ -170,17 +170,17 @@ export const vendorNavigationItems: NavCategory[] = [
       },
       {
         name: "Fundraising",
-        href: "/fundraising",
+        href: "/vibes-fund",
         icon: Heart,
       },
       {
         name: "Crowdfunding",
-        href: "/crowdfunding",
+        href: "/vibes-fund",
         icon: Heart,
       },
       {
         name: "Social Media Outreach",
-        href: "/social-media-outreach",
+        href: "/vibes-fund",
         icon: Share,
       },
     ],
