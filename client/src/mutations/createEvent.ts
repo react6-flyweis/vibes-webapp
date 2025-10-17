@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { axiosInstance } from "@/lib/queryClient";
 
 export default function useCreateEventMutation() {
   // Keep this hook minimal: expose mutate/mutateAsync and let callers handle
@@ -8,7 +8,7 @@ export default function useCreateEventMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) => apiRequest("/api/events/create", "POST", data),
+    mutationFn: (data: any) => axiosInstance.post("/api/events/create", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
     },
