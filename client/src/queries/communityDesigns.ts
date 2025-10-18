@@ -22,7 +22,7 @@ export interface CommunityDesignApiItem {
   _id: string;
   created_at?: string;
   updated_at?: string;
-  community_designs_id?: number;
+  community_designs_id: number;
 }
 
 async function fetchCommunityDesigns() {
@@ -32,7 +32,19 @@ async function fetchCommunityDesigns() {
   return res.data;
 }
 
+interface DesignTabMapApiItem {
+  _id: string;
+  tabs_id: number;
+  community_designs_id: CommunityDesignApiItem;
+  status: boolean;
+  created_by: number | { id: number; name?: string; avatar?: string };
+  updated_by?: number | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
+  console.log("Mapping item:", item);
   return {
     id: item.community_designs_id,
     title: item.title ?? "",
@@ -103,7 +115,7 @@ export function useCommunityDesignsQuery() {
 }
 
 async function fetchDesignsByTab(tabId: number | string) {
-  const res = await axiosInstance.get<IResponseList<CommunityDesignApiItem>>(
+  const res = await axiosInstance.get<IResponseList<DesignTabMapApiItem>>(
     `/api/master/design-tabs-map/getDesignsByTabId/${tabId}`
   );
   return res.data;
@@ -114,8 +126,10 @@ export function useDesignsByTabQuery(tabId: number | string | undefined) {
     queryKey: ["/api/master/design-tabs-map/getDesignsByTabId", tabId],
     queryFn: () => fetchDesignsByTab(tabId ?? ""),
     enabled: typeof tabId !== "undefined" && tabId !== null && tabId !== "",
-    select: (res: IResponseList<CommunityDesignApiItem> | undefined) =>
-      (res?.data ?? []).map(mapToSharedDesign),
+    select: (res) =>
+      (res?.data ?? [])
+        .map((i) => i.community_designs_id)
+        .map(mapToSharedDesign),
     staleTime: 1000 * 60 * 2,
   });
 }
