@@ -166,6 +166,25 @@ const GetStarted = lazy(() => import("./pages/auth/get-started"));
 const VibesBusiness = lazy(() => import("@/pages/vibes-business"));
 const VendorCRM = lazy(() => import("@/pages/vendor-crm"));
 const VibesLaunchFund = lazy(() => import("@/pages/vibes-launchfund"));
+const FinancialDashboard = lazy(() => import("@/pages/financial-dashboard"));
+const FinancialDashboard_DashboardTab = lazy(
+  () => import("@/pages/financial-dashboard/DashboardTab")
+);
+const FinancialDashboard_EscrowTab = lazy(
+  () => import("@/pages/financial-dashboard/EscrowTab")
+);
+const FinancialDashboard_PayoutsTab = lazy(
+  () => import("@/pages/financial-dashboard/PayoutsTab")
+);
+const FinancialDashboard_ProcessingTab = lazy(
+  () => import("@/pages/financial-dashboard/ProcessingTab")
+);
+const FinancialDashboard_TipsTab = lazy(
+  () => import("@/pages/financial-dashboard/TipsTab")
+);
+const FinancialDashboard_RefundsTab = lazy(
+  () => import("@/pages/financial-dashboard/RefundsTab")
+);
 
 function DashboardRouter() {
   return (
@@ -372,7 +391,18 @@ function DashboardRouter() {
         <Route path="/payment-test" element={<PaymentTest />} />
         <Route path="/vibes-business" element={<VibesBusiness />} />
         <Route path="/crm-dashboard" element={<VendorCRM />} />
-        <Route path="/vibes-fund" element={<VibesLaunchFund />} />
+        <Route path="/vibes-fund/*" element={<VibesLaunchFund />} />
+        <Route path="/financial-management/*" element={<FinancialDashboard />}>
+          <Route index element={<FinancialDashboard_DashboardTab />} />
+          <Route path="escrow" element={<FinancialDashboard_EscrowTab />} />
+          <Route path="payouts" element={<FinancialDashboard_PayoutsTab />} />
+          <Route
+            path="processing"
+            element={<FinancialDashboard_ProcessingTab />}
+          />
+          <Route path="tips" element={<FinancialDashboard_TipsTab />} />
+          <Route path="refunds" element={<FinancialDashboard_RefundsTab />} />
+        </Route>
 
         {/* Legacy Routes */}
         <Route path="/login" element={<SimpleLoginPage />} />
