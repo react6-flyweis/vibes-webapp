@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Link, useLocation } from "react-router";
 import launchFundIcon from "@/assets/icons/lauchfund.svg";
 import {
   DiscoverTab,
@@ -9,10 +10,20 @@ import {
   SmartAITab,
 } from "@/components/launchfund";
 
-const tabs = ["Discover", "Featured", "Create", "My Campaigns", "Smart AI"];
+const tabs = [
+  { key: "discover", label: "Discover" },
+  { key: "featured", label: "Featured" },
+  { key: "create", label: "Create" },
+  { key: "my-campaigns", label: "My Campaigns" },
+  { key: "smart-ai", label: "Smart AI" },
+];
 
 export default function VibesLaunchFund() {
-  const [active, setActive] = useState<string>("Discover");
+  const location = useLocation();
+
+  // Determine active tab from current pathname. Expect routes like /vibes-fund/:tab
+  const parts = location.pathname.split("/").filter(Boolean);
+  const activeTab = parts[1] || "discover"; // if path is /vibes-fund or /vibes-fund/
 
   return (
     <div className="bg-gray-50">
@@ -35,17 +46,24 @@ export default function VibesLaunchFund() {
         </div>
 
         <div className="space-y-4">
-          <Tabs value={active} onValueChange={(v) => setActive(v)}>
+          {/* Use Radix Tabs but control active state via route. Tabs value must match label to maintain styling, so map keys to labels */}
+          <Tabs
+            value={
+              // find label for activeTab key, fallback to Discover
+              tabs.find((t) => t.key === activeTab)?.label || "Discover"
+            }
+          >
             {/* Tabs (centered) */}
             <div className="flex justify-center">
               <TabsList className="inline-flex items-center gap-2 bg-transparent rounded-lg p-1">
                 {tabs.map((t) => (
                   <TabsTrigger
-                    key={t}
-                    value={t}
+                    key={t.key}
+                    value={t.label}
                     className="px-4 py-2 rounded-md text-sm font-medium"
                   >
-                    {t}
+                    {/* Link to the subroute so clicking updates the URL */}
+                    <Link to={`/vibes-fund/${t.key}`}>{t.label}</Link>
                   </TabsTrigger>
                 ))}
               </TabsList>
