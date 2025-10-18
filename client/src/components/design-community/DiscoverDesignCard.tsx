@@ -9,7 +9,6 @@ import {
   Flag,
   Bookmark,
   Clock,
-  Users,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,6 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
 import RemixDialog from "@/components/design-community/RemixDialog";
-import CollaborationDialog from "@/components/design-community/CollaborationDialog";
 import { SharedDesign } from "@/types/designs";
 
 type Props = {
@@ -57,12 +55,12 @@ const downloadBlobUrl = (blobUrl: string, filename: string) => {
   a.remove();
 };
 
-export default function CommunityDesignCard({ design }: Props) {
+export function DiscoverDesignCard({ design }: Props) {
   const { toast } = useToast();
 
   const [showDetails, setShowDetails] = React.useState(false);
   const [showRemix, setShowRemix] = React.useState(false);
-  const [showCollab, setShowCollab] = React.useState(false);
+  // removed collaboration UI: manage collaborators option hidden
 
   // Use centralized interaction mutation for likes (mutation hook without toasts)
   const likeMutation = useCommunityDesignLikeMutation();
@@ -217,38 +215,6 @@ export default function CommunityDesignCard({ design }: Props) {
     },
   });
 
-  const inviteCollaboratorMutation = useMutation({
-    mutationFn: async (payload: {
-      designId: string;
-      email: string;
-      role: string;
-    }) => {
-      const res = await apiRequest(
-        "POST",
-        `/api/designs/${payload.designId}/invite`,
-        payload
-      );
-      return res;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Invitation Sent",
-        description: "Collaborator invited successfully",
-      });
-      setShowCollab(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/designs/invites"] });
-      queryClient.invalidateQueries({
-        queryKey: ["/api/designs/collaborations"],
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Invitation Failed",
-        description: "Unable to send invitation.",
-        variant: "destructive",
-      });
-    },
-  });
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
@@ -346,10 +312,6 @@ export default function CommunityDesignCard({ design }: Props) {
                   onClick={() => shareMutation.mutate(design.id.toString())}
                 >
                   <Share2 className="w-4 h-4 mr-2" /> Share Design
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowCollab(true)}>
-                  <Users className="w-4 h-4 mr-2" /> Manage Collaborators
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-400">
@@ -487,21 +449,7 @@ export default function CommunityDesignCard({ design }: Props) {
         </DialogContent>
       </Dialog>
 
-      {/* Collaboration Dialog */}
-      <Dialog open={showCollab} onOpenChange={setShowCollab}>
-        <DialogContent className="bg-black/90 border-purple-500/20 text-white max-w-lg">
-          <CollaborationDialog
-            onSend={(payload) =>
-              inviteCollaboratorMutation.mutate({
-                designId: design.id.toString(),
-                email: payload.email,
-                role: payload.role,
-              })
-            }
-            onCancel={() => setShowCollab(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Collaboration UI removed */}
     </>
   );
 }
