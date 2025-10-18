@@ -28,8 +28,9 @@ export default function CollaborationDialog({ onSend, onCancel }: Props) {
   const [collaboratorRole, setCollaboratorRole] = useState<"editor" | "viewer">(
     "viewer"
   );
+
   return (
-    <DialogContent className="bg-black/90 border-purple-500/20 text-white">
+    <DialogContent className="bg-black/90 border-purple-500/20 text-white max-w-lg">
       <DialogHeader>
         <DialogTitle>Invite Collaborators</DialogTitle>
         <DialogDescription className="text-gray-400">
