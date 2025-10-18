@@ -6,7 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { CheckCircle, Gift, Plus, Target } from "lucide-react";
+import { CheckCircle, Gift, Plus, Target, Trash } from "lucide-react";
+import { BusinessCategorySelector } from "./BusinessCategorySelector";
+import { CampaignTypeSelector } from "./CampaignTypeSelector";
+import {
+  useCreateVibeFundCampaign,
+  VibeFundCampaignPayload,
+} from "@/mutations/createVibeFundCampaign";
 import {
   Form,
   FormField,
@@ -29,11 +35,8 @@ const campaignSchema = z.object({
   title: z.string().min(1, "Title is required").max(80),
   shortDescription: z.string().min(1, "Short description is required").max(200),
   story: z.string().min(1, "Campaign story is required"),
-  category: z.string().nullable().optional(),
-  type: z
-    .union([z.literal("reward"), z.literal("equity"), z.literal("donation")])
-    .nullable()
-    .optional(),
+  category: z.string().min(1, "Category is required"),
+  type: z.string().min(1, "Campaign type is required"),
   currency: z.string().default("USD"),
   goal: z.string().min(1, "Funding goal is required"),
   duration: z.string().default("1 Month"),
@@ -52,6 +55,7 @@ type CampaignForm = z.infer<typeof campaignSchema>;
 
 export default function CampaignCreator() {
   const [step, setStep] = React.useState<number>(0);
+  const createCampaignMutation = useCreateVibeFundCampaign();
 
   const form = useForm<CampaignForm>({
     resolver: zodResolver(campaignSchema),
@@ -73,6 +77,11 @@ export default function CampaignCreator() {
       milestones: [],
     },
   });
+
+  // watch milestones so the UI updates when items are added/removed
+  const milestones = form.watch("milestones") || [];
+  // watch tiers so the UI updates when reward tiers are added/removed
+  const tiers = form.watch("tiers") || [];
 
   const fieldsByStep: Record<number, (keyof CampaignForm)[]> = {
     0: ["title", "shortDescription", "story", "category", "type"],
@@ -107,10 +116,80 @@ export default function CampaignCreator() {
       return;
     }
 
-    // For now, just log the form values. In future this should POST to an API.
-    console.log("Launching campaign with:", form.getValues());
-    // Move to a final success state or show a toast / redirect as required
-    setStep((s) => s + 1);
+    // Prepare payload from form values and map to backend shape
+    const values = form.getValues();
+
+    const mapTypeToId = (t: any) => {
+      if (!t) return undefined;
+      if (typeof t === "number") return t;
+      if (t === "reward") return 1;
+      if (t === "equity") return 2;
+      if (t === "donation") return 3;
+      return undefined;
+    };
+
+    const parseNumber = (s: any) => {
+      if (typeof s === "number") return s;
+      if (!s) return 0;
+      const num = Number(String(s).replace(/[^0-9.-]+/g, ""));
+      return Number.isNaN(num) ? 0 : num;
+    };
+
+    const reward_tiers = (values.tiers || []).map((t: any) => {
+      if (!t) return "";
+      if (typeof t === "string") return t;
+      const amount =
+        t.amount !== undefined && t.amount !== null ? String(t.amount) : "";
+      const title = t.title || "";
+      const amountStr =
+        amount !== "" ? (amount.startsWith("$") ? amount : `$${amount}`) : "";
+      return amountStr ? `${amountStr} - ${title}`.trim() : title;
+    });
+
+    const milestonesArr = (values.milestones || []).map((m: any) => {
+      if (!m) return "";
+      if (typeof m === "string") return m;
+      return m.title || String(m) || "";
+    });
+
+    const backendPayload: VibeFundCampaignPayload = {
+      title: values.title,
+      campaign_description: values.shortDescription,
+      campaign_story: values.story,
+      business_category_id: values.category
+        ? Number(values.category)
+        : undefined,
+      compaign_type_id: mapTypeToId(values.type),
+      funding_goal: parseNumber(values.goal),
+      campaign_duration: values.duration,
+      funding_model:
+        values.fundingModel === "all-or-nothing"
+          ? "All or Nothing"
+          : values.fundingModel === "keep-what-you-raise"
+          ? "Keep What You Raise"
+          : values.fundingModel,
+      cover_image: values.coverImageUrl || undefined,
+      campaign_video: values.videoUrl || undefined,
+      reward_tiers,
+      milestones: milestonesArr,
+      approved_status: false,
+      emozi: (values as any).emozi || "🚀",
+      status: true,
+    };
+
+    try {
+      // Use mutation if available via react-query - we'll call it directly here
+      await createCampaignMutation.mutateAsync(backendPayload);
+      // Move to a final success state or show a toast / redirect as required
+      setStep((s) => s + 1);
+      // Basic user feedback for now
+      window.alert("Campaign launched successfully.");
+    } catch (err: any) {
+      console.error("Failed to launch campaign:", err);
+      window.alert(
+        "Failed to launch campaign: " + (err?.message || String(err))
+      );
+    }
   };
 
   return (
@@ -210,35 +289,11 @@ export default function CampaignCreator() {
                       <FormItem>
                         <FormLabel>Category *</FormLabel>
                         <FormControl>
-                          <div className="grid grid-cols-2 gap-3 mt-2">
-                            {[
-                              "Startup & Business",
-                              "Creative Projects",
-                              "Community & Social",
-                              "Charity & Causes",
-                              "Technology",
-                              "Fashion & Design",
-                              "Food & Beverage",
-                              "Events & Entertainment",
-                              "Music & Audio",
-                              "Health & Wellness",
-                            ].map((c) => (
-                              <button
-                                key={c}
-                                type="button"
-                                onClick={() => field.onChange(c)}
-                                className={`text-left p-3 border rounded-md text-sm ${
-                                  field.value === c
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-gray-200"
-                                }`}
-                              >
-                                {c}
-                              </button>
-                            ))}
-                          </div>
+                          <BusinessCategorySelector
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -250,33 +305,10 @@ export default function CampaignCreator() {
                       <FormItem>
                         <FormLabel>Campaign Type *</FormLabel>
                         <FormControl>
-                          <div className="grid grid-cols-1 gap-3 mt-2">
-                            {[
-                              { key: "reward", label: "Rewards-Based" },
-                              { key: "equity", label: "Equity Investment" },
-                              { key: "donation", label: "Donation-Based" },
-                            ].map((t) => (
-                              <button
-                                key={t.key}
-                                type="button"
-                                onClick={() => field.onChange(t.key)}
-                                className={`w-full text-left p-4 border rounded-md ${
-                                  field.value === t.key
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-gray-200"
-                                }`}
-                              >
-                                <div className="font-medium">{t.label}</div>
-                                <div className="text-sm text-gray-500">
-                                  {t.key === "reward"
-                                    ? "Offer products or perks to backers"
-                                    : t.key === "equity"
-                                    ? "Raise capital for ownership stakes"
-                                    : "Accept donations for causes"}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
+                          <CampaignTypeSelector
+                            value={field.value}
+                            onChange={(v) => field.onChange(v)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -551,36 +583,127 @@ export default function CampaignCreator() {
                     }}
                     className="ml-4"
                   >
-                    <Plus className="w-4 h-4 mr-2" /> + Add Tier
+                    <Plus className="w-4 h-4" /> Add Tier
                   </Button>
                 </div>
               </div>
 
-              <div className="border-dashed border-2 border-gray-200 rounded-md p-12 text-center mt-6">
-                <div className="text-gray-400">
-                  <Gift className="w-8 h-8 mx-auto" />
+              {tiers.length === 0 ? (
+                <div className="border-dashed border-2 border-gray-200 rounded-md p-12 text-center mt-6">
+                  <div className="text-gray-400">
+                    <Gift className="w-8 h-8 mx-auto" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-700">
+                    No Reward Tiers Yet
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Add reward tiers to give backers incentives to support your
+                    campaign
+                  </p>
+                  <div className="mt-6">
+                    <Button
+                      onClick={() => {
+                        const current = form.getValues("tiers") || [];
+                        form.setValue("tiers", [
+                          ...current,
+                          { title: "", amount: 0, description: "" },
+                        ]);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" /> Add Your First Tier
+                    </Button>
+                  </div>
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-700">
-                  No Reward Tiers Yet
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Add reward tiers to give backers incentives to support your
-                  campaign
-                </p>
-                <div className="mt-6">
-                  <Button
-                    onClick={() => {
-                      const current = form.getValues("tiers") || [];
-                      form.setValue("tiers", [
-                        ...current,
-                        { title: "", amount: "" },
-                      ]);
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" /> + Add Your First Tier
-                  </Button>
+              ) : (
+                <div className="space-y-4 mt-6">
+                  {tiers.map((t: any, idx: number) => (
+                    <div key={idx} className="border rounded-md p-6 bg-white">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <Gift className="w-5 h-5 text-blue-500" />
+                          <h4 className="text-lg font-semibold">
+                            Tier {idx + 1}
+                          </h4>
+                        </div>
+                        <div>
+                          <Button
+                            variant="ghost"
+                            onClick={() => {
+                              const cur = form.getValues("tiers") || [];
+                              cur.splice(idx, 1);
+                              form.setValue("tiers", cur);
+                            }}
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <FormField
+                          control={form.control}
+                          name={`tiers.${idx}.amount` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Amount</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`tiers.${idx}.title` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Tier Title</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="e.g., Early Bird"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`tiers.${idx}.description` as any}
+                        render={({ field }) => (
+                          <FormItem className="mt-4">
+                            <FormLabel>Description (optional)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe the rewards included in this tier..."
+                                {...field}
+                                className="h-24"
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => {
+                        const current = form.getValues("tiers") || [];
+                        form.setValue("tiers", [
+                          ...current,
+                          { title: "", amount: 0, description: "" },
+                        ]);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" /> Add Tier
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-center justify-between mt-6">
                 <Button variant="ghost" onClick={onPrevious}>
@@ -620,35 +743,127 @@ export default function CampaignCreator() {
                       ]);
                     }}
                   >
-                    <Plus className="w-4 h-4 mr-2" /> + Add Milestone
+                    <Plus className="w-4 h-4" /> Add Milestone
                   </Button>
                 </div>
               </div>
 
-              <div className="border-dashed border-2 border-gray-200 rounded-md p-12 text-center mt-6">
-                <div className="text-gray-400">
-                  <Gift className="w-8 h-8 mx-auto" />
+              {milestones.length === 0 ? (
+                <div className="border-dashed border-2 border-gray-200 rounded-md p-12 text-center mt-6">
+                  <div className="text-gray-400">
+                    <Gift className="w-8 h-8 mx-auto" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-700">
+                    No Milestones Yet
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Add milestones to show backers how you'll use the funds
+                  </p>
+                  <div className="mt-6">
+                    <Button
+                      onClick={() => {
+                        const cur = form.getValues("milestones") || [];
+                        form.setValue("milestones", [
+                          ...cur,
+                          { title: "", amount: 0, description: "" },
+                        ]);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" /> Add Your First Milestone
+                    </Button>
+                  </div>
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-700">
-                  No Milestones Yet
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Add milestones to show backers how you'll use the funds
-                </p>
-                <div className="mt-6">
-                  <Button
-                    onClick={() => {
-                      const cur = form.getValues("milestones") || [];
-                      form.setValue("milestones", [
-                        ...cur,
-                        { title: "", amount: "" },
-                      ]);
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-2" /> + Add Your First Milestone
-                  </Button>
+              ) : (
+                <div className="space-y-4 mt-6">
+                  {milestones.map((m: any, idx: number) => (
+                    <div key={idx} className="border rounded-md p-6 bg-white">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <Target className="w-5 h-5 text-blue-500" />
+                          <h4 className="text-lg font-semibold">
+                            Milestone {idx + 1}
+                          </h4>
+                        </div>
+                        <div>
+                          <Button
+                            variant="ghost"
+                            onClick={() => {
+                              const cur = form.getValues("milestones") || [];
+                              cur.splice(idx, 1);
+                              form.setValue("milestones", cur);
+                            }}
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <FormField
+                          control={form.control}
+                          name={`milestones.${idx}.amount` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Target Amount</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`milestones.${idx}.title` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Milestone Title</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="e.g., Early Bird Special"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`milestones.${idx}.description` as any}
+                        render={({ field }) => (
+                          <FormItem className="mt-4">
+                            <FormLabel>Description *</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe what will be accomplished at this funding level ..."
+                                {...field}
+                                className="h-24"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => {
+                        const cur = form.getValues("milestones") || [];
+                        form.setValue("milestones", [
+                          ...cur,
+                          { title: "", amount: 0, description: "" },
+                        ]);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" /> Add Milestone
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-center justify-between mt-6">
                 <Button variant="ghost" onClick={onPrevious}>
@@ -773,24 +988,30 @@ export default function CampaignCreator() {
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={onLaunch}
+                      disabled={createCampaignMutation.isPending}
                       className="bg-green-600 text-white hover:bg-green-700"
                     >
-                      {" "}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="inline w-4 h-4 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>{" "}
-                      Launch Campaign
+                      {createCampaignMutation.isPending ? (
+                        <span>Launching...</span>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="inline w-4 h-4 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Launch Campaign
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
