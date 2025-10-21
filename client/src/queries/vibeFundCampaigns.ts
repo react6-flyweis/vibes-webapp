@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
+import { IResponseList } from "@/types";
 
 export type VibeFundCampaign = {
   _id: string;
@@ -27,25 +28,59 @@ export type VibeFundCampaign = {
   compaign_type?: Record<string, unknown>;
 };
 
-type VibeFundResponse = {
-  success: boolean;
-  message: string;
-  data: VibeFundCampaign[];
-  pagination?: Record<string, unknown>;
-  timestamp?: string;
+export type VibeFundQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: boolean | string;
+  approved_status?: boolean | string;
+  business_category_id?: string | number;
+  compaign_type_id?: string | number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
 
-const fetchVibeFundCampaigns = async () => {
-  const res = await axiosInstance.get<VibeFundResponse>(
-    "/api/master/vibe-fund-campaign/getAll"
+const fetchVibeFundCampaigns = async (params?: VibeFundQueryParams) => {
+  const queryParams: Record<string, unknown> = {
+    page: params?.page ?? 1,
+    limit: params?.limit ?? 10,
+    search: params?.search ?? "",
+    status: params?.status ?? "",
+    approved_status: params?.approved_status ?? "",
+    sortBy: params?.sortBy ?? "created_at",
+    sortOrder: params?.sortOrder ?? "desc",
+  };
+
+  // Only include these filters when explicitly provided and not the 'all' token
+  if (
+    params?.business_category_id !== undefined &&
+    params?.business_category_id !== "all" &&
+    params?.business_category_id !== ""
+  ) {
+    queryParams.business_category_id = params.business_category_id;
+  }
+
+  if (
+    params?.compaign_type_id !== undefined &&
+    params?.compaign_type_id !== "all" &&
+    params?.compaign_type_id !== ""
+  ) {
+    queryParams.compaign_type_id = params.compaign_type_id;
+  }
+
+  const res = await axiosInstance.get<IResponseList<VibeFundCampaign>>(
+    "/api/master/vibe-fund-campaign/getAll",
+    {
+      params: queryParams,
+    }
   );
   return res.data;
 };
 
-export function useVibeFundCampaigns() {
+export function useVibeFundCampaigns(params?: VibeFundQueryParams) {
   return useQuery({
-    queryKey: ["/api/master/vibe-fund-campaign/getAll"],
-    queryFn: fetchVibeFundCampaigns,
+    queryKey: ["/api/master/vibe-fund-campaign/getAll", params ?? {}],
+    queryFn: () => fetchVibeFundCampaigns(params),
     select: (d) => d?.data ?? [],
     staleTime: 1000 * 60 * 2,
   });
