@@ -168,6 +168,9 @@ const VibesBusiness = lazy(() => import("@/pages/vibes-business"));
 const VendorCRM = lazy(() => import("@/pages/vendor-crm"));
 const VibesLaunchFund = lazy(() => import("@/pages/vibes-launchfund"));
 const FinancialDashboard = lazy(() => import("@/pages/financial-dashboard"));
+const SecurityTrustDashboard = lazy(
+  () => import("@/pages/security-trust-dashboard")
+);
 const BackersDashboard = lazy(() => import("@/pages/backers-dashboard"));
 const FinancialDashboard_DashboardTab = lazy(
   () => import("@/pages/financial-dashboard/DashboardTab")
@@ -406,6 +409,8 @@ function DashboardRouter() {
           <Route path="tips" element={<FinancialDashboard_TipsTab />} />
           <Route path="refunds" element={<FinancialDashboard_RefundsTab />} />
         </Route>
+
+        <Route path="/security-trust/*" element={<SecurityTrustDashboard />} />
         <Route path="/backer-experience/*" element={<BackersDashboard />} />
 
         {/* Legacy Routes */}
