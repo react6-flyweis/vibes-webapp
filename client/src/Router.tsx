@@ -69,6 +69,7 @@ const ARPartyOverlays = lazy(() => import("@/pages/ar-party-overlays"));
 const AIPersonalizedRecommendations = lazy(
   () => import("@/pages/ai-personalized-recommendations")
 );
+const Caterings = lazy(() => import("@/pages/caterings"));
 const SmartContractEscrow = lazy(() => import("@/pages/smart-contract-escrow"));
 const EnhancedDJBooth = lazy(() => import("@/pages/enhanced-dj-booth"));
 const AdaptiveMusicEngine = lazy(() => import("@/pages/adaptive-music-engine"));
@@ -392,6 +393,7 @@ function DashboardRouter() {
         <Route path="/payment-test" element={<PaymentTest />} />
         <Route path="/vibes-business" element={<VibesBusiness />} />
         <Route path="/crm-dashboard" element={<VendorCRM />} />
+        <Route path="caterings" element={<Caterings />} />
         <Route path="/vibes-fund/*" element={<VibesLaunchFund />} />
         <Route path="/financial-management/*" element={<FinancialDashboard />}>
           <Route index element={<FinancialDashboard_DashboardTab />} />
