@@ -96,7 +96,7 @@ export default function VendorCRM() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">AI CRM Vendor Outreach</h1>
+          <h1 className="text-2xl font-semibold">CRM Vendor Outreach</h1>
           <p className="text-sm text-muted-foreground">
             Manage your vendor pipeline from discovery to activation
           </p>
