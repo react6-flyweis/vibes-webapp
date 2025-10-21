@@ -123,3 +123,23 @@ export function useStaffByRoleQuery(roleId = 4) {
     staleTime: 1000 * 60 * 2,
   });
 }
+
+// New: fetch staff by vendor id
+export const fetchStaffByVendorId = async (vendorId: number) => {
+  const res = await axiosInstance.get<IResponseList<StaffUser>>(
+    `/api/master/staff-event-book/getStaffByVendorId?vendorId=${vendorId}`
+  );
+  return res.data;
+};
+
+export function useStaffByVendorQuery(vendorId: number | null) {
+  return useQuery<IResponseList<StaffUser>, Error, StaffUser[]>({
+    queryKey: vendorId
+      ? [`/api/master/staff-event-book/getStaffByVendorId`, vendorId]
+      : [`/api/master/staff-event-book/getStaffByVendorId`, "null"],
+    queryFn: () => fetchStaffByVendorId(vendorId ?? 0),
+    enabled: !!vendorId,
+    select: (res) => res?.data ?? [],
+    staleTime: 1000 * 60 * 2,
+  });
+}
