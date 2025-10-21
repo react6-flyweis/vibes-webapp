@@ -130,6 +130,9 @@ export const navigationItems: NavCategory[] = [
       },
     ],
   },
+];
+
+export const userNavigationItems: NavCategory[] = [
   {
     title: "Marketplace",
     items: [
@@ -155,6 +158,26 @@ export const navigationItems: NavCategory[] = [
   },
 ];
 export const vendorNavigationItems: NavCategory[] = [
+  {
+    title: "Marketplace",
+    items: [
+      {
+        name: "Vendor Marketplace",
+        href: "/vendor-marketplace",
+        icon: Star,
+      },
+      {
+        name: "Staffings",
+        href: "/staffings",
+        icon: Users,
+      },
+      {
+        name: "Catering Services",
+        href: "/caterings",
+        icon: Heart,
+      },
+    ],
+  },
   // Vibes fund
   //  vibesfund
   // fundraising
@@ -355,7 +378,7 @@ export const vendorNavigationItems: NavCategory[] = [
       },
       {
         name: "Campaign Management",
-        href: "/campaign-management",
+        href: "/vibes-fund",
         icon: TrendingUp,
       },
     ],
