@@ -2,18 +2,51 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { useVibeFundCampaigns } from "@/queries/vibeFundCampaigns";
+import { BusinessCategorySelect } from "@/components/campaign/BusinessCategorySelect";
+import { CampaignTypeSelect } from "@/components/campaign/CampaignTypeSelect";
+import { useState } from "react";
 
 const DiscoverTab: React.FC = () => {
-  const { data: campaigns, isLoading, isError, error } = useVibeFundCampaigns();
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined
+  );
+  const [selectedCampaignType, setSelectedCampaignType] = useState<
+    string | undefined
+  >(undefined);
+
+  // paging / search / sort state
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
+  const [search, setSearch] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(search);
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // debounce search input
+  React.useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+  const params = {
+    page,
+    limit,
+    search: debouncedSearch,
+    status: true,
+    approved_status: "",
+    business_category_id: selectedCategory,
+    compaign_type_id: selectedCampaignType,
+    sortBy,
+    sortOrder,
+  };
+
+  const {
+    data: campaigns,
+    isLoading,
+    isError,
+    error,
+  } = useVibeFundCampaigns(params as any);
 
   return (
     <div>
@@ -22,33 +55,29 @@ const DiscoverTab: React.FC = () => {
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input placeholder="Search campaigns..." className="pl-10" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search campaigns..."
+              className="pl-10"
+            />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Select>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="reward">Reward</SelectItem>
-              <SelectItem value="equity">Equity</SelectItem>
-              <SelectItem value="donation">Donation</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="w-40">
+            <BusinessCategorySelect
+              value={selectedCategory}
+              onChange={(val) => setSelectedCategory(val)}
+            />
+          </div>
 
-          <Select>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="featured">Featured</SelectItem>
-              <SelectItem value="trending">Trending</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="w-36">
+            <CampaignTypeSelect
+              value={selectedCampaignType}
+              onChange={(val) => setSelectedCampaignType(val)}
+            />
+          </div>
 
           <Button variant="outline">Create</Button>
         </div>
