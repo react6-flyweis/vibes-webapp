@@ -7,7 +7,7 @@ import {
   FeaturedTab,
   CreateTab,
   MyCampaignsTab,
-  SmartAITab,
+  // SmartAITab,
 } from "@/components/launchfund";
 
 const tabs = [
@@ -15,7 +15,7 @@ const tabs = [
   { key: "featured", label: "Featured" },
   { key: "create", label: "Create" },
   { key: "my-campaigns", label: "My Campaigns" },
-  { key: "smart-ai", label: "Smart AI" },
+  // { key: "smart-ai", label: "Smart AI" },
 ];
 
 export default function VibesLaunchFund() {
@@ -86,9 +86,9 @@ export default function VibesLaunchFund() {
               <MyCampaignsTab />
             </TabsContent>
 
-            <TabsContent value="Smart AI">
+            {/* <TabsContent value="Smart AI">
               <SmartAITab />
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </div>
       </div>
