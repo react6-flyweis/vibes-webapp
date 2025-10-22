@@ -12,12 +12,77 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useVendorOverview } from "@/hooks/useVendorOverview";
+import { useVendorPipeline } from "@/hooks/useVendorPipeline";
+import { useVendorRecentActivities } from "@/hooks/useVendorRecentActivities";
+import { useVendorUpcomingFollowups } from "@/hooks/useVendorUpcomingFollowups";
 
-export default function Overview({ stats, pipeline, recent, upcoming }: any) {
+export default function Overview() {
+  const { data: overview, isLoading, isError, error } = useVendorOverview();
+  const {
+    data: pipelineData,
+    isLoading: pipelineLoading,
+    isError: pipelineError,
+  } = useVendorPipeline();
+  const {
+    data: recentData,
+    isLoading: recentLoading,
+    isError: recentError,
+  } = useVendorRecentActivities();
+  const {
+    data: upcomingData,
+    isLoading: upcomingLoading,
+    isError: upcomingError,
+  } = useVendorUpcomingFollowups();
+
+  // prefer remote data if available, otherwise fallback to provided stats
+  const displayStats = [
+    {
+      title: "Leads (Last Month)",
+      value: overview?.totalLeadsLastMonth,
+      sub: "Total leads in last 30 days",
+    },
+    {
+      title: "Active Leads",
+      value: overview?.activeLeads,
+      sub: "Leads currently active",
+    },
+    {
+      title: "Conversion Rate",
+      value: `${overview?.conversionRate}%`,
+      sub: "Overall conversion",
+    },
+    {
+      title: "Avg Time to Convert",
+      value: `${overview?.avgTimeToConvert} days`,
+      sub: "Average days to convert",
+    },
+  ];
+
   return (
     <div className="space-y-6">
+      {isLoading && (
+        <div className="text-sm text-muted-foreground">
+          Loading vendor overview...
+        </div>
+      )}
+      {isError && (
+        <div className="text-sm text-destructive">
+          Failed to load vendor overview: {(error as any)?.message ?? "Unknown"}
+        </div>
+      )}
+      {pipelineLoading && (
+        <div className="text-sm text-muted-foreground">
+          Loading pipeline overview...
+        </div>
+      )}
+      {pipelineError && (
+        <div className="text-sm text-destructive">
+          Failed to load pipeline overview
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {stats.map((s: any) => (
+        {displayStats.map((s: any) => (
           <Card key={s.title}>
             <CardHeader>
               <CardTitle className="text-sm">{s.title}</CardTitle>
@@ -41,7 +106,33 @@ export default function Overview({ stats, pipeline, recent, upcoming }: any) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {pipeline.map((p: any) => (
+            {[
+              {
+                stage: "Lead Discovered",
+                count: pipelineData?.leadDiscovered.totalCount,
+                pct: pipelineData?.leadDiscovered.conversionRate ?? 0,
+              },
+              {
+                stage: "Lead Contacted",
+                count: pipelineData?.leadContacted.totalCount,
+                pct: pipelineData?.leadContacted.conversionRate ?? 0,
+              },
+              {
+                stage: "Onboarding Started",
+                count: pipelineData?.onboardingStarted.totalCount,
+                pct: pipelineData?.onboardingStarted.conversionRate ?? 0,
+              },
+              {
+                stage: "Activated Leads",
+                count: pipelineData?.activatedLeads.totalCount,
+                pct: pipelineData?.activatedLeads.conversionRate ?? 0,
+              },
+              {
+                stage: "Featured",
+                count: pipelineData?.featured.totalCount,
+                pct: pipelineData?.featured.conversionRate ?? 0,
+              },
+            ].map((p: any) => (
               <div key={p.stage} className="space-y-1">
                 <div className="flex justify-between">
                   <div className="text-sm">{p.stage}</div>
@@ -72,7 +163,7 @@ export default function Overview({ stats, pipeline, recent, upcoming }: any) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recent.map((r: any) => (
+                {recentData?.map((r: any) => (
                   <TableRow key={r.id}>
                     <TableCell className="font-medium">{r.title}</TableCell>
                     <TableCell>{r.channel}</TableCell>
@@ -92,7 +183,7 @@ export default function Overview({ stats, pipeline, recent, upcoming }: any) {
             <CardTitle>Upcoming Follow-ups</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {upcoming.map((u: any) => (
+            {upcomingData?.map((u) => (
               <div key={u.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar>
