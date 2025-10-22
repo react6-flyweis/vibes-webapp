@@ -168,6 +168,7 @@ const GetStarted = lazy(() => import("./pages/auth/get-started"));
 const VibesBusiness = lazy(() => import("@/pages/vibes-business"));
 const VendorCRM = lazy(() => import("@/pages/vendor-crm"));
 const VibesLaunchFund = lazy(() => import("@/pages/vibes-launchfund"));
+const VendorMigration = lazy(() => import("@/pages/vendor-migration"));
 const FinancialDashboard = lazy(() => import("@/pages/financial-dashboard"));
 const SecurityTrustDashboard = lazy(
   () => import("@/pages/security-trust-dashboard")
@@ -395,6 +396,7 @@ function DashboardRouter() {
         <Route path="/live-reaction-walls" element={<LiveReactionWalls />} />
         <Route path="/reaction-walls" element={<LiveReactionWalls />} />
         <Route path="/payment-test" element={<PaymentTest />} />
+        <Route path="/vendor-migration" element={<VendorMigration />} />
         <Route path="/vibes-business" element={<VibesBusiness />} />
         <Route path="/crm-dashboard" element={<VendorCRM />} />
         <Route path="staffings" element={<StaffingsPage />} />
