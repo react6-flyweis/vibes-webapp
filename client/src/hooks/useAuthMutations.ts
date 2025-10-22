@@ -79,6 +79,44 @@ export function useResendOtpMutation(
   });
 }
 
+export function useForgotPasswordMutation(
+  options?: UseMutationOptions<unknown, unknown, { email?: string | undefined }>
+) {
+  return useMutation<unknown, unknown, { email?: string | undefined }>({
+    mutationFn: async (data) => {
+      return await apiRequest("/api/users/forgot-password", "POST", data);
+    },
+    ...options,
+  });
+}
+
+export function useResetPasswordMutation(
+  options?: UseMutationOptions<
+    unknown,
+    unknown,
+    {
+      email?: string | undefined;
+      otp?: string | undefined;
+      newPassword?: string | undefined;
+    }
+  >
+) {
+  return useMutation<
+    unknown,
+    unknown,
+    {
+      email?: string | undefined;
+      otp?: string | undefined;
+      newPassword?: string | undefined;
+    }
+  >({
+    mutationFn: async (data) => {
+      return await apiRequest("/api/users/reset-password", "POST", data);
+    },
+    ...options,
+  });
+}
+
 // Create user / signup mutation for the new endpoint
 export function useCreateUserMutation(
   options?: UseMutationOptions<
