@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import OtpVerificationDialog from "./OtpVerificationDialog";
+import ForgotPasswordDialog from "./ForgotPasswordDialog";
+import ResetPasswordDialog from "./ResetPasswordDialog";
 
 import {
   Form,
@@ -38,6 +40,9 @@ export function LoginForm() {
   const [showOtp, setShowOtp] = useState(false);
   const [otpEmail, setOtpEmail] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [pendingOtp, setPendingOtp] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -94,11 +99,21 @@ export function LoginForm() {
   const handleVerify = async (code: string) => {
     try {
       const remember = form.getValues("rememberMe") || false;
-      await verifyMutation.mutateAsync({
+      const res = await verifyMutation.mutateAsync({
         email: otpEmail,
         otp: code,
         remember,
       });
+
+      // If backend instructs to reset password next (flow: forgot-password -> verify -> reset-password)
+      const nextStep = (res as any)?.data?.data?.nextStep;
+      if (nextStep === "reset-password") {
+        setPendingOtp(code);
+        setShowOtp(false);
+        setShowReset(true);
+        return;
+      }
+
       toast({ title: "Logged in", description: "Verification successful." });
       setShowOtp(false);
       navigate("/");
@@ -216,14 +231,14 @@ export function LoginForm() {
           )}
         />
 
-        <Link to="/auth/forgot-password">
-          <Button
-            variant="link"
-            className="text-sm text-purple-600 hover:text-purple-700 p-0"
-          >
-            Forgot password?
-          </Button>
-        </Link>
+        <Button
+          type="button"
+          variant="link"
+          className="text-sm text-purple-600 hover:text-purple-700 p-0"
+          onClick={() => setShowForgot(true)}
+        >
+          Forgot password?
+        </Button>
         <Button
           type="submit"
           size="lg"
@@ -239,6 +254,29 @@ export function LoginForm() {
         email={otpEmail}
         onVerify={handleVerify}
         onResend={handleResend}
+      />
+      <ForgotPasswordDialog
+        open={showForgot}
+        onOpenChange={setShowForgot}
+        initialEmail={form.getValues("email")}
+        onOpenReset={(email?: string) => {
+          setOtpEmail(email);
+          setPendingOtp(undefined);
+          setShowReset(true);
+        }}
+      />
+      <ResetPasswordDialog
+        open={showReset}
+        onOpenChange={setShowReset}
+        email={otpEmail}
+        otp={pendingOtp}
+        onSuccess={() => {
+          setShowReset(false);
+          toast({
+            title: "Password updated",
+            description: "You can now log in with your new password.",
+          });
+        }}
       />
     </Form>
   );
