@@ -1,14 +1,24 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useVendorOverview } from "@/hooks/useVendorOverview";
 
 export default function Analytics() {
+  const { data, isLoading, isError, error } = useVendorOverview();
+
+  const totalOutreach = data?.totalLeadsLastMonth ?? 0;
+  const activeLeads = data?.activeLeads ?? 0;
+  const conversionRate = data?.conversionRate ?? 0;
+  const avgTimeToConvert = data?.avgTimeToConvert ?? 0;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent>
             <div className="text-sm">Total Outreach</div>
-            <div className="text-2xl font-semibold">1247</div>
+            <div className="text-2xl font-semibold">
+              {isLoading ? "…" : totalOutreach ?? "—"}
+            </div>
             <div className="text-sm text-muted-foreground">
               Messages sent this month
             </div>
@@ -17,16 +27,26 @@ export default function Analytics() {
 
         <Card>
           <CardContent>
-            <div className="text-sm">Response Rate</div>
-            <div className="text-2xl font-semibold">34.2%</div>
-            <div className="text-sm text-green-600">+5.2% from last month</div>
+            <div className="text-sm">Active Leads</div>
+            <div className="text-2xl font-semibold">
+              {isLoading ? "…" : activeLeads ?? "—"}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Leads currently in pipeline
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
             <div className="text-sm">Conversion Rate</div>
-            <div className="text-2xl font-semibold">18.4%</div>
+            <div className="text-2xl font-semibold">
+              {isLoading
+                ? "…"
+                : conversionRate != null
+                ? `${conversionRate}%`
+                : "—"}
+            </div>
             <div className="text-sm text-muted-foreground">
               Leads to activated vendors
             </div>
@@ -35,10 +55,16 @@ export default function Analytics() {
 
         <Card>
           <CardContent>
-            <div className="text-sm">Avg Response Time</div>
-            <div className="text-2xl font-semibold">4.7h</div>
+            <div className="text-sm">Avg Time to Convert</div>
+            <div className="text-2xl font-semibold">
+              {isLoading
+                ? "…"
+                : avgTimeToConvert != null
+                ? `${avgTimeToConvert}h`
+                : "—"}
+            </div>
             <div className="text-sm text-muted-foreground">
-              Average vendor response time
+              Average time to convert
             </div>
           </CardContent>
         </Card>
@@ -52,67 +78,79 @@ export default function Analytics() {
           </p>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border rounded p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  ✉️
+          {isError ? (
+            <div className="text-sm text-destructive">
+              Error loading overview: {String((error as any)?.message ?? error)}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border rounded p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    ✉️
+                  </div>
+                  <div>
+                    <div className="font-medium">Email</div>
+                    <div className="text-sm text-muted-foreground">
+                      {isLoading ? "Loading…" : `sent • responses`}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-medium">Email</div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold">
+                    {isLoading ? "…" : "32.2%"}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    892 sent • 287 responses
+                    Response Rate
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold">32.2%</div>
-                <div className="text-sm text-muted-foreground">
-                  Response Rate
-                </div>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between border rounded p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  💬
+              <div className="flex items-center justify-between border rounded p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                    💬
+                  </div>
+                  <div>
+                    <div className="font-medium">Instagram DM</div>
+                    <div className="text-sm text-muted-foreground">
+                      {isLoading ? "Loading…" : `sent • responses`}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-medium">Instagram DM</div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold">
+                    {isLoading ? "…" : "41%"}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    234 sent • 96 responses
+                    Response Rate
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold">41%</div>
-                <div className="text-sm text-muted-foreground">
-                  Response Rate
-                </div>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between border rounded p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  💬
+              <div className="flex items-center justify-between border rounded p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                    💬
+                  </div>
+                  <div>
+                    <div className="font-medium">LinkedIn</div>
+                    <div className="text-sm text-muted-foreground">
+                      {isLoading ? "Loading…" : `sent • responses`}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-medium">LinkedIn</div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold">
+                    {isLoading ? "…" : "31.4%"}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    121 sent • 38 responses
+                    Response Rate
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold">31.4%</div>
-                <div className="text-sm text-muted-foreground">
-                  Response Rate
-                </div>
-              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>
