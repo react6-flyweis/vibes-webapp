@@ -13,6 +13,9 @@ const EventPlanningAuth = lazy(() => import("@/pages/event-planning-auth"));
 const EnhancedEventPage = lazy(() => import("@/pages/enhanced-event"));
 const BusinessPromotionPage = lazy(() => import("@/pages/business-promotion"));
 const VendorOnboarding = lazy(() => import("@/pages/vendor-onboarding"));
+const VendorOnboardingPortal = lazy(
+  () => import("@/pages/vendor-onboarding-portal")
+);
 const VendorMarketplace = lazy(() => import("@/pages/vendor-marketplace"));
 const PricingPage = lazy(() => import("@/pages/pricing"));
 const PremiumDashboard = lazy(() => import("@/pages/premium-dashboard"));
@@ -227,6 +230,10 @@ function DashboardRouter() {
         <Route path="/vendor-dashboard" element={<VendorDashboard />} />
         <Route path="/corporate" element={<CorporateDashboard />} />
         <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
+        <Route
+          path="/vendor-onboarding-portal"
+          element={<VendorOnboardingPortal />}
+        />
         <Route path="/vendors" element={<VendorMarketplace />} />
         <Route path="/vendor-marketplace" element={<VendorMarketplace />} />
         <Route path="/ai-theme-generator" element={<AIThemeGenerator />} />
