@@ -2,7 +2,16 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function Pipeline({ pipeline }: any) {
+const pipeline = [
+  { stage: "Lead Discovered", count: 145, pct: 15.2 },
+  { stage: "Contacted", count: 89, pct: 28.1 },
+  { stage: "Interested", count: 67, pct: 42.7 },
+  { stage: "Onboarding Started", count: 43, pct: 67.4 },
+  { stage: "Activated", count: 29, pct: 85.2 },
+  { stage: "Featured", count: 18, pct: 94.1 },
+];
+
+export default function Pipeline() {
   return (
     <div>
       <h2 className="text-lg font-semibold mb-2">CRM Pipeline Stages</h2>
