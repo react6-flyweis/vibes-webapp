@@ -7,6 +7,8 @@ import Outreach from "@/components/vendor-crm/Outreach";
 import Templates from "@/components/vendor-crm/Templates";
 import Analytics from "@/components/vendor-crm/Analytics";
 import Automation from "@/components/vendor-crm/Automation";
+import AddLeadDialog from "@/components/vendor-crm/AddLeadDialog";
+import FilterDialog from "@/components/vendor-crm/FilterDialog";
 
 export default function VendorCRM() {
   return (
@@ -19,10 +21,8 @@ export default function VendorCRM() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            Filter
-          </Button>
-          <Button size="sm">+ Add Lead</Button>
+          <FilterDialog />
+          <AddLeadDialog />
         </div>
       </div>
 
