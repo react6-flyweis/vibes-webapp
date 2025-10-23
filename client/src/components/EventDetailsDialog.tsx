@@ -1,5 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -24,21 +26,26 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-type FormValues = {
-  startDate: string;
-  endDate: string;
-  eventName: string;
-  eventAddress: string;
-  eventType: string;
-  guestCount: string;
-};
+const eventDetailsSchema = z.object({
+  startDate: z.string().nonempty("Start date is required"),
+  endDate: z.string().optional(),
+  eventName: z.string().min(3, "Event name must be at least 3 characters"),
+  eventAddress: z
+    .string()
+    .min(3, "Event address must be at least 3 characters"),
+  eventType: z.enum(["Birthday", "Wedding", "Corporate"]),
+  // coerce to number so the input can be a numeric string
+  guestCount: z.coerce.number().min(1, "Please enter at least 1 guest"),
+});
+
+type FormValues = z.infer<typeof eventDetailsSchema>;
 
 type Props = {
   open: boolean;
   vendorName?: string;
   vendorPhone?: string;
   onClose: () => void;
-  onSubmit: (payload: any) => void;
+  onSubmit: (payload: any) => void | Promise<void>;
 };
 
 export default function EventDetailsDialog({
@@ -49,19 +56,26 @@ export default function EventDetailsDialog({
   onSubmit,
 }: Props) {
   const form = useForm<FormValues>({
+    resolver: zodResolver(eventDetailsSchema),
     defaultValues: {
       startDate: "",
       endDate: "",
       eventName: "",
       eventAddress: "",
       eventType: "Birthday",
-      guestCount: "",
+      guestCount: 0,
     },
   });
 
-  const handleSubmit = (values: FormValues) => {
-    onSubmit(values);
-    form.reset();
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      await onSubmit(values);
+      form.reset();
+    } catch (err) {
+      // If parent onSubmit throws, keep the form open so user can retry
+      // Optionally, parent can surface an error via toast
+      console.error("EventDetailsDialog onSubmit failed:", err);
+    }
   };
 
   return (
