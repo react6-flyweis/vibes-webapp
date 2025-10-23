@@ -1,5 +1,7 @@
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -8,57 +10,67 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import EventTypeSelector from "@/components/event-type-select";
+import EventSelector from "./event-select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   staff: any | null;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: FormValues) => void;
 };
+
+const staffShiftSchema = z.object({
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().optional(),
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
+  eventType: z.string().min(1, "Event type is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  eventName: z.string().min(1, "Event name is required"),
+  eventAddress: z.string().min(1, "Event address is required"),
+  guestCount: z.preprocess((val) => {
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      if (trimmed === "") return undefined;
+      const n = Number(trimmed);
+      return Number.isNaN(n) ? val : n;
+    }
+    return val;
+  }, z.number().int().nonnegative().optional()),
+  specialRequests: z.string().optional(),
+});
+type FormValues = z.infer<typeof staffShiftSchema>;
 
 export default function StaffShiftDialog({
   open,
   onOpenChange,
-  staff,
   onSubmit,
 }: Props) {
-  type FormValues = {
-    startDate: string;
-    endDate: string;
-    startTime: string;
-    endTime: string;
-    eventType: string;
-    eventName: string;
-    eventAddress: string;
-    guestCount: string;
-    specialRequests: string;
-  };
+  const form = useForm<FormValues>({
+    resolver: zodResolver(staffShiftSchema),
+    defaultValues: {
+      startDate: "",
+      endDate: "",
+      startTime: "",
+      endTime: "",
+      eventType: "",
+      eventName: "",
+      eventAddress: "",
+      guestCount: undefined,
+      specialRequests: "",
+    },
+  });
 
-  const { control, register, handleSubmit, reset, formState } =
-    useForm<FormValues>({
-      defaultValues: {
-        startDate: "",
-        endDate: "",
-        startTime: "",
-        endTime: "",
-        eventType: "",
-        eventName: "",
-        eventAddress: "",
-        guestCount: "",
-        specialRequests: "",
-      },
-    });
-
-  const { errors } = formState;
+  const { handleSubmit, reset, control, setValue } = form;
 
   React.useEffect(() => {
     if (!open) reset();
@@ -78,144 +90,185 @@ export default function StaffShiftDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(submit)}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          <div>
-            <Label>Start date</Label>
-            <Input
-              {...register("startDate", { required: "Start date is required" })}
-              type="date"
-            />
-            {errors.startDate && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.startDate.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label>End date</Label>
-            <Input {...register("endDate")} type="date" />
-            {errors.endDate && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.endDate.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label>Start time</Label>
-            <Input
-              {...register("startTime", { required: "Start time is required" })}
-              type="time"
-            />
-            {errors.startTime && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.startTime.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label>End time</Label>
-            <Input
-              {...register("endTime", { required: "End time is required" })}
-              type="time"
-            />
-            {errors.endTime && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.endTime.message}
-              </p>
-            )}
-          </div>
-
-          <div className="md:col-span-2">
-            <Label>Event type</Label>
-            <Controller
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(submit)}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <FormField
               control={control}
-              name="eventType"
-              rules={{ required: "Event type is required" }}
+              name="startDate"
               render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(v) => field.onChange(v)}
-                >
-                  <SelectTrigger className="w-full mt-2">
-                    <SelectValue placeholder="Select event type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="birthday">Birthday</SelectItem>
-                    <SelectItem value="wedding">Wedding</SelectItem>
-                    <SelectItem value="corporate">Corporate</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormItem>
+                  <FormLabel>Start date</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="date" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.eventType && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.eventType.message}
-              </p>
-            )}
-          </div>
 
-          <div className="md:col-span-2">
-            <Label>Event name</Label>
-            <Input
-              {...register("eventName", { required: "Event name is required" })}
+            <FormField
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>End date</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="date" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.eventName && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.eventName.message}
-              </p>
-            )}
-          </div>
 
-          <div className="md:col-span-2">
-            <Label>Event address</Label>
-            <Input
-              {...register("eventAddress", {
-                required: "Event address is required",
-              })}
+            <FormField
+              control={control}
+              name="startTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Start time</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="time" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.eventAddress && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.eventAddress.message}
-              </p>
-            )}
-          </div>
 
-          <div className="md:col-span-2">
-            <Label>No of guests</Label>
-            <Input
-              {...register("guestCount", {
-                pattern: { value: /^[0-9]+$/, message: "Enter a valid number" },
-              })}
-              type="number"
+            <FormField
+              control={control}
+              name="endTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>End time</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="time" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.guestCount && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.guestCount.message}
-              </p>
-            )}
-          </div>
 
-          <div className="md:col-span-2 flex justify-end gap-3 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onOpenChange(false);
-                reset();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Next &rarr;</Button>
-          </div>
-        </form>
+            <div className="md:col-span-2">
+              <FormField
+                control={control}
+                name="eventType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event type</FormLabel>
+                    <FormControl>
+                      <div className="mt-2">
+                        <EventTypeSelector
+                          value={field.value as string}
+                          onChange={(val) => field.onChange(val)}
+                          placeholder="Select event type"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <FormField
+                control={control}
+                name="eventId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Choose existing event (optional)</FormLabel>
+                    <FormControl>
+                      <div className="mt-2">
+                        <EventSelector
+                          value={(field.value as any) ?? null}
+                          onChange={(val, item) => {
+                            field.onChange(val);
+                            if (item) {
+                              // populate name and address fields from selected event
+                              try {
+                                setValue("eventName", item.name_title ?? "");
+                                setValue(
+                                  "eventAddress",
+                                  item.street_address ?? ""
+                                );
+                              } catch (e) {
+                                console.warn(
+                                  "Couldn't auto-fill event fields",
+                                  e
+                                );
+                              }
+                            }
+                          }}
+                          placeholder="Select an event to prefill"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={control}
+              name="eventName"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Event name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name="eventAddress"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Event address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name="guestCount"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>No of guests</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  onOpenChange(false);
+                  reset();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Next &rarr;</Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
