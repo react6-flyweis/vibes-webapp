@@ -30,11 +30,9 @@ export default function StaffCategorySelector({
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <FormControl>
-        <SelectTrigger className={className || "w-48"}>
-          <SelectValue placeholder={isLoading ? "Loading..." : placeholder} />
-        </SelectTrigger>
-      </FormControl>
+      <SelectTrigger className={className || "w-48"}>
+        <SelectValue placeholder={isLoading ? "Loading..." : placeholder} />
+      </SelectTrigger>
 
       <SelectContent>
         <SelectItem value="all">All Categories</SelectItem>
