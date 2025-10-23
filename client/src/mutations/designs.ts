@@ -24,6 +24,15 @@ export async function createDesign(payload: CreateDesignPayload) {
   return res.data;
 }
 
+export async function updateDesign(id: number, payload: CreateDesignPayload) {
+  const url = `/api/master/community-designs/updateCommunityDesignById`;
+  const body = { id, ...payload };
+  const res: AxiosResponse = await axiosInstance.put<
+    IResponse<CommunityDesignApiItem>
+  >(url, body);
+  return res.data;
+}
+
 export type CreateDesignTabMapPayload = {
   tabs_id: number;
   community_designs_id: number;
@@ -42,6 +51,23 @@ export function useCreateDesign(options?: {
 }) {
   return useMutation({
     mutationFn: (payload: CreateDesignPayload) => createDesign(payload),
+    onSuccess: options?.onSuccess,
+    onError: options?.onError,
+  });
+}
+
+export function useUpdateDesign(options?: {
+  onSuccess?: (data: IResponse<CommunityDesignApiItem>) => void;
+  onError?: (err: any) => void;
+}) {
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: CreateDesignPayload;
+    }) => updateDesign(id, payload),
     onSuccess: options?.onSuccess,
     onError: options?.onError,
   });
