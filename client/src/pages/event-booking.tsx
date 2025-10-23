@@ -22,6 +22,8 @@ import CheckoutForm from "@/components/EventBooking/CheckoutForm";
 import OrderSummary from "@/components/EventBooking/OrderSummary";
 import EventHeader from "@/components/EventBooking/EventHeader";
 import { EventEntryTicket } from "@/queries/tickets";
+import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
+import { useCreateEntryTicketsPayment } from "@/mutations/useCreateEntryTicketsPayment";
 
 export default function EventBooking() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -44,9 +46,15 @@ export default function EventBooking() {
   });
   const [promoCode, setPromoCode] = useState("");
   const [usePoints, setUsePoints] = useState(false);
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+  const [priceEstimate, setPriceEstimate] = useState<number>(0);
+  const [pendingPayment, setPendingPayment] = useState<any>(null);
   const [step, setStep] = useState<
     "tickets" | "seats" | "checkout" | "confirmation"
   >("tickets");
+
+  // shared payment mutation used by dialogs/pages
+  const createEntryTicketsPaymentMutation = useCreateEntryTicketsPayment();
 
   // Fetch event details using centralized query
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
@@ -78,11 +86,12 @@ export default function EventBooking() {
   const ticketOrderMutation = useCreateTicketOrder({
     onSuccess: (data) => {
       toast({
-        title: "Booking Successful!",
+        title: "Order created",
         description:
-          "Your tickets have been booked. Check your email for confirmation.",
+          "Your order was created. Please complete payment to confirm your booking.",
       });
-      setStep("confirmation");
+      // Do not move to confirmation until payment is completed.
+      // The payment dialog will be opened by the createOrderOnServer onSuccess handler.
       queryClient.invalidateQueries({ queryKey: ["/api/user/bookings"] });
     },
     onError: (err) => {
@@ -176,7 +185,8 @@ export default function EventBooking() {
     });
   };
 
-  const handleBooking = () => {
+  // Step 1: create order on server which returns calculation details + order id
+  const createOrderOnServer = () => {
     const tickets = Object.entries(selectedTickets)
       .filter(([_, quantity]) => quantity > 0)
       .map(([typeId, quantity]) => ({
@@ -193,9 +203,18 @@ export default function EventBooking() {
       return;
     }
 
+    if (tickets.length === 0) {
+      toast({
+        title: "No tickets selected",
+        description: "Please select at least one ticket to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const payload = {
       event_id: Number(eventId),
-      tax_percentage: 10, // default placeholder, replace with real calculation if needed
+      tax_percentage: 10,
       coupon_code: promoCode || null,
       firstName: personalInfo.firstName,
       lastName: personalInfo.lastName,
@@ -206,7 +225,32 @@ export default function EventBooking() {
       tickets,
     };
 
-    ticketOrderMutation.mutate(payload);
+    // create an order on the server; onSuccess we'll open the payment dialog
+    ticketOrderMutation.mutate(payload, {
+      onSuccess: (orderResponse) => {
+        const finalAmount =
+          orderResponse?.final_amount ??
+          orderResponse?.calculation_details?.final_amount ??
+          0;
+        setPriceEstimate(finalAmount);
+        setPendingPayment({ orderResponse });
+        setPriceDialogOpen(true);
+      },
+    });
+  };
+
+  const handleMethodSelect = async (method: number) => {
+    // create intent and return payment intent data
+
+    const res = await createEntryTicketsPaymentMutation.mutateAsync({
+      order_id: pendingPayment.orderResponse.event_entry_tickets_order_id,
+      payment_method_id: method,
+      billingDetails: "Ticket Booking",
+    });
+
+    const paymentIntent = res.data.data.paymentIntent;
+
+    return paymentIntent;
   };
 
   // category color helper was moved into TicketItem component
@@ -317,7 +361,7 @@ export default function EventBooking() {
                     setUsePoints={setUsePoints}
                     userProfile={userProfile}
                     onBack={() => setStep("seats")}
-                    onComplete={handleBooking}
+                    onComplete={createOrderOnServer}
                     isLoading={ticketOrderMutation.isPending}
                   />
                 </CardContent>
@@ -376,6 +420,43 @@ export default function EventBooking() {
           </div>
         </div>
       </div>
+      {/* Price confirmation dialog wired to checkout */}
+      <PriceConfirmationDialog
+        open={priceDialogOpen}
+        onOpenChange={(open) => setPriceDialogOpen(open)}
+        priceEstimate={priceEstimate}
+        onPrevious={() => {
+          // go back to checkout step
+          setPriceDialogOpen(false);
+          setStep("checkout");
+        }}
+        onConfirm={(payment) => {
+          // payment confirmed in UI; call pay endpoint with created order id
+          const created = pendingPayment?.orderResponse;
+          const orderId =
+            created?.event_entry_tickets_order_id ??
+            created?.event_entry_tickets_order_id;
+          if (!orderId) {
+            toast({
+              title: "Missing order",
+              description: "Cannot process payment: order id missing.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // call pay mutation
+          // payOrderMutation.mutate({
+          //   event_entry_tickets_order_id: orderId,
+          //   payment,
+          // });
+          // close dialog
+          setPriceDialogOpen(false);
+        }}
+        orderResponse={pendingPayment?.orderResponse}
+        paymentIntent={pendingPayment?.paymentIntent}
+        onMethodSelect={handleMethodSelect}
+      />
     </div>
   );
 }
