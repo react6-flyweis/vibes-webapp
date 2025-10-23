@@ -1,0 +1,32 @@
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "@/lib/queryClient";
+import { IResponse } from "@/types";
+import {
+  PaymentIntent,
+  Transaction,
+  Order,
+} from "@/mutations/useCreateEntryTicketsPayment";
+
+export interface CreateStaffBookingPaymentPayload {
+  staff_event_book_id: number;
+  payment_method_id: number;
+  billingDetails: string;
+}
+
+export interface CreateStaffBookingPaymentData {
+  paymentIntent: PaymentIntent;
+  transaction?: Transaction;
+  order?: Order;
+  [k: string]: any;
+}
+
+export function useCreateStaffBookingPayment() {
+  return useMutation({
+    mutationFn: async (payload: CreateStaffBookingPaymentPayload) => {
+      return await axiosInstance.post<IResponse<CreateStaffBookingPaymentData>>(
+        "/api/master/staff-event-book/StaffBookingPayment",
+        payload
+      );
+    },
+  });
+}
