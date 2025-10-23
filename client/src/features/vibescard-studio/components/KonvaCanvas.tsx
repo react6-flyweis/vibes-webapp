@@ -8,6 +8,7 @@ import {
   Group,
   Transformer,
 } from "react-konva";
+import Konva from "konva";
 import { DesignElement, ColorScheme, EventDetails } from "../types";
 
 interface KonvaCanvasProps {
@@ -20,7 +21,8 @@ interface KonvaCanvasProps {
   gridVisible: boolean;
   colorScheme: ColorScheme;
   eventDetails: EventDetails;
-  stageRef?: React.RefObject<any>;
+  stageRef?: React.RefObject<Konva.Stage>;
+  initialKonvaJSON?: string;
 }
 
 // Image component wrapper to handle loading with CORS support
@@ -116,23 +118,55 @@ export function KonvaCanvas({
   colorScheme,
   eventDetails,
   stageRef,
+  initialKonvaJSON,
 }: KonvaCanvasProps) {
-  const localStageRef = useRef<any>(null);
+  const localStageRef = useRef<Konva.Stage>(null);
   const effectiveStageRef = stageRef || localStageRef;
   const transformerRef = useRef<any>(null);
   const selectedNodeRef = useRef<any>(null);
+  const [initialLoaded, setInitialLoaded] = useState(false);
 
   // Scale factor for zoom
   const scale = zoom / 100;
 
   // Update transformer when selection changes
   useEffect(() => {
+    const stage = effectiveStageRef && (effectiveStageRef as any).current;
+
+    // If initial Konva JSON was loaded, we need to find nodes by id on the stage
+    if (initialLoaded && selectedElement && transformerRef.current && stage) {
+      const node = stage.findOne(`#${selectedElement}`);
+      if (node) {
+        transformerRef.current.nodes([node]);
+        transformerRef.current.getLayer()?.batchDraw();
+        selectedNodeRef.current = node;
+      } else {
+        transformerRef.current.nodes([]);
+        selectedNodeRef.current = null;
+      }
+      return;
+    }
+
     if (selectedElement && transformerRef.current && selectedNodeRef.current) {
       // Attach transformer to the selected node
       transformerRef.current.nodes([selectedNodeRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
   }, [selectedElement]);
+
+  // Load initial Konva JSON into the stage once when provided
+  useEffect(() => {
+    if (!initialKonvaJSON) return;
+    const stage = effectiveStageRef && effectiveStageRef.current;
+    if (!stage) return;
+    try {
+      Konva.Node.create(initialKonvaJSON, stage.container());
+
+      setInitialLoaded(true);
+    } catch (err) {
+      console.error("Failed to load initial Konva JSON:", err);
+    }
+  }, [initialKonvaJSON]);
 
   // Handle clicking on stage to deselect
   const handleStageClick = (e: any) => {
