@@ -6,7 +6,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { usePaymentMethods } from "@/queries/getPaymentMethods";
+import { Elements } from "@stripe/react-stripe-js";
+import { PaymentIntent } from "@/mutations/useCreateEntryTicketsPayment";
+import StripePaymentElementForm from "./StripePaymentElementForm";
 
 type Props = {
   open: boolean;
@@ -14,7 +17,9 @@ type Props = {
   priceEstimate: number;
   onConfirm: (payment: any) => void;
   onPrevious: () => void;
-  staffLabel?: string;
+  orderResponse?: any;
+  paymentIntent?: any;
+  onMethodSelect: (method: number) => Promise<PaymentIntent>;
 };
 
 export default function PriceConfirmationDialog({
@@ -23,48 +28,91 @@ export default function PriceConfirmationDialog({
   priceEstimate,
   onConfirm,
   onPrevious,
-  staffLabel,
+  onMethodSelect,
 }: Props) {
-  const [method, setMethod] = React.useState<string>("card");
-  const [upiId, setUpiId] = React.useState("");
-  const [cardNumber, setCardNumber] = React.useState("");
-  const [cardExpiry, setCardExpiry] = React.useState("");
-  const [cardCvv, setCardCvv] = React.useState("");
-  const [accountNumber, setAccountNumber] = React.useState("");
+  const [paymentError, setPaymentError] = React.useState<string | null>(null);
+  const [method, setMethod] = React.useState<number>(1);
+  const [stripePromise, setStripePromise] = React.useState<any>(null);
+  const [showStripeElements, setShowStripeElements] = React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [createdPaymentIntent, setCreatedPaymentIntent] =
+    React.useState<PaymentIntent | null>(null);
 
-  React.useEffect(() => {
-    if (!open) {
-      setMethod("card");
-      setUpiId("");
-      setCardNumber("");
-      setCardExpiry("");
-      setCardCvv("");
-      setAccountNumber("");
+  const { data: methods, isLoading, isError } = usePaymentMethods();
+
+  const clientSecret = createdPaymentIntent?.clientSecret;
+  const elementsOptions = React.useMemo(
+    () => ({ clientSecret }),
+    [clientSecret]
+  );
+
+  const handleMethodSelect = async () => {
+    setPaymentError(null);
+    // if (!onMethodSelect) {
+    //   setPaymentError("Payment method selection is not available.");
+    //   return;
+    // }
+    setIsProcessing(true);
+    try {
+      console.log("Selected method:", method);
+      const paymentIntent = await onMethodSelect(method);
+      console.log("Created Payment Intent:", paymentIntent);
+      setCreatedPaymentIntent(paymentIntent);
+      setShowStripeElements(true);
+    } catch (err) {
+      setPaymentError((err as any)?.message || "Failed to process payment.");
+    } finally {
+      setIsProcessing(false);
     }
-  }, [open]);
+  };
 
-  const isPayDisabled = React.useMemo(() => {
-    if (method === "upi") return upiId.trim() === "";
-    if (method === "card")
-      return !(
-        cardNumber.trim().length >= 12 &&
-        cardExpiry.trim() &&
-        cardCvv.trim()
-      );
-    if (method === "netbanking") return accountNumber.trim() === "";
-    return false;
-  }, [method, upiId, cardNumber, cardExpiry, cardCvv, accountNumber]);
+  // Always preload Stripe when the dialog opens so Elements are ready regardless of method
+  React.useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        if (!stripePromise && open) {
+          const { loadStripe } = await import("@stripe/stripe-js");
+          const key =
+            import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
+            import.meta.env.VITE_STRIPE_PUBLIC ||
+            undefined;
+          const publicKey = key || undefined;
+
+          if (!publicKey) {
+            // If the public key isn't configured, surface a helpful error so
+            // developers know why Stripe Elements won't load.
+            setPaymentError(
+              "Stripe public key is not configured (VITE_STRIPE_PUBLIC_KEY)."
+            );
+            return;
+          }
+
+          const promise = loadStripe(publicKey as string);
+          if (mounted) setStripePromise(promise);
+        }
+      } catch (err) {
+        // ignore preload errors here; they'll be surfaced on actual use
+        // but set payment error for visibility
+        setPaymentError((err as any)?.message || String(err));
+      }
+    };
+
+    if (open) load();
+    return () => {
+      mounted = false;
+    };
+    // only run when dialog opens/closes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex items-start justify-between">
           <DialogTitle className="text-lg font-semibold">
             Price & Confirmation
           </DialogTitle>
-          {staffLabel && (
-            <div className="text-sm text-gray-700 mt-1">{staffLabel}</div>
-          )}
         </DialogHeader>
 
         <div className="py-4">
@@ -75,75 +123,42 @@ export default function PriceConfirmationDialog({
 
           <div className="mb-4">
             <div className="text-sm mb-3">Payment Options:</div>
-            <div className="flex gap-4">
-              <button
-                className={`flex-1 p-4 border rounded ${
-                  method === "card" ? "border-blue-500" : "border-gray-300"
-                }`}
-                onClick={() => setMethod("card")}
-              >
-                Card
-              </button>
-              <button
-                className={`flex-1 p-4 border rounded ${
-                  method === "upi" ? "border-blue-500" : "border-gray-300"
-                }`}
-                onClick={() => setMethod("upi")}
-              >
-                UPI
-              </button>
-              <button
-                className={`flex-1 p-4 border rounded ${
-                  method === "netbanking"
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-                onClick={() => setMethod("netbanking")}
-              >
-                Net Banking
-              </button>
-            </div>
+            {isLoading && (
+              <div className="text-sm text-gray-500">Loading...</div>
+            )}
+            {isError && (
+              <div className="text-sm text-red-500">
+                Failed to load payment methods
+              </div>
+            )}
+            {!isLoading && !isError && (
+              <div className="flex gap-4">
+                {methods && methods.length > 0 ? (
+                  methods.map((m) => {
+                    // derive a safe key for method
+                    const key = m.payment_methods_id;
+                    return (
+                      <button
+                        key={m._id}
+                        className={`flex-1 p-4 border rounded ${
+                          method === key ? "border-blue-500" : "border-gray-300"
+                        }`}
+                        onClick={() => setMethod(key)}
+                        type="button"
+                      >
+                        <span className="mr-2">{m.emoji ?? ""}</span>
+                        {m.payment_method}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    No payment methods available
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-
-          {method === "card" && (
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-              <Input
-                placeholder="Card number"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-              />
-              <Input
-                placeholder="mm/yy"
-                value={cardExpiry}
-                onChange={(e) => setCardExpiry(e.target.value)}
-              />
-              <Input
-                placeholder="CVV"
-                value={cardCvv}
-                onChange={(e) => setCardCvv(e.target.value)}
-              />
-            </div>
-          )}
-
-          {method === "upi" && (
-            <div className="mb-6">
-              <Input
-                placeholder="Enter UPI ID"
-                value={upiId}
-                onChange={(e) => setUpiId(e.target.value)}
-              />
-            </div>
-          )}
-
-          {method === "netbanking" && (
-            <div className="mb-6">
-              <Input
-                placeholder="Enter Account Number"
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
-              />
-            </div>
-          )}
 
           <div className="flex justify-between items-center">
             <Button
@@ -155,26 +170,41 @@ export default function PriceConfirmationDialog({
             >
               ← Previous
             </Button>
-            <Button
-              disabled={isPayDisabled}
-              onClick={() => {
-                const payment: any = { method };
-                if (method === "upi") payment.upiId = upiId;
-                if (method === "card")
-                  payment.card = {
-                    number: cardNumber,
-                    expiry: cardExpiry,
-                    cvv: cardCvv,
-                  };
-                if (method === "netbanking")
-                  payment.accountNumber = accountNumber;
-                onConfirm(payment);
-                onOpenChange(false);
-              }}
-            >
-              Pay →
+            <Button onClick={handleMethodSelect} disabled={isProcessing}>
+              {isProcessing ? "Processing..." : "Pay →"}
             </Button>
           </div>
+          {paymentError && (
+            <div className="text-sm text-red-500 mt-3">{paymentError}</div>
+          )}
+
+          {showStripeElements && stripePromise && clientSecret && (
+            <div className="mt-4">
+              {/*
+                Elements' options.clientSecret is not mutable. Passing a key
+                derived from clientSecret forces Elements to remount whenever
+                the clientSecret changes (for example after creating a
+                PaymentIntent), avoiding the runtime error.
+              */}
+              <Elements
+                key={clientSecret}
+                stripe={stripePromise}
+                options={elementsOptions}
+              >
+                <StripePaymentElementForm
+                  clientSecret={clientSecret}
+                  onComplete={(result: any) => {
+                    // bubble up successful payment result
+                    if (result && !result.error) {
+                      onConfirm(result);
+                      // close dialog after confirm
+                      onOpenChange(false);
+                    }
+                  }}
+                />
+              </Elements>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
