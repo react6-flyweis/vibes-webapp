@@ -11,7 +11,7 @@ export type Vendor = {
   mobile_no?: string;
   address?: string;
   review_count?: number;
-  catering_marketplace_category_id?: number;
+  catering_marketplace_category_id: number;
 };
 
 type Props = {
@@ -65,7 +65,9 @@ export default function CateringVendorCard({
         <div className="mt-4">
           <Button
             className="bg-blue-500 text-white w-full"
-            onClick={() => onBook?.(vendor._id)}
+            onClick={() =>
+              onBook?.(vendor.catering_marketplace_category_id.toString())
+            }
           >
             Book Now
           </Button>
