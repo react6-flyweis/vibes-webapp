@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useCreateStaffBookingMutation } from "@/mutations/createStaffBooking";
+import { useCreateEntryTicketsPayment } from "@/mutations/useCreateEntryTicketsPayment";
+import { useCreateStaffBookingPayment } from "@/mutations/useCreateStaffBookingPayment";
 import { useStaffByRoleQuery, StaffUser } from "@/queries/staffing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,12 +49,12 @@ export default function EnhancedStaffingMarketplace() {
 
   const [showShiftDialog, setShowShiftDialog] = useState(false);
 
-  const { data: staffUsers = [], isLoading } = useStaffByRoleQuery(4);
+  const { data: staffUsers, isLoading } = useStaffByRoleQuery(4);
 
-  const staffMembers: StaffMember[] = staffUsers.map((u: StaffUser) => {
+  const staffMembers: StaffMember[] = staffUsers?.map((u: StaffUser) => {
     const workingPrice = u.staff_details?.working_prices?.[0];
     return {
-      id: u._id,
+      id: u.user_id,
       name: u.name,
       category: workingPrice?.category_details?.name?.toLowerCase() || "staff",
       specialties: workingPrice?.category_details
@@ -91,6 +93,8 @@ export default function EnhancedStaffingMarketplace() {
     },
   });
 
+  const createStaffBookingPaymentMutation = useCreateStaffBookingPayment();
+
   const handleDirectBooking = (staff: StaffMember) => {
     setSelectedStaff(staff);
     setShowShiftDialog(true);
@@ -100,6 +104,7 @@ export default function EnhancedStaffingMarketplace() {
   const [showPriceDialog, setShowPriceDialog] = useState(false);
   const [pendingBookingPayload, setPendingBookingPayload] = useState<any>(null);
   const [priceEstimate, setPriceEstimate] = useState<number>(0);
+  const [pendingPayment, setPendingPayment] = useState<any | null>(null);
 
   const filteredStaff = staffMembers.filter((staff: StaffMember) => {
     const matchesCategory =
@@ -181,7 +186,7 @@ export default function EnhancedStaffingMarketplace() {
               if (!open) setSelectedStaff(null);
             }}
             staff={selectedStaff}
-            onSubmit={(values: any) => {
+            onSubmit={(values) => {
               // compute duration in hours
               let durationHours = 1;
               if (values.startTime && values.endTime) {
@@ -196,6 +201,7 @@ export default function EnhancedStaffingMarketplace() {
               }
 
               const payload = {
+                eventId: values.eventId,
                 staffId: selectedStaff?.id,
                 staffName: selectedStaff?.name,
                 eventDate: values.startDate,
@@ -215,8 +221,37 @@ export default function EnhancedStaffingMarketplace() {
                 : 0;
               setPriceEstimate(estimate);
               setPendingBookingPayload(payload);
-              setShowShiftDialog(false);
-              setShowPriceDialog(true);
+              // create booking on server before presenting payment options
+              (async () => {
+                try {
+                  const res = await bookingMutation.mutateAsync({
+                    // convert payload to server shape
+                    event_id: payload.eventId,
+                    dateFrom: payload.eventDate,
+                    dateTo: payload.eventDate,
+                    timeFrom: payload.startTime,
+                    timeTo: payload.endTime,
+                    event_type_id: payload.eventType,
+                    staff_id: payload.staffId,
+                    event_name: payload.eventName,
+                    event_address: payload.eventAddress,
+                    no_of_guests: payload.guestCount,
+                    special_instruction: payload.specialRequests,
+                    transaction_status: "Pending",
+                    transaction_id: null,
+                    status: true,
+                  });
+
+                  // server response may nest data; normalize accordingly
+                  const orderResponse = res?.data ?? res;
+                  setPendingPayment({ orderResponse });
+                  setShowShiftDialog(false);
+                  setShowPriceDialog(true);
+                } catch (err) {
+                  // bookingMutation.onError handles toast; keep dialog open for retry
+                  console.error("Booking create failed:", err);
+                }
+              })();
             }}
           />
         )}
@@ -231,10 +266,52 @@ export default function EnhancedStaffingMarketplace() {
             setShowShiftDialog(true);
           }}
           onConfirm={(payment) => {
-            // attach payment info and finalize booking
-            const finalPayload = { ...pendingBookingPayload, payment };
-            bookingMutation.mutate(finalPayload);
+            const created = pendingPayment?.orderResponse;
+            if (!created) {
+              toast({
+                title: "Missing order",
+                description: "Cannot finalize payment: order missing.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            // TODO: finalize payment on server using `payment` and booking id
+            toast({
+              title: "Payment processed",
+              description: "Payment completed for your booking.",
+            });
             setPendingBookingPayload(null);
+            setPendingPayment(null);
+          }}
+          onMethodSelect={async (method: number) => {
+            // use staff booking payment endpoint
+            try {
+              const created = pendingPayment?.orderResponse;
+              const staffBookingId =
+                created?.staff_event_book_id ??
+                created?.staff_event_book_id ??
+                created?._id;
+
+              if (!staffBookingId) {
+                throw new Error("Missing staff booking id");
+              }
+
+              const res = await createStaffBookingPaymentMutation.mutateAsync({
+                staff_event_book_id: Number(staffBookingId),
+                payment_method_id: method,
+                billingDetails: "Staff Booking Payment",
+              });
+
+              const paymentIntent = res.data.data.paymentIntent;
+              return paymentIntent;
+            } catch (err) {
+              console.error(
+                "Failed to create staff booking payment intent:",
+                err
+              );
+              throw err;
+            }
           }}
         />
 
