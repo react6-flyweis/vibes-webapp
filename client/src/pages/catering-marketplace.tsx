@@ -13,6 +13,7 @@ import { ChefHat, Search, Utensils, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCateringMarketplacesQuery } from "@/queries/cateringMarketplaces";
 import { useCreateCateringBooking } from "@/queries/cateringBookings";
+import { useCreateCateringBookingPayment } from "@/mutations/useCreateCateringBookingPayment";
 import CateringCategorySelector from "@/components/CateringCategorySelector";
 import CateringVendorCard from "@/components/CateringVendorCard";
 import EventDetailsDialog from "@/components/EventDetailsDialog";
@@ -89,21 +90,62 @@ export default function CateringMarketplace() {
     },
   });
 
+  const createCateringBookingPaymentMutation =
+    useCreateCateringBookingPayment();
+
+  const [pendingPayment, setPendingPayment] = useState<any | null>(null);
+
   const handleBookClick = (vendorId: string) => {
     setActiveVendorId(vendorId);
     setDialogOpen(true);
   };
 
-  const handleDialogSubmit = (payload: any) => {
-    // Close details dialog and open Menu & Services dialog next
-    setDialogOpen(false);
-    setEventDetails(payload);
-    setMenuInitialValues({
-      cuisine: "Italian",
-      specialPreferences: "",
-      pricePerPerson: "",
-    });
-    setMenuDialogOpen(true);
+  const handleDialogSubmit = async (payload: any) => {
+    // When users submit event details, create a booking on the server
+    if (!activeVendorId) {
+      toast({
+        title: "Missing vendor",
+        description: "Please select a vendor before requesting booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const bookingPayload = {
+      event_name: payload.eventName || "",
+      event_address: payload.eventAddress || "",
+      event_type_id: 1,
+      catering_marketplace_id: Number(activeVendorId),
+      event_to_date:
+        payload.endDate || payload.startDate || new Date().toISOString(),
+      event_from_date: payload.startDate || new Date().toISOString(),
+      event_to_time: "23:00",
+      event_from_time: "18:00",
+      guest_count: Number(payload.guestCount) || 0,
+      amount: 0,
+    };
+
+    try {
+      const res = await bookingMutation.mutateAsync(bookingPayload as any);
+      const bookingResponse = res?.data ?? res;
+      setPendingPayment(bookingResponse);
+
+      // Close details dialog and open Menu & Services dialog next
+      setDialogOpen(false);
+      setEventDetails(payload);
+      setMenuInitialValues({
+        cuisine: "Italian",
+        specialPreferences: "",
+        pricePerPerson: "",
+      });
+      setMenuDialogOpen(true);
+    } catch (err) {
+      // bookingMutation.onError will show toast; keep dialog open for retry
+      console.error(
+        "Failed to create catering booking on details submit:",
+        err
+      );
+    }
     // keep activeVendorId until menu dialog completes
   };
 
@@ -118,41 +160,21 @@ export default function CateringMarketplace() {
     setConfirmDialogOpen(true);
   };
 
-  const handleConfirm = (payment?: any) => {
-    // Prepare payload according to API spec
-    if (!activeVendorId || !eventDetails || !menuDetails || !confirmPayload) {
-      toast({
-        title: "Missing data",
-        description: "Please complete event and menu details.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const payload = {
-      event_name: eventDetails.eventName || "",
-      event_address: eventDetails.eventAddress || "",
-      event_type_id:
-        typeof eventDetails.eventType === "number" ? eventDetails.eventType : 1,
-      catering_marketplace_id: Number(activeVendorId) || 0,
-      event_to_date:
-        eventDetails.endDate ||
-        eventDetails.startDate ||
-        new Date().toISOString(),
-      event_from_date: eventDetails.startDate || new Date().toISOString(),
-      event_to_time: eventDetails.endTime || "23:00",
-      event_from_time: eventDetails.startTime || "18:00",
-      guest_count: confirmPayload.guestCount || 0,
-      amount: Math.round(
-        (confirmPayload.guestCount || 0) * (confirmPayload.pricePerPerson || 0)
-      ),
-    };
-
-    // call booking API
-    bookingMutation.mutate(payload as any);
+  const handleConfirm = async (payment?: any) => {
+    // This is called after payment completes via StripePaymentElementForm
+    // We assume booking was already created before payment intent was requested.
+    // Show success toast and clear local state.
+    toast({
+      title: "Payment processed",
+      description: "Payment completed for your booking.",
+    });
 
     setConfirmDialogOpen(false);
     setActiveVendorId(null);
+    setEventDetails(null);
+    setMenuDetails(null);
+    setConfirmPayload(null);
+    setPendingPayment(null);
   };
 
   // const orderMutation = useMutation({
@@ -176,14 +198,53 @@ export default function CateringMarketplace() {
   //   },
   // });
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!selectedMenu) return;
 
-    // orderMutation.mutate({
-    //   menuId: selectedMenu.id,
-    //   ...orderDetails,
-    //   totalCost: calculateOrderCost(),
-    // });
+    // require a vendor id (activeVendorId should be set when user opened vendor menus)
+    if (!activeVendorId) {
+      toast({
+        title: "Select vendor",
+        description:
+          "Please start your order from a vendor page so we know which caterer to contact.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const guestCount = parseInt(orderDetails.guestCount || "0") || 0;
+    if (guestCount === 0) {
+      toast({
+        title: "Invalid guest count",
+        description: "Please enter a valid number of guests.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      event_name: `Order: ${selectedMenu.name}`,
+      event_address:
+        orderDetails.deliveryAddress || selectedMenu.location || "",
+      event_type_id: 1,
+      catering_marketplace_id: Number(activeVendorId) || 0,
+      event_to_date: orderDetails.eventDate || new Date().toISOString(),
+      event_from_date: orderDetails.eventDate || new Date().toISOString(),
+      event_to_time: "23:00",
+      event_from_time: "18:00",
+      guest_count: guestCount,
+      amount: Math.round(guestCount * (selectedMenu.pricePerPerson || 0)),
+    };
+
+    // call booking API via react-query mutateAsync so we can await it
+    try {
+      await bookingMutation.mutateAsync(payload as any);
+      // close modal and clear local selection
+      setSelectedMenu(null);
+    } catch (err) {
+      // onError provided to the hook will already show a toast; log for debugging
+      console.error("Catering booking failed:", err);
+    }
   };
 
   const calculateOrderCost = () => {
@@ -295,13 +356,13 @@ export default function CateringMarketplace() {
           onSubmit={handleDialogSubmit}
         />
 
-        <MenuServicesDialog
+        {/* <MenuServicesDialog
           open={menuDialogOpen}
           initial={menuInitialValues}
           onBack={() => setDialogOpen(true)}
           onClose={() => setMenuDialogOpen(false)}
           onSubmit={handleMenuSubmit}
-        />
+        /> */}
 
         <PriceConfirmationDialog
           open={confirmDialogOpen}
@@ -318,6 +379,73 @@ export default function CateringMarketplace() {
             // go back to menu dialog
             setConfirmDialogOpen(false);
             setMenuDialogOpen(true);
+          }}
+          onMethodSelect={async (method: number) => {
+            // Ensure booking exists, then create payment intent for it
+            if (
+              !activeVendorId ||
+              !eventDetails ||
+              !menuDetails ||
+              !confirmPayload
+            ) {
+              throw new Error("Missing booking data");
+            }
+
+            let bookingResponse = pendingPayment;
+            try {
+              if (!bookingResponse) {
+                const payload = {
+                  event_name: eventDetails.eventName || "",
+                  event_address: eventDetails.eventAddress || "",
+                  event_type_id:
+                    typeof eventDetails.eventType === "number"
+                      ? eventDetails.eventType
+                      : 1,
+                  catering_marketplace_id: Number(activeVendorId) || 0,
+                  event_to_date:
+                    eventDetails.endDate ||
+                    eventDetails.startDate ||
+                    new Date().toISOString(),
+                  event_from_date:
+                    eventDetails.startDate || new Date().toISOString(),
+                  event_to_time: eventDetails.endTime || "23:00",
+                  event_from_time: eventDetails.startTime || "18:00",
+                  guest_count: confirmPayload.guestCount || 0,
+                  amount: Math.round(
+                    (confirmPayload.guestCount || 0) *
+                      (confirmPayload.pricePerPerson || 0)
+                  ),
+                };
+
+                const res = await bookingMutation.mutateAsync(payload as any);
+                bookingResponse = res?.data ?? res;
+                setPendingPayment(bookingResponse);
+              }
+
+              // extract booking id from response (try common keys)
+              const bookingId =
+                bookingResponse?.catering_marketplace_booking_id ||
+                bookingResponse?.id ||
+                bookingResponse?._id ||
+                bookingResponse?.booking_id;
+
+              if (!bookingId) {
+                throw new Error("Missing booking id from server response");
+              }
+
+              const paymentRes =
+                await createCateringBookingPaymentMutation.mutateAsync({
+                  catering_marketplace_booking_id: Number(bookingId),
+                  payment_method_id: method,
+                  billingDetails: "CateringBooking",
+                });
+
+              // follow the staff pattern: return paymentIntent located at data.data.paymentIntent
+              return paymentRes.data.data.paymentIntent;
+            } catch (err) {
+              console.error("Failed to create booking/payment intent:", err);
+              throw err;
+            }
           }}
         />
 
