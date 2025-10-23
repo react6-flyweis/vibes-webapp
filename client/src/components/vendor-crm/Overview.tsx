@@ -39,22 +39,22 @@ export default function Overview() {
   const displayStats = [
     {
       title: "Leads (Last Month)",
-      value: overview?.totalLeadsLastMonth,
+      value: overview?.totalLeadsLastMonth || 0,
       sub: "Total leads in last 30 days",
     },
     {
       title: "Active Leads",
-      value: overview?.activeLeads,
+      value: overview?.activeLeads || 0,
       sub: "Leads currently active",
     },
     {
       title: "Conversion Rate",
-      value: `${overview?.conversionRate}%`,
+      value: `${overview?.conversionRate || 0}%`,
       sub: "Overall conversion",
     },
     {
       title: "Avg Time to Convert",
-      value: `${overview?.avgTimeToConvert} days`,
+      value: `${overview?.avgTimeToConvert || 0} days`,
       sub: "Average days to convert",
     },
   ];
