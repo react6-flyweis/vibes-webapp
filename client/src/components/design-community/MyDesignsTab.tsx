@@ -3,7 +3,7 @@ import { useDesignsByTabQuery } from "@/queries/communityDesigns";
 import { Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Dialog } from "@/components/ui/dialog";
 import CollaborationDialog from "@/components/design-community/CollaborationDialog";
 import { MyDesignCard } from "@/components/design-community/MyDesignCard";
@@ -45,6 +45,7 @@ export default function MyDesignsTab() {
   // fetch shared designs for tab id 2
   const { data: myDesignsList, isLoading, isError } = useDesignsByTabQuery(2);
   console.log("My Designs List:", myDesignsList);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -116,8 +117,8 @@ export default function MyDesignsTab() {
               <MyDesignCard
                 key={design.id}
                 design={design}
-                onEdit={() => {
-                  /* navigate to edit screen or handle edit */
+                onEdit={(d) => {
+                  navigate(`/vibescard-studio/${d.id}`);
                 }}
                 onManageCollaborators={(d) => {
                   setSelectedDesign(Number(d.id));
