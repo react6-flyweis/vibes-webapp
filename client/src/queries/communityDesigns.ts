@@ -1,10 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
-import type { IResponseList } from "@/types";
+import type { IResponse, IResponseList } from "@/types";
 import type { SharedDesign } from "@/types/designs";
 
+export interface CategoryApiItem {
+  _id: string;
+  category_name: string;
+  emozi?: string;
+  status?: boolean;
+  created_by?: number | null;
+  updated_by?: number | null;
+  created_at?: string;
+  updated_at?: string;
+  category_id?: number;
+}
+
+export interface CreatorApiItem {
+  _id?: string;
+  name?: string;
+  email?: string;
+  user_id?: number;
+  avatar?: string;
+  business_name?: string;
+  role_id?: number;
+  status?: boolean;
+}
+
 export interface CommunityDesignApiItem {
-  categories_id: number;
+  categories_id: number | CategoryApiItem;
   image: string;
   title: string;
   sub_title?: string | null;
@@ -17,11 +40,13 @@ export interface CommunityDesignApiItem {
   remixes?: number;
   downloads?: number;
   status?: boolean;
-  created_by?: number | { id: number; name?: string; avatar?: string };
+  created_by?: number | CreatorApiItem;
   updated_by?: number | null;
   _id: string;
   created_at?: string;
   updated_at?: string;
+  design_json_data?: string;
+  collaborators_user_id?: any[];
   community_designs_id: number;
 }
 
@@ -50,18 +75,24 @@ function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
     title: item.title ?? "",
     description: item.sub_title ?? "",
     creator: {
-      id:
-        item.created_by && typeof item.created_by === "object"
-          ? String(item.created_by.id)
-          : String(item.created_by ?? "0"),
-      name:
-        typeof item.created_by === "object" && item.created_by.name
-          ? item.created_by.name
-          : "Unknown",
-      avatar:
-        typeof item.created_by === "object" && item.created_by.avatar
-          ? item.created_by.avatar
-          : "",
+      id: (() => {
+        if (!item.created_by) return "0";
+        if (typeof item.created_by === "number") return String(item.created_by);
+        return String(
+          (item.created_by as CreatorApiItem).user_id ??
+            (item.created_by as CreatorApiItem)._id ??
+            "0"
+        );
+      })(),
+      name: (() => {
+        if (!item.created_by) return "Unknown";
+        if (typeof item.created_by === "number") return "Unknown";
+        return (item.created_by as CreatorApiItem).name ?? "Unknown";
+      })(),
+      avatar: (() => {
+        if (!item.created_by || typeof item.created_by === "number") return "";
+        return (item.created_by as CreatorApiItem).avatar ?? "";
+      })(),
       verified: false,
       followers: 0,
     },
@@ -74,7 +105,30 @@ function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
         5: "logo",
         6: "poster",
       };
-      return map[item.categories_id] ?? "invitation";
+      // categories_id can be a number or an object
+      const catId =
+        typeof item.categories_id === "number"
+          ? item.categories_id
+          : (item.categories_id as CategoryApiItem)?.category_id ??
+            (item.categories_id as CategoryApiItem)?._id
+          ? undefined
+          : undefined;
+      if (typeof catId === "number") return map[catId] ?? "invitation";
+      // fallback: try to map common category names
+      const catObj =
+        typeof item.categories_id === "object"
+          ? (item.categories_id as CategoryApiItem)
+          : undefined;
+      if (catObj && catObj.category_name) {
+        const name = catObj.category_name.toLowerCase();
+        if (name.includes("invitation")) return "invitation";
+        if (name.includes("decor")) return "decoration";
+        if (name.includes("layout")) return "layout";
+        if (name.includes("theme")) return "theme";
+        if (name.includes("logo")) return "logo";
+        if (name.includes("poster")) return "poster";
+      }
+      return "invitation";
     })(),
     tags: item.hash_tag ?? [],
     thumbnail: item.image ?? "",
@@ -130,6 +184,24 @@ export function useDesignsByTabQuery(tabId: number | string | undefined) {
       (res?.data ?? [])
         .map((i) => i.community_designs_id)
         .map(mapToSharedDesign),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+// Fetch a single community design by id
+async function fetchCommunityDesignById(id: string | number) {
+  const res = await axiosInstance.get<IResponse<CommunityDesignApiItem>>(
+    `/api/master/community-designs/getCommunityDesignById/${id}`
+  );
+  return res.data;
+}
+
+export function useCommunityDesignByIdQuery(id: string | number | undefined) {
+  return useQuery({
+    queryKey: ["/api/master/community-designs/getCommunityDesignById", id],
+    queryFn: () => fetchCommunityDesignById(id ?? ""),
+    enabled: typeof id !== "undefined" && id !== null && id !== "",
+    select: (res) => res?.data,
     staleTime: 1000 * 60 * 2,
   });
 }
