@@ -22,6 +22,7 @@ interface ToolbarProps {
   onZoomOut: () => void;
   onSave: () => void;
   isSaving?: boolean;
+  saveLabel?: string;
   onExport: () => void;
 }
 
@@ -35,6 +36,7 @@ export function Toolbar({
   onZoomOut,
   onSave,
   isSaving = false,
+  saveLabel = "Save",
   onExport,
 }: ToolbarProps) {
   return (
@@ -79,7 +81,7 @@ export function Toolbar({
         <div className="flex items-center gap-2">
           <Button onClick={onSave} disabled={isSaving} size="sm">
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? "Saving..." : saveLabel}
           </Button>
 
           <Button onClick={onExport} size="sm">
