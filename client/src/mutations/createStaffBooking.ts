@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
+import { IResponse } from "@/types";
 
 export type CreateStaffBookingPayload = {
-  event_id?: number;
+  event_id?: string | number;
   dateFrom?: string;
   dateTo?: string;
   timeFrom?: string;
   timeTo?: string;
-  event_type_id?: number;
+  event_type_id?: number | string;
   staff_id?: number | string;
   event_name?: string;
   event_address?: string;
@@ -20,8 +21,35 @@ export type CreateStaffBookingPayload = {
   payment?: any;
 };
 
-export async function createStaffBooking(payload: CreateStaffBookingPayload) {
-  const res = await axiosInstance.post(
+export interface StaffEventBooking {
+  event_id?: number;
+  dateTo?: string;
+  dateFrom?: string;
+  timeTo?: string;
+  timeFrom?: string;
+  event_type_id?: number;
+  staff_id?: number | string;
+  event_name?: string;
+  event_address?: string;
+  no_of_guests?: number | string;
+  special_instruction?: string;
+  transaction_status?: string;
+  transaction_id?: string | null;
+  status?: boolean;
+  created_by?: number | null;
+  updated_by?: number | null;
+  _id?: string;
+  created_at?: string;
+  updated_at?: string;
+  staff_event_book_id?: number;
+}
+
+export type CreateStaffBookingResponse = IResponse<StaffEventBooking>;
+
+export async function createStaffBooking(
+  payload: CreateStaffBookingPayload
+): Promise<CreateStaffBookingResponse> {
+  const res = await axiosInstance.post<CreateStaffBookingResponse>(
     "/api/master/staff-event-book/create",
     payload
   );
