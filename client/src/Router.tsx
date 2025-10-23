@@ -128,6 +128,7 @@ const InteractiveLiveVibesInvite = lazy(
   () => import("@/pages/interactive-live-vibes-invite")
 );
 const VibesCardStudio = lazy(() => import("@/pages/vibescard-studio"));
+const VibesCardEdit = lazy(() => import("@/pages/vibescard-edit"));
 const VibeLedgerDashboard = lazy(() => import("@/pages/vibeledger-dashboard"));
 const InteractiveDesignGenerator = lazy(
   () => import("@/pages/interactive-design-generator")
@@ -359,6 +360,7 @@ function DashboardRouter() {
           element={<CompleteInviteWorkflow />}
         />
         <Route path="/vibescard-studio" element={<VibesCardStudio />} />
+        <Route path="/vibescard-studio/:id" element={<VibesCardEdit />} />
         <Route
           path="/interactive-design-generator"
           element={<InteractiveDesignGenerator />}
