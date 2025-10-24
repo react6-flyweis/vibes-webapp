@@ -1,16 +1,30 @@
 import { Button } from "../ui/button";
-import UserMenu from "../UserMenu";
 import LogoHeart from "./LogoHeart";
 import { Link } from "react-router";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuthStore, User } from "@/store/auth-store";
 import { LogOutIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useMemo } from "react";
 
 const Topbar: React.FC = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
   const logout = useAuthStore((s) => s.logout);
 
-  const handleLogout = () => {
-    logout();
+  const user = useAuthStore((s) => s.user) as User | null;
+
+  const initials = useMemo(() => {
+    const name = user?.name || "";
+    const parts = name.split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (
+      (parts[0][0] || "") + (parts[parts.length - 1][0] || "")
+    ).toUpperCase();
+  }, [user]);
+
+  const handleLogout = async () => {
+    // Ensure we wait for logout if it returns a promise, then redirect to /login
+    await Promise.resolve(logout());
+    window.location.href = "/login";
   };
 
   return (
@@ -34,7 +48,12 @@ const Topbar: React.FC = () => {
                 <LogOutIcon />
                 Logout
               </Button>
-              <UserMenu />
+              <Link to="/profile">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.name} alt={user?.name || "User"} />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+              </Link>
             </>
           )}
         </div>
