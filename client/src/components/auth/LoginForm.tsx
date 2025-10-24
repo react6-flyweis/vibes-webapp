@@ -118,9 +118,10 @@ export function LoginForm() {
       setShowOtp(false);
       navigate("/");
     } catch (err: any) {
+      const errorMessage = extractApiErrorMessage(err);
       toast({
         title: "Verification failed",
-        description: err?.message || "Invalid code",
+        description: errorMessage || "Invalid code",
         variant: "destructive",
       });
     }
@@ -134,9 +135,10 @@ export function LoginForm() {
         description: "A new code was sent to your email.",
       });
     } catch (err: any) {
+      const errorMessage = extractApiErrorMessage(err);
       toast({
         title: "Error",
-        description: err?.message || "Could not resend code",
+        description: errorMessage || "Could not resend code",
         variant: "destructive",
       });
     }
