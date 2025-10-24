@@ -7,8 +7,7 @@ import { Link, useNavigate } from "react-router";
 import { Dialog } from "@/components/ui/dialog";
 import CollaborationDialog from "@/components/design-community/CollaborationDialog";
 import { MyDesignCard } from "@/components/design-community/MyDesignCard";
-import { apiRequest } from "@/lib/queryClient";
-import { useMutation } from "@tanstack/react-query";
+import { useAddDesignCollaboratorMutation } from "@/queries/designCollaborators";
 import { useToast } from "@/hooks/use-toast";
 
 export default function MyDesignsTab() {
@@ -16,19 +15,8 @@ export default function MyDesignsTab() {
   const [showCollabLocal, setShowCollabLocal] = useState(false);
   const { toast } = useToast();
 
-  const inviteCollaboratorMutation = useMutation({
-    mutationFn: async (payload: {
-      designId: string;
-      email: string;
-      role: string;
-    }) => {
-      const res = await apiRequest(
-        "POST",
-        `/api/designs/${payload.designId}/invite`,
-        payload
-      );
-      return res;
-    },
+  // Use the shared mutation hook that posts to /api/master/design-tabs-map/addCollaborator
+  const addCollaboratorMutation = useAddDesignCollaboratorMutation({
     onSuccess: () => {
       toast({ title: "Invitation Sent", description: "Collaborator invited" });
       setShowCollabLocal(false);
@@ -141,10 +129,13 @@ export default function MyDesignsTab() {
         {selectedDesign != null && (
           <CollaborationDialog
             onSend={(payload) =>
-              inviteCollaboratorMutation.mutate({
-                designId: selectedDesign.toString(),
+              // map the dialog payload to the API payload shape
+              addCollaboratorMutation.mutate({
+                community_designs_id: Number(selectedDesign),
+                // NOTE: assuming design_tabs_map_id 3 (collaborations tab) as default
+                design_tabs_map_id: 3,
                 email: payload.email,
-                role: payload.role,
+                permission: payload.role,
               })
             }
             onCancel={() => setShowCollabLocal(false)}
