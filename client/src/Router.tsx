@@ -1,13 +1,15 @@
 import React, { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router";
 import { Layout } from "@/components/layout";
+import { AppShell } from "./components/app-shell";
+import { useAuthStore } from "./store/auth-store";
 
 // Lazy-loaded pages (code-splitting)
 const NotFound = lazy(() => import("@/pages/not-found"));
-const SimpleHome = lazy(() => import("@/pages/simple-home"));
-const HomePage = lazy(() => import("@/pages/home"));
+// const SimpleHome = lazy(() => import("@/pages/simple-home"));
+// const HomePage = lazy(() => import("@/pages/home"));
 const ModernHome = lazy(() => import("@/pages/modern-home"));
-const Dashboard = lazy(() => import("@/pages/dashboard"));
+// const Dashboard = lazy(() => import("@/pages/dashboard"));
 const EventPlanning = lazy(() => import("@/pages/event-planning"));
 const EventPlanningAuth = lazy(() => import("@/pages/event-planning-auth"));
 const EnhancedEventPage = lazy(() => import("@/pages/enhanced-event"));
@@ -198,13 +200,14 @@ const FinancialDashboard_RefundsTab = lazy(
 );
 
 function DashboardRouter() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<ModernHome />} />
-        <Route path="/home" element={<ModernHome />} />
-        {/* <Route path="/home" element={<HomePage />} /> */}
-
         <Route path="/plan-event/" element={<EventPlanningAuth />} />
         <Route path="/plan-event/:id" element={<EnhancedEventPage />} />
         <Route path="/ai-party-designer" element={<AIPartyDesigner />} />
@@ -441,6 +444,14 @@ function Router() {
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/"
+        element={
+          <AppShell>
+            <ModernHome />
+          </AppShell>
+        }
+      />
       <Route path="*" element={<DashboardRouter />} />
     </Routes>
   );
