@@ -17,6 +17,15 @@ export interface FetchEventsParams {
   sortOrder?: "asc" | "desc";
 }
 
+export interface ICategoryTag {
+  _id: string;
+  name: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+  country_id: number;
+}
+
 export interface IEvent {
   _id: string;
   name_title: string;
@@ -27,7 +36,7 @@ export interface IEvent {
   country_id?: number;
   state_id?: number;
   city_id?: number;
-  event_category_tags_id?: number;
+  event_category_tags_id?: ICategoryTag;
   tags?: string[];
   date?: string;
   time?: string;
