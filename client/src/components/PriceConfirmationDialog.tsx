@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { usePaymentMethods } from "@/queries/getPaymentMethods";
 import { Elements } from "@stripe/react-stripe-js";
 import { PaymentIntent } from "@/mutations/useCreateEntryTicketsPayment";
+import { useConfirmPayment } from "@/mutations/useConfirmPayment";
 import StripePaymentElementForm from "./StripePaymentElementForm";
+import { useCheckPaymentStatus } from "@/mutations/useCheckPaymentStatus";
 
 type Props = {
   open: boolean;
@@ -37,6 +39,64 @@ export default function PriceConfirmationDialog({
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [createdPaymentIntent, setCreatedPaymentIntent] =
     React.useState<PaymentIntent | null>(null);
+  const confirmPaymentMutation = useConfirmPayment();
+  const [pollPaymentIntentId, setPollPaymentIntentId] = React.useState<
+    string | null
+  >(null);
+  const [confirmResponse, setConfirmResponse] = React.useState<any | null>(
+    null
+  );
+
+  const checkQuery = useCheckPaymentStatus(
+    pollPaymentIntentId,
+    !!pollPaymentIntentId
+  );
+
+  // watch the polling query and finalize when payment reaches a terminal state
+  React.useEffect(() => {
+    if (!checkQuery.data) return;
+
+    // normalize where the backend might put the status
+    const payloadAny: any = checkQuery.data?.data.data;
+
+    console.log("Polling payment status:", payloadAny);
+
+    const status =
+      payloadAny?.payment_status ||
+      payloadAny?.status ||
+      payloadAny?.payment_intent?.status ||
+      payloadAny?.paymentIntent?.status ||
+      null;
+
+    if (!status) return;
+
+    // success / confirmed states
+    if (
+      status === "succeeded" ||
+      status === "confirmed" ||
+      status === "confirm"
+    ) {
+      // bubble up the original confirm response if present, otherwise the check payload
+      onConfirm(confirmResponse?.data ?? payloadAny ?? checkQuery.data);
+      // stop polling and clear stored confirm response
+      setPollPaymentIntentId(null);
+      setConfirmResponse(null);
+      // close dialog
+      onOpenChange(false);
+      return;
+    }
+
+    // handle terminal failure states
+    if (
+      status === "requires_payment_method" ||
+      status === "canceled" ||
+      status === "failed"
+    ) {
+      setPaymentError(`Payment ${status}`);
+      setPollPaymentIntentId(null);
+      setConfirmResponse(null);
+    }
+  }, [checkQuery.data]);
 
   const { data: methods, isLoading, isError } = usePaymentMethods();
 
@@ -158,53 +218,93 @@ export default function PriceConfirmationDialog({
                 )}
               </div>
             )}
-          </div>
 
-          <div className="flex justify-between items-center">
-            <Button
-              variant="outline"
-              onClick={() => {
-                onPrevious();
-                onOpenChange(false);
-              }}
-            >
-              ← Previous
-            </Button>
-            <Button onClick={handleMethodSelect} disabled={isProcessing}>
-              {isProcessing ? "Processing..." : "Pay →"}
-            </Button>
-          </div>
-          {paymentError && (
-            <div className="text-sm text-red-500 mt-3">{paymentError}</div>
-          )}
-
-          {showStripeElements && stripePromise && clientSecret && (
-            <div className="mt-4">
-              {/*
-                Elements' options.clientSecret is not mutable. Passing a key
-                derived from clientSecret forces Elements to remount whenever
-                the clientSecret changes (for example after creating a
-                PaymentIntent), avoiding the runtime error.
-              */}
-              <Elements
-                key={clientSecret}
-                stripe={stripePromise}
-                options={elementsOptions}
+            <div className="flex justify-between items-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onPrevious();
+                  onOpenChange(false);
+                }}
               >
-                <StripePaymentElementForm
-                  clientSecret={clientSecret}
-                  onComplete={(result: any) => {
-                    // bubble up successful payment result
-                    if (result && !result.error) {
-                      onConfirm(result);
-                      // close dialog after confirm
-                      onOpenChange(false);
-                    }
-                  }}
-                />
-              </Elements>
+                ← Previous
+              </Button>
+              <Button onClick={handleMethodSelect} disabled={isProcessing}>
+                {isProcessing ? "Processing..." : "Pay →"}
+              </Button>
             </div>
-          )}
+            {paymentError && (
+              <div className="text-sm text-red-500 mt-3">{paymentError}</div>
+            )}
+
+            {/* Stripe form or pending UI */}
+            {pollPaymentIntentId ? (
+              <div className="mt-4 flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <div className="text-sm text-gray-700">Payment pending…</div>
+              </div>
+            ) : (
+              showStripeElements &&
+              stripePromise &&
+              clientSecret && (
+                <div className="mt-4">
+                  <Elements
+                    key={clientSecret}
+                    stripe={stripePromise}
+                    options={elementsOptions}
+                  >
+                    <StripePaymentElementForm
+                      clientSecret={clientSecret}
+                      onComplete={async (result: any) => {
+                        if (!result) return;
+                        if (result.error) {
+                          setPaymentError(
+                            result.error?.message || "Payment failed"
+                          );
+                          return;
+                        }
+
+                        const paymentIntent = result.paymentIntent;
+                        if (!paymentIntent || !paymentIntent.id) {
+                          setPaymentError(
+                            "No payment intent returned from Stripe."
+                          );
+                          return;
+                        }
+
+                        // Confirm the payment on our backend and start polling
+                        setPaymentError(null);
+                        setIsProcessing(true);
+                        try {
+                          const payment_method_id =
+                            paymentIntent.payment_method ||
+                            paymentIntent.latest_payment_method ||
+                            null;
+
+                          const payload = {
+                            payment_intent_id: paymentIntent.id,
+                            payment_method_id,
+                          } as any;
+
+                          const res = await confirmPaymentMutation.mutateAsync(
+                            payload
+                          );
+                          setConfirmResponse(res);
+                          setPollPaymentIntentId(paymentIntent.id);
+                        } catch (err) {
+                          setPaymentError(
+                            (err as any)?.message || "Failed to confirm payment"
+                          );
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }}
+                    />
+                  </Elements>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
