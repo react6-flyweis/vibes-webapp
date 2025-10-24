@@ -50,7 +50,7 @@ export default function EventCard({ event }: Props) {
             variant="outline"
             className="text-purple-300 border-purple-300 mb-2"
           >
-            {event.event_category_tags_id}
+            {event.event_category_tags_id?.name}
           </Badge>
           <h3 className="text-xl font-bold text-white mb-1 line-clamp-2">
             {event.name_title}
