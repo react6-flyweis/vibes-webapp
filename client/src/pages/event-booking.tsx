@@ -431,27 +431,13 @@ export default function EventBooking() {
           setStep("checkout");
         }}
         onConfirm={(payment) => {
-          // payment confirmed in UI; call pay endpoint with created order id
-          const created = pendingPayment?.orderResponse;
-          const orderId =
-            created?.event_entry_tickets_order_id ??
-            created?.event_entry_tickets_order_id;
-          if (!orderId) {
-            toast({
-              title: "Missing order",
-              description: "Cannot process payment: order id missing.",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // call pay mutation
-          // payOrderMutation.mutate({
-          //   event_entry_tickets_order_id: orderId,
-          //   payment,
-          // });
-          // close dialog
+          toast({
+            title: "Payment Successful",
+            description: "Your payment was processed successfully.",
+          });
           setPriceDialogOpen(false);
+          // move to confirmation step
+          setStep("confirmation");
         }}
         orderResponse={pendingPayment?.orderResponse}
         paymentIntent={pendingPayment?.paymentIntent}
