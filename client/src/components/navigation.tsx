@@ -168,7 +168,7 @@ export default function Navigation() {
               </NavLink>
             ))}
             {/* AI Features Dropdown */}           
-            <DropdownMenu>
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -179,8 +179,8 @@ export default function Navigation() {
                   <span>AI Features</span>
                   <ChevronDown className="w-3 h-3" />               
                 </Button>
-              </DropdownMenuTrigger>
-              {/* <DropdownMenuContent>
+              </DropdownMenuTrigger> */}
+            {/* <DropdownMenuContent>
                 {aiFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
@@ -193,7 +193,7 @@ export default function Navigation() {
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent> */}
-            </DropdownMenu>
+            {/* </DropdownMenu> */}
             {/* Experience Features Dropdown */}           
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
