@@ -19,14 +19,14 @@ import {
 import { Users } from "lucide-react";
 
 interface Props {
-  onSend: (payload: { email: string; role: "editor" | "viewer" }) => void;
+  onSend: (payload: { email: string; role: "Edit" | "View" }) => void;
   onCancel: () => void;
 }
 
 export default function CollaborationDialog({ onSend, onCancel }: Props) {
   const [collaboratorEmail, setCollaboratorEmail] = useState("");
-  const [collaboratorRole, setCollaboratorRole] = useState<"editor" | "viewer">(
-    "viewer"
+  const [collaboratorRole, setCollaboratorRole] = useState<"Edit" | "View">(
+    "View"
   );
 
   return (
@@ -54,7 +54,7 @@ export default function CollaborationDialog({ onSend, onCancel }: Props) {
           <Label htmlFor="collaborator-role">Permission Level</Label>
           <Select
             value={collaboratorRole}
-            onValueChange={(value: "editor" | "viewer") =>
+            onValueChange={(value: "Edit" | "View") =>
               setCollaboratorRole(value)
             }
           >
@@ -62,12 +62,10 @@ export default function CollaborationDialog({ onSend, onCancel }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="viewer">
+              <SelectItem value="View">
                 Viewer - Can view and comment
               </SelectItem>
-              <SelectItem value="editor">
-                Editor - Can edit and modify
-              </SelectItem>
+              <SelectItem value="Edit">Editor - Can edit and modify</SelectItem>
             </SelectContent>
           </Select>
         </div>
