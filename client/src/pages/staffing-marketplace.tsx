@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useCreateStaffBookingMutation } from "@/mutations/createStaffBooking";
-import { useCreateEntryTicketsPayment } from "@/mutations/useCreateEntryTicketsPayment";
 import { useCreateStaffBookingPayment } from "@/mutations/useCreateStaffBookingPayment";
 import { useStaffByRoleQuery, StaffUser } from "@/queries/staffing";
 import { Button } from "@/components/ui/button";
@@ -51,30 +50,32 @@ export default function EnhancedStaffingMarketplace() {
 
   const { data: staffUsers, isLoading } = useStaffByRoleQuery(4);
 
-  const staffMembers: StaffMember[] = staffUsers?.map((u: StaffUser) => {
-    const workingPrice = u.staff_details?.working_prices?.[0];
-    return {
-      id: u.user_id,
-      name: u.name,
-      category: workingPrice?.category_details?.name?.toLowerCase() || "staff",
-      specialties: workingPrice?.category_details
-        ? [workingPrice.category_details.name]
-        : [],
-      rating: workingPrice?.review_count ?? 0,
-      totalJobs: u.staff_details?.total_bookings ?? 0,
-      hourlyRate: (workingPrice?.price ?? 0) / 100,
-      location: u.city_details?.name || "",
-      availability: [],
-      profileImage: undefined,
-      experience: "",
-      verified: !!u.status,
-      portfolio: [],
-      availableDates: [],
-      reviews: [],
-      mobile: u.mobile,
-      reviewsCount: workingPrice?.review_count ?? 0,
-    };
-  });
+  const staffMembers: StaffMember[] =
+    staffUsers?.map((u: StaffUser) => {
+      const workingPrice = u.staff_details?.working_prices?.[0];
+      return {
+        id: u.user_id,
+        name: u.name,
+        category:
+          workingPrice?.category_details?.name?.toLowerCase() || "staff",
+        specialties: workingPrice?.category_details
+          ? [workingPrice.category_details.name]
+          : [],
+        rating: workingPrice?.review_count ?? 0,
+        totalJobs: u.staff_details?.total_bookings ?? 0,
+        hourlyRate: (workingPrice?.price ?? 0) / 100,
+        location: u.city_details?.name || "",
+        availability: [],
+        profileImage: undefined,
+        experience: "",
+        verified: !!u.status,
+        portfolio: [],
+        availableDates: [],
+        reviews: [],
+        mobile: u.mobile,
+        reviewsCount: workingPrice?.review_count ?? 0,
+      };
+    }) || [];
 
   const bookingMutation = useCreateStaffBookingMutation({
     onSuccess: () => {
