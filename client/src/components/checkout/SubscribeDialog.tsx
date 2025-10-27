@@ -9,14 +9,22 @@ import {
 } from "@/components/ui/dialog";
 import PaymentSuccessDialog from "./PaymentSuccessDialog";
 
-interface CheckoutDialogProps {
+interface SubscribeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  plan?: {
+    _id?: string;
+    plan_name?: string;
+    price?: number | string;
+    planDuration?: string;
+    description?: string;
+  } | null;
 }
 
-export const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
+export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
   open,
   onOpenChange,
+  plan = null,
 }) => {
   const [cards, setCards] = useState([
     {
@@ -75,18 +83,29 @@ export const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
       .padStart(12, "0");
     const now = new Date();
     const time = now.toLocaleString();
-    setSuccessData({ amount: "$35.00", ref, time });
+    const priceString = formatPrice(plan?.price);
+    setSuccessData({ amount: priceString || "$0.00", ref, time });
     onOpenChange(false); // close checkout
     setTimeout(() => setShowSuccess(true), 300); // open success after a short delay
   };
+
+  function formatPrice(p: number | string | undefined | null) {
+    if (p == null || p === "") return null;
+    if (typeof p === "number") return `$${p.toFixed(2)}`;
+    // try to detect if string already contains a $ or other currency
+    if (typeof p === "string") {
+      return p.startsWith("$") ? p : `$${p}`;
+    }
+    return null;
+  }
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>Checkout</DialogTitle>
+            <DialogTitle>Subscribe</DialogTitle>
             <DialogDescription>
-              Select a payment method and confirm your purchase.
+              Select a payment method and confirm your subscription.
             </DialogDescription>
           </DialogHeader>
 
@@ -203,12 +222,15 @@ export const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
                 <h4 className="font-semibold mb-2">Alışveriş Özeti</h4>
                 <div className="text-sm text-muted-foreground mb-4">
                   <div className="flex justify-between">
-                    <span>Pro(Monthly)</span>
-                    <span>$15.00</span>
+                    <span>
+                      {plan?.plan_name ?? "Selected Plan"}
+                      {plan?.planDuration ? ` (${plan.planDuration})` : ""}
+                    </span>
+                    <span>{formatPrice(plan?.price) ?? "$0.00"}</span>
                   </div>
                   <div className="flex justify-between mt-2 font-bold">
                     <span>Total:</span>
-                    <span>$35.00</span>
+                    <span>{formatPrice(plan?.price) ?? "$0.00"}</span>
                   </div>
                 </div>
                 <button
@@ -239,4 +261,4 @@ export const CheckoutDialog: React.FC<CheckoutDialogProps> = ({
   );
 };
 
-export default CheckoutDialog;
+export default SubscribeDialog;
