@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
+import { IResponseList } from "@/types";
 
 export interface IVibeBusinessPlan {
   _id: string;
@@ -20,24 +21,17 @@ export interface IVibeBusinessPlan {
   plan_id?: number;
 }
 
-export interface IVibeBusinessResponse {
-  success: boolean;
-  message?: string;
-  data: IVibeBusinessPlan[];
-  pagination?: any;
-  timestamp?: string;
-}
-
-export async function fetchVibeBusinessSubscriptions() {
+export function fetchVibeBusinessSubscriptions() {
   const url = "/api/master/vibe-business-subscription/all";
-  return axiosInstance.get<IVibeBusinessResponse>(url);
+  return axiosInstance.get<IResponseList<IVibeBusinessPlan>>(url);
 }
 
-export function useVibeBusinessSubscriptions() {
+export function useVibeBusinessSubscriptions(options?: { enabled?: boolean }) {
   const key = ["/api/master/vibe-business-subscription/all"];
   return useQuery({
     queryKey: key,
-    queryFn: () => fetchVibeBusinessSubscriptions(),
+    queryFn: fetchVibeBusinessSubscriptions,
     select: (res) => res.data.data,
+    ...options,
   });
 }
