@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import OtpVerificationDialog from "./OtpVerificationDialog";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
 import ResetPasswordDialog from "./ResetPasswordDialog";
@@ -20,7 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-// ...existing code...
 import {
   useLoginMutation,
   useVerifyOtpMutation,
@@ -215,12 +215,10 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2">
               <FormControl>
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="rememberMe"
                   checked={field.value}
-                  onChange={field.onChange}
-                  className="w-4 h-4 rounded border-gray-300"
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
               <Label
