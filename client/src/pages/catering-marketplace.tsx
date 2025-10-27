@@ -127,18 +127,25 @@ export default function CateringMarketplace() {
 
     try {
       const res = await bookingMutation.mutateAsync(bookingPayload as any);
-      const bookingResponse = res?.data ?? res;
+      const bookingResponse = res?.data;
+
       setPendingPayment(bookingResponse);
 
-      // Close details dialog and open Menu & Services dialog next
+      const returnedAmount = bookingResponse.transaction.amount || 0;
+
+      // compute a per-person price if guest_count is available
+      const guestCount = Number(payload.guestCount) || 0;
+      const pricePerPerson = guestCount > 0 ? returnedAmount / guestCount : 0;
+
+      // Close details dialog and open the price/payment confirmation dialog
       setDialogOpen(false);
       setEventDetails(payload);
-      setMenuInitialValues({
-        cuisine: "Italian",
-        specialPreferences: "",
-        pricePerPerson: "",
-      });
-      setMenuDialogOpen(true);
+      // provide menuDetails with returned pricePerPerson so UI shows correct estimate
+      setMenuDetails({ pricePerPerson });
+      // set a confirm payload using guest count and returned pricePerPerson
+      setConfirmPayload({ guestCount, pricePerPerson });
+      // open the confirmation / payment dialog
+      setConfirmDialogOpen(true);
     } catch (err) {
       // bookingMutation.onError will show toast; keep dialog open for retry
       console.error(
@@ -417,17 +424,27 @@ export default function CateringMarketplace() {
                   ),
                 };
 
-                const res = await bookingMutation.mutateAsync(payload as any);
-                bookingResponse = res?.data ?? res;
-                setPendingPayment(bookingResponse);
+                const res = await bookingMutation.mutateAsync(payload);
+                setPendingPayment(res.data);
+
+                const returnedAmount =
+                  bookingResponse?.transaction?.amount ?? 0;
+                if (returnedAmount && (confirmPayload?.guestCount || 0) > 0) {
+                  const computedPricePerPerson =
+                    returnedAmount / (confirmPayload!.guestCount || 1);
+                  setMenuDetails((md) => ({
+                    ...(md || {}),
+                    pricePerPerson: computedPricePerPerson,
+                  }));
+                  setConfirmPayload((cp) => ({
+                    ...(cp || {}),
+                    pricePerPerson: computedPricePerPerson,
+                  }));
+                }
               }
 
-              // extract booking id from response (try common keys)
               const bookingId =
-                bookingResponse?.catering_marketplace_booking_id ||
-                bookingResponse?.id ||
-                bookingResponse?._id ||
-                bookingResponse?.booking_id;
+                bookingResponse.booking.catering_marketplace_booking_id;
 
               if (!bookingId) {
                 throw new Error("Missing booking id from server response");
