@@ -256,9 +256,67 @@ export default function EventBooking() {
   // category color helper was moved into TicketItem component
 
   if (eventLoading) {
+    // Skeleton loading state: mimic page layout so content doesn't jump
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Header skeleton */}
+              <div className="bg-white/6 rounded-lg p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-28 h-28 bg-white/10 rounded-md animate-pulse" />
+                  <div className="flex-1">
+                    <div className="h-6 bg-white/10 rounded w-3/4 mb-3 animate-pulse" />
+                    <div className="h-4 bg-white/8 rounded w-1/2 animate-pulse" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Tickets selection skeletons */}
+              <div className="bg-white/10 backdrop-blur-sm border-white/20 rounded-md p-4">
+                <div className="mb-4">
+                  <div className="h-5 bg-white/10 rounded w-1/3 mb-2 animate-pulse" />
+                  <div className="h-4 bg-white/8 rounded w-1/4 animate-pulse" />
+                </div>
+
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between gap-4 p-3 bg-white/6 rounded-md"
+                    >
+                      <div className="flex-1">
+                        <div className="h-4 bg-white/10 rounded w-2/3 mb-2 animate-pulse" />
+                        <div className="h-3 bg-white/8 rounded w-1/3 animate-pulse" />
+                      </div>
+
+                      <div className="w-24 h-8 bg-white/8 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <div className="h-10 w-48 bg-blue-600/70 rounded-md animate-pulse" />
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar skeleton */}
+            <div>
+              <div className="bg-white/10 backdrop-blur-sm border-white/20 rounded-md p-4 sticky top-4">
+                <div className="h-6 bg-white/10 rounded w-1/2 mb-4 animate-pulse" />
+                <div className="space-y-3">
+                  <div className="h-4 bg-white/8 rounded w-full animate-pulse" />
+                  <div className="h-4 bg-white/8 rounded w-5/6 animate-pulse" />
+                  <div className="h-4 bg-white/8 rounded w-3/4 animate-pulse" />
+                </div>
+
+                <div className="mt-6 h-10 bg-blue-600/70 rounded-md animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
