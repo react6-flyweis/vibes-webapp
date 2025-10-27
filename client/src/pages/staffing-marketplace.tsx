@@ -80,8 +80,8 @@ export default function EnhancedStaffingMarketplace() {
   const bookingMutation = useCreateStaffBookingMutation({
     onSuccess: () => {
       toast({
-        title: "Booking Confirmed!",
-        description: "Your staff member has been successfully booked.",
+        title: "Booking Created — Complete Payment to Confirm",
+        description: "Please complete payment to confirm the booking.",
       });
       setShowShiftDialog(false);
     },
@@ -266,7 +266,7 @@ export default function EnhancedStaffingMarketplace() {
             setShowPriceDialog(false);
             setShowShiftDialog(true);
           }}
-          onConfirm={(payment) => {
+          onConfirm={async (payment) => {
             const created = pendingPayment?.orderResponse;
             if (!created) {
               toast({
@@ -277,13 +277,47 @@ export default function EnhancedStaffingMarketplace() {
               return;
             }
 
-            // TODO: finalize payment on server using `payment` and booking id
-            toast({
-              title: "Payment processed",
-              description: "Payment completed for your booking.",
-            });
-            setPendingBookingPayload(null);
-            setPendingPayment(null);
+            try {
+              // attempt to locate booking id from server response
+              const staffBookingId =
+                created?.staff_event_book_id ?? created?._id ?? created?.id;
+
+              if (!staffBookingId) {
+                toast({
+                  title: "Missing booking id",
+                  description: "Cannot finalize payment: booking id missing.",
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              // finalize payment on server - pass payment identifier (depends on your API)
+              await createStaffBookingPaymentMutation.mutateAsync({
+                staff_event_book_id: Number(staffBookingId),
+                payment_intent_id: payment?.id || payment,
+                billingDetails: "Staff Booking Payment",
+                // `finalize` is a flag used to indicate completion to the backend if supported
+                finalize: true,
+              });
+
+              toast({
+                title: "Booking Confirmed!",
+                description:
+                  "Your payment was received and booking is confirmed.",
+              });
+
+              setPendingBookingPayload(null);
+              setPendingPayment(null);
+              setShowPriceDialog(false);
+            } catch (err) {
+              console.error("Failed to finalize payment:", err);
+              toast({
+                title: "Payment Failed",
+                description: "There was an error finalizing payment.",
+                variant: "destructive",
+              });
+              throw err;
+            }
           }}
           onMethodSelect={async (method: number) => {
             // use staff booking payment endpoint
