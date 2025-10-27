@@ -9,7 +9,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { AddStaffDialog } from "@/components/AddStaffDialog";
 
 function StaffTable({ staff }: { staff: StaffUser[] }) {
   return (
@@ -70,7 +70,8 @@ export default function StaffingsPage() {
         {isError && <div>Error: {error?.message ?? "Unknown error"}</div>}
 
         <div className="mb-4 flex justify-end">
-          <Button variant="default">Add Staff</Button>
+          {/* Use AddStaffDialog which provides the trigger and the form dialog */}
+          <AddStaffDialog />
         </div>
 
         <Card>
