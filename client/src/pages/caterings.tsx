@@ -12,7 +12,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import AddCateringDialog from "@/components/AddCateringDialog";
 
 function CateringsTable({ caterings }: { caterings: CateringMarketplace[] }) {
   return (
@@ -55,6 +55,8 @@ export default function CateringsPage() {
     error,
   } = useCateringMarketplacesByAuthQuery();
 
+  // AddCateringDialog handles create mutation and toast
+
   return (
     <div className="bg-gray-50 py-5">
       <div className="max-w-6xl mx-auto">
@@ -69,7 +71,7 @@ export default function CateringsPage() {
         {isError && <div>Error: {error?.message ?? "Unknown error"}</div>}
 
         <div className="mb-4 flex justify-end">
-          <Button variant="default">Add Catering</Button>
+          <AddCateringDialog />
         </div>
 
         <Card>
