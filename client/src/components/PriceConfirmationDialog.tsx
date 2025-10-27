@@ -6,12 +6,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { usePaymentMethods } from "@/queries/getPaymentMethods";
 import { Elements } from "@stripe/react-stripe-js";
 import { PaymentIntent } from "@/mutations/useCreateEntryTicketsPayment";
 import { useConfirmPayment } from "@/mutations/useConfirmPayment";
 import StripePaymentElementForm from "./StripePaymentElementForm";
 import { useCheckPaymentStatus } from "@/mutations/useCheckPaymentStatus";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 type Props = {
   open: boolean;
@@ -120,7 +122,8 @@ export default function PriceConfirmationDialog({
       setCreatedPaymentIntent(paymentIntent);
       setShowStripeElements(true);
     } catch (err) {
-      setPaymentError((err as any)?.message || "Failed to process payment.");
+      const errorMessage = extractApiErrorMessage(err);
+      setPaymentError(errorMessage || "Failed to process payment.");
     } finally {
       setIsProcessing(false);
     }
@@ -167,8 +170,11 @@ export default function PriceConfirmationDialog({
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open}>
+      <DialogContent
+        className="max-w-xl max-h-[90vh] overflow-y-auto"
+        showCloseButton={false}
+      >
         <DialogHeader className="flex items-start justify-between">
           <DialogTitle className="text-lg font-semibold">
             Price & Confirmation
@@ -182,57 +188,74 @@ export default function PriceConfirmationDialog({
           </div>
 
           <div className="mb-4">
-            <div className="text-sm mb-3">Payment Options:</div>
-            {isLoading && (
-              <div className="text-sm text-gray-500">Loading...</div>
-            )}
-            {isError && (
-              <div className="text-sm text-red-500">
-                Failed to load payment methods
-              </div>
-            )}
-            {!isLoading && !isError && (
-              <div className="flex gap-4">
-                {methods && methods.length > 0 ? (
-                  methods.map((m) => {
-                    // derive a safe key for method
-                    const key = m.payment_methods_id;
-                    return (
-                      <button
-                        key={m._id}
-                        className={`flex-1 p-4 border rounded ${
-                          method === key ? "border-blue-500" : "border-gray-300"
-                        }`}
-                        onClick={() => setMethod(key)}
-                        type="button"
-                      >
-                        <span className="mr-2">{m.emoji ?? ""}</span>
-                        {m.payment_method}
-                      </button>
-                    );
-                  })
-                ) : (
-                  <div className="text-sm text-gray-500">
-                    No payment methods available
+            {/* Only show payment options and navigation when the Stripe form is not visible */}
+            {!showStripeElements ? (
+              <>
+                <div className="text-sm mb-3">Payment Options:</div>
+                {isLoading && (
+                  <div className="text-sm text-gray-500">Loading...</div>
+                )}
+                {isError && (
+                  <div className="text-sm text-red-500">
+                    Failed to load payment methods
                   </div>
                 )}
-              </div>
-            )}
+                {!isLoading && !isError && (
+                  <div className="flex gap-4">
+                    {methods && methods.length > 0 ? (
+                      methods.map((m) => {
+                        // derive a safe key for method
+                        const key = m.payment_methods_id;
+                        return (
+                          <button
+                            key={m._id}
+                            className={`flex-1 p-4 border rounded ${
+                              method === key
+                                ? "border-blue-500"
+                                : "border-gray-300"
+                            }`}
+                            onClick={() => setMethod(key)}
+                            type="button"
+                          >
+                            <span className="mr-2">{m.emoji ?? ""}</span>
+                            {m.payment_method}
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        No payment methods available
+                      </div>
+                    )}
+                  </div>
+                )}
 
-            <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onPrevious();
-                  onOpenChange(false);
-                }}
-              >
-                ← Previous
-              </Button>
-              <Button onClick={handleMethodSelect} disabled={isProcessing}>
-                {isProcessing ? "Processing..." : "Pay →"}
-              </Button>
-            </div>
+                <div className="mt-5 flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      onPrevious();
+                      onOpenChange(false);
+                    }}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Previous
+                  </Button>
+                  <Button onClick={handleMethodSelect} disabled={isProcessing}>
+                    {isProcessing ? (
+                      "Processing..."
+                    ) : (
+                      <>
+                        Pay
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            ) : null}
+
+            {/* Always show payment errors */}
             {paymentError && (
               <div className="text-sm text-red-500 mt-3">{paymentError}</div>
             )}
