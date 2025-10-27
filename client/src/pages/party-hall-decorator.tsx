@@ -77,8 +77,9 @@ export default function PartyHallDecorator() {
   const [selectedDecoration, setSelectedDecoration] =
     useState<DecorationItem | null>(null);
   const [currentTheme, setCurrentTheme] = useState<PartyTheme | null>(null);
+  // Default to preview mode: design-mode UI is commented out/disabled below
   const [viewMode, setViewMode] = useState<"design" | "preview" | "3d">(
-    "design"
+    "preview"
   );
   const [lighting, setLighting] = useState({
     ambient: 0.6,
@@ -835,94 +836,7 @@ export default function PartyHallDecorator() {
             </div>
           </Card>
 
-          <Card className="p-4">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5" />
-              Decorations
-            </h3>
-            <Tabs defaultValue="balloons" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 text-xs">
-                <TabsTrigger value="balloons">Balloons</TabsTrigger>
-                <TabsTrigger value="lighting">Lights</TabsTrigger>
-                <TabsTrigger value="flowers">Flowers</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="balloons" className="mt-4 space-y-2">
-                {decorationCatalog.balloons.map((item, i) => (
-                  <div
-                    key={i}
-                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, "balloons", item)}
-                    onClick={() => addDecoration("balloons", item)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium text-sm">{item.name}</div>
-                        <div className="text-xs text-gray-500">
-                          ${item.price}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Circle className="w-4 h-4 text-pink-500" />
-                        <Move3D className="w-3 h-3 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-
-              <TabsContent value="lighting" className="mt-4 space-y-2">
-                {decorationCatalog.lighting.map((item, i) => (
-                  <div
-                    key={i}
-                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, "lighting", item)}
-                    onClick={() => addDecoration("lighting", item)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium text-sm">{item.name}</div>
-                        <div className="text-xs text-gray-500">
-                          ${item.price}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4 text-yellow-500" />
-                        <Move3D className="w-3 h-3 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-
-              <TabsContent value="flowers" className="mt-4 space-y-2">
-                {decorationCatalog.flowers.map((item, i) => (
-                  <div
-                    key={i}
-                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, "flowers", item)}
-                    onClick={() => addDecoration("flowers", item)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium text-sm">{item.name}</div>
-                        <div className="text-xs text-gray-500">
-                          ${item.price}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Flower className="w-4 h-4 text-green-500" />
-                        <Move3D className="w-3 h-3 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </TabsContent>
-            </Tabs>
-          </Card>
+          {/* Decorations moved to the right sidebar per request */}
 
           <Card className="p-4">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -963,6 +877,11 @@ export default function PartyHallDecorator() {
             </div>
           </Card>
 
+          {/*
+            View Controls - commented out per request
+            The view mode selector, lighting intensity and animation speed
+            controls have been disabled by commenting this block.
+          
           <Card className="p-4">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <Settings className="w-5 h-5" />
@@ -1013,6 +932,7 @@ export default function PartyHallDecorator() {
               </div>
             </div>
           </Card>
+          */}
         </div>
 
         {/* Main Hall Visualization */}
@@ -1138,7 +1058,7 @@ export default function PartyHallDecorator() {
                 onDrop={handleDrop}
               >
                 {/* Grid overlay */}
-                {showGrid && viewMode === "design" && (
+                {/* {showGrid && viewMode === "design" && (
                   <div className="absolute inset-0 opacity-20">
                     <svg width="100%" height="100%">
                       <defs>
@@ -1159,7 +1079,7 @@ export default function PartyHallDecorator() {
                       <rect width="100%" height="100%" fill="url(#grid)" />
                     </svg>
                   </div>
-                )}
+                )} */}
 
                 {/* Floor */}
                 <div
@@ -1229,121 +1149,119 @@ export default function PartyHallDecorator() {
 
         {/* Right Sidebar - Properties & Controls */}
         <div className="col-span-3 space-y-4">
-          {selectedDecoration ? (
-            <Card className="p-4">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Wand2 className="w-5 h-5" />
-                Edit Decoration
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm">Name</Label>
-                  <Input
-                    value={selectedDecoration.name}
-                    onChange={(e) =>
-                      updateDecoration(selectedDecoration.id, {
-                        name: e.target.value,
-                      })
-                    }
-                    className="mt-1"
-                  />
-                </div>
+          {/*
+            Editing placeholder commented out per request. To re-enable, remove this comment and restore the block.
 
-                <div>
-                  <Label className="text-sm">Position X</Label>
-                  <Slider
-                    value={[selectedDecoration.position.x]}
-                    onValueChange={([value]) =>
-                      updateDecoration(selectedDecoration.id, {
-                        position: { ...selectedDecoration.position, x: value },
-                      })
-                    }
-                    max={100}
-                    min={-100}
-                    step={5}
-                    className="mt-2"
-                  />
-                </div>
+            {selectedDecoration ? (
+              <Card className="p-4">
+                <h3 className="font-semibold mb-4">Editing Disabled</h3>
+                <p className="text-sm text-gray-600">
+                  Decoration editing is currently disabled.
+                </p>
+              </Card>
+            ) : null}
+          */}
 
-                <div>
-                  <Label className="text-sm">Position Y</Label>
-                  <Slider
-                    value={[selectedDecoration.position.y]}
-                    onValueChange={([value]) =>
-                      updateDecoration(selectedDecoration.id, {
-                        position: { ...selectedDecoration.position, y: value },
-                      })
-                    }
-                    max={100}
-                    min={0}
-                    step={5}
-                    className="mt-2"
-                  />
-                </div>
+          {/* Decorations (moved from left) */}
+          <Card className="p-4">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              Decorations
+            </h3>
+            <Tabs defaultValue="balloons" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 text-xs">
+                <TabsTrigger value="balloons">Balloons</TabsTrigger>
+                <TabsTrigger value="lighting">Lights</TabsTrigger>
+                <TabsTrigger value="flowers">Flowers</TabsTrigger>
+              </TabsList>
 
-                <div>
-                  <Label className="text-sm">Scale</Label>
-                  <Slider
-                    value={[selectedDecoration.scale]}
-                    onValueChange={([value]) =>
-                      updateDecoration(selectedDecoration.id, { scale: value })
-                    }
-                    max={2}
-                    min={0.1}
-                    step={0.1}
-                    className="mt-2"
-                  />
-                </div>
+              <TabsContent value="balloons" className="mt-4 space-y-2">
+                {decorationCatalog.balloons.map((item, i) => (
+                  <div
+                    key={i}
+                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, "balloons", item)}
+                    onClick={() => addDecoration("balloons", item)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-sm">{item.name}</div>
+                        <div className="text-xs text-gray-500">
+                          ${item.price}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Circle className="w-4 h-4 text-pink-500" />
+                        <Move3D className="w-3 h-3 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
 
-                <div>
-                  <Label className="text-sm">Rotation</Label>
-                  <Slider
-                    value={[selectedDecoration.rotation]}
-                    onValueChange={([value]) =>
-                      updateDecoration(selectedDecoration.id, {
-                        rotation: value,
-                      })
-                    }
-                    max={360}
-                    min={0}
-                    step={15}
-                    className="mt-2"
-                  />
-                </div>
+              <TabsContent value="lighting" className="mt-4 space-y-2">
+                {decorationCatalog.lighting.map((item, i) => (
+                  <div
+                    key={i}
+                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, "lighting", item)}
+                    onClick={() => addDecoration("lighting", item)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-sm">{item.name}</div>
+                        <div className="text-xs text-gray-500">
+                          ${item.price}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4 text-yellow-500" />
+                        <Move3D className="w-3 h-3 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
 
-                <div>
-                  <Label className="text-sm">Color</Label>
-                  <Input
-                    type="color"
-                    value={selectedDecoration.color}
-                    onChange={(e) =>
-                      updateDecoration(selectedDecoration.id, {
-                        color: e.target.value,
-                      })
-                    }
-                    className="mt-1"
-                  />
-                </div>
+              <TabsContent value="flowers" className="mt-4 space-y-2">
+                {decorationCatalog.flowers.map((item, i) => (
+                  <div
+                    key={i}
+                    className="p-2 border rounded-lg hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, "flowers", item)}
+                    onClick={() => addDecoration("flowers", item)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-sm">{item.name}</div>
+                        <div className="text-xs text-gray-500">
+                          ${item.price}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Flower className="w-4 h-4 text-green-500" />
+                        <Move3D className="w-3 h-3 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+            </Tabs>
+          </Card>
 
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => removeDecoration(selectedDecoration.id)}
-                >
-                  Remove Decoration
-                </Button>
-              </div>
-            </Card>
-          ) : (
-            <Card className="p-4">
-              <h3 className="font-semibold mb-4">No decoration selected</h3>
-              <p className="text-sm text-gray-600">
-                Click on any decoration in the hall to edit its properties
-              </p>
-            </Card>
-          )}
+          {/* No decoration selected card hidden per request
+          <Card className="p-4">
+            <h3 className="font-semibold mb-4">No decoration selected</h3>
+            <p className="text-sm text-gray-600">
+              Click on any decoration in the hall to edit its properties
+            </p>
+          </Card>
+          */}
 
+          {/* Quick Actions commented out per request
           <Card className="p-4">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <PartyPopper className="w-5 h-5" />
@@ -1392,6 +1310,7 @@ export default function PartyHallDecorator() {
               </Button>
             </div>
           </Card>
+          */}
 
           <Card className="p-4">
             <h3 className="font-semibold mb-4">Cost Summary</h3>
