@@ -1,24 +1,34 @@
 import React, { useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import CheckoutDialog from "@/components/checkout/CheckoutDialog";
+import SubscribeDialog from "@/components/checkout/SubscribeDialog";
 import PlanCard from "@/components/vibes-business/PlanCard";
 import { useVibeBusinessSubscriptions } from "@/hooks/useVibeBusinessSubscriptions";
+import { useVibeBusinessActiveSubscription } from "@/hooks/useVibeBusinessActiveSubscription";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const VibesBusiness: React.FC = () => {
-  const [isAnnual, setIsAnnual] = useState(false);
+  // billing frequency toggle temporarily hidden — always show all plans
 
   const [open, setOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
   const {
-    data: plans,
-    isLoading,
-    isError,
+    data: activeSubscription,
+    isLoading: isActiveLoading,
+    isError: isActiveError,
+    error: activeError,
+  } = useVibeBusinessActiveSubscription();
+
+  const {
+    data: plans = [],
+    isLoading: isPlansLoading,
+    isError: isError,
     error,
-  } = useVibeBusinessSubscriptions();
-  const filteredPlans = (plans || []).filter((p) => {
-    if (isAnnual) return /ann/i.test(p.planDuration || "");
-    return !/ann/i.test(p.planDuration || "");
+  } = useVibeBusinessSubscriptions({
+    enabled: !isActiveLoading && !activeSubscription?.status,
   });
+
+  const isLoading = isActiveLoading || isPlansLoading;
+  // show all plans for now
+  const filteredPlans = plans;
 
   return (
     <div className="vibes-business-page min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-950 to-purple-700 p-8">
@@ -28,20 +38,57 @@ const VibesBusiness: React.FC = () => {
           <p className="mt-2 opacity-80">Select your Plan</p>
         </header>
 
-        <div className="flex items-center justify-center space-x-6 mb-8">
-          <span className="text-white mr-3 font-semibold">Monthly</span>
-
-          <Switch
-            checked={isAnnual}
-            onCheckedChange={setIsAnnual}
-            className="bg-black"
-          />
-
-          <span className="text-white ml-3 font-semibold">Annually</span>
-        </div>
+        {/* billing frequency toggle temporarily hidden — showing all plans */}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {isLoading ? (
+          {isActiveLoading ? (
+            // show a single skeleton while active-subscription check runs
+            <div className="col-span-1 md:col-span-3">
+              <div className="card rounded-xl p-6 shadow-2xl">
+                <Skeleton className="h-6 w-40 mb-4" />
+                <Skeleton className="h-10 w-56 mb-2" />
+                <Skeleton className="h-5 w-full mb-4" />
+              </div>
+            </div>
+          ) : activeSubscription?.status ? (
+            // User already has an active subscription — show details and skip plan selection
+            <div className="col-span-1 md:col-span-3 text-center text-white opacity-90">
+              <div className="mx-auto max-w-xl bg-white bg-opacity-6 rounded-xl p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-lg font-semibold">
+                      Active Subscription
+                    </div>
+                    <div className="text-sm opacity-80">
+                      Plan ID: {activeSubscription.plan_id}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm opacity-70">
+                      Status: {activeSubscription.transaction_status}
+                    </div>
+                    <div className="text-sm opacity-70">
+                      Txn: #{activeSubscription.transaction_id}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm opacity-80">
+                  Starts:{" "}
+                  {new Date(
+                    activeSubscription.start_plan_date || ""
+                  ).toLocaleDateString()}{" "}
+                  — Ends:{" "}
+                  {new Date(
+                    activeSubscription.end_plan_date || ""
+                  ).toLocaleDateString()}
+                </div>
+                <div className="mt-4 text-sm opacity-75">
+                  You already have an active subscription. To change plans,
+                  please manage your subscription from your account.
+                </div>
+              </div>
+            </div>
+          ) : isPlansLoading ? (
             // show 3 skeleton cards to match grid layout
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="card rounded-xl p-6 shadow-2xl">
@@ -91,19 +138,25 @@ const VibesBusiness: React.FC = () => {
                 <PlanCard
                   key={plan._id}
                   plan={plan}
-                  onSelect={() => setOpen(true)}
+                  onSelect={() => {
+                    setSelectedPlan(plan);
+                    setOpen(true);
+                  }}
                 />
               ))}
             </>
           )}
         </div>
       </div>
-      {/* Checkout dialog extracted to component */}
-      <React.Suspense>
-        {/* lazy-loading unnecessary here but keeps parity with other code-split pages */}
-        {/* import locally to avoid circular imports at top-level */}
-        <CheckoutDialog open={open} onOpenChange={setOpen} />
-      </React.Suspense>
+
+      <SubscribeDialog
+        open={open}
+        onOpenChange={(isOpen: boolean) => {
+          setOpen(isOpen);
+          if (!isOpen) setSelectedPlan(null);
+        }}
+        plan={selectedPlan}
+      />
     </div>
   );
 };
