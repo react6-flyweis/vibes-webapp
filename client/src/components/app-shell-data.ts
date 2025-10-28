@@ -18,6 +18,7 @@ import {
   Layout,
   Shield,
   Share,
+  Box,
   // Zap,
   // Settings,
   // Bell,
@@ -317,6 +318,13 @@ export const vendorNavigationItems: NavCategory[] = [
         href: "/corporate-dashboard",
         icon: TrendingUp,
         description: "Corporate event management",
+      },
+      {
+        name: "Vendor migration hub",
+        href: "/vendor-migration",
+        icon: Box,
+        description:
+          "Migrate your store from Etsy, Aliexpress, Temu, Amazon in one click",
       },
       // {
       //   name: "Advanced Business Intelligence",
