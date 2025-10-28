@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, forwardRef } from "react";
 import {
   Stage,
   Layer,
@@ -27,7 +27,7 @@ interface KonvaCanvasProps {
 }
 
 // Image component wrapper to handle loading with CORS support
-function ImageElement({ src, ...props }: any) {
+const ImageElement = forwardRef<any, any>(({ src, ...props }: any, ref) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState(false);
 
@@ -40,7 +40,10 @@ function ImageElement({ src, ...props }: any) {
       const img = new Image();
 
       // Enable CORS for external images (images from other domains)
-      if (imgSrc.startsWith("http://") || imgSrc.startsWith("https://")) {
+      if (
+        imgSrc &&
+        (imgSrc.startsWith("http://") || imgSrc.startsWith("https://"))
+      ) {
         img.crossOrigin = "anonymous";
       }
 
@@ -105,8 +108,8 @@ function ImageElement({ src, ...props }: any) {
   }
 
   if (!image) return null;
-  return <KonvaImage image={image} {...props} />;
-}
+  return <KonvaImage ref={ref} image={image} {...props} />;
+});
 
 export function KonvaCanvas({
   elements,
@@ -252,8 +255,7 @@ export function KonvaCanvas({
       onTap: () => onSelectElement(element.id),
       onDragEnd: (e: any) => handleDragEnd(element.id, e),
       onTransformEnd: (e: any) => handleTransformEnd(element.id, e),
-      // Attach ref to selected element for transformer
-      ref: isSelected ? selectedNodeRef : null,
+      // Attach ref to selected element for transformer (added per-node below)
       // Remove stroke since transformer will show handles
       name: element.id,
     };
@@ -293,6 +295,7 @@ export function KonvaCanvas({
         return (
           <Text
             {...commonProps}
+            ref={isSelected ? selectedNodeRef : null}
             text={displayText}
             fontSize={(element.style?.fontSize || 18) * elementScale}
             fontFamily={element.style?.fontFamily || "Inter"}
@@ -323,6 +326,7 @@ export function KonvaCanvas({
         return (
           <Text
             {...commonProps}
+            ref={isSelected ? selectedNodeRef : null}
             text={element.content?.text || element.content?.emblem || "LOGO"}
             fontSize={(element.style?.fontSize || 20) * elementScale}
             fontFamily={element.style?.fontFamily || "sans-serif"}
@@ -347,6 +351,7 @@ export function KonvaCanvas({
           return (
             <Rect
               {...commonProps}
+              ref={isSelected ? selectedNodeRef : null}
               fillLinearGradientStartPoint={{ x: 0, y: 0 }}
               fillLinearGradientEndPoint={{
                 x: element.width * elementScale,
@@ -375,6 +380,7 @@ export function KonvaCanvas({
           return (
             <ImageElement
               {...commonProps}
+              ref={isSelected ? selectedNodeRef : null}
               src={element.content.src}
               cornerRadius={element.style?.borderRadius || 0}
             />
@@ -420,6 +426,7 @@ export function KonvaCanvas({
         return (
           <Rect
             {...commonProps}
+            ref={isSelected ? selectedNodeRef : null}
             stroke={element.style?.borderColor || colorScheme.accent}
             strokeWidth={element.style?.strokeWidth || 4}
             cornerRadius={element.style?.borderRadius || 0}
