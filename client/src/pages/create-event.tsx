@@ -171,18 +171,24 @@ export default function CreateEvent() {
     }
 
     try {
-      await createMutation.mutateAsync(payload);
+      const res = await createMutation.mutateAsync(payload);
 
-      // success handling
+      // Prefer `event_id`, then `_id`, then `id`, then nested `data.id`.
+      const newEventId = res.data.data.event_id;
+
+      // success toast
       toast({
         title: "Event Created Successfully!",
-        description: "Ready to send immersive invitations to your guests.",
+        description: "Redirecting to event planning...",
       });
 
-      // Navigate to Interactive Live Vibes Invite system
-      setTimeout(() => {
-        navigate("/interactive-live-vibes-invite");
-      }, 2000);
+      // If we have an id, go to plan-event/:id. Otherwise fallback to interactive invite.
+      if (newEventId) {
+        // small delay so user sees toast briefly
+        setTimeout(() => navigate(`/plan-event/${String(newEventId)}`), 800);
+      } else {
+        setTimeout(() => navigate("/interactive-live-vibes-invite"), 800);
+      }
     } catch (err: any) {
       toast({
         title: "Error",
@@ -996,7 +1002,7 @@ export default function CreateEvent() {
                     className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
                     disabled={form.formState.isSubmitting}
                   >
-                      Create Event & Send Invites
+                    Create Event & Send Invites
                   </Button>
                 </div>
               </form>
