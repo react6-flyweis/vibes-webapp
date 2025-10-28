@@ -6,6 +6,7 @@ import {
   Image as KonvaImage,
   Rect,
   Group,
+  Ellipse,
   Transformer,
 } from "react-konva";
 import Konva from "konva";
@@ -382,6 +383,31 @@ export function KonvaCanvas({
         return null;
 
       case "shape":
+        // Support rectangle, ellipse and circle shapes
+        if (
+          element.content?.shape === "ellipse" ||
+          element.content?.shape === "circle"
+        ) {
+          const w = element.width * elementScale;
+          const h =
+            element.content?.shape === "circle"
+              ? element.width * elementScale
+              : element.height * elementScale;
+
+          return (
+            <Group {...commonProps}>
+              <Ellipse
+                x={w / 2}
+                y={h / 2}
+                radiusX={w / 2}
+                radiusY={h / 2}
+                fill={element.style?.backgroundColor || colorScheme.primary}
+                listening={false}
+              />
+            </Group>
+          );
+        }
+
         return (
           <Rect
             {...commonProps}
@@ -395,9 +421,9 @@ export function KonvaCanvas({
           <Rect
             {...commonProps}
             stroke={element.style?.borderColor || colorScheme.accent}
-            strokeWidth={4}
+            strokeWidth={element.style?.strokeWidth || 4}
             cornerRadius={element.style?.borderRadius || 0}
-            fill="transparent"
+            fill={element.style?.fill || "transparent"}
           />
         );
 
