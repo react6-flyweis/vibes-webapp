@@ -38,7 +38,10 @@ export default function VendorMigration() {
           </p>
 
           <div className="mt-8 flex justify-center gap-4">
-            <Link to="/vibes-fund" className="inline-flex items-center">
+            <Link
+              to="/vendor-onboarding-portal"
+              className="inline-flex items-center"
+            >
               <Button className="bg-gradient-cta">Start My Migration</Button>
             </Link>
 
