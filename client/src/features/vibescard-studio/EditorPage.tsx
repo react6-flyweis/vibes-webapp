@@ -47,6 +47,7 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
   const {
     elements,
     setElements,
+    setElementsWithHistory,
     selectedElement,
     setSelectedElement,
     colorScheme,
@@ -55,6 +56,10 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
     updateElement,
     deleteElement,
     duplicateElement,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useDesignElements(
     {
       primary: "#6366f1",
@@ -65,6 +70,51 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
     },
     canvasSize
   );
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+
+      const target = e.target as HTMLElement | null;
+      const isEditable =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+
+      if (isEditable) return; // allow native undo in text inputs
+
+      // Undo: Ctrl/Cmd+Z
+      if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        try {
+          undo();
+        } catch (err) {
+          // ignore
+        }
+        return;
+      }
+
+      // Redo: Ctrl+Y or Ctrl/Cmd+Shift+Z
+      if (
+        (mod && e.key.toLowerCase() === "y") ||
+        (mod && e.key.toLowerCase() === "z" && e.shiftKey)
+      ) {
+        e.preventDefault();
+        try {
+          redo();
+        } catch (err) {
+          // ignore
+        }
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [undo, redo]);
 
   const [eventTitle, setEventTitle] = useState("New Design");
   const [eventMessage, setEventMessage] = useState("You're Invited!");
@@ -105,8 +155,8 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
       hostName: hostName,
     };
 
-    // Update elements that have dataField mappings
-    setElements((prevElements) =>
+    // Update elements that have dataField mappings (record in history)
+    setElementsWithHistory((prevElements) =>
       prevElements.map((element) => {
         if (element.dataField && eventDetailsMap[element.dataField]) {
           return {
@@ -151,10 +201,10 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
         hostName: hostName,
       };
 
-      // Apply the template with event details
+      // Apply the template with event details (record in history)
       applyTemplate(
         template,
-        setElements,
+        setElementsWithHistory,
         setColorScheme,
         setSelectedElement,
         setCanvasSize,
@@ -249,8 +299,8 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
       // Preload and convert external images to base64
       const updatedElements = await preloadImagesForExport(elements);
 
-      // Update the elements state with base64 images
-      setElements(updatedElements);
+      // Update the elements state with base64 images (record in history)
+      setElementsWithHistory(updatedElements);
 
       // Wait for React to re-render and Konva to update
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -302,8 +352,8 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
       // Preload and convert external images to base64
       const updatedElements = await preloadImagesForExport(elements);
 
-      // Update the elements state with base64 images
-      setElements(updatedElements);
+      // Update the elements state with base64 images (record in history)
+      setElementsWithHistory(updatedElements);
 
       // Wait for React to re-render and Konva to update
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -587,6 +637,10 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
           saveLabel={initialDesign ? "Update" : "Save"}
           //   isSaving={saveDesign.isPending}
           onExport={handleExport}
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
 
         {/* Canvas */}
