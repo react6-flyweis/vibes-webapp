@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { DesignElement, ColorScheme, CanvasSize } from "../types";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,6 +11,23 @@ export function useDesignElements(
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [colorScheme, setColorScheme] =
     useState<ColorScheme>(initialColorScheme);
+
+  // History stacks for undo/redo
+  const undoStack = useRef<DesignElement[][]>([]);
+  const redoStack = useRef<DesignElement[][]>([]);
+  const [historyVersion, setHistoryVersion] = useState(0);
+
+  const pushHistory = useCallback((nextElements: DesignElement[]) => {
+    // Push a deep-cloned snapshot of the provided elements to undo stack
+    // Note: callers should pass the PREVIOUS state (before change)
+    undoStack.current.push(JSON.parse(JSON.stringify(nextElements)));
+    // Clear redo on new action
+    redoStack.current = [];
+    // Cap history to 50 entries
+    if (undoStack.current.length > 50) undoStack.current.shift();
+    // Trigger re-render so interested components can read canUndo/canRedo
+    setHistoryVersion((v) => v + 1);
+  }, []);
 
   const addElement = useCallback(
     (type: DesignElement["type"], content: any = {}) => {
@@ -48,7 +65,12 @@ export function useDesignElements(
         },
       };
 
-      setElements((prev) => [...prev, newElement]);
+      setElements((prev) => {
+        // record previous snapshot
+        pushHistory(prev);
+        const next = [...prev, newElement];
+        return next;
+      });
       setSelectedElement(newElement.id);
 
       toast({
@@ -63,16 +85,24 @@ export function useDesignElements(
 
   const updateElement = useCallback(
     (id: string, updates: Partial<DesignElement>) => {
-      setElements((prev) =>
-        prev.map((el) => (el.id === id ? { ...el, ...updates } : el))
-      );
+      setElements((prev) => {
+        pushHistory(prev);
+        const next = prev.map((el) =>
+          el.id === id ? { ...el, ...updates } : el
+        );
+        return next;
+      });
     },
     []
   );
 
   const deleteElement = useCallback(
     (id: string) => {
-      setElements((prev) => prev.filter((el) => el.id !== id));
+      setElements((prev) => {
+        pushHistory(prev);
+        const next = prev.filter((el) => el.id !== id);
+        return next;
+      });
       if (selectedElement === id) {
         setSelectedElement(null);
       }
@@ -95,16 +125,62 @@ export function useDesignElements(
           y: element.y + 20,
           zIndex: Math.max(...elements.map((el) => el.zIndex)) + 1,
         };
-        setElements((prev) => [...prev, duplicate]);
+        setElements((prev) => {
+          pushHistory(prev);
+          const next = [...prev, duplicate];
+          return next;
+        });
         setSelectedElement(duplicate.id);
       }
     },
     [elements]
   );
 
+  // Direct setElements wrapper that records history
+  const setElementsWithHistory = useCallback(
+    (next: DesignElement[] | ((prev: DesignElement[]) => DesignElement[])) => {
+      setElements((prev) => {
+        // push the previous snapshot before applying the new state
+        pushHistory(prev);
+        const resolved =
+          typeof next === "function" ? (next as any)(prev) : next;
+        return resolved as DesignElement[];
+      });
+    },
+    [pushHistory]
+  );
+
+  const canUndo = () => undoStack.current.length > 0;
+  const canRedo = () => redoStack.current.length > 0;
+  // Expose booleans that update when historyVersion changes so components re-render
+  const canUndoFlag = historyVersion >= 0 ? canUndo() : canUndo();
+  const canRedoFlag = historyVersion >= 0 ? canRedo() : canRedo();
+
+  const undo = useCallback(() => {
+    if (!canUndo()) return;
+    // Move current state to redo and restore last undo
+    setElements((current) => {
+      redoStack.current.push(JSON.parse(JSON.stringify(current)));
+      const previous = undoStack.current.pop() as DesignElement[];
+      setHistoryVersion((v) => v + 1);
+      return JSON.parse(JSON.stringify(previous));
+    });
+  }, []);
+
+  const redo = useCallback(() => {
+    if (!canRedo()) return;
+    setElements((current) => {
+      undoStack.current.push(JSON.parse(JSON.stringify(current)));
+      const next = redoStack.current.pop() as DesignElement[];
+      setHistoryVersion((v) => v + 1);
+      return JSON.parse(JSON.stringify(next));
+    });
+  }, []);
+
   return {
     elements,
-    setElements,
+    setElements: setElements,
+    setElementsWithHistory,
     selectedElement,
     setSelectedElement,
     colorScheme,
@@ -113,5 +189,10 @@ export function useDesignElements(
     updateElement,
     deleteElement,
     duplicateElement,
+    // history API
+    undo,
+    redo,
+    canUndo: canUndoFlag,
+    canRedo: canRedoFlag,
   };
 }
