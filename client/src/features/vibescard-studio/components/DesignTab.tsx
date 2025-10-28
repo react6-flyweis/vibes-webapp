@@ -63,43 +63,43 @@ const designElements = [
     description: "Patterns & gradients",
   },
   { type: "logo", icon: Upload, name: "Logo", description: "Brand elements" },
-  { type: "border", icon: Crop, name: "Borders", description: "Ornate frames" },
-  {
-    type: "animation",
-    icon: Sparkles,
-    name: "Animation",
-    description: "Motion effects",
-  },
-  {
-    type: "music",
-    icon: Music,
-    name: "Music",
-    description: "Background audio",
-  },
-  {
-    type: "video",
-    icon: Video,
-    name: "Video",
-    description: "Video backgrounds",
-  },
-  {
-    type: "qr",
-    icon: QrCode,
-    name: "QR Code",
-    description: "Quick response codes",
-  },
-  {
-    type: "calendar",
-    icon: Calendar,
-    name: "Calendar",
-    description: "Date integration",
-  },
-  {
-    type: "rsvp",
-    icon: MessageSquare,
-    name: "RSVP",
-    description: "Response buttons",
-  },
+  // { type: "border", icon: Crop, name: "Borders", description: "Ornate frames" },
+  // {
+  //   type: "animation",
+  //   icon: Sparkles,
+  //   name: "Animation",
+  //   description: "Motion effects",
+  // },
+  // {
+  //   type: "music",
+  //   icon: Music,
+  //   name: "Music",
+  //   description: "Background audio",
+  // },
+  // {
+  //   type: "video",
+  //   icon: Video,
+  //   name: "Video",
+  //   description: "Video backgrounds",
+  // },
+  // {
+  //   type: "qr",
+  //   icon: QrCode,
+  //   name: "QR Code",
+  //   description: "Quick response codes",
+  // },
+  // {
+  //   type: "calendar",
+  //   icon: Calendar,
+  //   name: "Calendar",
+  //   description: "Date integration",
+  // },
+  // {
+  //   type: "rsvp",
+  //   icon: MessageSquare,
+  //   name: "RSVP",
+  //   description: "Response buttons",
+  // },
 ];
 
 export function DesignTab({
@@ -111,6 +111,19 @@ export function DesignTab({
   colorScheme,
 }: DesignTabProps) {
   const [templateSearch, setTemplateSearch] = useState("");
+
+  // Local blank template for VibesCard Studio only
+  const blankTemplate: Template = {
+    id: "blank-local",
+    name: "Blank",
+    category: "All",
+    thumbnail: "⬜",
+    premium: false,
+    palette: ["#ffffff"],
+    preview: "",
+    elements: [],
+    style: { background: "#ffffff", canvasSize: { width: 800, height: 1027 } },
+  };
 
   const filteredTemplates = templates.filter(
     (template) =>
@@ -164,6 +177,28 @@ export function DesignTab({
 
           {/* Template Grid */}
           <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+            {/* Blank option shown only in VibesCard Studio */}
+            <div
+              key={blankTemplate.id}
+              className={`relative cursor-pointer rounded-lg p-3 border-2 transition-all transform hover:scale-105 w-full
+                ${
+                  selectedTemplate === blankTemplate.id
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-200 dark:border-gray-600 hover:border-blue-300"
+                }`}
+              onClick={() => onApplyTemplate(blankTemplate)}
+            >
+              <div className="text-2xl mb-2 text-center">
+                {blankTemplate.thumbnail}
+              </div>
+              <div className="text-xs font-medium text-center">
+                {blankTemplate.name}
+              </div>
+              <div className="text-xs text-gray-500 text-center mt-1">
+                {blankTemplate.category}
+              </div>
+            </div>
+
             {filteredTemplates.map((template) => (
               <div
                 key={template.id}
