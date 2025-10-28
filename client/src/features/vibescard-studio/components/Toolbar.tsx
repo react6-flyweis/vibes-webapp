@@ -24,6 +24,10 @@ interface ToolbarProps {
   isSaving?: boolean;
   saveLabel?: string;
   onExport: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export function Toolbar({
@@ -38,6 +42,10 @@ export function Toolbar({
   isSaving = false,
   saveLabel = "Save",
   onExport,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
 }: ToolbarProps) {
   return (
     <div className="bg-[#1F2937] border-gray-300 border-b text-white dark:bg-gray-800 dark:border-gray-700 p-4">
@@ -54,13 +62,23 @@ export function Toolbar({
               <Eye className="w-4 h-4" />
             </Button>
 
-            <Separator orientation="vertical" className="h-6" />
-
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onUndo}
+              disabled={!canUndo}
+              title="Undo (Ctrl/Cmd+Z)"
+            >
               <RotateCcw className="w-4 h-4" />
             </Button>
 
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRedo}
+              disabled={!canRedo}
+              title="Redo (Ctrl+Y / Ctrl/Cmd+Shift+Z)"
+            >
               <RotateCw className="w-4 h-4" />
             </Button>
 
