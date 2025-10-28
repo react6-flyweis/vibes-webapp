@@ -39,19 +39,32 @@ export default function ResetPasswordDialog({
   const { toast } = useToast();
   const mutation = useResetPasswordMutation();
 
-  const form = useForm<{ password: string; confirm: string }>({
-    defaultValues: { password: "", confirm: "" },
+  const form = useForm<{ password: string; confirm: string; otp: string }>({
+    defaultValues: { password: "", confirm: "", otp: otp || "" },
     mode: "onTouched",
   });
 
   useEffect(() => {
     if (open) {
-      form.reset({ password: "", confirm: "" });
+      form.reset({ password: "", confirm: "", otp: otp || "" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, otp]);
 
-  const onSubmit = async (values: { password: string; confirm: string }) => {
+  const onSubmit = async (values: {
+    password: string;
+    confirm: string;
+    otp: string;
+  }) => {
+    if (!values.otp || !/^[0-9]{6}$/.test(values.otp)) {
+      toast({
+        title: "Invalid",
+        description: "Please enter the 6-digit verification code",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (values.password.length < 8) {
       toast({
         title: "Invalid",
@@ -70,7 +83,13 @@ export default function ResetPasswordDialog({
     }
 
     try {
-      await mutation.mutateAsync({ email, otp, newPassword: values.password });
+      // prefer the otp entered by the user in the form, fallback to prop
+      const otpToSend = values.otp || otp;
+      await mutation.mutateAsync({
+        email,
+        otp: otpToSend,
+        newPassword: values.password,
+      });
       toast({
         title: "Password updated",
         description: "You can now log in with your new password.",
@@ -105,6 +124,28 @@ export default function ResetPasswordDialog({
             </DialogHeader>
 
             <div className="mt-6 space-y-4">
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm text-gray-600">
+                      Verification code
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="Enter 6-digit code"
+                        className="rounded-xl border-gray-200 h-12 px-4 mt-2"
+                        maxLength={6}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="password"
