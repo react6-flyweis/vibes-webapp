@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
@@ -23,8 +25,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useVendorOnboarding } from "@/mutations/useVendorOnboarding";
 import StepProgress from "@/components/onboarding/StepProgress";
 import DocumentUploadItem from "@/components/onboarding/DocumentUploadItem";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 const steps = [
   "Basic Information",
@@ -52,20 +56,22 @@ const schema = z.object({
   serviceAreas: z.string().optional(),
   primaryServiceLocation: z.string().optional(),
   optionalRegions: z.string().optional(),
-  pinCode: z.string().optional(),
-  preferredWorkingHours: z.string().optional(),
+  pinCode: z.string().min(1, "Pin code is required"),
+  preferredWorkingHours: z
+    .string()
+    .min(1, "Preferred working hours are required"),
   payoutEmail: z.string().optional(),
-  kycFullName: z.string().optional(),
-  kycDob: z.string().optional(),
-  kycIdType: z.string().optional(),
-  kycIdNumber: z.string().optional(),
-  kycPan: z.string().optional(),
-  kycGst: z.string().optional(),
-  accountHolderName: z.string().optional(),
-  bankName: z.string().optional(),
-  branchName: z.string().optional(),
-  accountNumber: z.string().optional(),
-  ifscCode: z.string().optional(),
+  kycFullName: z.string().min(1, "Authorized person's full name is required"),
+  kycDob: z.string().min(1, "Date of birth is required"),
+  kycIdType: z.string().min(1, "ID type is required"),
+  kycIdNumber: z.string().min(1, "ID number is required"),
+  kycPan: z.string().min(1, "PAN is required"),
+  kycGst: z.string().min(1, "GST number is required"),
+  accountHolderName: z.string().min(1, "Account holder name is required"),
+  bankName: z.string().min(1, "Bank name is required"),
+  branchName: z.string().min(1, "Branch name is required"),
+  accountNumber: z.string().min(1, "Account number is required"),
+  ifscCode: z.string().min(1, "IFSC code is required"),
   upiId: z.string().optional(),
   termsAccepted: z.boolean().optional(),
 });
@@ -74,6 +80,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function VendorOnboardingPortal() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   type DocKey =
     | "businessRegistration"
@@ -154,6 +161,7 @@ export default function VendorOnboardingPortal() {
   });
   const stepFields = useMemo(
     () => [
+      // Step 0: Basic information
       [
         "businessName",
         "legalName",
@@ -169,26 +177,64 @@ export default function VendorOnboardingPortal() {
         "zip",
         "country",
       ],
-      [], // document upload handled separately
+      // Step 1: Document upload (files are stored in state, validated in next())
       [],
+      // Step 2: KYC fields
+      ["kycFullName", "kycDob", "kycIdType", "kycIdNumber", "kycPan", "kycGst"],
+      // Step 3: Service Areas
       [
         "primaryServiceLocation",
         "optionalRegions",
         "pinCode",
         "preferredWorkingHours",
       ],
-      ["payoutEmail"],
-      [], // termsAccepted validated at submit only
+      // Step 4: Payment setup
+      [
+        "accountHolderName",
+        "bankName",
+        "branchName",
+        "accountNumber",
+        "ifscCode",
+        "upiId",
+        "payoutEmail",
+      ],
+      // Step 5: Preview & Publish (termsAccepted validated on submit)
+      [],
     ],
     []
   );
 
   const next = async () => {
     const fields = stepFields[current] as (keyof FormValues)[];
+
     if (fields.length) {
       const valid = await form.trigger(fields as any);
       if (!valid) return;
     }
+
+    // // Custom validation for steps that rely on component state (files)
+    // if (current === 1) {
+    //   const uploaded = Object.values(documents).filter(Boolean).length;
+    //   if (uploaded === 0) {
+    //     toast({
+    //       title: "Please upload at least one document before continuing.",
+    //       variant: "destructive",
+    //     });
+    //     return;
+    //   }
+    // }
+
+    // if (current === 2) {
+    //   // Require both an ID document and a photo verification file
+    //   if (!kycFiles.idDocument || !kycFiles.photoVerification) {
+    //     toast({
+    //       title: "Please upload an ID document and a photo verification.",
+    //       variant: "destructive",
+    //     });
+    //     return;
+    //   }
+    // }
+
     if (current < steps.length - 1) setCurrent((c) => c + 1);
   };
 
@@ -210,7 +256,7 @@ export default function VendorOnboardingPortal() {
     setDocuments((d) => ({ ...d, [category]: null }));
   }
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
     // Enforce terms acceptance only at final submit to keep step flow flexible
     if (!values.termsAccepted) {
       // set a form error so UI shows feedback near the checkbox
@@ -227,14 +273,59 @@ export default function VendorOnboardingPortal() {
     }
 
     const documentsCount = Object.values(documents).filter(Boolean).length;
-    const payload = { ...values, documentsCount };
-    console.log("Vendor Onboarding Submitted", payload);
-    toast({
-      title: "Submitted",
-      description: "Vendor onboarding (mock) submitted",
-    });
-    setCurrent(steps.length - 1);
+    const payload = {
+      // map form values to API expected keys where reasonably possible
+      Vendor_id: undefined,
+      Basic_information_business_name: values.businessName,
+      Basic_information_LegalName: values.legalName,
+      Basic_information_Email: values.email,
+      Basic_information_phone: values.phone,
+      Basic_information_Business_Description: values.description,
+      Basic_information_BusinessAddress: values.streetAddress,
+      Basic_information_City_id: undefined,
+      Basic_information_State_id: undefined,
+      Basic_information_ZipCode: values.zip,
+      Basic_information_Country_id: undefined,
+      service_areas_locaiton: values.primaryServiceLocation,
+      service_areas_Regions: values.optionalRegions,
+      service_areas_pincode: values.pinCode,
+      service_areas_workingHoures: values.preferredWorkingHours,
+      Payment_Setup_HolderName: values.accountHolderName,
+      Payment_Setup_BankName: values.bankName,
+      Payment_Setup_BranchName: values.branchName,
+      Payment_Setup_AccountNo: values.accountNumber,
+      Payment_Setup_Ifsc: values.ifscCode,
+      Payment_Setup_UPI: values.upiId,
+      ifConfirm: !!values.termsAccepted,
+      Status: true,
+      documentsCount,
+    };
+
+    // trigger the mutation using async API so we can await and catch
+    try {
+      const res = await vendorOnboardingMutation.mutateAsync(payload);
+      toast({
+        title: res?.success ? "Onboarding submitted" : "Submission result",
+        description: res?.message || "Vendor onboarding submitted",
+      });
+      setCurrent(steps.length - 1);
+
+      navigate("/vibes-business");
+    } catch (err: any) {
+      const errorMessage = extractApiErrorMessage(err);
+      toast({
+        title: "Submission failed",
+        description: errorMessage || "Could not submit vendor onboarding",
+        variant: "destructive",
+      });
+      form.setError("root", {
+        type: "manual",
+        message: errorMessage || "Could not submit vendor onboarding",
+      });
+    }
   };
+
+  const vendorOnboardingMutation = useVendorOnboarding();
 
   return (
     <div className="bg-slate-100">
@@ -467,6 +558,7 @@ export default function VendorOnboardingPortal() {
                               <FormLabel>Zip Code</FormLabel>
                               <FormControl>
                                 <Input
+                                  type="number"
                                   className="bg-gray-100"
                                   placeholder="ZIP"
                                   {...field}
@@ -697,6 +789,7 @@ export default function VendorOnboardingPortal() {
                                 {kycFiles.idDocument.name}
                               </div>
                               <Button
+                                type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeKycFile("idDocument")}
@@ -745,6 +838,7 @@ export default function VendorOnboardingPortal() {
                                 {kycFiles.photoVerification.name}
                               </div>
                               <Button
+                                type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
@@ -1083,8 +1177,15 @@ export default function VendorOnboardingPortal() {
                 </Card>
               )}
 
+              {form.formState.errors.root && (
+                <div className="text-sm text-red-600 mt-4">
+                  {form.formState.errors.root.message}
+                </div>
+              )}
+
               <div className="flex justify-between mt-6">
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={back}
                   disabled={current === 0}
@@ -1095,6 +1196,7 @@ export default function VendorOnboardingPortal() {
                 <div>
                   {current === 0 ? (
                     <Button
+                      type="button"
                       onClick={next}
                       className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] text-white"
                     >
@@ -1102,28 +1204,20 @@ export default function VendorOnboardingPortal() {
                     </Button>
                   ) : current < steps.length - 1 ? (
                     <>
-                      <Button onClick={next} className="mr-3">
+                      <Button type="button" onClick={next} className="mr-3">
                         Next
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() =>
-                          toast({
-                            title: "Saved",
-                            description: "Saved progress (mock)",
-                          })
-                        }
-                      >
-                        Save & Continue Later
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      type="submit"
-                      className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] text-white"
-                    >
-                      Publish
-                    </Button>
+                    <div className="flex items-center">
+                      <LoadingButton
+                        type="submit"
+                        className="bg-gradient-cta text-white"
+                        isLoading={form.formState.isSubmitting}
+                      >
+                        Publish
+                      </LoadingButton>
+                    </div>
                   )}
                 </div>
               </div>
