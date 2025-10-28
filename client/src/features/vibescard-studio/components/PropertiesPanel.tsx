@@ -41,7 +41,7 @@ export function PropertiesPanel({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1"
+                className="flex-1 bg-white text-black"
                 onClick={() => onDuplicateElement(selectedElement.id)}
               >
                 <Copy className="w-4 h-4 mr-2" />
@@ -50,7 +50,7 @@ export function PropertiesPanel({
               <Button
                 variant="destructive"
                 size="sm"
-                className="flex-1"
+                className="flex-1 bg-white text-black"
                 onClick={() => onDeleteElement(selectedElement.id)}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -69,6 +69,7 @@ export function PropertiesPanel({
                   <Input
                     type="number"
                     value={selectedElement.x}
+                    className="bg-white text-black"
                     onChange={(e) =>
                       onUpdateElement(selectedElement.id, {
                         x: Number(e.target.value),
@@ -81,6 +82,7 @@ export function PropertiesPanel({
                   <Input
                     type="number"
                     value={selectedElement.y}
+                    className="bg-white text-black"
                     onChange={(e) =>
                       onUpdateElement(selectedElement.id, {
                         y: Number(e.target.value),
@@ -93,6 +95,7 @@ export function PropertiesPanel({
                   <Input
                     type="number"
                     value={selectedElement.width}
+                    className="bg-white text-black"
                     onChange={(e) =>
                       onUpdateElement(selectedElement.id, {
                         width: Number(e.target.value),
@@ -105,6 +108,7 @@ export function PropertiesPanel({
                   <Input
                     type="number"
                     value={selectedElement.height}
+                    className="bg-white text-black"
                     onChange={(e) =>
                       onUpdateElement(selectedElement.id, {
                         height: Number(e.target.value),
@@ -121,6 +125,23 @@ export function PropertiesPanel({
             {selectedElement.type === "text" && (
               <div className="space-y-3">
                 <h4 className="font-medium">Text Style</h4>
+                {/* Text content editor */}
+                <div>
+                  <Label>Text</Label>
+                  <textarea
+                    className="w-full p-2 rounded bg-white text-black text-sm"
+                    rows={4}
+                    value={selectedElement.content?.text || ""}
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        content: {
+                          ...selectedElement.content,
+                          text: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
                 <div>
                   <Label>Font Size</Label>
                   <Slider
@@ -143,6 +164,7 @@ export function PropertiesPanel({
                         : "outline"
                     }
                     size="sm"
+                    className="bg-white text-black"
                     onClick={() =>
                       onUpdateElement(selectedElement.id, {
                         style: {
@@ -164,6 +186,7 @@ export function PropertiesPanel({
                         : "outline"
                     }
                     size="sm"
+                    className="bg-white text-black"
                     onClick={() =>
                       onUpdateElement(selectedElement.id, {
                         style: {
@@ -178,6 +201,215 @@ export function PropertiesPanel({
                   >
                     <Italic className="w-4 h-4" />
                   </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Image properties */}
+            {selectedElement.type === "image" && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Image</h4>
+                <div>
+                  <Label>Source URL</Label>
+                  <Input
+                    value={selectedElement.content?.src || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        content: {
+                          ...selectedElement.content,
+                          src: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Corner Radius</Label>
+                  <Slider
+                    value={[selectedElement.style?.borderRadius || 0]}
+                    onValueChange={(value) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          borderRadius: value[0],
+                        },
+                      })
+                    }
+                    min={0}
+                    max={100}
+                    step={1}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Shape properties */}
+            {selectedElement.type === "shape" && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Shape</h4>
+                <div>
+                  <Label>Shape</Label>
+                  <select
+                    value={selectedElement.content?.shape || "rectangle"}
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        content: {
+                          ...selectedElement.content,
+                          shape: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full p-2 rounded bg-white text-black text-sm"
+                  >
+                    <option value="rectangle">Rectangle</option>
+                    <option value="ellipse">Ellipse</option>
+                    <option value="circle">Circle</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Fill Color</Label>
+                  <Input
+                    value={selectedElement.style?.backgroundColor || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          backgroundColor: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Corner Radius</Label>
+                  <Slider
+                    value={[selectedElement.style?.borderRadius || 0]}
+                    onValueChange={(value) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          borderRadius: value[0],
+                        },
+                      })
+                    }
+                    min={0}
+                    max={200}
+                    step={1}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Background properties */}
+            {selectedElement.type === "background" && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Background</h4>
+                <div>
+                  <Label>Background (color or gradient)</Label>
+                  <Input
+                    value={selectedElement.style?.background || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          background: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Logo properties */}
+            {selectedElement.type === "logo" && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Logo</h4>
+                <div>
+                  <Label>Text</Label>
+                  <Input
+                    value={selectedElement.content?.text || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        content: {
+                          ...selectedElement.content,
+                          text: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Color</Label>
+                  <Input
+                    value={selectedElement.style?.color || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          color: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Font Size</Label>
+                  <Slider
+                    value={[selectedElement.style?.fontSize || 20]}
+                    onValueChange={(value) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: { ...selectedElement.style, fontSize: value[0] },
+                      })
+                    }
+                    min={8}
+                    max={96}
+                    step={1}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Border properties */}
+            {selectedElement.type === "border" && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Border</h4>
+                <div>
+                  <Label>Stroke Color</Label>
+                  <Input
+                    value={selectedElement.style?.borderColor || ""}
+                    className="bg-white text-black"
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          borderColor: e.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Stroke Width</Label>
+                  <Slider
+                    value={[selectedElement.style?.strokeWidth || 4]}
+                    onValueChange={(value) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style,
+                          strokeWidth: value[0],
+                        },
+                      })
+                    }
+                    min={1}
+                    max={40}
+                    step={1}
+                  />
                 </div>
               </div>
             )}
