@@ -366,31 +366,31 @@ export const vendorNavigationItems: NavCategory[] = [
   //  - security trus
   // - Backer experience
   //  - Campaign management
-  {
-    title: "Vibes LaunchFund",
-    items: [
-      {
-        name: "Financial Management",
-        href: "/financial-management",
-        icon: Star,
-      },
-      {
-        name: "Security Trust",
-        href: "/security-trust",
-        icon: Shield,
-      },
-      {
-        name: "Backer Experience",
-        href: "/backer-experience",
-        icon: Users,
-      },
-      {
-        name: "Campaign Management",
-        href: "/vibes-fund",
-        icon: TrendingUp,
-      },
-    ],
-  },
+  // {
+  //   title: "Vibes LaunchFund",
+  //   items: [
+  //     {
+  //       name: "Financial Management",
+  //       href: "/financial-management",
+  //       icon: Star,
+  //     },
+  //     {
+  //       name: "Security Trust",
+  //       href: "/security-trust",
+  //       icon: Shield,
+  //     },
+  //     {
+  //       name: "Backer Experience",
+  //       href: "/backer-experience",
+  //       icon: Users,
+  //     },
+  //     {
+  //       name: "Campaign Management",
+  //       href: "/vibes-fund",
+  //       icon: TrendingUp,
+  //     },
+  //   ],
+  // },
   //   {
   //     title: "Political Campaign",
   //     items: [
