@@ -94,7 +94,7 @@ export default function ClientsTab() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full border-white/20 text-white hover:bg-white/10"
+                  className="w-full bg-white/20 text-white hover:bg-white/10"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Manage
