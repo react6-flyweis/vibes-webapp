@@ -322,7 +322,7 @@ function DashboardRouter() {
         <Route path="/vibe-mall" element={<VibeMall />} />
         <Route path="/pro-host-control" element={<ProHostControlPanel />} />
         <Route path="/party-quest" element={<PartyQuestGamified />} />
-        <Route path="/corporate-dashboard" element={<CorporateDashboard />} />
+        <Route path="/corporate-dashboard/*" element={<CorporateDashboard />} />
         <Route path="/loyalty-rewards" element={<LoyaltyRewards />} />
         <Route path="/professional-tools" element={<ProfessionalTools />} />
         <Route path="/playful-discovery" element={<PlayfulEventDiscovery />} />
