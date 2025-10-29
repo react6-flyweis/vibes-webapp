@@ -9,12 +9,10 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useCorporatePricingPlans } from "@/hooks/useCorporatePricingPlans";
+import PricingForm from "@/components/pricing/PricingForm";
 
 export default function PricingTab() {
-  const { data, isLoading, isError, error } = useCorporatePricingPlans();
-
-  // Map API item to PricingForm default values
-  const plan = data && data.length > 0 ? data[0] : undefined;
+  const { data, isLoading, isError } = useCorporatePricingPlans();
 
   return (
     <Card className="bg-white/5 backdrop-blur-md border-white/10 p-4">
@@ -23,6 +21,10 @@ export default function PricingTab() {
         <p className="text-slate-300">Configure booking and price ranges</p>
       </CardHeader>
       <CardContent>
+        {/* Add pricing form so admins can create plans inline */}
+        <div className="mb-6">
+          <PricingForm />
+        </div>
         {isLoading ? (
           <p className="text-slate-300">Loading pricing plans...</p>
         ) : isError ? (
