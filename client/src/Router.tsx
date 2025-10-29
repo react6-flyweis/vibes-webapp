@@ -230,7 +230,7 @@ function DashboardRouter() {
         <Route path="/vendor-payment-setup" element={<VendorPaymentSetup />} />
         <Route path="/vendor-payments" element={<VendorPaymentSetup />} />
         <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/premium-dashboard" element={<PremiumDashboard />} />
+        <Route path="/premium-dashboard/*" element={<PremiumDashboard />} />
         <Route path="/vendor-dashboard" element={<VendorDashboard />} />
         <Route path="/corporate" element={<CorporateDashboard />} />
         <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
