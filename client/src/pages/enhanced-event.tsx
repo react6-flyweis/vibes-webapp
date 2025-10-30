@@ -24,13 +24,15 @@ export default function EnhancedEventPage() {
   const { id: eventId } = useParams();
 
   const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  // start on 'menu' if there is no plan map so users are forced to create one
+  const [activeTab, setActiveTab] = useState<string>("overview");
 
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
 
   const { data: planMap, isLoading: planMapLoading } =
     usePlanEventMapsByEventQuery(eventId);
 
+  // while loading or missing event/planMap show loading
   if (eventLoading || !eventId || !event || planMapLoading || !planMap) {
     return (
       <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
@@ -66,6 +68,12 @@ export default function EnhancedEventPage() {
 
   // Chat UI and logic moved into ChatTab component
 
+  // determine whether a plan map exists (planMap query returns an array)
+  const hasPlanMap = Array.isArray(planMap) && planMap.length > 0;
+
+  // ensure initial active tab is menu if no plan map
+  if (!hasPlanMap && activeTab !== "menu") setActiveTab("menu");
+
   return (
     <div className="min-h-screen bg-[#0C111F]">
       <Navigation />
@@ -79,7 +87,20 @@ export default function EnhancedEventPage() {
 
         <Tabs
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={(next) => {
+            // If there's no plan map, only allow staying on 'menu' or 'overview'
+            if (!hasPlanMap) {
+              // Allow switching to 'menu' or 'overview' (overview shows hero + menu builder)
+              if (next === "menu" || next === "overview") {
+                setActiveTab(next);
+              }
+              // otherwise ignore the change
+              return;
+            }
+
+            // when plan map exists, allow normal switching
+            setActiveTab(next);
+          }}
           className="space-y-6"
         >
           <TabsList className="grid w-full grid-cols-9 bg-[#24292D] p-1">
@@ -97,6 +118,8 @@ export default function EnhancedEventPage() {
               <TabsTrigger
                 key={tab}
                 value={tab}
+                // disable all tabs except overview & menu while there's no plan map
+                disabled={!hasPlanMap && !["overview", "menu"].includes(tab)}
                 className={`bg-[#24292D] data-[state=active]:focus:outline-hidden text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#24292D] data-[state=active]:border data-[state=active]:border-white data-[state=active]:rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 text-center`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -137,20 +160,20 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="photos" className="space-y-6">
-            <PhotosTab eventId={eventId} />
+            <PhotosTab eventId={eventId} planMap={planMap?.[0]} />
           </TabsContent>
 
           <TabsContent value="guests" className="space-y-6">
-            <GuestsTab eventId={eventId} />
+            <GuestsTab eventId={eventId} planMap={planMap?.[0]} />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <SettingsTab event={event} />
+            <SettingsTab event={event} planMap={planMap?.[0]} />
           </TabsContent>
         </Tabs>
       </div>
 
-      <div className="fixed bottom-20 right-6 flex flex-col gap-3">
+      {/* <div className="fixed bottom-20 right-6 flex flex-col gap-3">
         <Button
           onClick={() => setIsSocialSharingOpen(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
@@ -164,15 +187,15 @@ export default function EnhancedEventPage() {
         >
           <Send className="h-6 w-6" />
         </Button>
-      </div>
+      </div> */}
 
       {/* AddItemModal is now managed inside MenuBuilder */}
 
-      <SocialMediaSharing
+      {/* <SocialMediaSharing
         event={event}
         isOpen={isSocialSharingOpen}
         onClose={() => setIsSocialSharingOpen(false)}
-      />
+      /> */}
     </div>
   );
 }
