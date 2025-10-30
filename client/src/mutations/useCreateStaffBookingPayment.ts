@@ -9,8 +9,12 @@ import {
 
 export interface CreateStaffBookingPaymentPayload {
   staff_event_book_id: number;
-  payment_method_id: number;
-  billingDetails: string;
+  payment_method_id?: number;
+  billingDetails?: string;
+  // optional fields used by callers
+  payment_intent_id?: string | number;
+  payment?: any;
+  finalize?: boolean;
 }
 
 export interface CreateStaffBookingPaymentData {
