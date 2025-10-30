@@ -140,3 +140,103 @@ export function useStaffByVendorQuery(vendorId: number | null) {
     staleTime: 1000 * 60 * 2,
   });
 }
+
+// New: fetch all staff from master endpoint and normalize to StaffUser[]
+export type RawMasterStaffItem = {
+  staff_working_price_id: number;
+  staff_id: number;
+  staff_category_id: number | null;
+  price: number;
+  review_count: number;
+  status: boolean;
+  staff_info: {
+    user_id: number;
+    name: string;
+    email?: string;
+    mobile?: string;
+    online_status?: boolean;
+    status?: boolean;
+    country_id?: number;
+    state_id?: number;
+    city_id?: number;
+    business_name?: string;
+    created_on?: string;
+    updated_on?: string;
+  };
+  staff_category_info?: {
+    staff_category_id: number;
+    name: string;
+  } | null;
+};
+
+export const fetchAllStaff = async () => {
+  const res = await axiosInstance.get<{
+    success: boolean;
+    message: any;
+    data: RawMasterStaffItem[];
+    pagination?: any;
+    timestamp?: string;
+  }>(`/api/master/staff/getAll`);
+
+  // normalize each item into StaffUser shape expected by UI
+  const normalized: StaffUser[] = (res.data.data || []).map((item) => {
+    const user = item.staff_info || ({} as any);
+    const category = item.staff_category_info;
+
+    const workingPrice: StaffWorkingPrice = {
+      _id: String(item.staff_working_price_id),
+      staff_id: item.staff_id,
+      staff_category_id: item.staff_category_id ?? 0,
+      price: item.price,
+      review_count: item.review_count ?? 0,
+      staff_working_price_id: item.staff_working_price_id,
+      category_details: category
+        ? {
+            _id: String(category.staff_category_id),
+            name: category.name,
+            staff_category_id: category.staff_category_id,
+          }
+        : null,
+    };
+
+    const staffDetails: StaffDetails = {
+      working_prices: [workingPrice],
+      recent_bookings: [],
+      total_working_prices: 1,
+      total_bookings: 0,
+    };
+
+    const staffUser: StaffUser = {
+      _id: String(user.user_id ?? item.staff_id),
+      user_id: user.user_id ?? item.staff_id,
+      name: user.name || "",
+      email: user.email,
+      mobile: user.mobile,
+      online_status: user.online_status,
+      status: user.status,
+      country_id: user.country_id,
+      state_id: user.state_id,
+      city_id: user.city_id,
+      staff_details: staffDetails,
+    };
+
+    return staffUser;
+  });
+
+  return {
+    success: res.data.success,
+    message: res.data.message,
+    data: normalized,
+    pagination: res.data.pagination,
+    timestamp: res.data.timestamp,
+  } as IResponseList<StaffUser>;
+};
+
+export function useAllStaffQuery() {
+  return useQuery<IResponseList<StaffUser>, Error, StaffUser[]>({
+    queryKey: [`/api/master/staff/getAll`],
+    queryFn: fetchAllStaff,
+    select: (res) => res?.data ?? [],
+    staleTime: 1000 * 60 * 2,
+  });
+}
