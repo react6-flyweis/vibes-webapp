@@ -108,6 +108,18 @@ export default function PriceConfirmationDialog({
     [clientSecret]
   );
 
+  // Clear transient UI state when the dialog is closed so errors don't persist
+  React.useEffect(() => {
+    if (!open) {
+      setPaymentError(null);
+      setShowStripeElements(false);
+      setCreatedPaymentIntent(null);
+      setPollPaymentIntentId(null);
+      setConfirmResponse(null);
+      setIsProcessing(false);
+    }
+  }, [open]);
+
   const handleMethodSelect = async () => {
     setPaymentError(null);
     // if (!onMethodSelect) {
