@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   useLoginMutation,
   useVerifyOtpMutation,
-  useResendOtpMutation,
+  useForgotPasswordMutation,
 } from "@/hooks/useAuthMutations";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
 
@@ -94,7 +94,7 @@ export function LoginForm() {
 
   const verifyMutation = useVerifyOtpMutation();
 
-  const resendMutation = useResendOtpMutation();
+  const resendMutation = useForgotPasswordMutation();
 
   const handleVerify = async (code: string) => {
     try {
