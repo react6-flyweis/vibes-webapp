@@ -36,6 +36,8 @@ const eventDetailsSchema = z.object({
   eventType: z.enum(["Birthday", "Wedding", "Corporate"]),
   // coerce to number so the input can be a numeric string
   guestCount: z.coerce.number().min(1, "Please enter at least 1 guest"),
+  // optional amount for pre-authorisation or estimated charge
+  amount: z.coerce.number().min(0),
 });
 
 type FormValues = z.infer<typeof eventDetailsSchema>;
@@ -64,6 +66,7 @@ export default function EventDetailsDialog({
       eventAddress: "",
       eventType: "Birthday",
       guestCount: 0,
+      amount: 0,
     },
   });
 
@@ -192,6 +195,24 @@ export default function EventDetailsDialog({
                     <FormControl>
                       <Input
                         placeholder="Enter the Number"
+                        type="number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount (INR)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter total amount"
                         type="number"
                         {...field}
                       />
