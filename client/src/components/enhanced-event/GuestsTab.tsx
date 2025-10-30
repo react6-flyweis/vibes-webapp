@@ -9,8 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { GuestManagementPanel } from "@/components/guest-management-panel";
+import { PlanEventMapData } from "@/queries/planEventMaps";
 
-export default function GuestsTab({ eventId }: { eventId: string }) {
+export default function GuestsTab({
+  eventId,
+  planMap,
+}: {
+  eventId: string;
+  planMap?: PlanEventMapData;
+}) {
   return (
     <Card>
       <CardHeader>
@@ -40,7 +47,7 @@ export default function GuestsTab({ eventId }: { eventId: string }) {
             <div className="text-sm text-gray-600">Declined</div>
           </div>
         </div> */}
-        <GuestManagementPanel eventId={eventId} />
+        <GuestManagementPanel eventId={eventId} planMap={planMap} />
       </CardContent>
     </Card>
   );
