@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useUpdatePlanEventMap } from "@/mutations/planEventMap";
 import {
   Card,
   CardContent,
@@ -11,22 +13,38 @@ import EventTypeSelector from "@/components/event-type-select";
 import { Input } from "@/components/ui/input";
 import ThemeSelector from "@/components/theme-selector";
 import DressCodeSelector from "@/components/dress-code-selector";
+import { PlanEventMapData } from "@/queries/planEventMaps";
+import { EventData } from "@/queries/events";
 
-// EventTypeSelector extracted to its own file
+export default function SettingsTab({
+  event,
+  planMap,
+}: {
+  event: EventData;
+  planMap?: PlanEventMapData;
+}) {
+  console.log("SettingsTab planMap:", planMap);
+  const { toast } = useToast();
+  const updatePlanMapMutation = useUpdatePlanEventMap({
+    onSuccess: () => {
+      toast({ title: "Settings saved", description: "Plan map updated." });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Save failed",
+        description: (err && err.message) || "Failed to update plan map.",
+        variant: "destructive",
+      });
+    },
+  });
 
-export default function SettingsTab({ event }: any) {
-  // Try to use event.event_theme_id first (API id), fallback to event.theme
   const [selectedTheme, setSelectedTheme] = useState<string | undefined>();
   const [selectedEventType, setSelectedEventType] = useState<
     string | undefined
   >();
   const [selectedDressCode, setSelectedDressCode] = useState<
     string | undefined
-  >(
-    event?.dressCodeId
-      ? String(event.dressCodeId)
-      : event?.dressCode ?? undefined
-  );
+  >();
 
   return (
     <Card>
@@ -70,7 +88,6 @@ export default function SettingsTab({ event }: any) {
             <Input
               type="url"
               placeholder="Spotify, Apple Music, or YouTube playlist URL..."
-              defaultValue={event.musicPlaylistUrl}
             />
           </div>
 
@@ -81,7 +98,26 @@ export default function SettingsTab({ event }: any) {
             <Input type="number" placeholder="Enter total budget..." />
           </div>
 
-          <Button className="w-full">Save Settings</Button>
+          <Button
+            className="w-full"
+            onClick={() => {
+              const eid =
+                planMap?.event_id ?? event?.event_id ?? event?._id ?? null;
+              if (!eid) {
+                toast({
+                  title: "Missing event id",
+                  description: "Cannot save settings: event id is missing.",
+                  variant: "destructive",
+                });
+                return;
+              }
+              const pmId = planMap?.plan_event_id ?? "";
+              updatePlanMapMutation.mutate({ id: pmId, event_id: eid });
+            }}
+            disabled={updatePlanMapMutation.isPending}
+          >
+            {updatePlanMapMutation.isPending ? "Saving..." : "Save Settings"}
+          </Button>
         </div>
       </CardContent>
     </Card>
