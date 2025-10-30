@@ -1,12 +1,13 @@
 import { Button } from "../ui/button";
-import LogoHeart from "./LogoHeart";
 import { Link } from "react-router";
 import { useAuthStore, User } from "@/store/auth-store";
 import { LogOutIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useMemo } from "react";
 
-const Topbar: React.FC = () => {
+import vibesLogo from "@/assets/icons/vibes-logo.png";
+
+export default function Topbar() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
   const logout = useAuthStore((s) => s.logout);
 
@@ -30,7 +31,7 @@ const Topbar: React.FC = () => {
   return (
     <nav className="w-full h-12 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow p-3">
       <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
-        <LogoHeart />
+        <img src={vibesLogo} alt="Vibes Logo" className="h-10 w-10" />
 
         <div className="flex gap-5 items-center">
           {!isAuthenticated ? (
@@ -60,6 +61,4 @@ const Topbar: React.FC = () => {
       </div>
     </nav>
   );
-};
-
-export default Topbar;
+}
