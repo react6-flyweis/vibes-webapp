@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { UserPlus, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { useInviteGuest } from "@/mutations/guest";
 import {
   Form,
   FormControl,
@@ -96,28 +96,9 @@ export default function GuestInviteModal({
   });
   */
 
-  // Use the master guest create API as requested by the product
-  const addGuestDirectly = useMutation({
-    mutationFn: async () => {
-      // payload per provided example; pull values from the form
-      const values = form.getValues();
-      const payload = {
-        name: values.name,
-        mobileno: values.mobileno || "",
-        email: values.email,
-        specialnote: values.specialnote || "",
-        img: values.img || "",
-        event_id: eventId,
-        status: true,
-      } as const;
-
-      return await apiRequest(`/api/master/guest/create`, "POST", payload);
-    },
+  // Use the new invite mutation which also links guest to plan map
+  const inviteGuest = useInviteGuest({
     onSuccess: () => {
-      // Invalidate participants list to reflect the new guest where applicable
-      queryClient.invalidateQueries({
-        queryKey: [`/api/events/${eventId}/participants`],
-      });
       toast({
         title: "Guest Added",
         description: `${form.getValues().name} has been added to the event.`,
@@ -137,7 +118,15 @@ export default function GuestInviteModal({
   const handleSubmit = (data: GuestFormValues) => {
     // Only direct-add is enabled currently
     if (data.name && data.email) {
-      addGuestDirectly.mutate();
+      inviteGuest.mutate({
+        name: data.name,
+        email: data.email,
+        mobileno: data.mobileno,
+        specialnote: data.specialnote,
+        img: data.img,
+        event_id: eventId,
+        status: true,
+      });
     }
   };
 
@@ -267,12 +256,12 @@ export default function GuestInviteModal({
                 // (inviteType === "email" && emails.length === 0) ||
                 (inviteType === "direct" && (!watchedName || !watchedEmail)) ||
                 // sendInvites.isPending ||
-                addGuestDirectly.isPending
+                inviteGuest.isPending
               }
               className="flex-1"
             >
               {/* {sendInvites.isPending || addGuestDirectly.isPending ? ( */}
-              {addGuestDirectly.isPending ? (
+              {inviteGuest.isPending ? (
                 "Processing..."
               ) : (
                 <>
