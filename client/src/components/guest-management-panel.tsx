@@ -25,17 +25,21 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useGuestsByEvent, Guest } from "@/queries/guests";
 import GuestInviteModal from "@/components/guest-invite-modal";
+import { PlanEventMapData } from "@/queries/planEventMaps";
 
 interface GuestManagementPanelProps {
   eventId: string;
+  planMap?: PlanEventMapData;
 }
 
-export function GuestManagementPanel({ eventId }: GuestManagementPanelProps) {
+export function GuestManagementPanel({
+  eventId,
+  planMap,
+}: GuestManagementPanelProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+
   const { data: guests = [], isLoading: participantsLoading } =
     useGuestsByEvent(eventId);
 
