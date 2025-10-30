@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -34,12 +35,32 @@ export default function EventSidebar({
   stats,
 }: EventSidebarProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isBulkInviteModalOpen, setIsBulkInviteModalOpen] = useState(false);
+  // const [isBulkInviteModalOpen, setIsBulkInviteModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const { data: participants = [] } = useQuery({
     queryKey: [`/api/events/${eventId}/participants`],
   });
+
+  const { toast } = useToast();
+
+  const handleShareClick = async () => {
+    try {
+      const url = `${window.location.origin}/events/${eventId}`;
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Link copied",
+        description: "Event link copied to clipboard",
+      });
+    } catch (err) {
+      console.error("Failed to copy link", err);
+      toast({
+        title: "Could not copy link",
+        description: "Please copy the URL manually.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const recentContributors = participants
     .filter((p: any) => p.user)
@@ -85,19 +106,23 @@ export default function EventSidebar({
         <div className="space-y-2 mt-4">
           <Button
             className="w-full bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
-            onClick={() => navigate("/interactive-live-vibes-invite")}
+            onClick={() => navigate("/evite-templates")}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             Create Interactive Invites
           </Button>
           <Button
             className="w-full bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-            onClick={() => setIsBulkInviteModalOpen(true)}
+            // onClick={() => setIsBulkInviteModalOpen(true)}
           >
             <Send className="mr-2 h-4 w-4" />
             Send Bulk Invites
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleShareClick}
+          >
             <Share className="mr-2 h-4 w-4" />
             Share Event Link
           </Button>
@@ -207,12 +232,12 @@ export default function EventSidebar({
         eventId={eventId}
       />
 
-      <BulkInviteModal
+      {/* <BulkInviteModal
         isOpen={isBulkInviteModalOpen}
         onClose={() => setIsBulkInviteModalOpen(false)}
         eventId={eventId}
         event={event}
-      />
+      /> */}
     </div>
   );
 }
