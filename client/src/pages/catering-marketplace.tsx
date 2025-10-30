@@ -122,7 +122,7 @@ export default function CateringMarketplace() {
       event_to_time: "23:00",
       event_from_time: "18:00",
       guest_count: Number(payload.guestCount) || 0,
-      amount: 0,
+      amount: Number(payload.amount) || 0,
     };
 
     try {
@@ -425,6 +425,7 @@ export default function CateringMarketplace() {
                 };
 
                 const res = await bookingMutation.mutateAsync(payload);
+                console.log(res);
                 setPendingPayment(res.data);
 
                 const returnedAmount =
