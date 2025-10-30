@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCreateStaffBookingMutation } from "@/mutations/createStaffBooking";
 import { useCreateStaffBookingPayment } from "@/mutations/useCreateStaffBookingPayment";
-import { useStaffByRoleQuery, StaffUser } from "@/queries/staffing";
+import { useAllStaffQuery, StaffUser } from "@/queries/staffing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,13 +48,13 @@ export default function EnhancedStaffingMarketplace() {
 
   const [showShiftDialog, setShowShiftDialog] = useState(false);
 
-  const { data: staffUsers, isLoading } = useStaffByRoleQuery(4);
+  const { data: staffUsers, isLoading } = useAllStaffQuery();
 
   const staffMembers: StaffMember[] =
     staffUsers?.map((u: StaffUser) => {
       const workingPrice = u.staff_details?.working_prices?.[0];
       return {
-        id: u.user_id,
+        id: String(u.user_id ?? u._id ?? ""),
         name: u.name,
         category:
           workingPrice?.category_details?.name?.toLowerCase() || "staff",
@@ -277,47 +277,56 @@ export default function EnhancedStaffingMarketplace() {
               return;
             }
 
-            try {
-              // attempt to locate booking id from server response
-              const staffBookingId =
-                created?.staff_event_book_id ?? created?._id ?? created?.id;
+            // successfull
+            toast({
+              title: "Payment Received",
+              description:
+                "Your payment was received. The server will confirm the booking shortly.",
+            });
 
-              if (!staffBookingId) {
-                toast({
-                  title: "Missing booking id",
-                  description: "Cannot finalize payment: booking id missing.",
-                  variant: "destructive",
-                });
-                return;
-              }
+            // try {
+            //   // attempt to locate booking id from server response
+            //   const staffBookingId =
+            //     created?.staff_event_book_id ?? created?._id ?? created?.id;
 
-              // finalize payment on server - pass payment identifier (depends on your API)
-              await createStaffBookingPaymentMutation.mutateAsync({
-                staff_event_book_id: Number(staffBookingId),
-                payment_intent_id: payment?.id || payment,
-                billingDetails: "Staff Booking Payment",
-                // `finalize` is a flag used to indicate completion to the backend if supported
-                finalize: true,
-              });
+            //   if (!staffBookingId) {
+            //     toast({
+            //       title: "Missing booking id",
+            //       description: "Cannot finalize payment: booking id missing.",
+            //       variant: "destructive",
+            //     });
+            //     return;
+            //   }
 
-              toast({
-                title: "Booking Confirmed!",
-                description:
-                  "Your payment was received and booking is confirmed.",
-              });
+            //   // finalize payment on server - pass payment identifier (depends on your API)
 
-              setPendingBookingPayload(null);
-              setPendingPayment(null);
-              setShowPriceDialog(false);
-            } catch (err) {
-              console.error("Failed to finalize payment:", err);
-              toast({
-                title: "Payment Failed",
-                description: "There was an error finalizing payment.",
-                variant: "destructive",
-              });
-              throw err;
-            }
+            //   // Send payment details to server. Do NOT attempt to update booking status
+            //   // from client-side — server will handle status transitions.
+            //   await createStaffBookingPaymentMutation.mutateAsync({
+            //     staff_event_book_id: Number(staffBookingId),
+            //     payment_intent_id: payment?.id || payment,
+            //     billingDetails: "Staff Booking Payment",
+            //   });
+
+            //   // Inform the user that payment was received and the server will confirm the booking.
+            //   toast({
+            //     title: "Payment Received",
+            //     description:
+            //       "Your payment was received. The server will confirm the booking shortly.",
+            //   });
+
+            //   setPendingBookingPayload(null);
+            //   setPendingPayment(null);
+            //   setShowPriceDialog(false);
+            // } catch (err) {
+            //   console.error("Failed to finalize payment:", err);
+            //   toast({
+            //     title: "Payment Failed",
+            //     description: "There was an error finalizing payment.",
+            //     variant: "destructive",
+            //   });
+            //   throw err;
+            // }
           }}
           onMethodSelect={async (method: number) => {
             // use staff booking payment endpoint
@@ -396,7 +405,7 @@ export default function EnhancedStaffingMarketplace() {
                   <h3 className="text-2xl font-bold text-white mt-4">
                     {staff.name}
                   </h3>
-                  <p className="text-white/90 mt-1">{staff.mobile || ""}</p>
+                  {/* <p className="text-white/90 mt-1">{staff.mobile || ""}</p> */}
 
                   <p className="text-white font-semibold mt-3">
                     {staff.category?.charAt(0).toUpperCase() +
