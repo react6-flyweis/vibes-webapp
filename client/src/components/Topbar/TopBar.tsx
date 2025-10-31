@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuthStore, User } from "@/store/auth-store";
 import { LogOutIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -10,6 +10,7 @@ import vibesLogo from "@/assets/icons/vibes-logo.png";
 export default function Topbar() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
   const logout = useAuthStore((s) => s.logout);
+  const navigate = useNavigate();
 
   const user = useAuthStore((s) => s.user) as User | null;
 
@@ -30,9 +31,10 @@ export default function Topbar() {
   }, [user]);
 
   const handleLogout = async () => {
-    // Ensure we wait for logout if it returns a promise, then redirect to /login
-    await Promise.resolve(logout());
-    window.location.href = "/login";
+    navigate("/login", { replace: true });
+    setTimeout(() => {
+      logout();
+    }, 0);
   };
 
   return (
