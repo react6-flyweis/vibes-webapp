@@ -42,6 +42,7 @@ export interface StaffEventBooking {
   created_at?: string;
   updated_at?: string;
   staff_event_book_id?: number;
+  staff_price?: number;
 }
 
 export type CreateStaffBookingResponse = IResponse<StaffEventBooking>;
@@ -64,11 +65,11 @@ export function useCreateStaffBookingMutation(options?: {
   return useMutation({
     mutationFn: (payload: CreateStaffBookingPayload) =>
       createStaffBooking(payload),
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/staffing/members"] });
       options?.onSuccess?.(data);
     },
-    onError: (err: any) => {
+    onError: (err) => {
       options?.onError?.(err);
     },
   });
