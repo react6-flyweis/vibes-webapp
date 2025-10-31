@@ -163,11 +163,6 @@ export const vendorNavigationItems: NavCategory[] = [
     title: "Marketplace",
     items: [
       {
-        name: "Vendor Marketplace",
-        href: "/vendor-marketplace",
-        icon: Star,
-      },
-      {
         name: "Staffings",
         href: "/staffings",
         icon: Users,
