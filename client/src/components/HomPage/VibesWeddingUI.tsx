@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Sparkles, Users, Crown, ArrowRight } from "lucide-react";
+import { Link } from "react-router";
 
 const cardData = [
   {
@@ -29,27 +30,22 @@ const cardData = [
 ];
 
 const VibesWeddingUI = () => {
-
-
-
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDarkMode ? 'light' : 'dark');
+    document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", isDarkMode ? "light" : "dark");
   };
 
   // Initialize theme from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
       setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     }
   }, []);
-
-
 
   return (
     <div className=" relative overflow-hidden ">
@@ -75,22 +71,26 @@ const VibesWeddingUI = () => {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <button
-              className="inline-flex items-center gap-2 text-gray-900 font-semibold px-6 py-3 rounded-md shadow-md transition"
-              style={{
-                background: "linear-gradient(90deg, #F59E0B 0%, #EAB308 100%)",
+            <Link to="/create-event">
+              <button
+                className="inline-flex items-center gap-2 text-gray-900 font-semibold px-6 py-3 rounded-md shadow-md transition"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #F59E0B 0%, #EAB308 100%)",
+                }}
+              >
+                <Sparkles className="w-5 h-5" />
+                Plan Your Wedding Celebration
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </Link>
 
-
-              }}>
-              <Sparkles className="w-5 h-5" />
-              Plan Your Wedding Celebration
-              <ArrowRight className="w-5 h-5" />
-            </button>
-
-            <button className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-md shadow-md transition">
-              <Crown className="w-5 h-5" />
-              Elegant Packages
-            </button>
+            <Link to="/vibes-businesses">
+              <button className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-md shadow-md transition">
+                <Crown className="w-5 h-5" />
+                Elegant Packages
+              </button>
+            </Link>
           </div>
         </div>
 
