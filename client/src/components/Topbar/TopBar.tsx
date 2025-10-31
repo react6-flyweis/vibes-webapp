@@ -16,9 +16,16 @@ export default function Topbar() {
   const initials = useMemo(() => {
     const name = user?.name || "";
     const parts = name.split(" ").filter(Boolean);
+
+    // Handle empty name
+    if (parts.length === 0) return "U";
+
+    // Single word name
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
+    // Multiple words - first and last initial
     return (
-      (parts[0][0] || "") + (parts[parts.length - 1][0] || "")
+      (parts[0]?.[0] || "") + (parts[parts.length - 1]?.[0] || "")
     ).toUpperCase();
   }, [user]);
 
