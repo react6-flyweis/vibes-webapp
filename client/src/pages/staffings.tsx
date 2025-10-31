@@ -1,5 +1,5 @@
 import React from "react";
-import { useStaffByVendorQuery, StaffUser } from "@/queries/staffing";
+import { useAllStaffQuery, StaffUser } from "@/queries/staffing";
 import {
   Table,
   TableHeader,
@@ -11,7 +11,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { AddStaffDialog } from "@/components/AddStaffDialog";
 
-function StaffTable({ staff }: { staff: StaffUser[] }) {
+function StaffTable({
+  staff,
+  isLoading,
+}: {
+  staff: StaffUser[];
+  isLoading?: boolean;
+}) {
   return (
     <Table>
       <TableHeader>
@@ -24,7 +30,28 @@ function StaffTable({ staff }: { staff: StaffUser[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {!staff || staff.length === 0 ? (
+        {isLoading ? (
+          // Render 5 skeleton rows while loading
+          Array.from({ length: 5 }).map((_, i) => (
+            <TableRow key={`skeleton-${i}`}>
+              <TableCell>
+                <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
+              </TableCell>
+            </TableRow>
+          ))
+        ) : !staff || staff.length === 0 ? (
           <TableRow>
             <TableCell colSpan={5}>No staff found.</TableCell>
           </TableRow>
@@ -47,12 +74,7 @@ function StaffTable({ staff }: { staff: StaffUser[] }) {
 }
 
 export default function StaffingsPage() {
-  const {
-    data: staff = [],
-    isLoading,
-    isError,
-    error,
-  } = useStaffByVendorQuery(null);
+  const { data: staff = [], isLoading, isError, error } = useAllStaffQuery();
 
   return (
     <div className="bg-gray-50 py-5">
@@ -66,9 +88,6 @@ export default function StaffingsPage() {
 
         {/* Vendor selection removed from UI; table header is shown even when empty */}
 
-        {isLoading && <div>Loading...</div>}
-        {isError && <div>Error: {error?.message ?? "Unknown error"}</div>}
-
         <div className="mb-4 flex justify-end">
           {/* Use AddStaffDialog which provides the trigger and the form dialog */}
           <AddStaffDialog />
@@ -76,7 +95,7 @@ export default function StaffingsPage() {
 
         <Card>
           <CardContent>
-            <StaffTable staff={staff} />
+            <StaffTable staff={staff} isLoading={isLoading} />
           </CardContent>
         </Card>
       </div>
