@@ -20,10 +20,12 @@ const DreamWeddingCard: React.FC = () => {
         {/* Buttons Group */}
         <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
           {/* Button 1 */}
-          <button className="flex items-center justify-center gap-2 bg-white text-amber-700 font-medium px-4 sm:px-6 py-2 rounded-md shadow-lg hover:scale-105 transition text-sm sm:text-base">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-700" />
-            Start Your Wedding Journey
-          </button>
+          <Link to="/create-event">
+            <button className="flex items-center justify-center gap-2 bg-white text-amber-700 font-medium px-4 sm:px-6 py-2 rounded-md shadow-lg hover:scale-105 transition text-sm sm:text-base">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-700" />
+              Start Your Wedding Journey
+            </button>
+          </Link>
 
           {/* Button 2 */}
           <button className="flex items-center justify-center gap-2 border border-white/50 bg-white/20 text-white px-4 sm:px-6 py-2 rounded-md backdrop-blur-xs hover:bg-white/30 transition text-sm sm:text-base">
