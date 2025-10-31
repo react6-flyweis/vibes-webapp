@@ -383,6 +383,14 @@ function DashboardRouter() {
           path="/collaborative-design-sharing"
           element={<CollaborativeDesignSharing />}
         />
+        <Route
+          path="/collaborative-design-sharing/:id"
+          element={<CollaborativeDesignSharing />}
+        />
+        <Route
+          path="/collaborative-design-sharing/:designId"
+          element={<CollaborativeDesignSharing />}
+        />
         <Route path="/immersive-party-cam" element={<ImmersivePartyCam />} />
         <Route path="/in-event-commerce" element={<InEventCommerce />} />
         <Route path="/cultural-dna-layer" element={<CulturalDNALayer />} />
