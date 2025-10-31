@@ -58,7 +58,7 @@ const cardsData = [
       },
     ],
     buttonText: "Start Vendor Registration",
-    buttonLink: "/vendor-onboarding", // 🔗 added route
+    buttonLink: "/vendor-onboarding-portal", // 🔗 added route
     gradientClasses: "bg-linear-to-br from-purple-50 to-pink-50",
     borderClass: "border-purple-200",
     buttonClasses: "bg-purple-600",
