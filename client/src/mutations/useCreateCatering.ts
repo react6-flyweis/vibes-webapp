@@ -32,7 +32,7 @@ export function useCreateCatering() {
         queryKey: ["/api/master/catering-marketplace/getAll"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["/api/master/catering-marketplace/by-auth"],
+        queryKey: ["/api/master/catering-marketplace/getByAuth"],
       });
     },
   });
