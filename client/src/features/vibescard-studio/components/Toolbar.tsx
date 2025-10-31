@@ -28,6 +28,10 @@ interface ToolbarProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  // optional design id to enable sharing
+  designId?: number | string | null;
+  // optional callback when share happens (e.g., to show toast)
+  onShare?: (sharedUrl: string) => void;
 }
 
 export function Toolbar({
@@ -46,7 +50,33 @@ export function Toolbar({
   onRedo,
   canUndo = false,
   canRedo = false,
+  designId = null,
+  onShare,
 }: ToolbarProps) {
+  const handleShare = async () => {
+    if (!designId) return;
+    const url = `/collaborative-design-sharing/${designId}`;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // fallback
+        const el = document.createElement("textarea");
+        el.value = url;
+        el.setAttribute("readonly", "");
+        el.style.position = "absolute";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+      }
+      onShare && onShare(url);
+    } catch (e) {
+      // ignore copy errors
+      console.error("Failed to copy share url", e);
+    }
+  };
   return (
     <div className="bg-[#1F2937] border-gray-300 border-b text-white dark:bg-gray-800 dark:border-gray-700 p-4">
       <div className="flex items-center justify-between">
@@ -107,10 +137,17 @@ export function Toolbar({
             Export
           </Button>
 
-          <Button variant="outline" size="sm" className="text-black">
-            <Share2 className="w-4 h-4 mr-2" />
-            Share
-          </Button>
+          {designId && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-black"
+              onClick={handleShare}
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Share
+            </Button>
+          )}
         </div>
       </div>
     </div>
