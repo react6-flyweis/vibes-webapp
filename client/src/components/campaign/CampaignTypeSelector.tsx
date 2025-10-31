@@ -19,13 +19,14 @@ export function CampaignTypeSelector({ value, onChange }: Props) {
         <div className="grid grid-cols-1 gap-3 mt-2">
           {(types || []).map((t: any) => {
             const id = t.compaign_type_id ?? t._id;
+            const idStr = id !== undefined && id !== null ? String(id) : "";
             const selected =
-              String(value) === String(id) || String(value) === String(t.name);
+              String(value) === idStr || String(value) === String(t.name);
             return (
               <button
                 key={t._id}
                 type="button"
-                onClick={() => onChange(id)}
+                onClick={() => onChange(idStr)}
                 className={`w-full text-left p-4 border  ${
                   selected ? "border-blue-500 bg-blue-50" : "border-gray-200"
                 }`}
