@@ -641,6 +641,13 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
           onRedo={redo}
           canUndo={canUndo}
           canRedo={canRedo}
+          designId={initialDesign?.community_designs_id ?? null}
+          onShare={(sharedUrl: string) =>
+            toast({
+              title: "Link Copied",
+              description: `Share link copied to clipboard: ${sharedUrl}`,
+            })
+          }
         />
 
         {/* Canvas */}
