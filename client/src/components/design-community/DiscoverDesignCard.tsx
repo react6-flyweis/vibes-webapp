@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   useCommunityDesignLikeMutation,
   useCommunityDesignDownloadMutation,
+  useCommunityDesignShareMutation,
   DownloadPayload,
 } from "@/mutations/interactions";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -104,25 +105,37 @@ export function DiscoverDesignCard({ design }: Props) {
     },
   });
 
-  const shareMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const res = await apiRequest(`/api/designs/${designId}/share`, "POST");
-      return res;
-    },
-    onSuccess: (data: any) => {
-      try {
-        void navigator.clipboard.writeText(
-          data?.shareUrl ?? window.location.href
-        );
-      } catch (e) {
-        // ignore
-      }
+  const shareMutation = useCommunityDesignShareMutation();
+
+  // Local share handler: copies a predictable client URL to clipboard and shows a toast.
+  const handleShare = async (designId: string) => {
+    const sharePath = `/collaborative-design-sharing/${designId}`;
+    const shareUrl = `${window.location.origin}${sharePath}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
       toast({
-        title: "Share Link Created",
-        description: "Design link copied to clipboard",
+        title: "Share Link Copied",
+        description: shareUrl,
       });
-    },
-  });
+    } catch (err) {
+      console.error("Clipboard write failed:", err);
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy link to clipboard",
+        variant: "destructive",
+      });
+    }
+
+    // Fire-and-forget server record (optional analytics)
+    try {
+      void shareMutation.mutate({
+        community_designs_id: designId,
+        status: true,
+      });
+    } catch (e) {
+      // ignore
+    }
+  };
 
   const handleDownload = async () => {
     const filename = `${slugify(design.title || "design")}.png`;
@@ -309,7 +322,7 @@ export function DiscoverDesignCard({ design }: Props) {
                   <Copy className="w-4 h-4 mr-2" /> Create Remix
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => shareMutation.mutate(design.id.toString())}
+                  onClick={() => handleShare(design.id.toString())}
                 >
                   <Share2 className="w-4 h-4 mr-2" /> Share Design
                 </DropdownMenuItem>
@@ -429,7 +442,7 @@ export function DiscoverDesignCard({ design }: Props) {
             onLike={() => handleLikeAction(design.id.toString())}
             onDownload={() => handleDownload()}
             onOpenRemix={() => setShowRemix(true)}
-            onShare={() => shareMutation.mutate(design.id.toString())}
+            onShare={() => handleShare(design.id.toString())}
           />
         </DialogContent>
       </Dialog>
