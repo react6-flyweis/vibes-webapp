@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import EventDetails from "./invite-steps/EventDetails";
 import TemplateSelection from "./invite-steps/TemplateSelection";
@@ -23,6 +21,7 @@ import image4 from "../../assests/templateImage/4.jpg";
 import image5 from "../../assests/templateImage/5.jpg";
 import GuestManagement from "@/components/invitation/GuestManagement";
 import PreviewInvitation from "@/components/invitation/PreviewInvitation";
+import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 
 // types moved to `@/types/invitation`
 
@@ -50,68 +49,14 @@ export default function CompleteInviteWorkflow() {
     sustainabilityBadges: false,
   });
 
-  // Guest management state
-  const [bulkGuestInput, setBulkGuestInput] = useState("");
-  const [singleGuest, setSingleGuest] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    tier: "general" as const,
-  });
-
   // Preview and sending state
   const [previewMode, setPreviewMode] = useState<
     "desktop" | "mobile" | "ar" | "nft"
   >("desktop");
-  const [sendingMethod, setSendingMethod] = useState<
-    "email" | "sms" | "social" | "qr" | "nfc"
-  >("email");
-  const [scheduledSend, setScheduledSend] = useState("");
-  const [personalizedMessages, setPersonalizedMessages] = useState<
-    Record<string, string>
-  >({});
 
-  const generateInvitationMutation = useMutation({
-    mutationFn: async (data: {
-      eventId: string;
-      templateId: string;
-      customizations: any;
-      guests: Guest[];
-    }) => {
-      const response = await apiRequest(
-        "POST",
-        "/api/invitations/generate",
-        data
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Invitations Generated",
-        description: "Your personalized invitations are ready to send",
-      });
-      setCurrentStep("send");
-    },
-  });
-
-  const sendInvitationsMutation = useMutation({
-    mutationFn: async (data: {
-      invitationId: string;
-      method: string;
-      recipients: Guest[];
-      scheduledTime?: string;
-      personalizations?: Record<string, string>;
-    }) => {
-      const response = await apiRequest("POST", "/api/invitations/send", data);
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Invitations Sent",
-        description: `Successfully sent ${data.sentCount} invitations`,
-      });
-    },
-  });
+  // Price confirmation dialog state
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+  const [priceEstimate, setPriceEstimate] = useState<number>(0);
 
   const sampleTemplates: InvitationTemplate[] = [
     {
@@ -188,92 +133,6 @@ export default function CompleteInviteWorkflow() {
     },
   ];
 
-  const handleCreateEvent = () => {
-    // Deprecated - event creation now handled inside EventDetails
-  };
-
-  const handleAddGuest = () => {
-    if (!singleGuest.name || !singleGuest.email) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide name and email",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newGuest: Guest = {
-      id: `guest-${Date.now()}`,
-      ...singleGuest,
-      rsvpStatus: "pending",
-      accessLevel: "full",
-    };
-
-    setGuestList((prev) => [...prev, newGuest]);
-    setSingleGuest({ name: "", email: "", phone: "", tier: "general" });
-
-    toast({
-      title: "Guest Added",
-      description: `${newGuest.name} has been added to the guest list`,
-    });
-  };
-
-  const handleBulkImport = () => {
-    if (!bulkGuestInput.trim()) return;
-
-    const lines = bulkGuestInput.split("\n").filter((line) => line.trim());
-    const newGuests: Guest[] = lines.map((line, index) => {
-      const [name, email, phone] = line.split(",").map((s) => s.trim());
-      return {
-        id: `guest-bulk-${Date.now()}-${index}`,
-        name: name || `Guest ${index + 1}`,
-        email: email || `guest${index + 1}@example.com`,
-        phone: phone || "",
-        tier: "general" as const,
-        rsvpStatus: "pending" as const,
-        accessLevel: "full" as const,
-      };
-    });
-
-    setGuestList((prev) => [...prev, ...newGuests]);
-    setBulkGuestInput("");
-
-    toast({
-      title: "Guests Imported",
-      description: `Added ${newGuests.length} guests to the list`,
-    });
-  };
-
-  const handleGenerateInvitations = () => {
-    if (!selectedEvent || !selectedTemplate || guestList.length === 0) {
-      toast({
-        title: "Missing Information",
-        description: "Please complete all steps before generating invitations",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    generateInvitationMutation.mutate({
-      eventId: selectedEvent.id,
-      templateId: selectedTemplate.id,
-      customizations,
-      guests: guestList,
-    });
-  };
-
-  const handleSendInvitations = () => {
-    if (!selectedEvent || guestList.length === 0) return;
-
-    sendInvitationsMutation.mutate({
-      invitationId: `invitation-${selectedEvent.id}`,
-      method: sendingMethod,
-      recipients: guestList,
-      scheduledTime: scheduledSend || undefined,
-      personalizations: personalizedMessages,
-    });
-  };
-
   const stepProgress = {
     event: 0,
     template: 20,
@@ -282,6 +141,40 @@ export default function CompleteInviteWorkflow() {
     preview: 80,
     send: 100,
   };
+
+  // Open the price dialog automatically when entering the send step
+  useEffect(() => {
+    if (currentStep === "send") {
+      setPriceEstimate(99.99);
+      setPriceDialogOpen(true);
+    } else {
+      setPriceDialogOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, selectedTemplate, guestList]);
+
+  const handleMethodSelect = async (method: number) => {
+    // throw error
+    throw new Error("Payment method selection not implemented yet.");
+  };
+
+  const handleConfirm = (payment: any) => {
+    setPriceDialogOpen(false);
+    toast({
+      title: "Payment confirmed",
+      description: "Payment was processed (stub).",
+    });
+  };
+
+  // Build preview data from selections for the Preview step
+  const previewData: InvitationPreview | null =
+    selectedEvent && selectedTemplate
+      ? {
+          template: selectedTemplate,
+          event: selectedEvent,
+          customizations,
+        }
+      : null;
 
   return (
     <div className="min-h-screen bg-[#111827] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -408,11 +301,33 @@ export default function CompleteInviteWorkflow() {
             />
           )}
 
-          {currentStep === "guests" && <GuestManagement />}
+          {currentStep === "guests" && (
+            <GuestManagement
+              eventId={selectedEvent?.id || ""}
+              onGuestsChange={(g) => {
+                // g is mapped to the frontend Guest shape in GuestManagement
+                setGuestList(g as Guest[]);
+              }}
+            />
+          )}
           {currentStep === "preview" && (
-            <PreviewInvitation setCurrentStep={setCurrentStep} />
+            <PreviewInvitation
+              setCurrentStep={setCurrentStep}
+              previewData={previewData}
+              guests={guestList}
+            />
           )}
           {currentStep === "send" && <SendStep />}
+
+          {/* Price confirmation dialog — opens when user reaches `send` step */}
+          <PriceConfirmationDialog
+            open={priceDialogOpen}
+            onOpenChange={(open) => setPriceDialogOpen(open)}
+            priceEstimate={priceEstimate}
+            onConfirm={handleConfirm}
+            onPrevious={() => setCurrentStep("preview")}
+            onMethodSelect={handleMethodSelect}
+          />
 
           {/* Navigation Buttons */}
           {currentStep !== "event" && currentStep !== "template" && (
