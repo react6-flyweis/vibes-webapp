@@ -244,8 +244,13 @@ export default function EnhancedStaffingMarketplace() {
                   });
 
                   // server response may nest data; normalize accordingly
-                  const orderResponse = res?.data ?? res;
+                  const orderResponse = res?.data;
                   setPendingPayment({ orderResponse });
+                  console.log(
+                    "Created staff booking:",
+                    orderResponse.staff_price
+                  );
+                  setPriceEstimate(orderResponse.staff_price || 0);
                   setShowShiftDialog(false);
                   setShowPriceDialog(true);
                 } catch (err) {
