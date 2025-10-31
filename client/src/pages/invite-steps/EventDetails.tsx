@@ -70,7 +70,7 @@ const EventDetails: React.FC<Props> = ({ setCurrentStep, onConfirm }) => {
     if (!eventsData || !Array.isArray(eventsData)) return null;
     try {
       return eventsData.map((e: any) => ({
-        id: e._id || e.event_id || `event-${Date.now()}`,
+        id: e.event_id || `event-${Date.now()}`,
         title: e.name_title || e.title || "Untitled Event",
         description: e.description || "",
         date: e.date || (e.created_at ? e.created_at.split("T")[0] : ""),
@@ -78,8 +78,13 @@ const EventDetails: React.FC<Props> = ({ setCurrentStep, onConfirm }) => {
         venue: e.venue_name || e.venue || "",
         address: e.street_address || "",
         hostName: e.created_by ? String(e.created_by) : "",
-        hostAvatar: e.event_image || "",
-        coverImage: e.event_image || "",
+        // fallback to Unsplash images when event_image is missing
+        hostAvatar:
+          e.event_image ||
+          "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150&q=80&auto=format&fit=crop&crop=faces",
+        coverImage:
+          e.event_image ||
+          "https://images.unsplash.com/photo-1503264116251-35a269479413?w=1200&q=80&auto=format&fit=crop",
         category:
           e.event_type_id && String(e.event_type_id).includes("1")
             ? "party"
@@ -112,7 +117,7 @@ const EventDetails: React.FC<Props> = ({ setCurrentStep, onConfirm }) => {
         return response;
       }
     },
-    onSuccess: (data: InvitationEvent) => {
+    onSuccess: (data) => {
       setSelectedEvent(data);
       setCurrentStep("template");
       toast({
