@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useParams, useNavigate } from "react-router";
 import {
   Heart,
   Share2,
@@ -15,6 +16,18 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import {
+  useCommunityDesignLikeMutation,
+  useCommunityDesignDownloadMutation,
+  DownloadPayload,
+} from "@/mutations/interactions";
+import RemixDialog from "@/components/design-community/RemixDialog";
+import { useCommunityDesignByIdQuery } from "@/queries/communityDesigns";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
+import type { SharedDesign } from "@/types/designs";
 import type { CollaborationInvite } from "@/types/designs";
 
 // Tabs (extracted)
@@ -25,9 +38,248 @@ import BookmarksTab from "@/components/design-community/BookmarksTab";
 
 export default function CollaborativeDesignSharing() {
   const [selectedTab, setSelectedTab] = useState("discover");
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   // Dialogs are now managed inside individual cards/tabs
 
   const { toast } = useToast();
+
+  // If an id is present in the URL, fetch that community design and open details dialog
+  const {
+    data: designResp,
+    isLoading: isDesignLoading,
+    isError: isDesignError,
+    error: designError,
+  } = useCommunityDesignByIdQuery(id);
+
+  // The query returns the raw API shape; try to map to SharedDesign if present
+  const selectedDesign: SharedDesign | null = useMemo(() => {
+    if (!designResp || !designResp.community_designs_id) return null;
+    // Reuse mapping logic lightly here to match DiscoverDesignCard/DesignDetailsDialog expectations
+    return {
+      id: designResp.community_designs_id,
+      title: designResp.title ?? "",
+      description: designResp.sub_title ?? "",
+      creator: {
+        id:
+          typeof designResp.created_by === "number"
+            ? String(designResp.created_by)
+            : (designResp.created_by as any)?.user_id ??
+              (designResp.created_by as any)?._id ??
+              "0",
+        name:
+          typeof designResp.created_by === "number"
+            ? "Unknown"
+            : (designResp.created_by as any)?.name ?? "Unknown",
+        avatar:
+          typeof designResp.created_by === "number"
+            ? ""
+            : (designResp.created_by as any)?.avatar ?? "",
+        verified: false,
+        followers: 0,
+      },
+      category: "invitation",
+      tags: designResp.hash_tag ?? [],
+      thumbnail: designResp.image ?? "",
+      previewImages: designResp.image ? [designResp.image] : [],
+      createdAt: designResp.created_at ?? new Date().toISOString(),
+      updatedAt: designResp.updated_at ?? new Date().toISOString(),
+      stats: {
+        views: designResp.views ?? 0,
+        likes: designResp.likes ?? 0,
+        downloads: designResp.downloads ?? 0,
+        remixes: designResp.remixes ?? 0,
+        shares: designResp.share ?? 0,
+      },
+      isLiked: false,
+      isBookmarked: false,
+      visibility: designResp.status ? "public" : "unlisted",
+      license: (designResp.image_sell_type as any) ?? "free",
+      difficulty: ((designResp.image_type || "beginner") as any) ?? "beginner",
+      timeToComplete: 0,
+      tools: [],
+      colors: [],
+      isRemix: false,
+      collaboration: {
+        isCollaborative: false,
+        collaborators: [],
+      },
+    } as SharedDesign;
+  }, [designResp]);
+
+  const [showDetailsOpen, setShowDetailsOpen] = useState<boolean>(Boolean(id));
+
+  // Keep dialog open state in sync with route id
+  React.useEffect(() => {
+    setShowDetailsOpen(Boolean(id));
+  }, [id]);
+
+  const handleCloseDetails = () => {
+    setShowDetailsOpen(false);
+    // navigate back to the base path without id
+    navigate("/collaborative-design-sharing");
+  };
+
+  // Interaction mutations and handlers (reused from DiscoverDesignCard)
+  const likeMutation = useCommunityDesignLikeMutation();
+  const downloadMutation = useCommunityDesignDownloadMutation();
+
+  const [showRemix, setShowRemix] = useState(false);
+
+  const remixMutation = useMutation({
+    mutationFn: async (data: {
+      designId: string;
+      title: string;
+      description: string;
+      remixType: string;
+    }) => {
+      const res = await apiRequest(
+        "POST",
+        `/api/designs/${data.designId}/remix`,
+        data
+      );
+      return res;
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Remix Created Successfully",
+        description: `Your remix "${data.title}" is available in your designs`,
+      });
+      setShowRemix(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
+      if (data?.id) {
+        window.open(`/design-editor/${data.id}`, "_blank");
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Remix Creation Failed",
+        description: "Unable to create remix. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLikeAction = async (designId: string) => {
+    try {
+      const payload = {
+        community_designs_id: designId,
+        status: true,
+      };
+      await likeMutation.mutateAsync(payload);
+      toast({ title: "Design Liked", description: "Added to your favorites" });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/master/community-designs/getAll"],
+      });
+    } catch (err: any) {
+      toast({
+        title: "Like Failed",
+        description: err?.message || "Unable to like design",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const slugify = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "design";
+
+  const downloadBlobUrl = (blobUrl: string, filename: string) => {
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  const handleDownload = async (design: SharedDesign) => {
+    const filename = `${slugify(design.title || "design")}.png`;
+
+    const src = design.previewImages?.[0] || design.thumbnail;
+    if (!src) {
+      toast({
+        title: "Download Failed",
+        description: "No image available to download",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (typeof src === "string" && src.startsWith("data:")) {
+        downloadBlobUrl(src, filename);
+        void downloadMutation
+          .mutateAsync({
+            community_designs_id: design.id,
+            status: true,
+          } as DownloadPayload)
+          .catch(() => {});
+        return;
+      }
+
+      const resp = await fetch(src, { mode: "cors" });
+      if (!resp.ok) throw new Error(`Failed to fetch image (${resp.status})`);
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      try {
+        downloadBlobUrl(url, filename);
+        void downloadMutation
+          .mutateAsync({
+            community_designs_id: design.id,
+            status: true,
+          } as DownloadPayload)
+          .catch(() => {});
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }
+    } catch (err) {
+      console.error("Download error:", err);
+      toast({
+        title: "Download Failed",
+        description: (err as any)?.message || "Unable to download image",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const bookmarkMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/bookmark`, "POST");
+      return res;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Design Bookmarked",
+        description: "Saved for later reference",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/master/community-designs/getAll"],
+      });
+    },
+  });
+
+  const shareMutation = useMutation({
+    mutationFn: async (designId: string) => {
+      const res = await apiRequest(`/api/designs/${designId}/share`, "POST");
+      return res;
+    },
+    onSuccess: (data: any) => {
+      try {
+        void navigator.clipboard.writeText(
+          data?.shareUrl ?? window.location.href
+        );
+      } catch (e) {
+        // ignore
+      }
+      toast({
+        title: "Share Link Created",
+        description: "Design link copied to clipboard",
+      });
+    },
+  });
 
   // const { data: sharedDesigns } = useQuery({
   //   queryKey: ["/api/designs/shared", selectedCategory, sortBy, searchQuery],
@@ -598,6 +850,50 @@ export default function CollaborativeDesignSharing() {
             <BookmarksTab />
           </TabsContent>
         </Tabs>
+
+        {/* Open details dialog when route contains an id */}
+        <Dialog
+          open={showDetailsOpen}
+          onOpenChange={(open) => !open && handleCloseDetails()}
+        >
+          <DialogContent className="bg-black/90 border-purple-500/20 text-white max-w-4xl">
+            {isDesignLoading ? (
+              <div className="p-6">Loading...</div>
+            ) : isDesignError || !selectedDesign ? (
+              <div className="p-6">
+                Error loading design:{" "}
+                {(designError as any)?.message ?? "Not found"}
+              </div>
+            ) : (
+              <>
+                <DesignDetailsDialog
+                  design={selectedDesign}
+                  onLike={() => handleLikeAction(String(selectedDesign.id))}
+                  onDownload={() => handleDownload(selectedDesign)}
+                  onOpenRemix={() => setShowRemix(true)}
+                  onShare={() =>
+                    shareMutation.mutate(String(selectedDesign.id))
+                  }
+                />
+
+                {/* Remix dialog (opened from details) */}
+                <Dialog open={showRemix} onOpenChange={setShowRemix}>
+                  <DialogContent className="bg-black/90 border-purple-500/20 text-white max-w-lg">
+                    <RemixDialog
+                      onCreate={(payload) =>
+                        remixMutation.mutate({
+                          designId: String(selectedDesign.id),
+                          ...payload,
+                        })
+                      }
+                      onCancel={() => setShowRemix(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Design Details Modal */}
         {/* Design Details Modal is now handled within individual cards/tabs */}
