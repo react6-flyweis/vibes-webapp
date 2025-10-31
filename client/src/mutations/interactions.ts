@@ -53,3 +53,27 @@ export function useCommunityDesignDownloadMutation() {
     },
   });
 }
+
+export type SharePayload = {
+  community_designs_id: number | string;
+  status: boolean;
+};
+
+export async function createCommunityDesignShare(payload: SharePayload) {
+  return axiosInstance.post(
+    "/api/master/community-designs-share/create",
+    payload
+  );
+}
+
+export function useCommunityDesignShareMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createCommunityDesignShare,
+    onSuccess: () => {
+      qc.invalidateQueries({
+        queryKey: ["/api/master/community-designs/getAll"],
+      });
+    },
+  });
+}
