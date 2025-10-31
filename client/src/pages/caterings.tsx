@@ -14,7 +14,15 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import AddCateringDialog from "@/components/AddCateringDialog";
 
-function CateringsTable({ caterings }: { caterings: CateringMarketplace[] }) {
+function CateringsTable({
+  caterings,
+  isLoading,
+}: {
+  caterings: CateringMarketplace[];
+  isLoading?: boolean;
+}) {
+  const skeletonCount = 5;
+
   return (
     <Table>
       <TableHeader>
@@ -27,7 +35,28 @@ function CateringsTable({ caterings }: { caterings: CateringMarketplace[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {!caterings || caterings.length === 0 ? (
+        {isLoading ? (
+          // render skeleton rows while loading
+          Array.from({ length: skeletonCount }).map((_, idx) => (
+            <TableRow key={`skeleton-${idx}`}>
+              <TableCell>
+                <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-40 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-28 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-56 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-32 animate-pulse" />
+              </TableCell>
+              <TableCell>
+                <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-20 animate-pulse" />
+              </TableCell>
+            </TableRow>
+          ))
+        ) : !caterings || caterings.length === 0 ? (
           <TableRow>
             <TableCell colSpan={5}>No caterings found.</TableCell>
           </TableRow>
@@ -48,14 +77,8 @@ function CateringsTable({ caterings }: { caterings: CateringMarketplace[] }) {
 }
 
 export default function CateringsPage() {
-  const {
-    data: caterings = [],
-    isLoading,
-    isError,
-    error,
-  } = useCateringMarketplacesByAuthQuery();
-
-  // AddCateringDialog handles create mutation and toast
+  const { data: caterings = [], isLoading } =
+    useCateringMarketplacesByAuthQuery();
 
   return (
     <div className="bg-gray-50 py-5">
@@ -67,16 +90,13 @@ export default function CateringsPage() {
           <p className="text-muted-foreground">Manage catering listings.</p>
         </div>
 
-        {isLoading && <div>Loading...</div>}
-        {isError && <div>Error: {error?.message ?? "Unknown error"}</div>}
-
         <div className="mb-4 flex justify-end">
           <AddCateringDialog />
         </div>
 
         <Card>
           <CardContent>
-            <CateringsTable caterings={caterings} />
+            <CateringsTable caterings={caterings} isLoading={isLoading} />
           </CardContent>
         </Card>
       </div>
