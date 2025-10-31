@@ -252,12 +252,12 @@ export default function InteractiveDesignGenerator() {
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="generator">Design Generator</TabsTrigger>
             <TabsTrigger value="moods">Mood Palettes</TabsTrigger>
-            <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
+            {/* <TabsTrigger value="collaboration">Collaboration</TabsTrigger> */}
             <TabsTrigger value="stories">Story Generator</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="group-integration">
+            {/* <TabsTrigger value="group-integration">
               Group Integration
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           {/* Design Generator Tab - Keep canvas always mounted */}
