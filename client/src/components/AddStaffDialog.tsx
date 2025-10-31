@@ -27,6 +27,7 @@ import { useCreateStaff } from "@/hooks/useCreateStaff";
 import { LoadingButton } from "./ui/loading-button";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
 import { toast } from "@/hooks/use-toast";
+import { PlusIcon } from "lucide-react";
 
 const addStaffSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -105,7 +106,10 @@ export function AddStaffDialog({ trigger }: Props) {
         <DialogTrigger asChild>{trigger}</DialogTrigger>
       ) : (
         <DialogTrigger asChild>
-          <Button variant="default">Add Staff</Button>
+          <Button variant="default" className="bg-gradient-cta">
+            <PlusIcon />
+            Add Staff
+          </Button>
         </DialogTrigger>
       )}
 
@@ -196,12 +200,13 @@ export function AddStaffDialog({ trigger }: Props) {
             <div className="flex justify-end space-x-2 pt-2">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
               <LoadingButton
+                className="bg-gradient-cta"
                 isLoading={form.formState.isSubmitting}
                 type="submit"
               >
