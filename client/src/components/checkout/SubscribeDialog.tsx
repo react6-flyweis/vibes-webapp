@@ -8,38 +8,37 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import PaymentSuccessDialog from "./PaymentSuccessDialog";
+import {
+  useCreateSubscription,
+  CreateSubscriptionPayload,
+} from "@/hooks/useCreateSubscription";
+import { IVibeBusinessPlan } from "@/hooks/useVibeBusinessSubscriptions";
 
 interface SubscribeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  plan?: {
-    _id?: string;
-    plan_name?: string;
-    price?: number | string;
-    planDuration?: string;
-    description?: string;
-  } | null;
+  plan?: IVibeBusinessPlan;
 }
 
 export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
   open,
   onOpenChange,
-  plan = null,
+  plan,
 }) => {
   const [cards, setCards] = useState([
     {
       id: 1,
-      bank: "Ziraat Bankası",
-      last4: "1234",
-      owner: "Hızır Kocaman",
-      exp: "12/34",
+      bank: "Garanti BBVA",
+      last4: "9876",
+      owner: "Hakan Yılmaz",
+      exp: "09/28",
     },
     {
       id: 2,
-      bank: "T. İş Bankası",
-      last4: "1234",
-      owner: "Jane Cooper",
-      exp: "12/34",
+      bank: "Akbank",
+      last4: "4321",
+      owner: "Elif Demir",
+      exp: "11/29",
     },
   ] as Array<any>);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -75,18 +74,59 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
     ref: "",
     time: "",
   });
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(
+    cards.length ? cards[0].id : null
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  const createSubscriptionMutation = useCreateSubscription({
+    onSuccess(data) {
+      // populate success dialog with returned transaction data
+      const amt = formatPrice(plan?.price) || "$0.00";
+      const ref = String(data.data?.transaction_id ?? data.data?._id ?? "");
+      const time = data.data?.createdAt ?? new Date().toISOString();
+      setSuccessData({ amount: amt, ref, time });
+      // close the subscribe dialog and show success
+      onOpenChange(false);
+      setShowSuccess(true);
+    },
+    onError(err) {
+      // keep the dialog open so the user can retry and show inline error
+      setError(
+        String((err as Error).message || "Failed to create subscription")
+      );
+    },
+  });
 
   const handlePayNow = () => {
-    // simulate payment processing and produce ref/time
-    const ref = Math.floor(Math.random() * 1e12)
-      .toString()
-      .padStart(12, "0");
-    const now = new Date();
-    const time = now.toLocaleString();
-    const priceString = formatPrice(plan?.price);
-    setSuccessData({ amount: priceString || "$0.00", ref, time });
-    onOpenChange(false); // close checkout
-    setTimeout(() => setShowSuccess(true), 300); // open success after a short delay
+    // If a subscription creation is already in progress, ignore
+    if (createSubscriptionMutation.isPending) return;
+
+    // clear previous error
+    setError(null);
+
+    // build payload for API
+    const payload: CreateSubscriptionPayload = {
+      user_id: 1, // TODO: replace with real user id from auth store
+      plan_id: Number(plan?.plan_id),
+      payment_method_id: selectedCardId ?? 1,
+      start_plan_date: new Date().toISOString(),
+      end_plan_date: new Date(
+        new Date().setFullYear(new Date().getFullYear() + 1)
+      ).toISOString(),
+      status: true,
+    };
+
+    createSubscriptionMutation.mutate(payload);
+  };
+
+  // Prevent closing the dialog while the mutation is pending
+  const handleDialogOpenChange = (nextOpen: boolean) => {
+    if (createSubscriptionMutation.isPending && !nextOpen) {
+      // ignore attempts to close while processing
+      return;
+    }
+    onOpenChange(nextOpen);
   };
 
   function formatPrice(p: number | string | undefined | null) {
@@ -100,7 +140,7 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
   }
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>Subscribe</DialogTitle>
@@ -114,13 +154,19 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
               <h3 className="font-semibold mb-3">Registered cards</h3>
               <div className="space-y-3">
                 {cards.map((c) => (
-                  <div
+                  <button
                     key={c.id}
-                    className="flex items-center justify-between p-3 rounded border"
+                    type="button"
+                    onClick={() => setSelectedCardId(c.id)}
+                    className={`flex items-center justify-between p-3 rounded border w-full text-left ${
+                      selectedCardId === c.id
+                        ? "border-emerald-400 bg-emerald-50"
+                        : ""
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="h-8 w-8 bg-gray-800 text-white rounded-full flex items-center justify-center">
-                        {c.id === 1 ? "✓" : "○"}
+                        {selectedCardId === c.id ? "✓" : "○"}
                       </div>
                       <div>
                         <div className="font-medium">{c.bank}</div>
@@ -130,7 +176,7 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
                       </div>
                     </div>
                     <div className="text-sm">{c.exp}</div>
-                  </div>
+                  </button>
                 ))}
 
                 {!showAddForm && (
@@ -219,7 +265,7 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
 
             <aside className="col-span-4">
               <div className="border rounded-lg p-4 bg-card">
-                <h4 className="font-semibold mb-2">Alışveriş Özeti</h4>
+                <h4 className="font-semibold mb-2">Plan</h4>
                 <div className="text-sm text-muted-foreground mb-4">
                   <div className="flex justify-between">
                     <span>
@@ -235,16 +281,28 @@ export const SubscribeDialog: React.FC<SubscribeDialogProps> = ({
                 </div>
                 <button
                   onClick={handlePayNow}
-                  className="w-full bg-emerald-500 text-white py-2 rounded"
+                  className="w-full bg-emerald-500 text-white py-2 rounded flex items-center justify-center space-x-2"
+                  disabled={createSubscriptionMutation.isPending}
                 >
-                  Pay Now
+                  {createSubscriptionMutation.isPending ? (
+                    <span>Processing...</span>
+                  ) : (
+                    <span>Pay Now</span>
+                  )}
                 </button>
+                {error && (
+                  <div className="text-sm text-red-600 mt-2">{error}</div>
+                )}
               </div>
             </aside>
           </div>
 
           <DialogFooter className="mt-4">
-            <button onClick={() => onOpenChange(false)} className="px-4 py-2">
+            <button
+              onClick={() => handleDialogOpenChange(false)}
+              className="px-4 py-2"
+              disabled={createSubscriptionMutation.isPending}
+            >
               Close
             </button>
           </DialogFooter>
