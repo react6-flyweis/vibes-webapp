@@ -21,6 +21,9 @@ import { Textarea } from "@/components/ui/textarea";
 import CateringCategorySelectId from "@/components/CateringCategorySelectId";
 import { useCreateCatering } from "@/mutations/useCreateCatering";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingButton } from "./ui/loading-button";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
+import { PlusIcon } from "lucide-react";
 
 export default function AddCateringDialog({
   triggerText = "Add Catering",
@@ -29,8 +32,6 @@ export default function AddCateringDialog({
 }) {
   const [open, setOpen] = React.useState(false);
   const createCatering = useCreateCatering();
-  const mutate = createCatering.mutateAsync.bind(createCatering);
-  const isLoading = (createCatering as any).isLoading as boolean;
   const { toast } = useToast();
 
   const form = useForm<{
@@ -60,25 +61,23 @@ export default function AddCateringDialog({
 
   const onSubmit = async (vals: any) => {
     try {
-      await mutate({ ...vals });
+      await createCatering.mutateAsync({ ...vals });
       toast({ title: "Catering created" });
       setOpen(false);
       form.reset();
-    } catch (err: any) {
-      const apiErr = err?.response?.data || err?.message || String(err);
-      if (apiErr && typeof apiErr === "object") {
-        const msg = apiErr.message || apiErr.error || JSON.stringify(apiErr);
-        form.setError("name", { type: "server", message: msg });
-      } else {
-        form.setError("name", { type: "server", message: String(apiErr) });
-      }
+    } catch (err) {
+      const apiErr = extractApiErrorMessage(err);
+      form.setError("root", { type: "server", message: apiErr });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">{triggerText}</Button>
+        <Button variant="default" className="bg-gradient-cta">
+          <PlusIcon />
+          {triggerText}
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -172,13 +171,23 @@ export default function AddCateringDialog({
               )}
             />
 
+            {form.formState.errors.root && (
+              <p className="text-sm text-red-600">
+                {form.formState.errors.root.message}
+              </p>
+            )}
+
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create"}
-              </Button>
+              <LoadingButton
+                className="bg-gradient-cta"
+                type="submit"
+                isLoading={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Creating..." : "Create"}
+              </LoadingButton>
             </div>
           </form>
         </Form>
