@@ -20,12 +20,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { LoadingButton } from "./ui/loading-button";
+import { ArrowRight } from "lucide-react";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   staff: any | null;
-  onSubmit: (data: FormValues) => void;
+  onSubmit: (data: FormValues) => Promise<void>;
 };
 
 const staffShiftSchema = z.object({
@@ -76,9 +79,16 @@ export default function StaffShiftDialog({
     if (!open) reset();
   }, [open, reset]);
 
-  const submit = (values: FormValues) => {
-    onSubmit(values);
-    // do not reset here in case parent wants to show success while dialog closes
+  const submit = async (values: FormValues) => {
+    try {
+      await onSubmit(values);
+    } catch (error) {
+      const errorMessage = extractApiErrorMessage(error);
+      form.setError("root", {
+        type: "server",
+        message: errorMessage || "Something went wrong",
+      });
+    }
   };
 
   return (
@@ -265,7 +275,12 @@ export default function StaffShiftDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit">Next &rarr;</Button>
+              <LoadingButton
+                isLoading={form.formState.isSubmitting}
+                type="submit"
+              >
+                Next <ArrowRight />
+              </LoadingButton>
             </div>
           </form>
         </Form>
