@@ -119,9 +119,9 @@ export default function Navigation() {
   // ];
   const businessItems = [
     { path: "/vendor-onboarding", label: "Join as Vendor", icon: Building2 },
-    { path: "#", label: "Advertise", icon: Store },
-    { path: "#", label: "Vendor Hub", icon: Store },
-    { path: "#", label: "System Overview", icon: Monitor },
+    // { path: "#", label: "Advertise", icon: Store },
+    // { path: "#", label: "Vendor Hub", icon: Store },
+    // { path: "#", label: "System Overview", icon: Monitor },
   ];
 
   // active state is now determined by NavLink from react-router
@@ -194,8 +194,8 @@ export default function Navigation() {
                 ))}
               </DropdownMenuContent> */}
             {/* </DropdownMenu> */}
-            {/* Experience Features Dropdown */}           
-            <DropdownMenu>
+            {/* Experience Features Dropdown */}       
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -207,7 +207,7 @@ export default function Navigation() {
                   <ChevronDown className="w-3 h-3" />               
                 </Button>
               </DropdownMenuTrigger>
-              {/* <DropdownMenuContent>
+              <DropdownMenuContent>
                 {experienceFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
@@ -219,10 +219,10 @@ export default function Navigation() {
                     </Link>
                   </DropdownMenuItem>
                 ))}
-              </DropdownMenuContent> */}
-            </DropdownMenu>
-            {/* Platform Features Dropdown */}           
-            <DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu> */}
+            {/* Platform Features Dropdown */}         
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -234,7 +234,7 @@ export default function Navigation() {
                   <ChevronDown className="w-3 h-3" />               
                 </Button>
               </DropdownMenuTrigger>
-              {/* <DropdownMenuContent>
+              <DropdownMenuContent>
                 {platformFeatures.map((item) => (
                   <DropdownMenuItem key={item.path} asChild>
                     <Link
@@ -246,8 +246,8 @@ export default function Navigation() {
                     </Link>
                   </DropdownMenuItem>
                 ))}
-              </DropdownMenuContent> */}
-            </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu> */}
           </div>
         </div>
         <div className="flex items-center space-x-4">
