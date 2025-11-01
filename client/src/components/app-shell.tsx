@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import SearchActions from "./SearchActions";
-import { Bell, Sparkles, Sun, Moon } from "lucide-react";
+import { Sparkles, Sun, Moon } from "lucide-react";
+import NotificationsSheet from "./NotificationsSheet";
 
 // Swiper Imports
 import DesktopNav from "./DesktopNav";
@@ -106,10 +106,7 @@ export function AppShell({ children }: AppShellProps) {
               <SearchActions />
 
               {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="w-4 h-4" />
-                <Badge className="absolute -top-1 -right-1 w-2 h-2 p-0 bg-red-500" />
-              </Button>
+              <NotificationsSheet />
 
               {/* Theme Toggle */}
               <Button variant="ghost" size="sm" onClick={toggleTheme}>
