@@ -28,7 +28,7 @@ export default function CateringVendorCard({
   if (skeleton) {
     return (
       <Card className="rounded-lg overflow-hidden shadow-sm">
-        <div className="bg-purple-700 p-4">
+        <div className="bg-purple-700 h-full flex-1 p-4">
           <Skeleton className="h-8 w-48 rounded-md" />
           <div className="mt-3">
             <Skeleton className="h-5 w-36" />
@@ -47,14 +47,12 @@ export default function CateringVendorCard({
   return (
     <Card className="rounded-lg border-0 overflow-hidden shadow-sm">
       <div className="bg-purple-700 p-6 text-center">
-        {vendor.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={vendor.image}
-            alt={vendor.name}
-            className="w-full h-32 object-cover rounded-md mb-4"
-          />
-        )}
+        <img
+          src={vendor.image}
+          alt={vendor.name}
+          className="w-full h-32 object-cover rounded-md mb-4"
+        />
+
         <h3 className="text-2xl font-bold text-white">{vendor.name}</h3>
         <p className="text-white/90 mt-2">{vendor.mobile_no}</p>
         <p className="text-white/80 mt-2 text-sm">{vendor.address}</p>
