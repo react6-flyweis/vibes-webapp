@@ -1,12 +1,13 @@
 import React from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, XIcon } from "lucide-react";
 import { usePaymentMethods } from "@/queries/getPaymentMethods";
 import { Elements } from "@stripe/react-stripe-js";
 import { PaymentIntent } from "@/mutations/useCreateEntryTicketsPayment";
@@ -187,10 +188,19 @@ export default function PriceConfirmationDialog({
         className="max-w-xl max-h-[90vh] overflow-y-auto"
         showCloseButton={false}
       >
-        <DialogHeader className="flex items-start justify-between">
+        <DialogHeader className="flex-row items-start justify-between">
           <DialogTitle className="text-lg font-semibold">
             Price & Confirmation
           </DialogTitle>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Close"
+            onClick={() => onOpenChange(false)}
+          >
+            <XIcon className="h-5 w-5" />
+          </Button>
         </DialogHeader>
 
         <div className="py-4">
