@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
+import { IResponseList } from "@/types";
 
 export interface IVibeBusinessActiveSubscription {
   user_id?: number;
@@ -14,17 +15,26 @@ export interface IVibeBusinessActiveSubscription {
   createdAt?: string;
   updatedAt?: string;
   vibe_business_plan_subscribed_id?: number;
-}
-
-export interface IVibeBusinessActiveSubscriptionResponse {
-  success: boolean;
-  message?: string;
-  data: IVibeBusinessActiveSubscription | null;
+  plan_details?: {
+    plan_id?: number;
+    plan_name?: string;
+    description?: string;
+    price?: number;
+    status?: boolean;
+  } | null;
+  transaction_details?: {
+    transaction_id?: number | string;
+    amount?: number;
+    status?: string;
+    transaction_date?: string;
+    reference_number?: string;
+    payment_method_id?: number;
+  } | null;
 }
 
 export async function fetchVibeBusinessActiveSubscription() {
   const url = "/api/master/vibe-business-plan-subscribed/getByAuth";
-  return axiosInstance.get<IVibeBusinessActiveSubscriptionResponse>(url);
+  return axiosInstance.get<IResponseList<IVibeBusinessActiveSubscription>>(url);
 }
 
 export function useVibeBusinessActiveSubscription() {
