@@ -13,6 +13,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
@@ -305,8 +312,8 @@ export default function VendorOnboardingPortal() {
     try {
       const res = await vendorOnboardingMutation.mutateAsync(payload);
       toast({
-        title: res?.success ? "Onboarding submitted" : "Submission result",
-        description: res?.message || "Vendor onboarding submitted",
+        title: res?.success ? "Onboarding Completed" : "Submission result",
+        description: res?.message || "Redirecting you to subscription setup",
       });
       setCurrent(steps.length - 1);
 
@@ -672,6 +679,16 @@ export default function VendorOnboardingPortal() {
                             <FormLabel>D.O.B</FormLabel>
                             <FormControl>
                               <Input
+                                type="date"
+                                max={
+                                  new Date(
+                                    new Date().setFullYear(
+                                      new Date().getFullYear() - 18
+                                    )
+                                  )
+                                    .toISOString()
+                                    .split("T")[0]
+                                }
                                 className="bg-gray-100"
                                 placeholder="YYYY-MM-DD"
                                 {...field}
@@ -708,6 +725,7 @@ export default function VendorOnboardingPortal() {
                             <FormLabel>ID Number</FormLabel>
                             <FormControl>
                               <Input
+                                type="number"
                                 className="bg-gray-100"
                                 placeholder="ID number"
                                 {...field}
@@ -910,6 +928,7 @@ export default function VendorOnboardingPortal() {
                             <FormLabel>Pin Code</FormLabel>
                             <FormControl>
                               <Input
+                                type="number"
                                 className="bg-gray-100"
                                 placeholder="Postal code"
                                 {...field}
@@ -927,11 +946,25 @@ export default function VendorOnboardingPortal() {
                           <FormItem>
                             <FormLabel>Preferred Working Hours</FormLabel>
                             <FormControl>
-                              <Input
-                                className="bg-gray-100"
-                                placeholder="e.g., 9am - 6pm"
-                                {...field}
-                              />
+                              <Select
+                                onValueChange={(v) => field.onChange(v)}
+                                value={field.value}
+                              >
+                                <SelectTrigger className="bg-gray-100">
+                                  <SelectValue placeholder="Select hours" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="9am-6pm">
+                                    9:00 AM - 6:00 PM
+                                  </SelectItem>
+                                  <SelectItem value="10am-7pm">
+                                    10:00 AM - 7:00 PM
+                                  </SelectItem>
+                                  <SelectItem value="12pm-9pm">
+                                    12:00 PM - 9:00 PM
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1012,6 +1045,7 @@ export default function VendorOnboardingPortal() {
                             <FormLabel>Account Number</FormLabel>
                             <FormControl>
                               <Input
+                                type="number"
                                 className="bg-gray-100"
                                 placeholder="Account number"
                                 {...field}
