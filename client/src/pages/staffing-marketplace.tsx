@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import StaffCategorySelector from "@/components/StaffCategorySelector";
 import StaffShiftDialog from "@/components/StaffShiftDialog";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
+import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 import { Search, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -106,6 +107,8 @@ export default function EnhancedStaffingMarketplace() {
   const [pendingBookingPayload, setPendingBookingPayload] = useState<any>(null);
   const [priceEstimate, setPriceEstimate] = useState<number>(0);
   const [pendingPayment, setPendingPayment] = useState<any | null>(null);
+  const [bookedDialogOpen, setBookedDialogOpen] = useState(false);
+  const [bookedInfo, setBookedInfo] = useState<any | null>(null);
 
   const filteredStaff = staffMembers.filter((staff: StaffMember) => {
     const matchesCategory =
@@ -187,7 +190,7 @@ export default function EnhancedStaffingMarketplace() {
               if (!open) setSelectedStaff(null);
             }}
             staff={selectedStaff}
-            onSubmit={(values) => {
+            onSubmit={async (values) => {
               // compute duration in hours
               let durationHours = 1;
               if (values.startTime && values.endTime) {
@@ -223,41 +226,41 @@ export default function EnhancedStaffingMarketplace() {
               setPriceEstimate(estimate);
               setPendingBookingPayload(payload);
               // create booking on server before presenting payment options
-              (async () => {
-                try {
-                  const res = await bookingMutation.mutateAsync({
-                    // convert payload to server shape
-                    event_id: payload.eventId,
-                    dateFrom: payload.eventDate,
-                    dateTo: payload.eventDate,
-                    timeFrom: payload.startTime,
-                    timeTo: payload.endTime,
-                    event_type_id: payload.eventType,
-                    staff_id: payload.staffId,
-                    event_name: payload.eventName,
-                    event_address: payload.eventAddress,
-                    no_of_guests: payload.guestCount,
-                    special_instruction: payload.specialRequests,
-                    transaction_status: "Pending",
-                    transaction_id: null,
-                    status: true,
-                  });
 
-                  // server response may nest data; normalize accordingly
-                  const orderResponse = res?.data;
-                  setPendingPayment({ orderResponse });
-                  console.log(
-                    "Created staff booking:",
-                    orderResponse.staff_price
-                  );
-                  setPriceEstimate(orderResponse.staff_price || 0);
-                  setShowShiftDialog(false);
-                  setShowPriceDialog(true);
-                } catch (err) {
-                  // bookingMutation.onError handles toast; keep dialog open for retry
-                  console.error("Booking create failed:", err);
-                }
-              })();
+              try {
+                const res = await bookingMutation.mutateAsync({
+                  // convert payload to server shape
+                  event_id: payload.eventId,
+                  dateFrom: payload.eventDate,
+                  dateTo: payload.eventDate,
+                  timeFrom: payload.startTime,
+                  timeTo: payload.endTime,
+                  event_type_id: payload.eventType,
+                  staff_id: payload.staffId,
+                  event_name: payload.eventName,
+                  event_address: payload.eventAddress,
+                  no_of_guests: payload.guestCount,
+                  special_instruction: payload.specialRequests,
+                  transaction_status: "Pending",
+                  transaction_id: null,
+                  status: true,
+                });
+
+                // server response may nest data; normalize accordingly
+                const orderResponse = res?.data;
+                setPendingPayment({ orderResponse });
+                console.log(
+                  "Created staff booking:",
+                  orderResponse.staff_price
+                );
+                setPriceEstimate(orderResponse.staff_price || 0);
+                setShowShiftDialog(false);
+                setShowPriceDialog(true);
+              } catch (err) {
+                // bookingMutation.onError handles toast; keep dialog open for retry
+                console.error("Booking create failed:", err);
+                throw err;
+              }
             }}
           />
         )}
@@ -282,7 +285,41 @@ export default function EnhancedStaffingMarketplace() {
               return;
             }
 
-            // successfull
+            // successful -> show booked dialog with details
+            const vendorName =
+              pendingBookingPayload?.staffName ||
+              created?.staff_name ||
+              selectedStaff?.name ||
+              null;
+            const serviceName =
+              pendingBookingPayload?.eventName ||
+              created?.event_name ||
+              "Staff Booking";
+            const guests =
+              pendingBookingPayload?.guestCount ||
+              created?.no_of_guests ||
+              null;
+            const pricePer = created?.staff_price || priceEstimate || null;
+            const total =
+              pricePer && guests
+                ? Number(pricePer) * Number(guests)
+                : pricePer || null;
+
+            setBookedInfo({
+              vendorName,
+              menuName: serviceName,
+              guestCount: guests,
+              pricePerPerson: pricePer,
+              totalAmount: total,
+              date:
+                pendingBookingPayload?.eventDate || created?.dateFrom || null,
+              time: `${
+                pendingBookingPayload?.startTime || created?.timeFrom || ""
+              } - ${pendingBookingPayload?.endTime || created?.timeTo || ""}`,
+            });
+
+            setBookedDialogOpen(true);
+
             toast({
               title: "Payment Received",
               description:
@@ -361,6 +398,23 @@ export default function EnhancedStaffingMarketplace() {
               );
               throw err;
             }
+          }}
+        />
+
+        <BookedSuccessDialog
+          open={bookedDialogOpen}
+          onOpenChange={(open) => {
+            setBookedDialogOpen(open);
+            if (!open) setBookedInfo(null);
+          }}
+          info={bookedInfo}
+          onDone={() => {
+            setBookedDialogOpen(false);
+            setBookedInfo(null);
+            setPendingBookingPayload(null);
+            setPendingPayment(null);
+            setShowPriceDialog(false);
+            setSelectedStaff(null);
           }}
         />
 
