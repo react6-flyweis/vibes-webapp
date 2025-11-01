@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { useAuthStore } from "@/store/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import StaffBookings from "@/components/staff/StaffBookings";
 import {
   Select,
   SelectTrigger,
@@ -33,6 +34,8 @@ type ProfileFormValues = {
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);
+
+  // Staff bookings are rendered by the `StaffBookings` component below
 
   const [isEditing, setIsEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
@@ -108,12 +111,20 @@ export default function Profile() {
                 >
                   Reset
                 </Button>
-                <Button size="sm" onClick={methods.handleSubmit(onSubmit)}>
+                <Button
+                  size="sm"
+                  className="bg-gradient-cta"
+                  onClick={methods.handleSubmit(onSubmit)}
+                >
                   Save
                 </Button>
               </div>
             ) : (
-              <Button size="sm" onClick={() => setIsEditing(true)}>
+              <Button
+                size="sm"
+                className="bg-gradient-cta w-32"
+                onClick={() => setIsEditing(true)}
+              >
                 Edit
               </Button>
             )}
@@ -283,6 +294,11 @@ export default function Profile() {
                 </div>
               </form>
             </Form>
+          </div>
+
+          {/* Staff bookings section */}
+          <div className="mt-8">
+            <StaffBookings />
           </div>
         </div>
       </div>
