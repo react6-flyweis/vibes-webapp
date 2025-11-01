@@ -25,6 +25,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { LoadingButton } from "./ui/loading-button";
+import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 const eventDetailsSchema = z.object({
   startDate: z.string().nonempty("Start date is required"),
@@ -36,8 +38,7 @@ const eventDetailsSchema = z.object({
   eventType: z.enum(["Birthday", "Wedding", "Corporate"]),
   // coerce to number so the input can be a numeric string
   guestCount: z.coerce.number().min(1, "Please enter at least 1 guest"),
-  // optional amount for pre-authorisation or estimated charge
-  amount: z.coerce.number().min(0),
+  // amount: z.coerce.number().min(0),
 });
 
 type FormValues = z.infer<typeof eventDetailsSchema>;
@@ -66,7 +67,7 @@ export default function EventDetailsDialog({
       eventAddress: "",
       eventType: "Birthday",
       guestCount: 0,
-      amount: 0,
+      // amount: 0,
     },
   });
 
@@ -75,19 +76,22 @@ export default function EventDetailsDialog({
       await onSubmit(values);
       form.reset();
     } catch (err) {
-      // If parent onSubmit throws, keep the form open so user can retry
-      // Optionally, parent can surface an error via toast
-      console.error("EventDetailsDialog onSubmit failed:", err);
+      const errorMessage = extractApiErrorMessage(err);
+      form.setError("root", {
+        type: "server",
+        message: errorMessage || "An unexpected error occurred",
+      });
     }
   };
 
+  const handleOpenChange = (openState: boolean) => {
+    // dont close if form is dirty/submitting
+    if (form.formState.isDirty || form.formState.isSubmitting) return;
+    if (!openState) onClose();
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(openState) => {
-        if (!openState) onClose();
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Event Details</DialogTitle>
@@ -204,7 +208,7 @@ export default function EventDetailsDialog({
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
@@ -220,14 +224,25 @@ export default function EventDetailsDialog({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
+
+            {form.formState.errors.root && (
+              <div className="text-red-600 text-sm">
+                {form.formState.errors.root.message}
+              </div>
+            )}
 
             <div className="flex gap-3 justify-end">
               <Button variant="outline" onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button type="submit">Request Booking</Button>
+              <LoadingButton
+                type="submit"
+                isLoading={form.formState.isSubmitting}
+              >
+                Request Booking
+              </LoadingButton>
             </div>
           </form>
         </Form>
