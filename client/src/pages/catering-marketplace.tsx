@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import CateringVendorCard from "@/components/CateringVendorCard";
 import EventDetailsDialog from "@/components/EventDetailsDialog";
 import MenuServicesDialog from "@/components/MenuServicesDialog";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
+import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 
 interface CateringMenu {
   id: string;
@@ -42,6 +43,29 @@ interface CateringMenu {
 }
 
 export default function CateringMarketplace() {
+  const bookingMutation = useCreateCateringBooking({
+    onSuccess: () => {
+      toast({
+        title: "Booking Created",
+        description: "Complete your payment to confirm the booking.",
+      });
+    },
+    onError: (err) => {
+      toast({
+        title: "Booking Error",
+        description: String(err),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createCateringBookingPaymentMutation =
+    useCreateCateringBookingPayment();
+
+  const [pendingPayment, setPendingPayment] = useState<any | null>(null);
+  const [bookedDialogOpen, setBookedDialogOpen] = useState(false);
+  const [bookedInfo, setBookedInfo] = useState<any | null>(null);
+
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCuisine, setSelectedCuisine] = useState("all");
@@ -71,29 +95,246 @@ export default function CateringMarketplace() {
   const [eventDetails, setEventDetails] = useState<any>(null);
   const [menuDetails, setMenuDetails] = useState<any>(null);
 
-  const bookingMutation = useCreateCateringBooking({
-    onSuccess: () => {
-      toast({
-        title: "Booking Created",
-        description: "The caterer will contact you shortly.",
-      });
-      // reset local state
-      setEventDetails(null);
-      setMenuDetails(null);
-    },
-    onError: (err) => {
-      toast({
-        title: "Booking Error",
-        description: String(err),
-        variant: "destructive",
-      });
-    },
-  });
+  const handleMenuSubmit = (vals: any) => {
+    const guestCount =
+      parseInt(eventDetails?.guestCount || vals.guestCount || "0") || 0;
+    const pricePerPerson = parseFloat(vals.pricePerPerson || "0") || 0;
+    setMenuDetails(vals);
+    setConfirmPayload({ guestCount, pricePerPerson });
+    setMenuDialogOpen(false);
+    setConfirmDialogOpen(true);
+  };
 
-  const createCateringBookingPaymentMutation =
-    useCreateCateringBookingPayment();
+  const handleConfirm = async (payment?: any) => {
+    setConfirmDialogOpen(false);
 
-  const [pendingPayment, setPendingPayment] = useState<any | null>(null);
+    const vendorName =
+      marketplaces.find((m: any) => m._id === activeVendorId)?.name || null;
+    const menuName = menuDetails?.name || selectedMenu?.name || null;
+    const guests =
+      (confirmPayload && confirmPayload.guestCount) ||
+      eventDetails?.guestCount ||
+      null;
+    const price =
+      (confirmPayload && confirmPayload.pricePerPerson) ||
+      menuDetails?.pricePerPerson ||
+      null;
+    const total =
+      (pendingPayment &&
+        pendingPayment.transaction &&
+        pendingPayment.transaction.amount) ||
+      (guests && price ? Number(guests) * Number(price) : null) ||
+      null;
+
+    setBookedInfo({
+      vendorName,
+      menuName,
+      guestCount: guests,
+      pricePerPerson: price,
+      totalAmount: total,
+      date: eventDetails?.startDate || eventDetails?.eventDate || null,
+      time:
+        (eventDetails &&
+          `${eventDetails.startTime || "8 PM"} - ${
+            eventDetails.endTime || "10 PM"
+          }`) ||
+        null,
+    });
+    console.debug("[Catering] bookedInfo (confirm):", {
+      vendorName,
+      menuName,
+      guestCount: guests,
+      pricePerPerson: price,
+      totalAmount: total,
+      date: eventDetails?.startDate || eventDetails?.eventDate || null,
+    });
+    setBookedDialogOpen(true);
+
+    setEventDetails(null);
+    setMenuDetails(null);
+    setConfirmPayload(null);
+    setPendingPayment(null);
+  };
+
+  const handleMethodSelect = async (method: number) => {
+    // Ensure booking exists, then create payment intent for it
+    if (!activeVendorId || !eventDetails || !menuDetails || !confirmPayload) {
+      throw new Error("Missing booking data");
+    }
+
+    // Use a local variable so we can update it after creating a booking
+    let bookingResponse = pendingPayment;
+    try {
+      if (!bookingResponse) {
+        const payload = {
+          event_name: eventDetails.eventName || "",
+          event_address: eventDetails.eventAddress || "",
+          event_type_id:
+            typeof eventDetails.eventType === "number"
+              ? eventDetails.eventType
+              : 1,
+          catering_marketplace_id: Number(activeVendorId) || 0,
+          event_to_date:
+            eventDetails.endDate ||
+            eventDetails.startDate ||
+            new Date().toISOString(),
+          event_from_date: eventDetails.startDate || new Date().toISOString(),
+          event_to_time: eventDetails.endTime || "23:00",
+          event_from_time: eventDetails.startTime || "18:00",
+          guest_count: confirmPayload.guestCount || 0,
+          amount: Math.round(
+            (confirmPayload.guestCount || 0) *
+              (confirmPayload.pricePerPerson || 0)
+          ),
+        };
+
+        const res = await bookingMutation.mutateAsync(payload);
+        console.log(res);
+        bookingResponse = res.data;
+        setPendingPayment(res.data);
+
+        const returnedAmount = bookingResponse?.transaction?.amount ?? 0;
+        if (returnedAmount && (confirmPayload?.guestCount || 0) > 0) {
+          const computedPricePerPerson =
+            returnedAmount / (confirmPayload!.guestCount || 1);
+          setMenuDetails((md: any) => ({
+            ...(md || {}),
+            pricePerPerson: computedPricePerPerson,
+          }));
+          setConfirmPayload((cp) => ({
+            guestCount:
+              (cp && cp.guestCount) || confirmPayload!.guestCount || 0,
+            pricePerPerson: computedPricePerPerson,
+          }));
+        }
+      }
+
+      const bookingId =
+        bookingResponse?.booking?.catering_marketplace_booking_id;
+
+      if (!bookingId) {
+        throw new Error("Missing booking id from server response");
+      }
+
+      const paymentRes = await createCateringBookingPaymentMutation.mutateAsync(
+        {
+          catering_marketplace_booking_id: Number(bookingId),
+          payment_method_id: method,
+          billingDetails: "CateringBooking",
+        }
+      );
+
+      // follow the staff pattern: return paymentIntent located at data.data.paymentIntent
+      return paymentRes.data.data.paymentIntent;
+    } catch (err) {
+      console.error("Failed to create booking/payment intent:", err);
+      throw err;
+    }
+  };
+
+  const calculateOrderCost = () => {
+    if (!selectedMenu || !orderDetails.guestCount) return 0;
+
+    const guestCount = parseInt(orderDetails.guestCount);
+    const subtotal = guestCount * selectedMenu.pricePerPerson;
+    const platformFee = subtotal * 0.15;
+
+    return subtotal + platformFee;
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchQuery(e.target.value);
+
+  const handleCategoryChange = (value: string) => setSelectedCategory(value);
+
+  const handleCuisineChange = (value: string) => setSelectedCuisine(value);
+
+  const handleDialogClose = () => setDialogOpen(false);
+
+  const handleMenuClose = () => setMenuDialogOpen(false);
+
+  const handleConfirmOpenChange = (open: boolean) => setConfirmDialogOpen(open);
+
+  const handleServingTypeChange = (value: string) =>
+    setOrderDetails((prev) => ({ ...prev, servingType: value }));
+
+  const handleOrderInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target as HTMLInputElement & { name: string };
+    setOrderDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOrderTextareaChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target as HTMLTextAreaElement & { name: string };
+    setOrderDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCancelOrder = () => setSelectedMenu(null);
+
+  const handleBookedDone = () => {
+    setBookedDialogOpen(false);
+    setBookedInfo(null);
+    setActiveVendorId(null);
+    setPendingPayment(null);
+    setConfirmPayload(null);
+    setSelectedMenu(null);
+    setOrderDetails({
+      eventDate: "",
+      guestCount: "",
+      servingType: "",
+      dietaryRequests: "",
+      deliveryAddress: "",
+      specialInstructions: "",
+    });
+  };
+
+  // Ensure bookedInfo is populated when the dialog is opened from any flow.
+  useEffect(() => {
+    if (bookedDialogOpen && !bookedInfo) {
+      const vendorName =
+        marketplaces.find((m: any) => m._id === activeVendorId)?.name || null;
+      const menuName =
+        (menuDetails && (menuDetails.name || menuDetails.menuName)) ||
+        (selectedMenu && selectedMenu.name) ||
+        null;
+      const guestCount =
+        (confirmPayload && confirmPayload.guestCount) ||
+        eventDetails?.guestCount ||
+        orderDetails?.guestCount ||
+        null;
+      const pricePerPerson =
+        (menuDetails && menuDetails.pricePerPerson) ||
+        (confirmPayload && confirmPayload.pricePerPerson) ||
+        (selectedMenu && selectedMenu.pricePerPerson) ||
+        null;
+      const totalAmount =
+        guestCount && pricePerPerson
+          ? Number(guestCount) * Number(pricePerPerson)
+          : null;
+
+      const info = {
+        vendorName,
+        menuName,
+        guestCount,
+        pricePerPerson,
+        totalAmount,
+        date:
+          eventDetails?.startDate ||
+          eventDetails?.eventDate ||
+          orderDetails?.eventDate ||
+          null,
+        time:
+          (eventDetails &&
+            `${eventDetails.startTime || "8 PM"} - ${
+              eventDetails.endTime || "10 PM"
+            }`) ||
+          null,
+      };
+      console.debug("[Catering] populate bookedInfo from effect:", info);
+      setBookedInfo(info);
+    }
+  }, [bookedDialogOpen]);
 
   const handleBookClick = (vendorId: string) => {
     setActiveVendorId(vendorId);
@@ -101,6 +342,7 @@ export default function CateringMarketplace() {
   };
 
   const handleDialogSubmit = async (payload: any) => {
+    console.log("handleDialogSubmit payload:", payload);
     // When users submit event details, create a booking on the server
     if (!activeVendorId) {
       toast({
@@ -122,11 +364,11 @@ export default function CateringMarketplace() {
       event_to_time: "23:00",
       event_from_time: "18:00",
       guest_count: Number(payload.guestCount) || 0,
-      amount: Number(payload.amount) || 0,
+      // amount: Number(payload.amount) || 0,
     };
 
     try {
-      const res = await bookingMutation.mutateAsync(bookingPayload as any);
+      const res = await bookingMutation.mutateAsync(bookingPayload);
       const bookingResponse = res?.data;
 
       setPendingPayment(bookingResponse);
@@ -154,34 +396,6 @@ export default function CateringMarketplace() {
       );
     }
     // keep activeVendorId until menu dialog completes
-  };
-
-  const handleMenuSubmit = (vals: any) => {
-    // open confirm dialog with calculated totals
-    const guestCount =
-      parseInt(eventDetails?.guestCount || vals.guestCount || "0") || 0;
-    const pricePerPerson = parseFloat(vals.pricePerPerson || "0") || 0;
-    setMenuDetails(vals);
-    setConfirmPayload({ guestCount, pricePerPerson });
-    setMenuDialogOpen(false);
-    setConfirmDialogOpen(true);
-  };
-
-  const handleConfirm = async (payment?: any) => {
-    // This is called after payment completes via StripePaymentElementForm
-    // We assume booking was already created before payment intent was requested.
-    // Show success toast and clear local state.
-    toast({
-      title: "Payment processed",
-      description: "Payment completed for your booking.",
-    });
-
-    setConfirmDialogOpen(false);
-    setActiveVendorId(null);
-    setEventDetails(null);
-    setMenuDetails(null);
-    setConfirmPayload(null);
-    setPendingPayment(null);
   };
 
   // const orderMutation = useMutation({
@@ -246,22 +460,39 @@ export default function CateringMarketplace() {
     // call booking API via react-query mutateAsync so we can await it
     try {
       await bookingMutation.mutateAsync(payload as any);
-      // close modal and clear local selection
+      // prepare bookedInfo from local state and show popup (server does not return menu details)
+      const vendorName =
+        marketplaces.find((m: any) => m._id === activeVendorId)?.name || null;
+      const menuName = selectedMenu?.name || null;
+      const guests = guestCount || orderDetails.guestCount || null;
+      const price = selectedMenu?.pricePerPerson || null;
+      const total = guests && price ? Number(guests) * Number(price) : null;
+
+      setBookedInfo({
+        vendorName,
+        menuName,
+        guestCount: guests,
+        pricePerPerson: price,
+        totalAmount: total,
+        date: orderDetails.eventDate || null,
+        time: null,
+      });
+      console.debug("[Catering] setBookedInfo (order):", {
+        vendorName,
+        menuName,
+        guestCount: guests,
+        pricePerPerson: price,
+        totalAmount: total,
+        date: orderDetails.eventDate || null,
+      });
+      setBookedDialogOpen(true);
+
+      // clear local selection
       setSelectedMenu(null);
     } catch (err) {
       // onError provided to the hook will already show a toast; log for debugging
       console.error("Catering booking failed:", err);
     }
-  };
-
-  const calculateOrderCost = () => {
-    if (!selectedMenu || !orderDetails.guestCount) return 0;
-
-    const guestCount = parseInt(orderDetails.guestCount);
-    const subtotal = guestCount * selectedMenu.pricePerPerson;
-    const platformFee = subtotal * 0.15; // 15% platform fee for catering
-
-    return subtotal + platformFee;
   };
 
   const getCategoryIcon = (category: string) => {
@@ -302,18 +533,18 @@ export default function CateringMarketplace() {
                     <Input
                       placeholder="Search menus, chefs, or dishes..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={handleSearchChange}
                       className="pl-10  "
                     />
                   </div>
                 </div>
                 <CateringCategorySelector
                   value={selectedCategory}
-                  onChange={setSelectedCategory}
+                  onChange={handleCategoryChange}
                 />
                 <Select
                   value={selectedCuisine}
-                  onValueChange={setSelectedCuisine}
+                  onValueChange={handleCuisineChange}
                 >
                   <SelectTrigger className="w-48 ">
                     <SelectValue placeholder="Cuisine" />
@@ -359,7 +590,7 @@ export default function CateringMarketplace() {
           vendorPhone={
             marketplaces.find((m: any) => m._id === activeVendorId)?.mobile_no
           }
-          onClose={() => setDialogOpen(false)}
+          onClose={handleDialogClose}
           onSubmit={handleDialogSubmit}
         />
 
@@ -373,7 +604,7 @@ export default function CateringMarketplace() {
 
         <PriceConfirmationDialog
           open={confirmDialogOpen}
-          onOpenChange={(open) => setConfirmDialogOpen(open)}
+          onOpenChange={handleConfirmOpenChange}
           priceEstimate={parseFloat(
             (
               (confirmPayload?.guestCount || 0) *
@@ -387,83 +618,27 @@ export default function CateringMarketplace() {
             setConfirmDialogOpen(false);
             setMenuDialogOpen(true);
           }}
-          onMethodSelect={async (method: number) => {
-            // Ensure booking exists, then create payment intent for it
-            if (
-              !activeVendorId ||
-              !eventDetails ||
-              !menuDetails ||
-              !confirmPayload
-            ) {
-              throw new Error("Missing booking data");
-            }
+          onMethodSelect={handleMethodSelect}
+        />
 
-            let bookingResponse = pendingPayment;
-            try {
-              if (!bookingResponse) {
-                const payload = {
-                  event_name: eventDetails.eventName || "",
-                  event_address: eventDetails.eventAddress || "",
-                  event_type_id:
-                    typeof eventDetails.eventType === "number"
-                      ? eventDetails.eventType
-                      : 1,
-                  catering_marketplace_id: Number(activeVendorId) || 0,
-                  event_to_date:
-                    eventDetails.endDate ||
-                    eventDetails.startDate ||
-                    new Date().toISOString(),
-                  event_from_date:
-                    eventDetails.startDate || new Date().toISOString(),
-                  event_to_time: eventDetails.endTime || "23:00",
-                  event_from_time: eventDetails.startTime || "18:00",
-                  guest_count: confirmPayload.guestCount || 0,
-                  amount: Math.round(
-                    (confirmPayload.guestCount || 0) *
-                      (confirmPayload.pricePerPerson || 0)
-                  ),
-                };
-
-                const res = await bookingMutation.mutateAsync(payload);
-                console.log(res);
-                setPendingPayment(res.data);
-
-                const returnedAmount =
-                  bookingResponse?.transaction?.amount ?? 0;
-                if (returnedAmount && (confirmPayload?.guestCount || 0) > 0) {
-                  const computedPricePerPerson =
-                    returnedAmount / (confirmPayload!.guestCount || 1);
-                  setMenuDetails((md) => ({
-                    ...(md || {}),
-                    pricePerPerson: computedPricePerPerson,
-                  }));
-                  setConfirmPayload((cp) => ({
-                    ...(cp || {}),
-                    pricePerPerson: computedPricePerPerson,
-                  }));
-                }
-              }
-
-              const bookingId =
-                bookingResponse.booking.catering_marketplace_booking_id;
-
-              if (!bookingId) {
-                throw new Error("Missing booking id from server response");
-              }
-
-              const paymentRes =
-                await createCateringBookingPaymentMutation.mutateAsync({
-                  catering_marketplace_booking_id: Number(bookingId),
-                  payment_method_id: method,
-                  billingDetails: "CateringBooking",
-                });
-
-              // follow the staff pattern: return paymentIntent located at data.data.paymentIntent
-              return paymentRes.data.data.paymentIntent;
-            } catch (err) {
-              console.error("Failed to create booking/payment intent:", err);
-              throw err;
-            }
+        <BookedSuccessDialog
+          open={bookedDialogOpen}
+          info={bookedInfo}
+          onDone={() => {
+            setBookedDialogOpen(false);
+            setBookedInfo(null);
+            setActiveVendorId(null);
+            setPendingPayment(null);
+            setConfirmPayload(null);
+            setSelectedMenu(null);
+            setOrderDetails({
+              eventDate: "",
+              guestCount: "",
+              servingType: "",
+              dietaryRequests: "",
+              deliveryAddress: "",
+              specialInstructions: "",
+            });
           }}
         />
 
@@ -499,13 +674,9 @@ export default function CateringMarketplace() {
                     </label>
                     <Input
                       type="date"
+                      name="eventDate"
                       value={orderDetails.eventDate}
-                      onChange={(e) =>
-                        setOrderDetails((prev) => ({
-                          ...prev,
-                          eventDate: e.target.value,
-                        }))
-                      }
+                      onChange={handleOrderInputChange}
                       className="bg-white/10 border-white/20 text-white"
                     />
                   </div>
@@ -516,14 +687,10 @@ export default function CateringMarketplace() {
                     </label>
                     <Input
                       type="number"
+                      name="guestCount"
                       placeholder={`Minimum ${selectedMenu.minOrder}`}
                       value={orderDetails.guestCount}
-                      onChange={(e) =>
-                        setOrderDetails((prev) => ({
-                          ...prev,
-                          guestCount: e.target.value,
-                        }))
-                      }
+                      onChange={handleOrderInputChange}
                       className="bg-white/10 border-white/20 text-white placeholder:text-orange-200"
                     />
                   </div>
@@ -534,12 +701,7 @@ export default function CateringMarketplace() {
                     </label>
                     <Select
                       value={orderDetails.servingType}
-                      onValueChange={(value) =>
-                        setOrderDetails((prev) => ({
-                          ...prev,
-                          servingType: value,
-                        }))
-                      }
+                      onValueChange={handleServingTypeChange}
                     >
                       <SelectTrigger className="bg-white/10 border-white/20 text-white">
                         <SelectValue placeholder="Select serving style" />
@@ -559,14 +721,10 @@ export default function CateringMarketplace() {
                       Delivery Address
                     </label>
                     <Input
+                      name="deliveryAddress"
                       placeholder="Event venue address"
                       value={orderDetails.deliveryAddress}
-                      onChange={(e) =>
-                        setOrderDetails((prev) => ({
-                          ...prev,
-                          deliveryAddress: e.target.value,
-                        }))
-                      }
+                      onChange={handleOrderInputChange}
                       className="bg-white/10 border-white/20 text-white placeholder:text-orange-200"
                     />
                   </div>
@@ -577,14 +735,10 @@ export default function CateringMarketplace() {
                     Dietary Restrictions
                   </label>
                   <Input
+                    name="dietaryRequests"
                     placeholder="Any allergies or dietary requirements..."
                     value={orderDetails.dietaryRequests}
-                    onChange={(e) =>
-                      setOrderDetails((prev) => ({
-                        ...prev,
-                        dietaryRequests: e.target.value,
-                      }))
-                    }
+                    onChange={handleOrderInputChange}
                     className="bg-white/10 border-white/20 text-white placeholder:text-orange-200"
                   />
                 </div>
@@ -594,14 +748,10 @@ export default function CateringMarketplace() {
                     Special Instructions
                   </label>
                   <textarea
+                    name="specialInstructions"
                     placeholder="Any special requests or setup instructions..."
                     value={orderDetails.specialInstructions}
-                    onChange={(e) =>
-                      setOrderDetails((prev) => ({
-                        ...prev,
-                        specialInstructions: e.target.value,
-                      }))
-                    }
+                    onChange={handleOrderTextareaChange}
                     className="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder:text-orange-200 resize-none h-20"
                   />
                 </div>
@@ -645,7 +795,7 @@ export default function CateringMarketplace() {
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
-                    onClick={() => setSelectedMenu(null)}
+                    onClick={handleCancelOrder}
                     className="flex-1 border-white/20 text-white hover:bg-white/10"
                   >
                     Cancel
