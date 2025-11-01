@@ -27,6 +27,7 @@ import {
   useForgotPasswordMutation,
 } from "@/hooks/useAuthMutations";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
+import { LoadingButton } from "../ui/loading-button";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -239,14 +240,14 @@ export function LoginForm() {
         >
           Forgot password?
         </Button>
-        <Button
+        <LoadingButton
           type="submit"
           size="lg"
           className="w-full rounded bg-gradient-cta text-white text-xl py-3 shadow-2xl"
-          disabled={form.formState.isSubmitting}
+          isLoading={form.formState.isSubmitting}
         >
           login
-        </Button>
+        </LoadingButton>
       </form>
       <OtpVerificationDialog
         open={showOtp}
