@@ -12,7 +12,7 @@ export type CreateCateringBookingPayload = {
   event_to_time: string;
   event_from_time: string;
   guest_count: number;
-  amount: number;
+  // amount: number;
 };
 
 // Response shapes based on API response
