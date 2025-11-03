@@ -3,14 +3,33 @@ import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { formatDate } from "@/lib/formatDate";
 import { Badge } from "@/components/ui/badge";
 import { EventData } from "@/queries/events";
+import { Guest } from "@/queries/guests";
+
+// Convert a time string (24-hour) like "19:30" or "19:30:00" to 12-hour format with AM/PM.
+// If the string already contains AM/PM, return it unchanged. If falsy, return "TBD".
+function formatTime12(time?: string | null) {
+  if (!time) return "TBD";
+  // If it already contains am/pm, return as-is (case-insensitive)
+  if (/\b(am|pm)\b/i.test(time)) return time;
+
+  const m = time.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (!m) return time; // unknown format, return raw
+
+  let hh = parseInt(m[1], 10);
+  const mm = m[2];
+  const suffix = hh >= 12 ? "PM" : "AM";
+  hh = hh % 12;
+  if (hh === 0) hh = 12;
+  return `${hh}:${mm} ${suffix}`;
+}
 
 interface Props {
   event: EventData;
-  stats: any;
+  guests?: Guest[];
   getTimeUntilEvent: () => string | null;
 }
 
-export default function Header({ event, stats, getTimeUntilEvent }: Props) {
+export default function Header({ event, guests, getTimeUntilEvent }: Props) {
   return (
     <div className="bg-[#0A0A0A] rounded-xl shadow-lg p-6 mb-6 text-white">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -35,7 +54,7 @@ export default function Header({ event, stats, getTimeUntilEvent }: Props) {
             </div>
             <div className="flex items-center gap-2 text-white">
               <Clock className="w-4 h-4" />
-              <span>{event.time}</span>
+              <span>{formatTime12(event.time)}</span>
             </div>
             <div className="flex items-center gap-2 text-white">
               <MapPin className="w-4 h-4" />
@@ -44,7 +63,7 @@ export default function Header({ event, stats, getTimeUntilEvent }: Props) {
             <div className="flex items-center gap-2 text-white">
               <Users className="w-4 h-4" />
               <span>
-                {stats?.confirmedCount || 0}/{event.max_capacity} attending
+                {guests?.length || 0}/{event.max_capacity} attending
               </span>
             </div>
           </div>
