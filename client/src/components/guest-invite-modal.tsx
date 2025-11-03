@@ -31,7 +31,7 @@ import {
 interface GuestInviteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  eventId: string;
+  eventId: number;
 }
 
 export default function GuestInviteModal({
