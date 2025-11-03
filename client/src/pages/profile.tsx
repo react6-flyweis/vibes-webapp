@@ -19,7 +19,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { CloudIcon, Pen } from "lucide-react";
+import { Pen } from "lucide-react";
+import useUpdateProfileMutation from "@/mutations/useUpdateProfile";
+import { useToast } from "@/hooks/use-toast";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 type ProfileFormValues = {
   name?: string;
@@ -55,6 +58,9 @@ export default function Profile() {
     },
   });
 
+  const updateProfileMutation = useUpdateProfileMutation();
+  const toast = useToast();
+
   // keep form in sync when auth store hydrates/changes
   useEffect(() => {
     methods.reset({
@@ -71,21 +77,33 @@ export default function Profile() {
     setAvatarPreview((user as any)?.avatar || null);
   }, [user]);
 
-  const onSubmit: SubmitHandler<ProfileFormValues> = (data) => {
+  const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
     // update auth-store user
     // Do not update the auth store from this form.
     // Normalize avatar locally (form value -> preview -> existing) so caller can use it if needed.
     const avatarValue =
       data.avatar || avatarPreview || (user as any)?.avatar || null;
 
-    // Prepare final payload (not persisted to store here)
+    // Prepare final payload and call mutation to persist
     const payload = {
+      id: user?.user_id || "",
       ...(data || {}),
       avatar: avatarValue,
-    } as ProfileFormValues;
-    // for now, just log the payload; persistence should be handled elsewhere (API or parent)
-    console.debug("Profile form submitted (not persisted):", payload);
-    setIsEditing(false);
+    } as ProfileFormValues & { id: number | string };
+
+    await updateProfileMutation.mutateAsync(payload, {
+      onSuccess: () => {
+        toast.toast({
+          title: "Profile updated",
+          description: "Your profile was updated successfully.",
+        });
+        setIsEditing(false);
+      },
+      onError: (err: any) => {
+        const msg = err?.message || "Failed to update profile";
+        toast.toast({ title: "Update failed", description: String(msg) });
+      },
+    });
   };
 
   const initials = useMemo(() => {
@@ -111,13 +129,14 @@ export default function Profile() {
                 >
                   Reset
                 </Button>
-                <Button
+                <LoadingButton
+                  isLoading={methods.formState.isSubmitting}
                   size="sm"
                   className="bg-gradient-cta"
                   onClick={methods.handleSubmit(onSubmit)}
                 >
                   Save
-                </Button>
+                </LoadingButton>
               </div>
             ) : (
               <Button
