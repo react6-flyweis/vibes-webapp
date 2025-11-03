@@ -12,6 +12,8 @@ interface PropertiesPanelProps {
   onUpdateElement: (id: string, updates: Partial<DesignElement>) => void;
   onDeleteElement: (id: string) => void;
   onDuplicateElement: (id: string) => void;
+  // color scheme object from editor (primary/secondary/accent/background/text)
+  colorScheme?: { [key: string]: string } | null;
 }
 
 export function PropertiesPanel({
@@ -19,6 +21,7 @@ export function PropertiesPanel({
   onUpdateElement,
   onDeleteElement,
   onDuplicateElement,
+  colorScheme = null,
 }: PropertiesPanelProps) {
   if (!selectedElement) {
     return (
@@ -36,6 +39,53 @@ export function PropertiesPanel({
             <CardTitle className="text-sm">Element Properties</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Palette swatches (editor color scheme) */}
+            {colorScheme && (
+              <div>
+                <Label>Design Palette</Label>
+                <div className="flex gap-2 mt-2">
+                  {Object.values(colorScheme).map((c) => (
+                    <button
+                      key={c}
+                      title={`Use ${c}`}
+                      onClick={() => {
+                        // apply palette color depending on element type
+                        if (selectedElement.type === "text") {
+                          onUpdateElement(selectedElement.id, {
+                            style: { ...selectedElement.style, color: c },
+                          });
+                        } else if (selectedElement.type === "shape") {
+                          onUpdateElement(selectedElement.id, {
+                            style: {
+                              ...selectedElement.style,
+                              backgroundColor: c,
+                            },
+                          });
+                        } else if (selectedElement.type === "logo") {
+                          onUpdateElement(selectedElement.id, {
+                            style: { ...selectedElement.style, color: c },
+                          });
+                        } else if (selectedElement.type === "border") {
+                          onUpdateElement(selectedElement.id, {
+                            style: { ...selectedElement.style, borderColor: c },
+                          });
+                        } else {
+                          // generic fallback - set background or color
+                          onUpdateElement(selectedElement.id, {
+                            style: {
+                              ...selectedElement.style,
+                              backgroundColor: c,
+                            },
+                          });
+                        }
+                      }}
+                      className="w-8 h-8 rounded border border-white/20"
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
             {/* Actions */}
             <div className="flex gap-2">
               <Button
@@ -156,6 +206,37 @@ export function PropertiesPanel({
                     step={1}
                   />
                 </div>
+                <div>
+                  <Label>Color</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={selectedElement.style?.color || "#000000"}
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            color: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-10 h-8 p-0 border-0 rounded"
+                      title="Pick text color"
+                    />
+                    <Input
+                      value={selectedElement.style?.color || ""}
+                      className="bg-white text-black flex-1"
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            color: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <Button
                     variant={
@@ -269,18 +350,36 @@ export function PropertiesPanel({
                 </div>
                 <div>
                   <Label>Fill Color</Label>
-                  <Input
-                    value={selectedElement.style?.backgroundColor || ""}
-                    className="bg-white text-black"
-                    onChange={(e) =>
-                      onUpdateElement(selectedElement.id, {
-                        style: {
-                          ...selectedElement.style,
-                          backgroundColor: e.target.value,
-                        },
-                      })
-                    }
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={
+                        selectedElement.style?.backgroundColor || "#ffffff"
+                      }
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            backgroundColor: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-10 h-8 p-0 border-0 rounded"
+                      title="Pick fill color"
+                    />
+                    <Input
+                      value={selectedElement.style?.backgroundColor || ""}
+                      className="bg-white text-black flex-1"
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            backgroundColor: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Corner Radius</Label>
@@ -345,18 +444,33 @@ export function PropertiesPanel({
                 </div>
                 <div>
                   <Label>Color</Label>
-                  <Input
-                    value={selectedElement.style?.color || ""}
-                    className="bg-white text-black"
-                    onChange={(e) =>
-                      onUpdateElement(selectedElement.id, {
-                        style: {
-                          ...selectedElement.style,
-                          color: e.target.value,
-                        },
-                      })
-                    }
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={selectedElement.style?.color || "#000000"}
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            color: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-10 h-8 p-0 border-0 rounded"
+                    />
+                    <Input
+                      value={selectedElement.style?.color || ""}
+                      className="bg-white text-black flex-1"
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            color: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Font Size</Label>
@@ -381,18 +495,33 @@ export function PropertiesPanel({
                 <h4 className="font-medium">Border</h4>
                 <div>
                   <Label>Stroke Color</Label>
-                  <Input
-                    value={selectedElement.style?.borderColor || ""}
-                    className="bg-white text-black"
-                    onChange={(e) =>
-                      onUpdateElement(selectedElement.id, {
-                        style: {
-                          ...selectedElement.style,
-                          borderColor: e.target.value,
-                        },
-                      })
-                    }
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={selectedElement.style?.borderColor || "#000000"}
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            borderColor: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-10 h-8 p-0 border-0 rounded"
+                    />
+                    <Input
+                      value={selectedElement.style?.borderColor || ""}
+                      className="bg-white text-black flex-1"
+                      onChange={(e) =>
+                        onUpdateElement(selectedElement.id, {
+                          style: {
+                            ...selectedElement.style,
+                            borderColor: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Stroke Width</Label>
