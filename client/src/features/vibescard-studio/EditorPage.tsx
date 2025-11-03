@@ -678,6 +678,7 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
         onUpdateElement={updateElement}
         onDeleteElement={deleteElement}
         onDuplicateElement={duplicateElement}
+        colorScheme={colorScheme}
       />
     </div>
   );
