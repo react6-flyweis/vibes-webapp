@@ -69,7 +69,6 @@ interface DesignTabMapApiItem {
 }
 
 function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
-  console.log("Mapping item:", item);
   return {
     id: item.community_designs_id,
     title: item.title ?? "",
@@ -181,9 +180,11 @@ export function useDesignsByTabQuery(tabId: number | string | undefined) {
     queryFn: () => fetchDesignsByTab(tabId ?? ""),
     enabled: typeof tabId !== "undefined" && tabId !== null && tabId !== "",
     select: (res) =>
-      (res?.data ?? [])
-        .map((i) => i.community_designs_id)
-        .map(mapToSharedDesign),
+      (res?.data ?? []).map((i) => ({
+        ...mapToSharedDesign(i.community_designs_id),
+        raw: i,
+      })),
+
     staleTime: 1000 * 60 * 2,
   });
 }
