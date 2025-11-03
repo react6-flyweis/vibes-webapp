@@ -31,10 +31,12 @@ import {
   useCommunityDesignShareMutation,
   DownloadPayload,
 } from "@/mutations/interactions";
+import { useDesignTabsMapCreateMutation } from "@/mutations/useDesignTabsMapCreateMutation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
 import RemixDialog from "@/components/design-community/RemixDialog";
 import { SharedDesign } from "@/types/designs";
+import { LoadingButton } from "../ui/loading-button";
 
 type Props = {
   design: SharedDesign;
@@ -89,21 +91,8 @@ export function DiscoverDesignCard({ design }: Props) {
 
   const downloadMutation = useCommunityDesignDownloadMutation();
 
-  const bookmarkMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const res = await apiRequest(`/api/designs/${designId}/bookmark`, "POST");
-      return res;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Design Bookmarked",
-        description: "Saved for later reference",
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["/api/master/community-designs/getAll"],
-      });
-    },
-  });
+  // Use dedicated mutation hook for creating a design-tabs-map entry
+  const bookmarkMutation = useDesignTabsMapCreateMutation();
 
   const shareMutation = useCommunityDesignShareMutation();
 
@@ -406,10 +395,34 @@ export function DiscoverDesignCard({ design }: Props) {
               />
               Like
             </Button>
-            <Button
+            <LoadingButton
+              isLoading={bookmarkMutation.isPending}
               size="sm"
               variant="outline"
-              onClick={() => bookmarkMutation.mutate(design.id.toString())}
+              onClick={() =>
+                bookmarkMutation.mutate(
+                  {
+                    tabs_id: 4,
+                    community_designs_id: design.id,
+                    status: true,
+                  },
+                  {
+                    onSuccess: () => {
+                      toast({
+                        title: "Design Bookmarked",
+                        description: "Saved for later reference",
+                      });
+                    },
+                    onError: (err: any) => {
+                      toast({
+                        title: "Bookmark Failed",
+                        description: err?.message || "Unable to save design",
+                        variant: "destructive",
+                      });
+                    },
+                  }
+                )
+              }
               className={`flex-1 ${
                 design.isBookmarked
                   ? "bg-yellow-500/20 border-yellow-500 text-yellow-400"
@@ -422,7 +435,7 @@ export function DiscoverDesignCard({ design }: Props) {
                 }`}
               />
               Save
-            </Button>
+            </LoadingButton>
             <Button
               size="sm"
               onClick={() => handleDownload()}
