@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -336,6 +336,47 @@ export default function CateringMarketplace() {
     }
   }, [bookedDialogOpen]);
 
+  const filteredMarketplaces = useMemo(() => {
+    const q = (searchQuery || "").trim().toLowerCase();
+    return (marketplaces || []).filter((m: any) => {
+      if (!m) return false;
+
+      // Category filter: support numeric or string category ids
+      if (selectedCategory && selectedCategory !== "all") {
+        const vendorCat =
+          m.catering_marketplace_category_id ??
+          m.catering_marketplace_category?._id ??
+          null;
+        if (vendorCat == null) return false;
+        if (
+          String(vendorCat) !== String(selectedCategory) &&
+          String(Number(selectedCategory)) !== String(vendorCat)
+        ) {
+          return false;
+        }
+      }
+
+      // Cuisine filter (if vendor exposes cuisine)
+      if (selectedCuisine && selectedCuisine !== "all") {
+        const vendorCuisine = (m.cuisine || m.cuisines || "")
+          .toString()
+          .toLowerCase();
+        if (!vendorCuisine.includes(selectedCuisine.toLowerCase()))
+          return false;
+      }
+
+      // Search across name, address, phone
+      if (q) {
+        const hay = `${m.name || ""} ${m.address || ""} ${
+          m.mobile_no || ""
+        }`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [marketplaces, searchQuery, selectedCategory, selectedCuisine]);
+
   const handleBookClick = (vendorId: string) => {
     setActiveVendorId(vendorId);
     setDialogOpen(true);
@@ -564,21 +605,27 @@ export default function CateringMarketplace() {
             Catering Vendors
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoadingMarketplaces
-              ? [1, 2, 3].map((i) => (
-                  <CateringVendorCard
-                    key={`vendor-skel-${i}`}
-                    skeleton
-                    onBook={handleBookClick}
-                  />
-                ))
-              : marketplaces.map((vendor: any) => (
-                  <CateringVendorCard
-                    key={vendor._id}
-                    vendor={vendor}
-                    onBook={handleBookClick}
-                  />
-                ))}
+            {isLoadingMarketplaces ? (
+              [1, 2, 3].map((i) => (
+                <CateringVendorCard
+                  key={`vendor-skel-${i}`}
+                  skeleton
+                  onBook={handleBookClick}
+                />
+              ))
+            ) : filteredMarketplaces.length === 0 ? (
+              <div className="col-span-full text-center text-orange-200 p-6 bg-white/5 rounded-md">
+                No vendors found. Try a different search or clear filters.
+              </div>
+            ) : (
+              filteredMarketplaces.map((vendor: any) => (
+                <CateringVendorCard
+                  key={vendor._id}
+                  vendor={vendor}
+                  onBook={handleBookClick}
+                />
+              ))
+            )}
           </div>
         </div>
 
