@@ -4,10 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDesignsByTabQuery } from "@/queries/communityDesigns";
+import { useDeleteDesignTabsMapMutation } from "@/mutations/useDeleteDesignTabsMapMutation";
+import { useToast } from "@/hooks/use-toast";
+import { LoadingButton } from "../ui/loading-button";
 
 export default function BookmarksTab() {
-  // If no `designs` prop is provided, fall back to querying tab id 4
   const { data: designs, isLoading } = useDesignsByTabQuery(4);
+  const { toast } = useToast();
+  const deleteMutation = useDeleteDesignTabsMapMutation();
 
   return (
     <>
@@ -62,13 +66,37 @@ export default function BookmarksTab() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute top-2 right-2">
-                  <Button
+                  <LoadingButton
                     size="sm"
                     variant="outline"
                     className="bg-yellow-500/20 border-yellow-500 text-yellow-400"
+                    isLoading={deleteMutation.isPending}
+                    onClick={() => {
+                      // If a design_tabs_map_id exists, remove it
+                      console.log("Design raw data:", design);
+                      if ((design as any).raw.design_tabs_map_id) {
+                        deleteMutation.mutate(design.raw.design_tabs_map_id, {
+                          onSuccess: () => {
+                            toast({
+                              title: "Bookmark Removed",
+                              description:
+                                "Design removed from your saved list",
+                            });
+                          },
+                          onError: (err: any) => {
+                            toast({
+                              title: "Remove Failed",
+                              description:
+                                err?.message || "Unable to remove bookmark",
+                              variant: "destructive",
+                            });
+                          },
+                        });
+                      }
+                    }}
                   >
                     <Bookmark className="h-3 w-3 fill-current" />
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
 
