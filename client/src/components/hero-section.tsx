@@ -1,25 +1,58 @@
 import { EventData } from "@/queries/events";
+import { Guest } from "@/queries/guests";
+import { PlanEventMapData } from "@/queries/planEventMaps";
 
 interface HeroSectionProps {
   event: EventData;
-  stats?: {
-    confirmedCount: number;
-    totalItems: number;
-    itemsByCategory: Record<string, { completed: number; total: number }>;
-  };
+  guests?: Guest[];
+  planMap?: PlanEventMapData;
 }
 
-export default function HeroSection({ event, stats }: HeroSectionProps) {
-  const completionPercentage = stats?.totalItems
-    ? Math.round(
-        (Object.values(stats.itemsByCategory).reduce(
-          (acc, cat) => acc + cat.completed,
-          0
-        ) /
-          stats.totalItems) *
-          100
-      )
-    : 0;
+export default function HeroSection({
+  event,
+  guests,
+  planMap,
+}: HeroSectionProps) {
+  // Derive items from the planMap prop in a defensive way. Different shapes are
+  // possible depending on how plan maps are loaded/stored, so check common
+  // patterns: `planMap.items` or `planMap.plans[].items`.
+  const itemsFromPlanMap: any[] = (() => {
+    if (!planMap) return [];
+    const pm: any = planMap as any;
+
+    // direct items array
+    if (Array.isArray(pm.items)) return pm.items;
+
+    // plans array with items per plan
+    if (Array.isArray(pm.plans)) {
+      return pm.plans.flatMap((p: any) =>
+        Array.isArray(p.items) ? p.items : []
+      );
+    }
+
+    // fallback: try to find any array-valued property that looks like items
+    for (const key of Object.keys(pm)) {
+      if (Array.isArray(pm[key])) return pm[key];
+    }
+
+    return [];
+  })();
+
+  const totalItems = itemsFromPlanMap.length;
+
+  const completedCount = itemsFromPlanMap.filter((it: any) => {
+    // handle a few common completed indicators
+    return Boolean(
+      it.completed ||
+        it.isCompleted ||
+        it.done ||
+        it.status === "done" ||
+        it.status === "completed"
+    );
+  }).length;
+
+  const completionPercentage =
+    totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
   return (
     <div className="w-full">
@@ -43,7 +76,7 @@ export default function HeroSection({ event, stats }: HeroSectionProps) {
           {/* Confirmed */}
           <div className="bg-white/20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">
-              {stats?.confirmedCount || 0}
+              {guests?.length || 0}
             </div>
             <div className="text-sm sm:text-base text-white">Confirmed</div>
           </div>
@@ -59,7 +92,7 @@ export default function HeroSection({ event, stats }: HeroSectionProps) {
           {/* Menu Items */}
           <div className="bg-white/20 backdrop-blur-xs rounded-lg p-4 flex flex-col items-center">
             <div className="text-2xl sm:text-3xl font-bold text-white">
-              {stats?.totalItems || 0}
+              {totalItems || 0}
             </div>
             <div className="text-sm sm:text-base text-white">Menu Items</div>
           </div>
