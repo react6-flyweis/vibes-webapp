@@ -19,12 +19,13 @@ import PhotosTab from "@/components/enhanced-event/PhotosTab";
 import GuestsTab from "@/components/enhanced-event/GuestsTab";
 import SettingsTab from "@/components/enhanced-event/SettingsTab";
 import SocialMediaSharing from "@/components/social-media-sharing";
+import { useGuestsByEvent } from "@/queries/guests";
 
 export default function EnhancedEventPage() {
   const { id: eventId } = useParams();
 
   const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
-  // start on 'menu' if there is no plan map so users are forced to create one
+  // active tab state
   const [activeTab, setActiveTab] = useState<string>("overview");
 
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
@@ -71,8 +72,7 @@ export default function EnhancedEventPage() {
   // determine whether a plan map exists (planMap query returns an array)
   const hasPlanMap = Array.isArray(planMap) && planMap.length > 0;
 
-  // ensure initial active tab is menu if no plan map
-  if (!hasPlanMap && activeTab !== "menu") setActiveTab("menu");
+  const { data: guests } = useGuestsByEvent(eventId);
 
   return (
     <div className="min-h-screen bg-[#0C111F]">
@@ -80,7 +80,7 @@ export default function EnhancedEventPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Header
-          stats={""}
+          guests={guests}
           event={event}
           getTimeUntilEvent={getTimeUntilEvent}
         />
@@ -88,13 +88,12 @@ export default function EnhancedEventPage() {
         <Tabs
           value={activeTab}
           onValueChange={(next) => {
-            // If there's no plan map, only allow staying on 'menu' or 'overview'
+            // If there's no plan map, only allow 'overview' or 'menu'.
+            // This lets the user start on the overview and go to the
+            // menu, but blocks navigation to later steps until they've
+            // added/claimed a menu item which creates a plan map.
             if (!hasPlanMap) {
-              // Allow switching to 'menu' or 'overview' (overview shows hero + menu builder)
-              if (next === "menu" || next === "overview") {
-                setActiveTab(next);
-              }
-              // otherwise ignore the change
+              if (next === "menu" || next === "overview") setActiveTab(next);
               return;
             }
 
@@ -129,12 +128,20 @@ export default function EnhancedEventPage() {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              <div className="lg:col-span-3">
-                <HeroSection event={event} />
+              <div className="flex flex-col gap-5 lg:col-span-3">
+                <HeroSection
+                  guests={guests}
+                  event={event}
+                  planMap={planMap?.[0]}
+                />
                 <MenuBuilder planMap={planMap?.[0]} eventId={eventId} />
               </div>
               <div className="lg:col-span-1">
-                <EventSidebar event={event} eventId={eventId} />
+                <EventSidebar
+                  guests={guests}
+                  event={event}
+                  planMap={planMap?.[0]}
+                />
               </div>
             </div>
           </TabsContent>
