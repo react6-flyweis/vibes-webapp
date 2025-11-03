@@ -1,20 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
-import {
-  Heart,
-  Share2,
-  Users,
-  Star,
-  Palette,
-  Globe,
-  Bookmark,
-  Award,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Share2, Users, Palette, Globe, Bookmark } from "lucide-react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -28,7 +16,6 @@ import { useCommunityDesignByIdQuery } from "@/queries/communityDesigns";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
 import type { SharedDesign } from "@/types/designs";
-import type { CollaborationInvite } from "@/types/designs";
 
 // Tabs (extracted)
 import DiscoverTab from "@/components/design-community/DiscoverTab";
@@ -56,6 +43,42 @@ export default function CollaborativeDesignSharing() {
   const selectedDesign: SharedDesign | null = useMemo(() => {
     if (!designResp || !designResp.community_designs_id) return null;
     // Reuse mapping logic lightly here to match DiscoverDesignCard/DesignDetailsDialog expectations
+    const extractColorsFromResp = (): string[] => {
+      try {
+        // design_json_data may be a JSON string saved from the editor which includes colorScheme
+        const raw = (designResp as any)?.design_json_data;
+        if (!raw) {
+          // fallback: some templates may include a top-level palette
+          if (Array.isArray((designResp as any)?.palette)) {
+            return (designResp as any).palette as string[];
+          }
+          return [];
+        }
+
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+
+        // If the saved JSON uses a colorScheme object, extract common fields
+        if (parsed?.colorScheme) {
+          const cs = parsed.colorScheme as any;
+          const out: string[] = [];
+          if (cs.primary) out.push(cs.primary);
+          if (cs.secondary) out.push(cs.secondary);
+          if (cs.accent) out.push(cs.accent);
+          if (cs.background) out.push(cs.background);
+          // remove duplicates and falsy
+          return Array.from(new Set(out.filter(Boolean)));
+        }
+
+        // If template exported a palette array
+        if (Array.isArray(parsed?.palette)) return parsed.palette;
+
+        return [];
+      } catch (err) {
+        // parsing failed
+        return [];
+      }
+    };
+
     return {
       id: designResp.community_designs_id,
       title: designResp.title ?? "",
@@ -98,7 +121,7 @@ export default function CollaborativeDesignSharing() {
       difficulty: ((designResp.image_type || "beginner") as any) ?? "beginner",
       timeToComplete: 0,
       tools: [],
-      colors: [],
+      colors: extractColorsFromResp(),
       isRemix: false,
       collaboration: {
         isCollaborative: false,
@@ -113,6 +136,31 @@ export default function CollaborativeDesignSharing() {
   React.useEffect(() => {
     setShowDetailsOpen(Boolean(id));
   }, [id]);
+
+  // Apply template palette (colors) to root CSS variables when a design is selected.
+  React.useEffect(() => {
+    const root =
+      typeof document !== "undefined" ? document.documentElement : null;
+    if (!root) return;
+
+    const applyPalette = (colors?: string[]) => {
+      // we support up to 4 palette colors; map them to CSS variables
+      const keys = [
+        "--design-color-0",
+        "--design-color-1",
+        "--design-color-2",
+        "--design-color-3",
+      ];
+      // clear all first
+      keys.forEach((k) => root.style.removeProperty(k));
+      if (!colors || colors.length === 0) return;
+      colors.slice(0, 4).forEach((color, idx) => {
+        if (color) root.style.setProperty(keys[idx], color);
+      });
+    };
+
+    applyPalette(selectedDesign?.colors);
+  }, [selectedDesign]);
 
   const handleCloseDetails = () => {
     setShowDetailsOpen(false);
@@ -245,22 +293,6 @@ export default function CollaborativeDesignSharing() {
     }
   };
 
-  const bookmarkMutation = useMutation({
-    mutationFn: async (designId: string) => {
-      const res = await apiRequest(`/api/designs/${designId}/bookmark`, "POST");
-      return res;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Design Bookmarked",
-        description: "Saved for later reference",
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["/api/master/community-designs/getAll"],
-      });
-    },
-  });
-
   const shareMutation = useMutation({
     mutationFn: async (designId: string) => {
       const res = await apiRequest(`/api/designs/${designId}/share`, "POST");
@@ -281,434 +313,45 @@ export default function CollaborativeDesignSharing() {
     },
   });
 
-  // const { data: sharedDesigns } = useQuery({
-  //   queryKey: ["/api/designs/shared", selectedCategory, sortBy, searchQuery],
-  //   refetchInterval: 30000,
-  // });
+  // const formatTimeAgo = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   const now = new Date();
+  //   const diffInHours = Math.floor(
+  //     (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  //   );
 
-  // const { data: myDesigns } = useQuery({
-  //   queryKey: ["/api/designs/my-designs"],
-  //   refetchInterval: 30000,
-  // });
+  //   if (diffInHours < 1) return "Just now";
+  //   if (diffInHours < 24) return `${diffInHours}h ago`;
+  //   const diffInDays = Math.floor(diffInHours / 24);
+  //   if (diffInDays < 7) return `${diffInDays}d ago`;
+  //   return date.toLocaleDateString();
+  // };
 
-  // const { data: collaborations } = useQuery({
-  //   queryKey: ["/api/designs/collaborations"],
-  //   refetchInterval: 30000,
-  // });
+  // const getDifficultyColor = (difficulty: string) => {
+  //   switch (difficulty) {
+  //     case "beginner":
+  //       return "bg-green-500";
+  //     case "intermediate":
+  //       return "bg-yellow-500";
+  //     case "advanced":
+  //       return "bg-red-500";
+  //     default:
+  //       return "bg-gray-500";
+  //   }
+  // };
 
-  // const { data: designComments } = useQuery({
-  //   queryKey: ["/api/designs/comments", selectedDesign],
-  //   enabled: !!selectedDesign,
-  //   refetchInterval: 15000,
-  // });
-
-  // const { data: pendingInvites } = useQuery({
-  //   queryKey: ["/api/designs/invites"],
-  //   refetchInterval: 30000,
-  // });
-
-  // const likeDesignMutation = useMutation({
-  //   mutationFn: async (designId: string) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${designId}/like`
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Design Liked",
-  //       description: "Added to your favorites",
-  //     });
-  //   },
-  // });
-
-  // const bookmarkDesignMutation = useMutation({
-  //   mutationFn: async (designId: string) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${designId}/bookmark`
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Design Bookmarked",
-  //       description: "Saved for later reference",
-  //     });
-  //   },
-  // });
-
-  // const downloadDesignMutation = useMutation({
-  //   mutationFn: async (designId: string) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${designId}/download`
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Download Started",
-  //       description: "Design files are being prepared",
-  //     });
-  //   },
-  // });
-
-  // const remixDesignMutation = useMutation({
-  //   mutationFn: async (data: {
-  //     designId: string;
-  //     title: string;
-  //     description: string;
-  //     remixType: "full" | "partial" | "inspired";
-  //     modifications?: {
-  //       colors?: string[];
-  //       elements?: any[];
-  //       layout?: any;
-  //       customizations?: any;
-  //     };
-  //   }) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${data.designId}/remix`,
-  //       data
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: (data) => {
-  //     toast({
-  //       title: "Remix Created Successfully",
-  //       description: `Your remix "${data.title}" is now available in your designs`,
-  //     });
-  //     setShowRemixDialog(false);
-  //     // Invalidate queries to refresh data
-  //     queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
-  //     // Open the remix in design editor
-  //     window.open(`/design-editor/${data.id}`, "_blank");
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       title: "Remix Creation Failed",
-  //       description: "Unable to create remix. Please try again.",
-  //       variant: "destructive",
-  //     });
-  //   },
-  // });
-
-  // const shareDesignMutation = useMutation({
-  //   mutationFn: async (designId: string) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${designId}/share`
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Share Link Created",
-  //       description: "Design link copied to clipboard",
-  //     });
-  //   },
-  // });
-
-  // // Comment creation is handled inside DesignDetailsDialog now.
-
-  // const inviteCollaboratorMutation = useMutation({
-  //   mutationFn: async (data: {
-  //     designId: string;
-  //     email: string;
-  //     role: string;
-  //   }) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/${data.designId}/invite`,
-  //       data
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: (data) => {
-  //     toast({
-  //       title: "Invitation Sent",
-  //       description: `Collaborator invitation sent to ${
-  //         data.invitation?.inviteeEmail || "the specified email"
-  //       }`,
-  //     });
-  //     setShowCollabDialog(false);
-  //     // Refresh collaboration data
-  //     queryClient.invalidateQueries({ queryKey: ["/api/designs/invites"] });
-  //     queryClient.invalidateQueries({
-  //       queryKey: ["/api/designs/collaborations"],
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       title: "Invitation Failed",
-  //       description:
-  //         "Unable to send collaboration invitation. Please check the email address and try again.",
-  //       variant: "destructive",
-  //     });
-  //   },
-  // });
-
-  // const handleInviteResponse = useMutation({
-  //   mutationFn: async (data: {
-  //     inviteId: string;
-  //     action: "accept" | "decline";
-  //   }) => {
-  //     const response = await apiRequest(
-  //       "POST",
-  //       `/api/designs/invites/${data.inviteId}/respond`,
-  //       data
-  //     );
-  //     return response.json();
-  //   },
-  //   onSuccess: (_, variables) => {
-  //     toast({
-  //       title:
-  //         variables.action === "accept"
-  //           ? "Invitation Accepted"
-  //           : "Invitation Declined",
-  //       description:
-  //         variables.action === "accept"
-  //           ? "You can now collaborate on this design"
-  //           : "Invitation declined",
-  //     });
-  //   },
-  // });
-
-  // const myDesignsList: SharedDesign[] = myDesigns || [
-  //   {
-  //     id: "my-design-birthday",
-  //     title: "Retro Birthday Bash",
-  //     description:
-  //       "80s-inspired birthday party invitation with neon colors and retro typography.",
-  //     creator: {
-  //       id: "current-user",
-  //       name: "You",
-  //       avatar:
-  //         "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-  //       verified: false,
-  //       followers: 45,
-  //     },
-  //     category: "invitation",
-  //     tags: ["birthday", "retro", "80s", "neon"],
-  //     thumbnail:
-  //       "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400",
-  //     previewImages: [
-  //       "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800",
-  //     ],
-  //     createdAt: "2025-01-20T12:00:00Z",
-  //     updatedAt: "2025-01-24T08:30:00Z",
-  //     stats: {
-  //       views: 234,
-  //       likes: 18,
-  //       downloads: 7,
-  //       remixes: 2,
-  //       shares: 5,
-  //     },
-  //     isLiked: false,
-  //     isBookmarked: false,
-  //     visibility: "public",
-  //     license: "free",
-  //     difficulty: "beginner",
-  //     timeToComplete: 25,
-  //     tools: ["Canva"],
-  //     colors: ["#ff0099", "#00ff99", "#9900ff", "#ffff00"],
-  //     isRemix: false,
-  //     collaboration: {
-  //       isCollaborative: true,
-  //       collaborators: [
-  //         {
-  //           id: "current-user",
-  //           name: "You",
-  //           avatar:
-  //             "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-  //           role: "owner",
-  //         },
-  //         {
-  //           id: "friend-jenny",
-  //           name: "Jenny Wilson",
-  //           avatar:
-  //             "https://images.unsplash.com/photo-1494790108755-2616b612b1c5?w=150",
-  //           role: "editor",
-  //         },
-  //       ],
-  //       inviteCode: "RETRO80S",
-  //     },
-  //   },
-  // ];
-
-  // const collaborationsList: SharedDesign[] = collaborations || [
-  //   {
-  //     id: "collab-design-gala",
-  //     title: "Charity Gala Invitation",
-  //     description:
-  //       "Sophisticated invitation design for charity fundraising events.",
-  //     creator: {
-  //       id: "creator-david",
-  //       name: "David Park",
-  //       avatar:
-  //         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-  //       verified: true,
-  //       followers: 567,
-  //     },
-  //     category: "invitation",
-  //     tags: ["charity", "gala", "formal", "elegant"],
-  //     thumbnail:
-  //       "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400",
-  //     previewImages: [
-  //       "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800",
-  //     ],
-  //     createdAt: "2025-01-21T09:15:00Z",
-  //     updatedAt: "2025-01-24T14:20:00Z",
-  //     stats: {
-  //       views: 892,
-  //       likes: 76,
-  //       downloads: 23,
-  //       remixes: 5,
-  //       shares: 12,
-  //     },
-  //     isLiked: false,
-  //     isBookmarked: true,
-  //     visibility: "unlisted",
-  //     license: "free",
-  //     difficulty: "intermediate",
-  //     timeToComplete: 40,
-  //     tools: ["InDesign", "Photoshop"],
-  //     colors: ["#1a1a1a", "#ffffff", "#d4af37", "#8b0000"],
-  //     isRemix: false,
-  //     collaboration: {
-  //       isCollaborative: true,
-  //       collaborators: [
-  //         {
-  //           id: "creator-david",
-  //           name: "David Park",
-  //           avatar:
-  //             "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-  //           role: "owner",
-  //         },
-  //         {
-  //           id: "current-user",
-  //           name: "You",
-  //           avatar:
-  //             "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-  //           role: "editor",
-  //         },
-  //         {
-  //           id: "collab-lisa",
-  //           name: "Lisa Chen",
-  //           avatar:
-  //             "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-  //           role: "viewer",
-  //         },
-  //       ],
-  //       inviteCode: "GALA2025",
-  //     },
-  //   },
-  // ];
-
-  // const comments: DesignComment[] = designComments || [
-  //   {
-  //     id: "comment-1",
-  //     designId: "design-neon-nights",
-  //     author: {
-  //       id: "user-sarah",
-  //       name: "Sarah Kim",
-  //       avatar:
-  //         "https://images.unsplash.com/photo-1494790108755-2616b612b1c5?w=150",
-  //     },
-  //     content:
-  //       "Absolutely love the color palette! The neon effects are perfectly executed. This would be perfect for our upcoming EDM event.",
-  //     createdAt: "2025-01-24T14:30:00Z",
-  //     likes: 12,
-  //     isLiked: false,
-  //   },
-  //   {
-  //     id: "comment-2",
-  //     designId: "design-neon-nights",
-  //     author: {
-  //       id: "user-tom",
-  //       name: "Tom Wilson",
-  //       avatar:
-  //         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-  //     },
-  //     content:
-  //       "Great work! Could you share how you achieved the glow effect on the text?",
-  //     createdAt: "2025-01-24T12:15:00Z",
-  //     likes: 8,
-  //     isLiked: true,
-  //   },
-  // ];
-
-  // const invites: CollaborationInvite[] = pendingInvites || [
-  //   {
-  //     id: "invite-1",
-  //     designId: "design-corporate-event",
-  //     designTitle: "Corporate Event Branding Package",
-  //     inviterName: "Jennifer Lopez",
-  //     inviterAvatar:
-  //       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-  //     role: "editor",
-  //     expiresAt: "2025-01-30T23:59:59Z",
-  //     status: "pending",
-  //   },
-  //   {
-  //     id: "invite-2",
-  //     designId: "design-music-festival",
-  //     designTitle: "Music Festival Visual Identity",
-  //     inviterName: "Chris Taylor",
-  //     inviterAvatar:
-  //       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-  //     role: "viewer",
-  //     expiresAt: "2025-01-28T23:59:59Z",
-  //     status: "pending",
-  //   },
-  // ];
-
-  const invites: CollaborationInvite[] = [];
-
-  // Bookmark mutation isn't implemented in this build; provide a harmless stub
-  const bookmarkDesignMutation = { mutate: (id: string) => {} };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    );
-
-    if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-    return date.toLocaleDateString();
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500";
-      case "intermediate":
-        return "bg-yellow-500";
-      case "advanced":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  const getLicenseIcon = (license: string) => {
-    switch (license) {
-      case "free":
-        return <Heart className="w-3 h-3" />;
-      case "premium":
-        return <Star className="w-3 h-3" />;
-      case "commercial":
-        return <Award className="w-3 h-3" />;
-      default:
-        return <Heart className="w-3 h-3" />;
-    }
-  };
+  // const getLicenseIcon = (license: string) => {
+  //   switch (license) {
+  //     case "free":
+  //       return <Heart className="w-3 h-3" />;
+  //     case "premium":
+  //       return <Star className="w-3 h-3" />;
+  //     case "commercial":
+  //       return <Award className="w-3 h-3" />;
+  //     default:
+  //       return <Heart className="w-3 h-3" />;
+  //   }
+  // };
 
   // Inline tab components moved to separate files in ./tabs/
 
@@ -729,7 +372,7 @@ export default function CollaborativeDesignSharing() {
         </div>
 
         {/* Pending Invitations Alert */}
-        {invites.length > 0 && (
+        {/* {invites.length > 0 && (
           <Card className="border-blue-500/20 bg-blue-500/10 backdrop-blur-lg">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
@@ -795,7 +438,7 @@ export default function CollaborativeDesignSharing() {
               ))}
             </CardContent>
           </Card>
-        )}
+        )} */}
 
         {/* Main Content Tabs */}
         <Tabs
