@@ -1,5 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useCreateEventPayment, {
+  CreateEventPaymentPayload,
+  PaymentIntent,
+} from "@/mutations/useCreateEventPayment";
 import { Button } from "@/components/ui/button";
+import SuccessDialog, { SuccessDialogDetail } from "@/components/SuccessDialog";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, ArrowLeft } from "lucide-react";
@@ -22,11 +27,12 @@ import image5 from "../../assests/templateImage/5.jpg";
 import GuestManagement from "@/components/invitation/GuestManagement";
 import PreviewInvitation from "@/components/invitation/PreviewInvitation";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
+import { useNavigate } from "react-router";
 
 // types moved to `@/types/invitation`
 
 export default function CompleteInviteWorkflow() {
-  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Core workflow state
   const [currentStep, setCurrentStep] = useState<StepType>("event");
@@ -142,28 +148,68 @@ export default function CompleteInviteWorkflow() {
     send: 100,
   };
 
-  // Open the price dialog automatically when entering the send step
-  useEffect(() => {
-    if (currentStep === "send") {
-      setPriceEstimate(99.99);
-      setPriceDialogOpen(true);
-    } else {
-      setPriceDialogOpen(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, selectedTemplate, guestList]);
+  // useEffect(() => {
+  //   if (currentStep === "send") {
+  //     setPriceEstimate(99.99);
+  //     // leave `priceDialogOpen` alone so it only opens on user action
+  //   } else {
+  //     setPriceDialogOpen(false);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentStep, selectedTemplate, guestList]);
+  const createEventPaymentMutation = useCreateEventPayment();
 
   const handleMethodSelect = async (method: number) => {
-    // throw error
-    throw new Error("Payment method selection not implemented yet.");
+    const payload: CreateEventPaymentPayload = {
+      amount: priceEstimate || 0,
+      payment_method_id: method,
+      billingDetails: "EventPayment",
+      event_id: Number(selectedEvent?.id) ?? 0,
+    };
+
+    const res = await createEventPaymentMutation.mutateAsync(payload);
+
+    const apiPayload = res?.data?.data ?? res?.data ?? res;
+
+    if (apiPayload?.amount) setPriceEstimate(Number(apiPayload.amount));
+
+    const paymentIntent = {
+      id: apiPayload.payment_intent_id,
+      clientSecret: apiPayload.client_secret ?? "",
+      amount: apiPayload.amount,
+      currency: apiPayload.currency,
+      status: apiPayload.status || apiPayload.payment_status,
+    };
+    return paymentIntent as PaymentIntent;
   };
 
   const handleConfirm = (payment: any) => {
+    console.log("Payment confirmed:", payment);
     setPriceDialogOpen(false);
-    toast({
-      title: "Payment confirmed",
-      description: "Payment was processed (stub).",
-    });
+    showPaymentSuccess(payment);
+  };
+
+  // success dialog state
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [successDetails, setSuccessDetails] = useState<
+    SuccessDialogDetail[] | React.ReactNode | undefined
+  >(undefined);
+
+  // show a success dialog with transaction details
+  const showPaymentSuccess = (payment: any) => {
+    const transactionId = payment?.transaction?.transaction_id ?? "-";
+    const paymentIntentId = payment?.data.payment_intent_id ?? "-";
+    const amount =
+      payment?.amount ?? payment?.paymentIntent?.amount ?? priceEstimate ?? 0;
+
+    const details: SuccessDialogDetail[] = [
+      { label: "Transaction ID", value: transactionId },
+      { label: "Payment Intent", value: paymentIntentId },
+      { label: "Amount", value: `${amount}$` },
+    ];
+
+    setSuccessDetails(details);
+    setSuccessDialogOpen(true);
   };
 
   // Build preview data from selections for the Preview step
@@ -329,6 +375,19 @@ export default function CompleteInviteWorkflow() {
             onMethodSelect={handleMethodSelect}
           />
 
+          <SuccessDialog
+            open={successDialogOpen}
+            onOpenChange={(open) => setSuccessDialogOpen(open)}
+            title={"Invitation Successful"}
+            description={"Your invitation was sent successfully."}
+            details={successDetails}
+            onDone={() => {
+              setSuccessDialogOpen(false);
+              // redirect to events page
+              navigate("/event-discovery");
+            }}
+          />
+
           {/* Navigation Buttons */}
           {currentStep !== "event" && currentStep !== "template" && (
             <div className="flex justify-between mt-8">
@@ -363,13 +422,19 @@ export default function CompleteInviteWorkflow() {
                     "send",
                   ];
                   const currentIndex = steps.indexOf(currentStep);
+                  // If we're on the final step, open the payment dialog
+                  if (currentStep === "send") {
+                    setPriceEstimate(99.99);
+                    setPriceDialogOpen(true);
+                    return;
+                  }
                   if (currentIndex < steps.length - 1) {
                     setCurrentStep(steps[currentIndex + 1] as any);
                   }
                 }}
                 className="bg-purple-600 hover:bg-purple-700"
               >
-                Continue
+                {currentStep === "send" ? "Pay & Send" : "Continue"}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
