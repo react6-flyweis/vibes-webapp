@@ -2,6 +2,7 @@ export interface SharedDesign {
   id: number;
   title: string;
   description: string;
+  designData?: string;
   creator: {
     id: string;
     name: string;

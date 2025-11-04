@@ -155,12 +155,15 @@ function mapToSharedDesign(item: CommunityDesignApiItem): SharedDesign {
       isCollaborative: false,
       collaborators: [],
     },
+    designData: item.design_json_data,
   } as SharedDesign;
 }
 
 export function useCommunityDesignsQuery() {
   return useQuery({
-    queryKey: ["/api/master/community-designs/getAll"],
+    queryKey: [
+      "/api/master/community-designs/getAll?sortBy=created_at&sortOrder=desc",
+    ],
     queryFn: fetchCommunityDesigns,
     select: (res) => (res?.data ?? []).map(mapToSharedDesign),
     staleTime: 1000 * 60 * 2,
