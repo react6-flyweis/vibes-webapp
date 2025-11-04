@@ -96,6 +96,7 @@ const BrandedMicroEvents = lazy(() => import("@/pages/branded-micro-events"));
 const VenueIntegration = lazy(() => import("@/pages/venue-integration"));
 const EventDiscovery = lazy(() => import("@/pages/event-discovery"));
 const EventBooking = lazy(() => import("@/pages/event-booking"));
+const MyEvents = lazy(() => import("@/pages/my-events"));
 const FindAndBookEvents = lazy(() => import("@/pages/find-and-book-events"));
 const UniquePartyExperiences = lazy(
   () => import("@/pages/unique-party-experiences")
@@ -309,6 +310,7 @@ function DashboardRouter() {
         <Route path="/branded-micro-events" element={<BrandedMicroEvents />} />
         <Route path="/venue-integration" element={<VenueIntegration />} />
         <Route path="/event-discovery" element={<EventDiscovery />} />
+        <Route path="/my-events" element={<MyEvents />} />
         <Route path="/find-events" element={<FindAndBookEvents />} />
         <Route path="/unique-parties" element={<UniquePartyExperiences />} />
         <Route path="/create-event" element={<CreateEvent />} />
