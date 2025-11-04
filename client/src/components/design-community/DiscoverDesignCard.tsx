@@ -22,8 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   useCommunityDesignLikeMutation,
@@ -35,6 +34,7 @@ import { useDesignTabsMapCreateMutation } from "@/mutations/useDesignTabsMapCrea
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DesignDetailsDialog from "@/components/design-community/DesignDetailsDialog";
 import RemixDialog from "@/components/design-community/RemixDialog";
+import { useNavigate } from "react-router";
 import { SharedDesign } from "@/types/designs";
 import { LoadingButton } from "../ui/loading-button";
 
@@ -63,6 +63,7 @@ export function DiscoverDesignCard({ design }: Props) {
 
   const [showDetails, setShowDetails] = React.useState(false);
   const [showRemix, setShowRemix] = React.useState(false);
+  const navigate = useNavigate();
   // removed collaboration UI: manage collaborators option hidden
 
   // Use centralized interaction mutation for likes (mutation hook without toasts)
@@ -181,41 +182,6 @@ export function DiscoverDesignCard({ design }: Props) {
       });
     }
   };
-
-  // Remix mutation (create remix based on this design)
-  const remixMutation = useMutation({
-    mutationFn: async (data: {
-      designId: string;
-      title: string;
-      description: string;
-      remixType: string;
-    }) => {
-      const res = await apiRequest(
-        "POST",
-        `/api/designs/${data.designId}/remix`,
-        data
-      );
-      return res;
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Remix Created Successfully",
-        description: `Your remix "${data.title}" is available in your designs`,
-      });
-      setShowRemix(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/designs/my-designs"] });
-      if (data?.id) {
-        window.open(`/design-editor/${data.id}`, "_blank");
-      }
-    },
-    onError: () => {
-      toast({
-        title: "Remix Creation Failed",
-        description: "Unable to create remix. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -464,12 +430,14 @@ export function DiscoverDesignCard({ design }: Props) {
       <Dialog open={showRemix} onOpenChange={setShowRemix}>
         <DialogContent className="bg-black/90 border-purple-500/20 text-white max-w-lg">
           <RemixDialog
-            onCreate={(payload) =>
-              remixMutation.mutate({
-                designId: design.id.toString(),
-                ...payload,
-              })
-            }
+            onCreate={(payload) => {
+              // Close the dialog and redirect to the Vibes Card Studio
+              setShowRemix(false);
+
+              navigate("/vibescard-studio", {
+                state: { designData: design.designData },
+              });
+            }}
             onCancel={() => setShowRemix(false)}
           />
         </DialogContent>
