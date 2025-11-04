@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import StaffBookings from "@/components/staff/StaffBookings";
+import CateringBookings from "@/components/catering/CateringBookings";
 import {
   Select,
   SelectTrigger,
@@ -313,6 +314,12 @@ export default function Profile() {
                 </div>
               </form>
             </Form>
+          </div>
+
+          {/* Staff bookings section */}
+          {/* Catering bookings section */}
+          <div className="mt-8">
+            <CateringBookings />
           </div>
 
           {/* Staff bookings section */}
