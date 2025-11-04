@@ -7,11 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { useParams } from "react-router";
-import { CheckCircle, AlertTriangle, Download, Smartphone } from "lucide-react";
+import { CheckCircle, AlertTriangle, Download } from "lucide-react";
 import TicketList from "@/components/EventBooking/TicketList";
 import Stepper from "@/components/EventBooking/Stepper";
 import { useEventByIdQuery } from "@/queries/events";
@@ -49,6 +48,8 @@ export default function EventBooking() {
   const [priceDialogOpen, setPriceDialogOpen] = useState(false);
   const [priceEstimate, setPriceEstimate] = useState<number>(0);
   const [pendingPayment, setPendingPayment] = useState<any>(null);
+  // indicates that payment has been confirmed and tickets are ready to download
+  const [isPaid, setIsPaid] = useState<boolean>(false);
   const [step, setStep] = useState<
     "tickets" | "seats" | "checkout" | "confirmation"
   >("tickets");
@@ -58,10 +59,6 @@ export default function EventBooking() {
 
   // Fetch event details using centralized query
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
-
-  const { data: userProfile } = useQuery<{ loyaltyPoints?: number }>({
-    queryKey: ["/api/user/profile"],
-  });
 
   // mutation to create userget tickets (reserve / register tickets for the user)
   const createUserGetTickets = useCreateEventEntryUserTickets({
@@ -85,11 +82,11 @@ export default function EventBooking() {
   // Create ticket order mutation (checkout)
   const ticketOrderMutation = useCreateTicketOrder({
     onSuccess: (data) => {
-      toast({
-        title: "Order created",
-        description:
-          "Your order was created. Please complete payment to confirm your booking.",
-      });
+      // toast({
+      //   title: "Order created",
+      //   description:
+      //     "Your order was created. Please complete payment to confirm your booking.",
+      // });
       // Do not move to confirmation until payment is completed.
       // The payment dialog will be opened by the createOrderOnServer onSuccess handler.
       queryClient.invalidateQueries({ queryKey: ["/api/user/bookings"] });
@@ -98,26 +95,6 @@ export default function EventBooking() {
       toast({
         title: "Booking Failed",
         description: (err && (err as any).message) || String(err),
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Apply promo code mutation
-  const promoMutation = useMutation({
-    mutationFn: async (code: string) => {
-      return await apiRequest("POST", "/api/promo/validate", { code, eventId });
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Promo Code Applied",
-        description: `${data.discount}% discount applied!`,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Invalid Promo Code",
-        description: error.message,
         variant: "destructive",
       });
     },
@@ -221,7 +198,7 @@ export default function EventBooking() {
       email: personalInfo.email,
       phoneNo: personalInfo.phone,
       promo_code: promoCode || null,
-      loyalty_points: usePoints ? userProfile?.loyaltyPoints ?? false : false,
+      loyalty_points: usePoints ?? false,
       tickets,
     };
 
@@ -253,6 +230,160 @@ export default function EventBooking() {
     return paymentIntent;
   };
 
+  // Open a printable ticket view using the order response stored in state.
+  const handleDownloadTickets = () => {
+    if (!pendingPayment?.orderResponse) {
+      toast({
+        title: "No tickets available",
+        description: "We couldn't find an order to generate tickets from.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const order = pendingPayment.orderResponse;
+    const calc = order.calculation_details || {};
+    const breakdown = calc.ticket_breakdown || [];
+
+    const eventTitle = (event && (event.name_title || "Event")) || "Event";
+    const orderId = order.event_entry_tickets_order_id ?? order._id ?? "-";
+    const finalAmount = order.final_amount ?? calc.final_amount ?? 0;
+
+    const styles = `
+      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color: #0f172a; }
+      .ticket { max-width: 720px; margin: 24px auto; padding: 20px; border-radius: 12px; background: linear-gradient(135deg,#0ea5e9,#7c3aed); color: #fff; }
+      .ticket h1 { margin: 0 0 8px 0; font-size: 22px; }
+      .meta { display:flex; justify-content:space-between; margin-bottom:12px; }
+      .section { background: rgba(255,255,255,0.06); padding:12px; border-radius:8px; margin-top:8px }
+      table { width:100%; border-collapse:collapse; }
+      td, th { padding:8px; text-align:left; }
+      .right { text-align:right; }
+      .actions { margin-top:16px; display:flex; gap:8px; }
+      button { background:#fff; color:#0f172a; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    `;
+
+    const ticketsHtml = breakdown
+      .map(
+        (t: any) => `
+          <div class="section">
+            <strong>${t.ticket_title || t.title || "Ticket"}</strong>
+            <div>Quantity: ${t.quantity}</div>
+            <div>Price per ticket: ${t.price_per_ticket ?? t.price ?? "-"}</div>
+            <div>Subtotal: ${t.item_subtotal ?? "-"}</div>
+          </div>`
+      )
+      .join("");
+
+    const html = `<!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Tickets - ${eventTitle}</title>
+        <style>${styles}</style>
+      </head>
+      <body>
+        <div class="ticket">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h1>${eventTitle}</h1>
+              <div>Order: <strong>${orderId}</strong></div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700;font-size:18px">Total</div>
+              <div style="font-size:20px">${finalAmount}</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            ${ticketsHtml}
+          </div>
+
+          <div class="section">
+            <table>
+              <tbody>
+                <tr><td>Subtotal</td><td class="right">${
+                  calc.subtotal ?? order.subtotal ?? "-"
+                }</td></tr>
+                <tr><td>Tax (${
+                  calc.tax_percentage ?? "-"
+                }%)</td><td class="right">${
+      calc.tax_amount ?? order.tax ?? "-"
+    }</td></tr>
+                <tr><td><strong>Final</strong></td><td class="right"><strong>${finalAmount}</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="actions">
+            <button id="printBtn">Print / Save as PDF</button>
+            <button id="closeBtn">Close</button>
+          </div>
+        </div>
+
+        <script>
+          document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+          document.getElementById('closeBtn').addEventListener('click', function(){ window.close(); });
+        </script>
+      </body>
+    </html>`;
+
+    // Try a few strategies to reliably open the printable ticket view.
+    // 1) window.open without features (some blockers disallow feature strings)
+    // 2) fall back to a data: URL via programmatic anchor click
+    // Only show the "popup blocked" toast if all methods fail.
+    let opened = false;
+
+    try {
+      const w = window.open("", "_blank");
+      if (w) {
+        try {
+          w.document.open();
+          w.document.write(html);
+          w.document.close();
+          opened = true;
+        } catch (e) {
+          // Some browsers may refuse write on a newly opened window. Try navigating it to a data URL instead.
+          try {
+            w.location.href =
+              "data:text/html;charset=utf-8," + encodeURIComponent(html);
+            opened = true;
+          } catch (err) {
+            // give up on this window handle
+            try {
+              w.close();
+            } catch {}
+          }
+        }
+      }
+    } catch (e) {
+      // ignore and try anchor fallback
+    }
+
+    if (!opened) {
+      try {
+        const a = document.createElement("a");
+        a.href = "data:text/html;charset=utf-8," + encodeURIComponent(html);
+        a.target = "_blank";
+        // Safari requires the element to be in the document
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        opened = true;
+      } catch (e) {
+        opened = false;
+      }
+    }
+
+    if (!opened) {
+      toast({
+        title: "Popup blocked",
+        description:
+          "Please allow popups to download tickets or use the browser's print to save.",
+        variant: "destructive",
+      });
+    }
+  };
   // category color helper was moved into TicketItem component
 
   if (eventLoading) {
@@ -414,10 +545,8 @@ export default function EventBooking() {
                     setPersonalInfo={setPersonalInfo}
                     promoCode={promoCode}
                     setPromoCode={setPromoCode}
-                    onApplyPromo={(code) => promoMutation.mutate(code)}
                     usePoints={usePoints}
                     setUsePoints={setUsePoints}
-                    userProfile={userProfile}
                     onBack={() => setStep("seats")}
                     onComplete={createOrderOnServer}
                     isLoading={ticketOrderMutation.isPending}
@@ -439,17 +568,26 @@ export default function EventBooking() {
                   </p>
 
                   <div className="flex justify-center gap-4">
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Tickets
-                    </Button>
                     <Button
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => handleDownloadTickets()}
+                      disabled={!isPaid || !pendingPayment}
+                      title={
+                        !isPaid
+                          ? "Tickets will be available after payment confirmation"
+                          : "Download your tickets"
+                      }
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      {isPaid ? "Download Tickets" : "Preparing Tickets..."}
+                    </Button>
+                    {/* <Button
                       variant="outline"
                       className="border-white/20 text-white hover:bg-white/10"
                     >
                       <Smartphone className="h-4 w-4 mr-2" />
                       Add to Wallet
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardContent>
               </Card>
@@ -467,11 +605,11 @@ export default function EventBooking() {
                   selectedTickets={selectedTickets}
                   selectedTicketDetails={selectedTicketDetails}
                   selectedSeats={selectedSeats}
-                  promo={
-                    promoMutation.data
-                      ? { discount: promoMutation.data.discount }
-                      : null
-                  }
+                  // promo={
+                  //   promoMutation.data
+                  //     ? { discount: promoMutation.data.discount }
+                  //     : null
+                  // }
                 />
               </CardContent>
             </Card>
@@ -489,11 +627,14 @@ export default function EventBooking() {
           setStep("checkout");
         }}
         onConfirm={(payment) => {
+          // mark payment as successful and keep the pendingPayment order data
           toast({
             title: "Payment Successful",
             description: "Your payment was processed successfully.",
           });
           setPriceDialogOpen(false);
+          // mark as paid so downloads become available
+          setIsPaid(true);
           // move to confirmation step
           setStep("confirmation");
         }}
