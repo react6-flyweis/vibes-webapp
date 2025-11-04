@@ -1,31 +1,26 @@
 import { Link, NavLink } from "react-router";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Home,
   Calendar,
-  Users,
   Sparkles,
   Store,
-  Crown,
   Building2,
-  User,
   Menu,
   X,
-  Monitor,
-  ChevronDown,
-  Brain,
-  Music,
-  Video,
-  Leaf,
-  Trophy,
-  Clock,
-  PartyPopper,
+  // Users,
+  // Crown,
+  // User,
+  // Monitor,
+  // ChevronDown,
+  // Brain,
+  // Music,
+  // Video,
+  // Leaf,
+  // Trophy,
+  // Clock,
+  // PartyPopper,
   CalendarPlus,
 } from "lucide-react";
 import { useState } from "react";
@@ -36,8 +31,8 @@ export default function Navigation() {
 
   const coreNavigationItems = [
     { path: "/", label: "Home", icon: Home },
-    { path: "/plan-event/", label: "Plan My Event", icon: CalendarPlus },
-    { path: "/event-discovery", label: "My Events", icon: Calendar },
+    { path: "/my-events/", label: "Plan My Event", icon: CalendarPlus },
+    { path: "/my-events", label: "My Events", icon: Calendar },
     { path: "/vendors", label: "Vendors", icon: Store },
   ];
 
