@@ -50,6 +50,17 @@ export default function AddCateringDialog({
     },
   });
 
+  // local image file + preview state (file is not uploaded to backend yet)
+  const [imageFile, setImageFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    // revoke object URL on unmount or when imageFile changes
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   // derive a value for the id-based select (undefined when not set)
   const rawCategory = form.getValues("catering_marketplace_category_id");
   const categoryValue =
@@ -126,18 +137,64 @@ export default function AddCateringDialog({
             <FormField
               control={form.control}
               name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const handleFileChange = (
+                  e: React.ChangeEvent<HTMLInputElement>
+                ) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setImageFile(file);
+                  if (file) {
+                    const url = URL.createObjectURL(file);
+                    setPreviewUrl(url);
+                    form.setValue("image", file.name);
+                  } else {
+                    setPreviewUrl(null);
+                    form.setValue("image", "");
+                  }
+                };
+
+                return (
+                  <FormItem>
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://example.com/image.jpg"
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <div className="mt-2">
+                      <label className="text-sm font-medium">
+                        Or upload image (optional)
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="block mt-2"
+                      />
+
+                      {previewUrl && (
+                        <div className="mt-2">
+                          <img
+                            src={previewUrl}
+                            alt="preview"
+                            className="h-24 w-24 object-cover rounded"
+                          />
+                        </div>
+                      )}
+
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Note: file upload isn't connected to the backend yet.
+                        The form will send the image field (currently the file
+                        name) with the existing mutation.
+                      </p>
+                    </div>
+
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
