@@ -23,41 +23,71 @@ interface KonvaCanvasProps {
   colorScheme: ColorScheme;
   eventDetails: EventDetails;
   stageRef?: React.RefObject<Konva.Stage>;
-  initialKonvaJSON?: string;
+  initialKonvaJSON?: string | null;
 }
 
 // Image component wrapper to handle loading with CORS support
 const ImageElement = forwardRef<any, any>(({ src, ...props }: any, ref) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!src) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
     const loadImage = (
       imgSrc: string,
       onSuccess: (img: HTMLImageElement) => void,
-      onError: () => void
+      onError: (err: any) => void
     ) => {
       const img = new Image();
 
-      // Enable CORS for external images (images from other domains)
-      if (
-        imgSrc &&
-        (imgSrc.startsWith("http://") || imgSrc.startsWith("https://"))
-      ) {
-        img.crossOrigin = "anonymous";
-      }
+      // Set a timeout for image loading
+      const timeout = setTimeout(() => {
+        console.warn(`⚠️  Image load timeout: ${imgSrc.substring(0, 50)}...`);
+        onError(new Error("Image load timeout"));
+      }, 10000);
 
-      img.onload = () => onSuccess(img);
-      img.onerror = onError;
+      // Always set crossOrigin for better compatibility
+      // This is important for both external images AND local SVG files
+      img.crossOrigin = "anonymous";
+
+      img.onload = () => {
+        clearTimeout(timeout);
+        console.log(
+          `✅ Image loaded successfully: ${imgSrc.substring(0, 50)}...`
+        );
+        onSuccess(img);
+      };
+
+      img.onerror = (err) => {
+        clearTimeout(timeout);
+        console.error(
+          `❌ Image load error: ${imgSrc.substring(0, 50)}...`,
+          err
+        );
+        onError(err);
+      };
+
       img.src = imgSrc;
 
       return img;
     };
 
     // Try multiple path resolution strategies
-    const pathsToTry: string[] = [];
+    const pathsToTry: string[] = [src];
 
-    pathsToTry.push(src);
+    // Add alternative paths for local images
+    if (src.startsWith("/src/")) {
+      pathsToTry.push(src.replace("/src/", "/"));
+      pathsToTry.push(src.substring(1));
+    } else if (src.startsWith("/") && !src.startsWith("//")) {
+      pathsToTry.push(src.substring(1));
+    }
 
     let currentAttempt = 0;
     let currentImage: HTMLImageElement | null = null;
@@ -65,33 +95,46 @@ const ImageElement = forwardRef<any, any>(({ src, ...props }: any, ref) => {
     const tryNextPath = () => {
       if (currentAttempt >= pathsToTry.length) {
         console.error(
-          "All image load attempts failed for:",
+          "❌ All image load attempts failed for:",
           src,
-          "Tried paths:",
+          "\nTried paths:",
           pathsToTry
         );
         setError(true);
+        setLoading(false);
         return;
       }
 
       const pathToTry = pathsToTry[currentAttempt];
       currentAttempt++;
 
+      console.log(
+        `🔄 Loading image (attempt ${currentAttempt}/${
+          pathsToTry.length
+        }): ${pathToTry.substring(0, 60)}...`
+      );
+
       currentImage = loadImage(
         pathToTry,
         (img) => {
           setImage(img);
           setError(false);
+          setLoading(false);
         },
-        () => {
+        (err) => {
           console.warn(
-            `Image load failed for path: ${pathToTry}, trying next...`
+            `Image load failed for path: ${pathToTry.substring(
+              0,
+              50
+            )}..., trying next...`
           );
           tryNextPath();
         }
       );
     };
 
+    setLoading(true);
+    setError(false);
     tryNextPath();
 
     return () => {
@@ -103,11 +146,53 @@ const ImageElement = forwardRef<any, any>(({ src, ...props }: any, ref) => {
   }, [src]);
 
   if (error && !image) {
-    // Return a placeholder rectangle if image fails to load
-    return <Rect {...props} fill="#e5e7eb" stroke="#9ca3af" strokeWidth={2} />;
+    // Return a placeholder rectangle with error indication if image fails to load
+    return (
+      <Group>
+        <Rect
+          {...props}
+          fill="#f3f4f6"
+          stroke="#ef4444"
+          strokeWidth={2}
+          dash={[5, 5]}
+        />
+        <Text
+          {...props}
+          text="❌ Image\nFailed"
+          fontSize={14}
+          fill="#ef4444"
+          align="center"
+          verticalAlign="middle"
+          listening={false}
+        />
+      </Group>
+    );
   }
 
-  if (!image) return null;
+  if (loading || !image) {
+    // Show loading placeholder
+    return (
+      <Group>
+        <Rect
+          {...props}
+          fill="#e5e7eb"
+          stroke="#9ca3af"
+          strokeWidth={1}
+          dash={[3, 3]}
+        />
+        <Text
+          {...props}
+          text="⏳ Loading..."
+          fontSize={12}
+          fill="#6b7280"
+          align="center"
+          verticalAlign="middle"
+          listening={false}
+        />
+      </Group>
+    );
+  }
+
   return <KonvaImage ref={ref} image={image} {...props} />;
 });
 
