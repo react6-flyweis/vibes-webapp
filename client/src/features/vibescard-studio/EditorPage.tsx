@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import {
   useCreateDesign,
@@ -26,11 +27,16 @@ import { CommunityDesignApiItem } from "@/queries/communityDesigns";
 
 interface EditorPageProps {
   initialDesign?: CommunityDesignApiItem;
+  designData?: string | null;
 }
 
-export default function EditorPage({ initialDesign }: EditorPageProps) {
+export default function EditorPage({
+  initialDesign,
+  designData,
+}: EditorPageProps) {
   const { toast } = useToast();
   const stageRef = useRef<any>(null);
+  const navigate = useNavigate();
 
   // Canvas state
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 1027 });
@@ -251,6 +257,7 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
           community_designs_id: createdId,
           status: true,
         });
+        navigate(`/vibescard-studio/${createdId}`);
       } catch (err) {
         console.error("Failed to map design to tab:", err);
         toast({
@@ -293,33 +300,79 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
         description: "Loading images and preparing canvas...",
       });
 
+      console.log("\n🚀 Starting export process...");
+      console.log(`📊 Total elements: ${elements.length}`);
+
+      const imageElements = elements.filter((el) => el.type === "image");
+      console.log(`🖼️  Image elements: ${imageElements.length}`);
+
+      if (imageElements.length > 0) {
+        console.log(
+          "Image sources:",
+          imageElements.map((el) => ({
+            id: el.id,
+            src: el.content?.src?.substring(0, 60) + "...",
+          }))
+        );
+      }
+
       // First, wait for all current images to load
+      console.log("⏳ Step 1: Waiting for images to load...");
       await waitForImagesToLoad(elements);
 
       // Preload and convert external images to base64
+      console.log("🔄 Step 2: Converting images to base64...");
       const updatedElements = await preloadImagesForExport(elements);
 
       // Update the elements state with base64 images (record in history)
+      console.log("💾 Step 3: Updating element state...");
       setElementsWithHistory(updatedElements);
 
       // Wait for React to re-render and Konva to update
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log("⏳ Step 4: Waiting for canvas to re-render...");
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
+      console.log("📸 Step 5: Exporting to PNG...");
       await exportDesignToPNG(stageRef);
 
       toast({
         title: "Export Success",
         description: "Your invitation has been downloaded",
       });
+
+      console.log("✅ Export completed successfully!\n");
     } catch (error) {
-      console.error("Export error:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Unable to export design. Please try again.";
+      console.error("\n❌ Export failed:", error);
+
+      let errorTitle = "Export Failed";
+      let errorMessage = "Unable to export design. Please try again.";
+
+      if (error instanceof Error) {
+        // Check for specific error types
+        if (
+          error.message.includes("CORS") ||
+          error.message.includes("cross-origin") ||
+          error.message.includes("tainted")
+        ) {
+          errorTitle = "CORS Security Error";
+          errorMessage =
+            "Cannot export with external images due to browser security. " +
+            "Try uploading images directly or use images from the same domain.";
+        } else if (error.message.includes("timeout")) {
+          errorTitle = "Timeout Error";
+          errorMessage =
+            "Image loading timed out. Please check your internet connection and try again.";
+        } else if (error.message.includes("Failed to load image")) {
+          errorTitle = "Image Load Error";
+          errorMessage =
+            "One or more images failed to load. Please check image URLs and try again.";
+        } else if (error.message.length < 200) {
+          errorMessage = error.message;
+        }
+      }
 
       toast({
-        title: "Export Failed",
+        title: errorTitle,
         description: errorMessage,
         variant: "destructive",
       });
@@ -668,7 +721,7 @@ export default function EditorPage({ initialDesign }: EditorPageProps) {
             location: eventLocation,
             hostName: hostName,
           }}
-          initialKonvaJSON={initialDesign?.design_json_data}
+          initialKonvaJSON={designData}
         />
       </div>
 
