@@ -33,6 +33,7 @@ export interface ColorScheme {
   accent: string;
   background: string;
   text: string;
+  [key: string]: string; // Allow index signature for dynamic access
 }
 
 export interface CanvasSize {
