@@ -33,6 +33,8 @@ export default function EnhancedEventPage() {
   const { data: planMap, isLoading: planMapLoading } =
     usePlanEventMapsByEventQuery(eventId);
 
+  const { data: guests } = useGuestsByEvent(eventId);
+
   // while loading or missing event/planMap show loading
   if (eventLoading || !eventId || !event || planMapLoading || !planMap) {
     return (
@@ -71,8 +73,6 @@ export default function EnhancedEventPage() {
 
   // determine whether a plan map exists (planMap query returns an array)
   const hasPlanMap = Array.isArray(planMap) && planMap.length > 0;
-
-  const { data: guests } = useGuestsByEvent(eventId);
 
   return (
     <div className="min-h-screen bg-[#0C111F]">
