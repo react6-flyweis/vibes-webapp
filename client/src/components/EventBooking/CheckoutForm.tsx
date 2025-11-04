@@ -16,10 +16,9 @@ interface Props {
   setPersonalInfo: (p: PersonalInfo) => void;
   promoCode: string;
   setPromoCode: (s: string) => void;
-  onApplyPromo: (code: string) => void;
+  // onApplyPromo: (code: string) => void;
   usePoints: boolean;
   setUsePoints: (b: boolean) => void;
-  userProfile?: { loyaltyPoints?: number } | null;
   onBack: () => void;
   onComplete: () => void;
   isLoading?: boolean;
@@ -30,10 +29,9 @@ export default function CheckoutForm({
   setPersonalInfo,
   promoCode,
   setPromoCode,
-  onApplyPromo,
-  usePoints,
-  setUsePoints,
-  userProfile,
+  // onApplyPromo,
+  // usePoints,
+  // setUsePoints,
   onBack,
   onComplete,
   isLoading,
@@ -109,17 +107,17 @@ export default function CheckoutForm({
             className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
           />
           <Button
-            onClick={() => onApplyPromo(promoCode)}
+            // onClick={() => onApplyPromo(promoCode)}
             disabled={!promoCode}
             variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
+            className="bg-white/20 text-white hover:bg-white/10"
           >
             Apply
           </Button>
         </div>
       </div>
 
-      {userProfile?.loyaltyPoints && userProfile.loyaltyPoints > 0 && (
+      {/* {userProfile?.loyaltyPoints && userProfile.loyaltyPoints > 0 && (
         <div>
           <h3 className="font-semibold text-white mb-4">Loyalty Points</h3>
           <div className="flex items-center gap-2">
@@ -136,13 +134,13 @@ export default function CheckoutForm({
             </label>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="flex justify-between mt-6">
         <Button
           variant="outline"
           onClick={onBack}
-          className="border-white/20 text-white hover:bg-white/10"
+          className="bg-white/20 text-white hover:bg-white/10"
         >
           Back to Seats
         </Button>

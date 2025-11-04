@@ -138,7 +138,7 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <div className="mt-6 pt-4 border-t border-white/20">
+      {/* <div className="mt-6 pt-4 border-t border-white/20">
         <div className="flex gap-2">
           <Button
             size="sm"
@@ -165,7 +165,7 @@ export default function OrderSummary({
             Invite
           </Button>
         </div>
-      </div>
+      </div> */}
 
       <div className="mt-4 text-xs text-blue-100">
         <div className="flex items-center gap-1 mb-1">
