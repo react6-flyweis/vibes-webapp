@@ -26,7 +26,6 @@ export default function VibesCardEditPage() {
   if (isError || !design) {
     return (
       <div className="min-h-screen bg-[#0b1220] text-white">
-        <Navigation />
         <div className="p-6 max-w-4xl mx-auto">
           Error: {(error as any)?.message ?? "Failed to load"}
         </div>
@@ -36,9 +35,8 @@ export default function VibesCardEditPage() {
 
   return (
     <div className="min-h-screen bg-[#0b1220] text-white">
-      <Navigation />
       {/* Pass fetched design into the shared editor */}
-      <EditorPage initialDesign={design} />
+      <EditorPage initialDesign={design} designData={design.design_json_data} />
     </div>
   );
 }
