@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router";
 import {
   navigationItems,
+  staffNavigationItems,
   userNavigationItems,
   vendorNavigationItems,
   type NavCategory,
@@ -24,6 +25,7 @@ export default function DesktopNav() {
   const categories: NavCategory[] = [
     ...navigationItems,
     ...(user?.role_id === 3 ? vendorNavigationItems : userNavigationItems),
+    ...(user?.role_id === 4 ? staffNavigationItems : []),
   ];
 
   return (
