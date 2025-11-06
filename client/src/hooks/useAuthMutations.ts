@@ -127,6 +127,7 @@ export function useCreateUserMutation(
       email: string;
       password: string;
       agreePrivacyPolicy: boolean;
+      role_id?: number;
     }
   >
 ) {
@@ -138,6 +139,7 @@ export function useCreateUserMutation(
       email: string;
       password: string;
       agreePrivacyPolicy: boolean;
+      role_id?: number;
     }
   >({
     mutationFn: async (data) => {
