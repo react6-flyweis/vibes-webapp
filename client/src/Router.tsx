@@ -53,6 +53,7 @@ const SimpleLoginPage = lazy(() => import("@/pages/simple-login"));
 const ProfilePage = lazy(() => import("@/pages/profile"));
 const Login = lazy(() => import("@/pages/auth/login"));
 const Signup = lazy(() => import("@/pages/auth/signup"));
+const StaffOnboarding = lazy(() => import("@/pages/auth/staff-onboarding"));
 const VibeCurator = lazy(() => import("@/pages/vibe-curator"));
 const VirtualPartyTwin = lazy(() => import("@/pages/virtual-party-twin"));
 const AdaptiveEnvironment = lazy(() => import("@/pages/adaptive-environment"));
@@ -454,6 +455,7 @@ function Router() {
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/staff-onboarding" element={<StaffOnboarding />} />
       <Route
         path="/"
         element={
