@@ -94,7 +94,7 @@ export default function EviteTemplates() {
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto ">
             Choose from our collection of professionally designed,
-            Evite-inspired templates. Each template is fully customizable and
+            Evibes-inspired templates. Each template is fully customizable and
             includes interactive features for your guests.
           </p>
         </div>
