@@ -66,7 +66,7 @@ export const navigationItems: NavCategory[] = [
       },
       {
         name: "List New Event",
-        href: "/create-event",
+        href: "/list-event",
         icon: Plus,
         description: "Start planning your event",
       },
