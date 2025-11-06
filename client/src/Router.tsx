@@ -106,6 +106,7 @@ const UniquePartyExperiences = lazy(
 );
 const PartyBooking = lazy(() => import("@/pages/party-booking"));
 const EventDetail = lazy(() => import("@/pages/event-detail"));
+const ListEvent = lazy(() => import("@/pages/list-event"));
 const CreateEvent = lazy(() => import("@/pages/create-event"));
 const LoyaltyRewards = lazy(() => import("@/pages/loyalty-rewards"));
 const ProfessionalTools = lazy(() => import("@/pages/professional-tools"));
@@ -317,6 +318,7 @@ function DashboardRouter() {
         <Route path="/find-events" element={<FindAndBookEvents />} />
         <Route path="/unique-parties" element={<UniquePartyExperiences />} />
         <Route path="/create-event" element={<CreateEvent />} />
+        <Route path="/list-event" element={<ListEvent />} />
         <Route path="/event-planning/:eventId" element={<EventPlanning />} />
         <Route path="/events/:eventId" element={<EventDetail />} />
         <Route path="/events/booking/:eventId" element={<EventBooking />} />
