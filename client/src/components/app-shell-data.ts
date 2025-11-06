@@ -100,7 +100,7 @@ export const navigationItems: NavCategory[] = [
       //   description: "Full invitation system demo",
       // },
       {
-        name: "Evite Templates",
+        name: "Evibes Templates",
         href: "/evite-templates",
         icon: FileText,
         description: "Professional invitation templates",
@@ -154,6 +154,26 @@ export const userNavigationItems: NavCategory[] = [
         href: "/catering-marketplace",
         icon: Heart,
         description: "Food and beverage options",
+      },
+    ],
+  },
+];
+
+export const staffNavigationItems: NavCategory[] = [
+  {
+    title: "Staff Tools",
+    items: [
+      {
+        name: "Staff Dashboard",
+        href: "/staff-dashboard",
+        icon: Layout,
+        description: "Manage your staffing assignments",
+      },
+      {
+        name: "My Bookings",
+        href: "/staff-bookings",
+        icon: Calendar,
+        description: "View your bookings in calendar",
       },
     ],
   },
