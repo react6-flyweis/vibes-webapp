@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import userIcon from "@/assets/icons/user.svg";
 import vendorIcon from "@/assets/icons/vendor.svg";
+import { Users } from "lucide-react";
 
 export default function GetStarted() {
   const navigate = useNavigate();
@@ -69,6 +70,28 @@ export default function GetStarted() {
                 </div>
                 <div className="text-sm text-muted-foreground group-hover:text-white transition-all duration-200">
                   Offer services, get clients
+                </div>
+              </div>
+            </div>
+
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => choose("staff")}
+              onKeyDown={(e) =>
+                (e.key === "Enter" || e.key === " ") && choose("staff")
+              }
+              className="flex items-center gap-4 rounded-lg border border-blue-200 p-4 cursor-pointer
+              hover:bg-primary group transition-all duration-200"
+            >
+              <Users className="h-12 w-12 text-blue-700 group-hover:text-white transition-all duration-200" />
+
+              <div className="flex-1">
+                <div className="text-lg font-semibold text-blue-700 group-hover:text-white transition-all duration-200">
+                  Staff
+                </div>
+                <div className="text-sm text-muted-foreground group-hover:text-white transition-all duration-200">
+                  Join our team
                 </div>
               </div>
             </div>
