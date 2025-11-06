@@ -135,7 +135,7 @@ export function DesignTab({
   return (
     <div className="space-y-4">
       {/* Templates Section */}
-      <Card className="bg-[#0A0A0A] text-white">
+      <Card className="bg-[#0A0A0A] ">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm">Templates</CardTitle>
         </CardHeader>
@@ -147,7 +147,7 @@ export function DesignTab({
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
-              <SelectTrigger className="text-xs">
+              <SelectTrigger className="text-xs ">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -171,7 +171,7 @@ export function DesignTab({
               placeholder="Search templates..."
               value={templateSearch}
               onChange={(e) => setTemplateSearch(e.target.value)}
-              className="text-xs"
+              className="text-xs bg-white/20"
             />
           </div>
 
@@ -205,7 +205,7 @@ export function DesignTab({
                 className={`relative cursor-pointer rounded-lg p-3 border-2 transition-all transform hover:scale-105 w-full
                   ${
                     selectedTemplate === template.id
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-gray-900"
                       : "border-gray-200 dark:border-gray-600 hover:border-blue-300"
                   }`}
                 onClick={() => onApplyTemplate(template)}
