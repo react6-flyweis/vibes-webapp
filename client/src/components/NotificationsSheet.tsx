@@ -35,7 +35,7 @@ export default function NotificationsSheet() {
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 w-4 h-4 p-0 bg-red-500 text-[10px]">
+            <Badge className="flex justify-center items-center absolute -top-1 -right-1 w-4 h-4 p-0 bg-red-500 text-[10px]">
               {unreadCount}
             </Badge>
           )}
