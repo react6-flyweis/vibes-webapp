@@ -78,6 +78,7 @@ const AIPersonalizedRecommendations = lazy(
 const StaffingsPage = lazy(() => import("@/pages/staffings"));
 const Caterings = lazy(() => import("@/pages/caterings"));
 const StaffDashboard = lazy(() => import("@/pages/staff-dashboard"));
+const StaffBookings = lazy(() => import("@/pages/staff-bookings"));
 const SmartContractEscrow = lazy(() => import("@/pages/smart-contract-escrow"));
 const EnhancedDJBooth = lazy(() => import("@/pages/enhanced-dj-booth"));
 const AdaptiveMusicEngine = lazy(() => import("@/pages/adaptive-music-engine"));
@@ -424,6 +425,7 @@ function DashboardRouter() {
         <Route path="/vibes-business" element={<VibesBusiness />} />
         <Route path="/crm-dashboard" element={<VendorCRM />} />
         <Route path="/staff-dashboard" element={<StaffDashboard />} />
+        <Route path="/staff-bookings" element={<StaffBookings />} />
         <Route path="staffings" element={<StaffingsPage />} />
         <Route path="caterings" element={<Caterings />} />
         <Route path="/vibes-fund/*" element={<VibesLaunchFund />} />
