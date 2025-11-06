@@ -38,7 +38,7 @@ export default function Login() {
       <LoginForm />
       <div className="mt-5 text-sm text-gray-600">
         Don't have an account?{" "}
-        <Link to="/auth/signup">
+        <Link to="/signup">
           <Button
             variant="link"
             className="text-purple-600 hover:text-purple-700 p-0"
