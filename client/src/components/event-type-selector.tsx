@@ -13,26 +13,6 @@ type Props = {
 export default function EventTypeSelector({ value, onChange }: Props) {
   const { data, isLoading, isError } = useEventTypesQuery();
 
-  const items: EventTypeItem[] = Array.isArray(data) ? data : [];
-
-  // When there are no items, fall back to the two sensible defaults
-  const fallback: EventTypeItem[] = [
-    {
-      _id: "public_event",
-      name: "Public Ticketed Events",
-      code: "public_event",
-      emozi: "🎟️",
-    },
-    {
-      _id: "private_planning",
-      name: "Private Party Planning",
-      code: "private_planning",
-      emozi: "🎉",
-    },
-  ];
-
-  const list = items.length > 0 ? items : fallback;
-
   // Show a single skeleton card while loading to avoid layout shift
   if (isLoading) {
     return (
@@ -56,7 +36,7 @@ export default function EventTypeSelector({ value, onChange }: Props) {
         </div>
       )}
 
-      {list.map((it) => {
+      {data?.map((it) => {
         const val = it.code || it._id || String(it.event_type_id || "");
         const active = value === val;
 
