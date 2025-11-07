@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { useToast } from "@/hooks/use-toast";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
-import { axiosInstance } from "@/lib/queryClient";
+import { useStaffOnboardingMutation } from "@/mutations/useStaffOnboardingMutation";
 import { useAuthStore } from "@/store/auth-store";
 
 const steps = [
@@ -36,18 +36,18 @@ const steps = [
 ];
 
 const schema = z.object({
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  streetAddress: z.string().min(1, "Please enter your street address"),
-  city: z.string().min(1, "Please enter your city"),
-  state: z.string().min(1, "Please enter your state"),
-  zipCode: z.string().min(3, "Please enter a valid zip code"),
-  country: z.string().min(1, "Please select your country"),
-  authorizedPersonFullName: z
+  mobile: z.string().min(10, "Please enter a valid phone number"),
+  address: z.string().min(1, "Please enter your street address"),
+  city_id: z.string().min(1, "Please enter your city"),
+  state_id: z.string().min(1, "Please enter your state"),
+  zip_code: z.string().min(3, "Please enter a valid zip code"),
+  country_id: z.string().min(1, "Please select your country"),
+  Authorized_Person_Name: z
     .string()
     .min(1, "Please enter authorized person's full name"),
-  dateOfBirth: z.string().min(1, "Please enter date of birth"),
-  governmentIdType: z.string().min(1, "Please select government ID type"),
-  idNumber: z.string().min(1, "Please enter ID number"),
+  DOB: z.string().min(1, "Please enter date of birth"),
+  Govt_id_type: z.string().min(1, "Please select government ID type"),
+  ID_Number: z.string().min(1, "Please enter ID number"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -69,29 +69,26 @@ export default function StaffOnboarding() {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      phone: "",
-      streetAddress: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-      authorizedPersonFullName: "",
-      dateOfBirth: "",
-      governmentIdType: "",
-      idNumber: "",
+      mobile: "",
+      address: "",
+      city_id: "",
+      state_id: "",
+      zip_code: "",
+      country_id: "",
+      Authorized_Person_Name: "",
+      DOB: "",
+      Govt_id_type: "",
+      ID_Number: "",
     },
   });
 
+  const onboardingMutation = useStaffOnboardingMutation();
+
   const stepFields = useMemo(
     () => [
-      ["phone"],
-      ["streetAddress", "city", "state", "zipCode", "country"],
-      [
-        "authorizedPersonFullName",
-        "dateOfBirth",
-        "governmentIdType",
-        "idNumber",
-      ],
+      ["mobile"],
+      ["address", "city_id", "state_id", "zip_code", "country_id"],
+      ["Authorized_Person_Name", "DOB", "Govt_id_type", "ID_Number"],
       [],
     ],
     []
@@ -136,25 +133,22 @@ export default function StaffOnboarding() {
 
   const onSubmit = async (data: FormValues) => {
     const payload = {
-      phone: data.phone,
-      street_address: data.streetAddress,
-      city: data.city,
-      state: data.state,
-      zip_code: data.zipCode,
-      country: data.country,
-      authorized_person_full_name: data.authorizedPersonFullName,
-      date_of_birth: data.dateOfBirth,
-      government_id_type: data.governmentIdType,
-      id_number: data.idNumber,
-      id_document: idDocument,
-      photo_verification: photoVerification,
+      mobile: data.mobile,
+      address: data.address,
+      country_id: parseInt(data.country_id),
+      state_id: parseInt(data.state_id),
+      city_id: parseInt(data.city_id),
+      zip_code: data.zip_code,
+      Authorized_Person_Name: data.Authorized_Person_Name,
+      DOB: data.DOB,
+      Govt_id_type: data.Govt_id_type,
+      ID_Number: data.ID_Number,
+      id_proof_owner_img: idDocument || "",
+      user_img: photoVerification || "",
     };
 
     try {
-      await axiosInstance.put(
-        `/api/users/updateUserById/${user?.user_id}`,
-        payload
-      );
+      await onboardingMutation.mutateAsync(payload);
 
       toast({
         title: "Onboarding Complete!",
@@ -267,7 +261,7 @@ export default function StaffOnboarding() {
                   <CardContent>
                     <FormField
                       control={form.control}
-                      name="phone"
+                      name="mobile"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
@@ -301,7 +295,7 @@ export default function StaffOnboarding() {
                   <CardContent>
                     <FormField
                       control={form.control}
-                      name="streetAddress"
+                      name="address"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
@@ -323,15 +317,16 @@ export default function StaffOnboarding() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="city_id"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              City <span className="text-red-500">*</span>
+                              City ID <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="New York"
+                                type="number"
+                                placeholder="1"
                                 className="bg-gray-100"
                                 {...field}
                               />
@@ -343,16 +338,16 @@ export default function StaffOnboarding() {
 
                       <FormField
                         control={form.control}
-                        name="state"
+                        name="state_id"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              State/Province{" "}
-                              <span className="text-red-500">*</span>
+                              State ID <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="NY"
+                                type="number"
+                                placeholder="1"
                                 className="bg-gray-100"
                                 {...field}
                               />
@@ -366,7 +361,7 @@ export default function StaffOnboarding() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <FormField
                         control={form.control}
-                        name="zipCode"
+                        name="zip_code"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
@@ -386,24 +381,19 @@ export default function StaffOnboarding() {
 
                       <FormField
                         control={form.control}
-                        name="country"
+                        name="country_id"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Country <span className="text-red-500">*</span>
+                              Country ID <span className="text-red-500">*</span>
                             </FormLabel>
                             <FormControl>
-                              <select
+                              <Input
+                                type="number"
+                                placeholder="1"
+                                className="bg-gray-100"
                                 {...field}
-                                className="w-full rounded-md border border-gray-200 bg-gray-100 h-10 px-4 text-sm"
-                              >
-                                <option value="">Select a country</option>
-                                {countries.map((c) => (
-                                  <option key={c} value={c}>
-                                    {c}
-                                  </option>
-                                ))}
-                              </select>
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -427,7 +417,7 @@ export default function StaffOnboarding() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="authorizedPersonFullName"
+                        name="Authorized_Person_Name"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
@@ -448,7 +438,7 @@ export default function StaffOnboarding() {
 
                       <FormField
                         control={form.control}
-                        name="dateOfBirth"
+                        name="DOB"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
@@ -477,7 +467,7 @@ export default function StaffOnboarding() {
 
                       <FormField
                         control={form.control}
-                        name="governmentIdType"
+                        name="Govt_id_type"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
@@ -504,7 +494,7 @@ export default function StaffOnboarding() {
 
                       <FormField
                         control={form.control}
-                        name="idNumber"
+                        name="ID_Number"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
@@ -606,7 +596,7 @@ export default function StaffOnboarding() {
                         <div className="space-y-2 text-sm">
                           <p>
                             <span className="font-medium">Phone:</span>{" "}
-                            {form.getValues("phone")}
+                            {form.getValues("mobile")}
                           </p>
                         </div>
 
@@ -616,23 +606,23 @@ export default function StaffOnboarding() {
                         <div className="space-y-2 text-sm">
                           <p>
                             <span className="font-medium">Street:</span>{" "}
-                            {form.getValues("streetAddress")}
+                            {form.getValues("address")}
                           </p>
                           <p>
-                            <span className="font-medium">City:</span>{" "}
-                            {form.getValues("city")}
+                            <span className="font-medium">City ID:</span>{" "}
+                            {form.getValues("city_id")}
                           </p>
                           <p>
-                            <span className="font-medium">State:</span>{" "}
-                            {form.getValues("state")}
+                            <span className="font-medium">State ID:</span>{" "}
+                            {form.getValues("state_id")}
                           </p>
                           <p>
                             <span className="font-medium">Zip Code:</span>{" "}
-                            {form.getValues("zipCode")}
+                            {form.getValues("zip_code")}
                           </p>
                           <p>
-                            <span className="font-medium">Country:</span>{" "}
-                            {form.getValues("country")}
+                            <span className="font-medium">Country ID:</span>{" "}
+                            {form.getValues("country_id")}
                           </p>
                         </div>
                       </div>
@@ -644,19 +634,19 @@ export default function StaffOnboarding() {
                         <div className="space-y-2 text-sm">
                           <p>
                             <span className="font-medium">Full Name:</span>{" "}
-                            {form.getValues("authorizedPersonFullName")}
+                            {form.getValues("Authorized_Person_Name")}
                           </p>
                           <p>
                             <span className="font-medium">Date of Birth:</span>{" "}
-                            {form.getValues("dateOfBirth")}
+                            {form.getValues("DOB")}
                           </p>
                           <p>
                             <span className="font-medium">ID Type:</span>{" "}
-                            {form.getValues("governmentIdType")}
+                            {form.getValues("Govt_id_type")}
                           </p>
                           <p>
                             <span className="font-medium">ID Number:</span>{" "}
-                            {form.getValues("idNumber")}
+                            {form.getValues("ID_Number")}
                           </p>
                           <p>
                             <span className="font-medium">Documents:</span>{" "}
