@@ -144,12 +144,6 @@ export const userNavigationItems: NavCategory[] = [
         description: "Find event vendors",
       },
       {
-        name: "Staffing Marketplace",
-        href: "/staffing-marketplace",
-        icon: Users,
-        description: "Hire event staff",
-      },
-      {
         name: "Catering Services",
         href: "/catering-marketplace",
         icon: Heart,
@@ -183,10 +177,16 @@ export const vendorNavigationItems: NavCategory[] = [
     title: "Marketplace",
     items: [
       {
-        name: "Staffings",
-        href: "/staffings",
+        name: "Staffing Marketplace",
+        href: "/staffing-marketplace",
         icon: Users,
+        description: "Hire event staff",
       },
+      // {
+      //   name: "Staffings",
+      //   href: "/staffings",
+      //   icon: Users,
+      // },
       {
         name: "Catering Services",
         href: "/caterings",
