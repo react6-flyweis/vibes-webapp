@@ -20,6 +20,7 @@ import { LoadingButton } from "@/components/ui/loading-button";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
 import { useNavigate } from "react-router";
 import { axiosInstance } from "@/lib/queryClient";
+import { useAuthStore } from "@/store/auth-store";
 
 const onboardingSchema = z.object({
   // Contact Information
@@ -47,11 +48,7 @@ const onboardingSchema = z.object({
 
 type OnboardingForm = z.infer<typeof onboardingSchema>;
 
-interface StaffOnboardingFormProps {
-  userId: string | number;
-}
-
-export function StaffOnboardingForm({ userId }: StaffOnboardingFormProps) {
+export function StaffOnboardingForm() {
   const [idDocumentPreview, setIdDocumentPreview] = useState<string | null>(
     null
   );
@@ -59,6 +56,7 @@ export function StaffOnboardingForm({ userId }: StaffOnboardingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
 
   const form = useForm<OnboardingForm>({
     resolver: zodResolver(onboardingSchema),
@@ -117,7 +115,10 @@ export function StaffOnboardingForm({ userId }: StaffOnboardingFormProps) {
     };
 
     try {
-      await axiosInstance.put(`/api/users/updateUserById/${userId}`, payload);
+      await axiosInstance.put(
+        `/api/users/updateUserById/${user?.user_id}`,
+        payload
+      );
 
       toast({
         title: "Onboarding Complete!",
