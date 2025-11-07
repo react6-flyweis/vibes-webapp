@@ -213,6 +213,7 @@ function DashboardRouter() {
   return (
     <Layout>
       <Routes>
+        <Route path="/staff-onboarding" element={<StaffOnboarding />} />
         <Route path="/plan-event/" element={<EventPlanningAuth />} />
         <Route path="/plan-event/:id" element={<EnhancedEventPage />} />
         <Route path="/ai-party-designer" element={<AIPartyDesigner />} />
@@ -461,7 +462,7 @@ function Router() {
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/staff-onboarding" element={<StaffOnboarding />} />
+
       <Route
         path="/"
         element={
