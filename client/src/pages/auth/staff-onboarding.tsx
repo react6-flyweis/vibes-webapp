@@ -31,6 +31,7 @@ import { useAuthStore } from "@/store/auth-store";
 const steps = [
   "Contact Information",
   "Address Information",
+  "Bank Details",
   "KYC Verification",
   "Review & Submit",
 ];
@@ -48,6 +49,16 @@ const schema = z.object({
   DOB: z.string().min(1, "Please enter date of birth"),
   Govt_id_type: z.string().min(1, "Please select government ID type"),
   ID_Number: z.string().min(1, "Please enter ID number"),
+  bank_account_holder: z.string().min(1, "Please enter account holder name"),
+  bank_name: z.string().min(1, "Please enter bank name"),
+  account_number: z.string().min(1, "Please enter account number"),
+  routing_number: z.string().min(1, "Please enter routing number"),
+  account_type: z.enum(["checking", "savings"]),
+  // initial payment or payment term percentage; must be a number and max 50
+  initial_payment: z.preprocess((val) => {
+    if (typeof val === "string") return val === "" ? undefined : Number(val);
+    return val;
+  }, z.number().min(0, "Enter a valid payment percentage").max(50, "Initial payment cannot exceed 50%")),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -79,6 +90,12 @@ export default function StaffOnboarding() {
       DOB: "",
       Govt_id_type: "",
       ID_Number: "",
+      bank_account_holder: "",
+      bank_name: "",
+      account_number: "",
+      routing_number: "",
+      account_type: "checking",
+      initial_payment: 0,
     },
   });
 
@@ -88,6 +105,14 @@ export default function StaffOnboarding() {
     () => [
       ["mobile"],
       ["address", "city_id", "state_id", "zip_code", "country_id"],
+      [
+        "bank_account_holder",
+        "bank_name",
+        "account_number",
+        "routing_number",
+        "account_type",
+        "initial_payment",
+      ],
       ["Authorized_Person_Name", "DOB", "Govt_id_type", "ID_Number"],
       [],
     ],
@@ -404,8 +429,157 @@ export default function StaffOnboarding() {
                 </Card>
               )}
 
-              {/* Step 2: KYC Verification */}
+              {/* Step 2: Bank Details */}
               {current === 2 && (
+                <Card className="mt-4">
+                  <CardHeader>
+                    <CardTitle>Bank Details</CardTitle>
+                    <CardDescription>
+                      Enter your bank information for payouts (optional for now)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="bank_account_holder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Account Holder Name{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Full name as on account"
+                                className="bg-gray-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="bank_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Bank Name <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Bank of Example"
+                                className="bg-gray-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="account_number"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Account Number{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="123456789"
+                                className="bg-gray-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="routing_number"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Routing Number{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="012345678"
+                                className="bg-gray-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="account_type"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Account Type{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <select
+                                {...field}
+                                className="w-full rounded-md border border-gray-200 bg-gray-100 h-10 px-4 text-sm"
+                              >
+                                <option value="checking">Checking</option>
+                                <option value="savings">Savings</option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="initial_payment"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Initial Payment / Payment Term (%){" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="0"
+                                min={0}
+                                max={50}
+                                step={1}
+                                className="bg-gray-100"
+                                {...(field as any)}
+                              />
+                            </FormControl>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Maximum allowed: 50%
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Step 3: KYC Verification */}
+              {current === 3 && (
                 <Card className="mt-4">
                   <CardHeader>
                     <CardTitle>KYC Verification</CardTitle>
@@ -579,7 +753,7 @@ export default function StaffOnboarding() {
               )}
 
               {/* Step 3: Review & Submit */}
-              {current === 3 && (
+              {current === 4 && (
                 <Card className="mt-4">
                   <CardHeader>
                     <CardTitle>Review & Submit</CardTitle>
@@ -655,6 +829,48 @@ export default function StaffOnboarding() {
                               : idDocument || photoVerification
                               ? "Partially uploaded"
                               : "No documents uploaded"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">
+                          Bank Details
+                        </h3>
+                        <div className="space-y-2 text-sm">
+                          <p>
+                            <span className="font-medium">Account Holder:</span>{" "}
+                            {form.getValues("bank_account_holder")}
+                          </p>
+                          <p>
+                            <span className="font-medium">Bank Name:</span>{" "}
+                            {form.getValues("bank_name")}
+                          </p>
+                          <p>
+                            <span className="font-medium">Account Number:</span>{" "}
+                            {form.getValues("account_number")
+                              ? `****${String(
+                                  form.getValues("account_number")
+                                ).slice(-4)}`
+                              : "Not provided"}
+                          </p>
+                          <p>
+                            <span className="font-medium">Routing Number:</span>{" "}
+                            {form.getValues("routing_number")
+                              ? `****${String(
+                                  form.getValues("routing_number")
+                                ).slice(-4)}`
+                              : "Not provided"}
+                          </p>
+                          <p>
+                            <span className="font-medium">Account Type:</span>{" "}
+                            {form.getValues("account_type")}
+                          </p>
+                          <p>
+                            <span className="font-medium">
+                              Initial Payment:
+                            </span>{" "}
+                            {form.getValues("initial_payment")}%
                           </p>
                         </div>
                       </div>
