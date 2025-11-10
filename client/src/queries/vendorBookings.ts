@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
-import { IResponseList } from "@/types";
+import { IResponseList, IResponse } from "@/types";
 
 export type VendorBooking = {
   _id: string;
@@ -24,6 +24,20 @@ export type VendorBooking = {
   updated_by?: number | null;
   created_at?: string;
   updated_at?: string;
+};
+
+export type CreateVendorBookingPayload = {
+  Year: number;
+  Month: number;
+  Date_start: string;
+  End_date: string;
+  Start_time: string;
+  End_time: string;
+  User_availabil: string;
+  user_id: number;
+  Vendor_Category_id: number[];
+  Event_id?: number;
+  Status: boolean;
 };
 
 // Fetch vendor bookings for the current logged-in vendor
@@ -57,5 +71,20 @@ export function useAllVendorBookingsQuery() {
     queryFn: fetchAllVendorBookings,
     select: (res) => res?.data ?? [],
     staleTime: 1000 * 60 * 2,
+  });
+}
+
+// Create vendor booking
+export function useCreateVendorBooking(options?: {
+  onSuccess?: (data: IResponse<any>) => void;
+  onError?: (err: unknown) => void;
+}) {
+  return useMutation({
+    mutationFn: (payload: CreateVendorBookingPayload) =>
+      axiosInstance
+        .post<IResponse<any>>("/api/vendor/bookings/create", payload)
+        .then((res) => res.data),
+    onSuccess: options?.onSuccess,
+    onError: options?.onError,
   });
 }
