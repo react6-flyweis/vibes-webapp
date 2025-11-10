@@ -15,7 +15,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, X, Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // simple helper to make category keys readable when we don't have a label map
 function humanizeCategory(key?: string) {
@@ -31,13 +39,27 @@ export default function VendorMarketplace() {
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState("");
   const [location, setLocation] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
 
   const { data: vendors = [], isLoading, error } = useVendors(3);
   const { data: serviceTypes = [] } = useVendorServiceTypes();
+
+  // Toggle category selection
+  const toggleCategory = (categoryId: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const removeCategory = (categoryId: string) => {
+    setSelectedCategories((prev) => prev.filter((id) => id !== categoryId));
+  };
 
   // Filter vendors based on search and filters
   const vendorsArray = Array.isArray(vendors) ? vendors : [];
@@ -54,14 +76,17 @@ export default function VendorMarketplace() {
       vendor.serviceLocation?.toLowerCase().includes(location.toLowerCase());
 
     const matchesCategory =
-      !selectedCategory ||
-      selectedCategory === "all" ||
-      // match by string category key
-      vendor.category === selectedCategory ||
-      vendor.categories?.includes(selectedCategory) ||
-      // match by business_category_id (numeric selection) or business_category_details name
-      vendor.business_category_id === Number(selectedCategory) ||
-      vendor.business_category_details?.business_category === selectedCategory;
+      selectedCategories.length === 0 ||
+      selectedCategories.some((selectedCat) => {
+        return (
+          // match by string category key
+          vendor.category === selectedCat ||
+          vendor.categories?.includes(selectedCat) ||
+          // match by business_category_id (numeric selection) or business_category_details name
+          vendor.business_category_id === Number(selectedCat) ||
+          vendor.business_category_details?.business_category === selectedCat
+        );
+      });
 
     return matchesSearch && matchesLocation && matchesCategory;
   });
@@ -97,15 +122,12 @@ export default function VendorMarketplace() {
 
             {/* Quick Filters */}
             <div className="flex flex-wrap gap-2">
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
+              {/* Category Multi-Select */}
+              <Select onValueChange={(value) => toggleCategory(value)}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="All Categories" />
+                  <SelectValue placeholder="Select Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
                   {serviceTypes.map((st) => (
                     <SelectItem
                       key={st.vendor_service_type_id}
@@ -114,24 +136,50 @@ export default function VendorMarketplace() {
                       {st.name}
                     </SelectItem>
                   ))}
-                  {/* {categoryGroups.map((group) => (
-                    <div key={group.title}>
-                      <div className="font-semibold text-xs text-gray-500 px-2 py-1">
-                        {group.title}
-                      </div>
-                      {group.categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {categoryLabels[category]}
-                        </SelectItem>
-                      ))}
-                    </div>
-                  ))} */}
                 </SelectContent>
               </Select>
 
+              {/* Date Range Picker */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-48 justify-start text-left font-normal",
+                      !dateRange.from && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd")} -{" "}
+                          {format(dateRange.to, "LLL dd")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, yyyy")
+                      )
+                    ) : (
+                      "Select dates"
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateRange.from}
+                    onSelect={(date) =>
+                      setDateRange({ from: date, to: dateRange.to })
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
               <Input
                 placeholder="Location..."
-                onChange={(e) => navigate(e.target.value)}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-40"
               />
 
@@ -145,6 +193,43 @@ export default function VendorMarketplace() {
               </Button>
             </div>
           </div>
+
+          {/* Selected Categories Display */}
+          {selectedCategories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300 mr-2">
+                Selected:
+              </span>
+              {selectedCategories.map((categoryId) => {
+                const category = serviceTypes.find(
+                  (st) => String(st.vendor_service_type_id) === categoryId
+                );
+                return (
+                  <Badge
+                    key={categoryId}
+                    variant="secondary"
+                    className="flex items-center gap-1 bg-party-coral text-white"
+                  >
+                    {category?.name || categoryId}
+                    <button
+                      onClick={() => removeCategory(categoryId)}
+                      className="ml-1 hover:bg-white/20 rounded-full"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedCategories([])}
+                className="text-xs h-6"
+              >
+                Clear All
+              </Button>
+            </div>
+          )}
 
           {/* Advanced Filters */}
           {showFilters && (
@@ -246,10 +331,12 @@ export default function VendorMarketplace() {
                     <button
                       key={st.vendor_service_type_id}
                       onClick={() =>
-                        setSelectedCategory(String(st.vendor_service_type_id))
+                        toggleCategory(String(st.vendor_service_type_id))
                       }
                       className={`block text-sm w-full text-left px-2 py-1 rounded transition-colors ${
-                        selectedCategory === String(st.vendor_service_type_id)
+                        selectedCategories.includes(
+                          String(st.vendor_service_type_id)
+                        )
                           ? "bg-party-coral text-white"
                           : "party-gray hover:bg-gray-100"
                       }`}
