@@ -23,6 +23,9 @@ import {
 import { LoadingButton } from "./ui/loading-button";
 import { ArrowRight } from "lucide-react";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
+import { AvailabilityTimeSlotSelector } from "./AvailabilityTimeSlotSelector";
+import { AvailabilityDateSelector } from "./AvailabilityDateSelector";
+import { AvailabilityDateRangeSelector } from "./AvailabilityDateRangeSelector";
 
 type Props = {
   open: boolean;
@@ -32,10 +35,12 @@ type Props = {
 };
 
 const staffShiftSchema = z.object({
+  timingMode: z.enum(["hourly", "fullday", "multiday"]),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
+  timeSlot: z.string().optional(), // For hourly mode
   eventType: z.string().min(1, "Event type is required"),
   eventId: z.string().min(1, "Event ID is required"),
   eventName: z.string().min(1, "Event name is required"),
@@ -56,15 +61,18 @@ type FormValues = z.infer<typeof staffShiftSchema>;
 export default function StaffShiftDialog({
   open,
   onOpenChange,
+  staff,
   onSubmit,
 }: Props) {
   const form = useForm<FormValues>({
     resolver: zodResolver(staffShiftSchema),
     defaultValues: {
+      timingMode: "hourly",
       startDate: "",
       endDate: "",
       startTime: "",
       endTime: "",
+      timeSlot: "",
       eventType: "",
       eventName: "",
       eventAddress: "",
@@ -73,15 +81,43 @@ export default function StaffShiftDialog({
     },
   });
 
-  const { handleSubmit, reset, control, setValue } = form;
+  const { handleSubmit, reset, control, setValue, watch } = form;
+  const timingMode = watch("timingMode");
+  const selectedDate = watch("startDate");
+  const selectedEndDate = watch("endDate");
 
   React.useEffect(() => {
     if (!open) reset();
   }, [open, reset]);
 
+  // Handle timing mode changes
+  React.useEffect(() => {
+    if (timingMode === "hourly") {
+      // For hourly mode, set times from time slot
+      const timeSlot = watch("timeSlot");
+      if (timeSlot) {
+        const [start, end] = timeSlot.split("-");
+        setValue("startTime", start);
+        setValue("endTime", end);
+        setValue("endDate", watch("startDate")); // Same day
+      }
+    } else if (timingMode === "fullday") {
+      // For full day, set times to full day (00:00 - 23:59)
+      setValue("startTime", "00:00");
+      setValue("endTime", "23:59");
+      setValue("endDate", watch("startDate")); // Same day
+    } else if (timingMode === "multiday") {
+      // For multiday, set default times to full day (00:00 - 23:59)
+      setValue("startTime", "00:00");
+      setValue("endTime", "23:59");
+    }
+  }, [timingMode, watch("timeSlot"), watch("startDate")]);
+
   const submit = async (values: FormValues) => {
     try {
-      await onSubmit(values);
+      // Remove timeSlot and timingMode before submitting to API
+      const { timeSlot, timingMode, ...apiData } = values;
+      await onSubmit(apiData as any);
     } catch (error) {
       const errorMessage = extractApiErrorMessage(error);
       form.setError("root", {
@@ -105,61 +141,155 @@ export default function StaffShiftDialog({
             onSubmit={handleSubmit(submit)}
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <FormField
-              control={control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Start date</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="date" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Timing Mode Selection (single inline segmented control) */}
+            <div className="md:col-span-2">
+              <FormField
+                control={control}
+                name="timingMode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Shift schedule</FormLabel>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Select schedule type
+                    </div>
+                    <FormControl>
+                      <div className="inline-flex rounded-md shadow-sm bg-transparent border divide-x">
+                        <button
+                          type="button"
+                          onClick={() => field.onChange("hourly")}
+                          aria-pressed={field.value === "hourly"}
+                          className={`px-3 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            field.value === "hourly"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-transparent text-muted-foreground hover:bg-muted"
+                          } rounded-l-md`}
+                        >
+                          Hourly
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => field.onChange("fullday")}
+                          aria-pressed={field.value === "fullday"}
+                          className={`px-3 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            field.value === "fullday"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-transparent text-muted-foreground hover:bg-muted"
+                          }`}
+                        >
+                          Full Day
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => field.onChange("multiday")}
+                          aria-pressed={field.value === "multiday"}
+                          className={`px-3 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            field.value === "multiday"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-transparent text-muted-foreground hover:bg-muted"
+                          } rounded-r-md`}
+                        >
+                          Multiple Days
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              control={control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>End date</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="date" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Date and Time Fields based on Mode */}
+            {timingMode === "hourly" && (
+              <>
+                <FormField
+                  control={control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={control}
-              name="startTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Start time</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="time" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={control}
+                  name="timeSlot"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Time Slot</FormLabel>
+                      <FormControl>
+                        <AvailabilityTimeSlotSelector
+                          userId={staff?.id}
+                          selectedDate={selectedDate}
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          enabled={open}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
 
-            <FormField
-              control={control}
-              name="endTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>End time</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="time" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {timingMode === "fullday" && (
+              <FormField
+                control={control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Date</FormLabel>
+                    <FormControl>
+                      <AvailabilityDateSelector
+                        userId={staff?.id}
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        enabled={open}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {timingMode === "multiday" && (
+              <>
+                <div className="md:col-span-2">
+                  <FormField
+                    control={control}
+                    name="startDate"
+                    render={({ field: startField }) => (
+                      <FormField
+                        control={control}
+                        name="endDate"
+                        render={({ field: endField }) => (
+                          <FormItem>
+                            <FormLabel>Date Range</FormLabel>
+                            <FormControl>
+                              <AvailabilityDateRangeSelector
+                                userId={staff?.id}
+                                startDate={startField.value || ""}
+                                endDate={endField.value || ""}
+                                onStartDateChange={startField.onChange}
+                                onEndDateChange={endField.onChange}
+                                enabled={open}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  />
+                </div>
+              </>
+            )}
 
             <div className="md:col-span-2">
               <FormField
