@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMyStaffBookingsQuery } from "@/queries/staffBookings";
+import { useAvailabilityCalendarByAuthQuery } from "@/queries/availabilityCalendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -37,12 +37,15 @@ import { Link } from "react-router";
 
 export default function StaffBookings() {
   const { data: bookings, isLoading } = useMyStaffBookingsQuery();
+  const { data: availabilityCalendar, isLoading: isLoadingAvailability } =
+    useAvailabilityCalendarByAuthQuery();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
 
-  if (isLoading) {
+  if (isLoading || isLoadingAvailability) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 py-8 px-4">
         <div className="max-w-7xl mx-auto">
@@ -69,9 +72,38 @@ export default function StaffBookings() {
     return acc;
   }, {} as Record<string, any[]>);
 
+  // Group availability calendar entries by date
+  const availabilityByDate = (availabilityCalendar || []).reduce(
+    (acc, entry) => {
+      try {
+        // Get all dates in the range from Date_start to End_date
+        const startDate = parseISO(entry.Date_start);
+        const endDate = parseISO(entry.End_date);
+        const dates = eachDayOfInterval({ start: startDate, end: endDate });
+
+        dates.forEach((date) => {
+          const dateStr = format(date, "yyyy-MM-dd");
+          if (!acc[dateStr]) {
+            acc[dateStr] = [];
+          }
+          acc[dateStr].push(entry);
+        });
+      } catch (e) {
+        console.error("Invalid date:", entry.Date_start, entry.End_date);
+      }
+      return acc;
+    },
+    {} as Record<string, any[]>
+  );
+
   // Get bookings for selected date
   const selectedDateBookings = selectedDate
     ? bookingsByDate[format(selectedDate, "yyyy-MM-dd")] || []
+    : [];
+
+  // Get availability entries for selected date
+  const selectedDateAvailability = selectedDate
+    ? availabilityByDate[format(selectedDate, "yyyy-MM-dd")] || []
     : [];
 
   // Generate calendar days
@@ -92,6 +124,16 @@ export default function StaffBookings() {
   const getBookingCount = (day: Date) => {
     const dateStr = format(day, "yyyy-MM-dd");
     return bookingsByDate[dateStr]?.length || 0;
+  };
+
+  const hasAvailability = (day: Date) => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    return availabilityByDate[dateStr]?.length > 0;
+  };
+
+  const getAvailabilityCount = (day: Date) => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    return availabilityByDate[dateStr]?.length || 0;
   };
 
   return (
@@ -195,6 +237,8 @@ export default function StaffBookings() {
                         : false;
                       const hasBookings = hasBooking(day);
                       const bookingCount = getBookingCount(day);
+                      const hasAvailabilityEntries = hasAvailability(day);
+                      const availabilityCount = getAvailabilityCount(day);
 
                       return (
                         <button
@@ -224,13 +268,21 @@ export default function StaffBookings() {
                                 ? "bg-green-500/10"
                                 : ""
                             }
+                            ${
+                              hasAvailabilityEntries &&
+                              !hasBookings &&
+                              !isSelected &&
+                              !isToday
+                                ? "bg-orange-500/10"
+                                : ""
+                            }
                           `}
                         >
                           <span className="relative z-10">
                             {format(day, "d")}
                           </span>
-                          {hasBookings && (
-                            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex flex-col gap-0.5 items-center">
+                            {hasBookings && (
                               <div className="flex gap-0.5">
                                 {Array.from({
                                   length: Math.min(bookingCount, 3),
@@ -241,8 +293,20 @@ export default function StaffBookings() {
                                   />
                                 ))}
                               </div>
-                            </div>
-                          )}
+                            )}
+                            {hasAvailabilityEntries && (
+                              <div className="flex gap-0.5">
+                                {Array.from({
+                                  length: Math.min(availabilityCount, 3),
+                                }).map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-1.5 h-1.5 rounded-full bg-orange-400"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </button>
                       );
                     })}
@@ -263,49 +327,113 @@ export default function StaffBookings() {
                 </CardHeader>
                 <CardContent>
                   {selectedDate ? (
-                    selectedDateBookings.length > 0 ? (
+                    selectedDateBookings.length > 0 ||
+                    selectedDateAvailability.length > 0 ? (
                       <div className="space-y-4">
-                        {selectedDateBookings.map((booking) => (
-                          <div
-                            key={booking._id}
-                            className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
-                            onClick={() => setSelectedBooking(booking)}
-                          >
-                            <h4 className="font-semibold text-white mb-2">
-                              {booking.event_name || "Event"}
+                        {/* Bookings Section */}
+                        {selectedDateBookings.length > 0 && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wide">
+                              Bookings ({selectedDateBookings.length})
                             </h4>
-                            <div className="space-y-1 text-sm text-white/70">
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-3 w-3" />
-                                <span>
-                                  {booking.timeFrom} - {booking.timeTo}
-                                </span>
-                              </div>
-                              {booking.staff_price && (
-                                <div className="flex items-center gap-2">
-                                  <DollarSign className="h-3 w-3" />
-                                  <span>
-                                    ${(booking.staff_price / 100).toFixed(2)}
-                                  </span>
+                            {selectedDateBookings.map((booking) => (
+                              <div
+                                key={booking._id}
+                                className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
+                                onClick={() => setSelectedBooking(booking)}
+                              >
+                                <h4 className="font-semibold text-white mb-2">
+                                  {booking.event_name || "Event"}
+                                </h4>
+                                <div className="space-y-1 text-sm text-white/70">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-3 w-3" />
+                                    <span>
+                                      {booking.timeFrom} - {booking.timeTo}
+                                    </span>
+                                  </div>
+                                  {booking.staff_price && (
+                                    <div className="flex items-center gap-2">
+                                      <DollarSign className="h-3 w-3" />
+                                      <span>
+                                        $
+                                        {(booking.staff_price / 100).toFixed(2)}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                            <Badge
-                              className="mt-2"
-                              variant={
-                                booking.transaction_status === "Completed"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {booking.transaction_status || "Pending"}
-                            </Badge>
+                                <Badge
+                                  className="mt-2"
+                                  variant={
+                                    booking.transaction_status === "Completed"
+                                      ? "default"
+                                      : "secondary"
+                                  }
+                                >
+                                  {booking.transaction_status || "Pending"}
+                                </Badge>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        )}
+
+                        {/* Availability Calendar Section */}
+                        {selectedDateAvailability.length > 0 && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-wide">
+                              Availability ({selectedDateAvailability.length})
+                            </h4>
+                            {selectedDateAvailability.map((availability) => (
+                              <div
+                                key={availability._id}
+                                className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-colors"
+                              >
+                                <h4 className="font-semibold text-white mb-2">
+                                  {availability.event_details?.name_title ||
+                                    "Event"}
+                                </h4>
+                                <div className="space-y-1 text-sm text-white/70">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-3 w-3" />
+                                    <span>
+                                      {availability.Start_time} -{" "}
+                                      {availability.End_time}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <CalendarIcon className="h-3 w-3" />
+                                    <span>
+                                      {format(
+                                        parseISO(availability.Date_start),
+                                        "MMM dd"
+                                      )}{" "}
+                                      -{" "}
+                                      {format(
+                                        parseISO(availability.End_date),
+                                        "MMM dd"
+                                      )}
+                                    </span>
+                                  </div>
+                                  {availability.event_details?.venue_name && (
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="h-3 w-3" />
+                                      <span className="truncate">
+                                        {availability.event_details.venue_name}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                <Badge className="mt-2 bg-orange-500/20 text-orange-200 border-orange-500/30">
+                                  {availability.User_availabil}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-center text-white/60 py-8">
-                        No bookings on this date
+                        No bookings or availability on this date
                       </div>
                     )
                   ) : (
@@ -331,6 +459,12 @@ export default function StaffBookings() {
                       <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
                     </div>
                     <span className="text-white/70">Has booking(s)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-orange-500/10 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                    </div>
+                    <span className="text-white/70">Has availability</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded bg-purple-500/30 border border-purple-500" />
@@ -436,7 +570,7 @@ export default function StaffBookings() {
         open={!!selectedBooking}
         onOpenChange={(open) => !open && setSelectedBooking(null)}
       >
-        <DialogContent className="bg-gray-900 bg-white/20 text-white max-w-2xl">
+        <DialogContent className="bg-gray-900/95 backdrop-blur-sm text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               {selectedBooking?.event_name || "Booking Details"}
