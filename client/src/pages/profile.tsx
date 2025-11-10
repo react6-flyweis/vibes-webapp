@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import StaffBookings from "@/components/staff/StaffBookings";
-import CateringBookings from "@/components/catering/CateringBookings";
+// import CateringBookings from "@/components/catering/CateringBookings";
 import {
   Select,
   SelectTrigger,
@@ -108,12 +108,22 @@ export default function Profile() {
   };
 
   const initials = useMemo(() => {
-    const name = user?.name || "";
-    const parts = name.split(" ").filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (
-      (parts[0][0] || "") + (parts[parts.length - 1][0] || "")
-    ).toUpperCase();
+    // Defensive: user.name may be undefined, null, or non-string. Ensure we handle all cases.
+    const rawName = user && typeof user.name === "string" ? user.name : "";
+    const parts = rawName.split(" ").filter(Boolean);
+
+    if (parts.length === 0) return "";
+
+    if (parts.length === 1) {
+      // Take up to two letters from single-part names (e.g., "Al" -> "AL")
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    const first = parts[0] && parts[0].length > 0 ? parts[0][0] : "";
+    const lastPart = parts[parts.length - 1];
+    const last = lastPart && lastPart.length > 0 ? lastPart[0] : "";
+
+    return (first + last).toUpperCase();
   }, [user]);
 
   return (
@@ -317,15 +327,13 @@ export default function Profile() {
           </div>
 
           {/* Staff bookings section */}
-          {/* Catering bookings section */}
-          <div className="mt-8">
-            <CateringBookings />
-          </div>
 
-          {/* Staff bookings section */}
-          <div className="mt-8">
-            <StaffBookings />
-          </div>
+          {/* Staff bookings section - only render for vendor users (role_id === 3) */}
+          {user?.role_id === 3 && (
+            <div className="mt-8">
+              <StaffBookings />
+            </div>
+          )}
         </div>
       </div>
     </div>
