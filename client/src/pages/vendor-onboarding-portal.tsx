@@ -36,6 +36,7 @@ import { useVendorOnboarding } from "@/mutations/useVendorOnboarding";
 import StepProgress from "@/components/onboarding/StepProgress";
 import DocumentUploadItem from "@/components/onboarding/DocumentUploadItem";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
+import CategoryMultiSelect from "@/components/CategoryMultiSelect";
 
 const steps = [
   "Basic Information",
@@ -51,7 +52,21 @@ const schema = z.object({
   legalName: z.string().optional(),
   email: z.string().email("Valid email is required"),
   phone: z.string().min(1, "Phone is required"),
-  primaryCategory: z.string().optional(),
+  categories: z
+    .array(
+      z.object({
+        category_id: z.number(),
+        category_name: z.string(),
+        pricing: z.number().min(0, "Pricing must be non-negative"),
+        pricing_currency: z.string(),
+      })
+    )
+    .min(1, "At least one category is required"),
+  initialPaymentRequired: z
+    .number()
+    .min(0, "Initial payment must be non-negative")
+    .max(50, "Initial payment cannot exceed 50%")
+    .optional(),
   yearsInBusiness: z.string().optional(),
   numberOfEmployees: z.string().optional(),
   description: z.string().optional(),
@@ -136,7 +151,8 @@ export default function VendorOnboardingPortal() {
       legalName: "",
       email: "",
       phone: "",
-      primaryCategory: "",
+      categories: [],
+      initialPaymentRequired: 0,
       yearsInBusiness: "",
       numberOfEmployees: "",
       description: "",
@@ -174,7 +190,8 @@ export default function VendorOnboardingPortal() {
         "legalName",
         "email",
         "phone",
-        "primaryCategory",
+        "categories",
+        "initialPaymentRequired",
         "yearsInBusiness",
         "numberOfEmployees",
         "description",
@@ -293,6 +310,8 @@ export default function VendorOnboardingPortal() {
       Basic_information_State_id: undefined,
       Basic_information_ZipCode: values.zip,
       Basic_information_Country_id: undefined,
+      categories: values.categories,
+      initial_payment_required: values.initialPaymentRequired,
       service_areas_locaiton: values.primaryServiceLocation,
       service_areas_Regions: values.optionalRegions,
       service_areas_pincode: values.pinCode,
@@ -493,6 +512,68 @@ export default function VendorOnboardingPortal() {
                         </FormItem>
                       )}
                     />
+
+                    {/* Categories with Pricing */}
+                    <div className="mt-6">
+                      <h3 className="text-lg font-medium mb-3">
+                        Service Categories & Pricing
+                      </h3>
+                      <FormField
+                        control={form.control}
+                        name="categories"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-semibold">
+                              Categories
+                            </FormLabel>
+                            <FormControl>
+                              <CategoryMultiSelect
+                                value={field.value}
+                                onChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Initial Payment Required */}
+                    <div className="mt-4">
+                      <FormField
+                        control={form.control}
+                        name="initialPaymentRequired"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Initial Payment Required (% - Max 50%)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="50"
+                                step="1"
+                                className="bg-gray-100"
+                                placeholder="0"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    parseFloat(e.target.value) || 0
+                                  )
+                                }
+                                value={field.value || ""}
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Percentage of total amount to be paid upfront
+                              (0-50%)
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     {/* Business Address section (matches design) */}
                     <div className="mt-6">
@@ -1117,9 +1198,34 @@ export default function VendorOnboardingPortal() {
                                   "numberOfEmployees"
                                 )} Employees`
                               : ""}
-                            {form.getValues("primaryCategory")
-                              ? `, ${form.getValues("primaryCategory")}`
-                              : ""}
+                          </li>
+                        </ul>
+
+                        <h3 className="text-base font-semibold mt-6 mb-3">
+                          Categories & Pricing:
+                        </h3>
+                        <ul className="list-disc pl-5 text-sm text-gray-800">
+                          {form.getValues("categories")?.length > 0 ? (
+                            form.getValues("categories").map((cat) => (
+                              <li key={cat.category_id}>
+                                {cat.category_name} - {cat.pricing_currency}{" "}
+                                {cat.pricing.toFixed(2)}
+                              </li>
+                            ))
+                          ) : (
+                            <li className="text-gray-500">
+                              No categories added
+                            </li>
+                          )}
+                        </ul>
+
+                        <h3 className="text-base font-semibold mt-6 mb-3">
+                          Payment Terms:
+                        </h3>
+                        <ul className="list-disc pl-5 text-sm text-gray-800">
+                          <li>
+                            Initial Payment Required:{" "}
+                            {form.getValues("initialPaymentRequired") || 0}%
                           </li>
                         </ul>
 
