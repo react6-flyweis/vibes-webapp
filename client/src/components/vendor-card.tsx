@@ -21,7 +21,8 @@ import {
   Share2,
   ExternalLink,
 } from "lucide-react";
-import ContactVendorDialog from "@/components/contact-vendor-dialog";
+import BookVendorDialog from "@/components/book-vendor-dialog";
+import { useAuthStore } from "@/store/auth-store";
 
 function humanizeCategory(key?: string) {
   if (!key) return "";
@@ -36,6 +37,7 @@ export default function VendorCard({ vendor }: { vendor: IVendor }) {
   const formatPrice = (cents: number) => `$${(cents / 100).toLocaleString()}`;
   const rating = 4.5 + Math.random() * 0.5; // Simulated rating
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -135,15 +137,15 @@ export default function VendorCard({ vendor }: { vendor: IVendor }) {
           {/* Example when API has `paymentMethods`: vendor.paymentMethods?.slice(0,3).map(...) */}
         </div>
 
-        {/* Single action: Request — opens contact dialog which posts to contact-vendor API */}
+        {/* Single action: Book Vendor — opens booking dialog */}
         <div className="pt-2">
-          <ContactVendorDialog
+          <BookVendorDialog
             vendorId={vendor.user_id ?? vendor._id}
-            userId={0} /* TODO: replace with current authenticated user id */
+            userId={user?.user_id ?? 0}
             trigger={
               <Button className="w-full bg-gradient-cta">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Request
+                <Calendar className="w-4 h-4 mr-2" />
+                Book Now
               </Button>
             }
           />
