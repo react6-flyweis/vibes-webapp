@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { IEvent, useEvents } from "@/hooks/useEvents";
+import { IEvent, fetchEvents } from "@/hooks/useEvents";
+import { useQuery } from "@tanstack/react-query";
+import type { IResponseList } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
 import EventCard from "@/components/event-card/EventCard";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,47 +20,6 @@ import EventCategorySelector from "@/components/event-category-selector";
 import CountrySelector from "@/components/country-selector";
 import { Calendar, MapPin, Search, Plus } from "lucide-react";
 
-// interface Event {
-//   id: string;
-//   title: string;
-//   description: string;
-//   category:
-//     | "concert"
-//     | "sports"
-//     | "festival"
-//     | "conference"
-//     | "theater"
-//     | "comedy";
-//   genre?: string;
-//   artist?: string;
-//   team?: string;
-//   venue: string;
-//   address: string;
-//   city: string;
-//   date: string;
-//   time: string;
-//   price: {
-//     min: number;
-//     max: number;
-//     currency: string;
-//   };
-//   image: string;
-//   rating: number;
-//   attendees: number;
-//   maxCapacity: number;
-//   tags: string[];
-//   featured: boolean;
-//   trending: boolean;
-//   soldOut: boolean;
-//   organizer: string;
-//   ticketTypes: Array<{
-//     type: string;
-//     price: number;
-//     available: number;
-//     benefits: string[];
-//   }>;
-// }
-
 interface EventFilters {
   category: string;
   genre: string;
@@ -67,57 +28,6 @@ interface EventFilters {
   dateRange: string;
   sortBy: string;
 }
-
-// const eventsData = [
-//   {
-//     id: "party_bus_001",
-//     title: "Miami Party Bus Tour",
-//     description:
-//       "VIP party bus experience through Miami's hottest nightlife spots with LED lights, premium sound system, and celebrity DJ.",
-//     category: "party-bus",
-//     venue: "Miami Party Bus Co.",
-//     address: "South Beach District",
-//     city: "Miami",
-//     date: "2025-06-20",
-//     time: "18:00",
-//     price: { min: 89, max: 149, currency: "USD" },
-//     image:
-//       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=240&fit=crop&auto=format",
-//     rating: 4.9,
-//     attendees: 78,
-//     maxCapacity: 100,
-//     tags: ["party bus", "nightlife", "Miami", "VIP"],
-//     featured: true,
-//     trending: true,
-//     soldOut: false,
-//     organizer: "Miami Nightlife Tours",
-//   },
-// ];
-// const eventsData = [
-//   {
-//     id: "party_bus_001",
-//     title: "Miami Party Bus Tour",
-//     description:
-//       "VIP party bus experience through Miami's hottest nightlife spots with LED lights, premium sound system, and celebrity DJ.",
-//     category: "party-bus",
-//     venue: "Miami Party Bus Co.",
-//     address: "South Beach District",
-//     city: "Miami",
-//     date: "2025-06-20",
-//     time: "18:00",
-//     price: { min: 89, max: 149, currency: "USD" },
-//     image:
-//       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=240&fit=crop&auto=format",
-//     rating: 4.9,
-//     attendees: 78,
-//     maxCapacity: 100,
-//     tags: ["party bus", "nightlife", "Miami", "VIP"],
-//     featured: true,
-//     trending: true,
-//     soldOut: false,
-//     organizer: "Miami Nightlife Tours",
-//   },
-// ];
 
 export default function EventDiscovery() {
   const navigate = useNavigate();
@@ -132,25 +42,43 @@ export default function EventDiscovery() {
   });
 
   const debouncedSearch = useDebounce(searchQuery, 350);
+  const [page, setPage] = useState(1);
+  const limit = 8;
 
-  // Fetch events from the server using the shared hook (debounced search)
-  const { data: events, isLoading } = useEvents({
-    page: 1,
-    limit: 50,
-    search: debouncedSearch,
-    status: true,
-    sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
-    sortOrder: "desc",
+  // Fetch events from the server using paginated endpoint (debounced search)
+  const queryKey = [
+    "/api/events/getAll",
+    {
+      page,
+      limit,
+      search: debouncedSearch,
+      sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
+      sortOrder: "desc",
+      status: true,
+    },
+  ];
+
+  const { data: paginatedRaw, isLoading } = useQuery({
+    queryKey,
+    queryFn: () =>
+      fetchEvents({
+        page,
+        limit,
+        search: debouncedSearch,
+        status: true,
+        sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
+        sortOrder: "desc",
+      }),
+    select: (res) => res.data,
   });
 
-  // const { data: recommendations = [] } = useQuery({
-  //   queryKey: ["/api/event-recommendations", searchQuery],
-  //   queryFn: async () => {
-  //     // For now, use the first 4 events as recommendations
-  //     const evs = events && Array.isArray(events) ? events : [];
-  //     return evs.slice(0, 4);
-  //   },
-  // });
+  const paginated = paginatedRaw as IResponseList<IEvent> | undefined;
+
+  // convenience variables
+  const events: IEvent[] =
+    (paginated as IResponseList<IEvent> | undefined)?.data ?? [];
+  const pagination = (paginated as IResponseList<IEvent> | undefined)
+    ?.pagination;
 
   const handleFilterChange = (key: keyof EventFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -159,6 +87,11 @@ export default function EventDiscovery() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
+
+  // reset to first page when search or sort/filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, filters.sortBy]);
 
   // Don't unmount the search/filter UI while loading — show skeletons in the events grid instead
 
@@ -337,6 +270,34 @@ export default function EventDiscovery() {
               : events?.map((event) => (
                   <EventCard key={event.event_id} event={event as IEvent} />
                 ))}
+          </div>
+          {/* Pagination Controls */}
+          <div className="mt-6 flex items-center justify-center space-x-4">
+            <Button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={
+                isLoading || (pagination ? !pagination.hasPrevPage : page <= 1)
+              }
+            >
+              Previous
+            </Button>
+
+            <div className="text-purple-200">
+              Page {page}
+              {pagination && pagination.totalPages
+                ? ` of ${pagination.totalPages}`
+                : ""}
+            </div>
+
+            <Button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={
+                isLoading ||
+                (pagination ? !pagination.hasNextPage : events.length < limit)
+              }
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>
