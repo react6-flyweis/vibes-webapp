@@ -246,7 +246,7 @@ export function LoginForm() {
           className="w-full rounded bg-gradient-cta text-white text-xl py-3 shadow-2xl"
           isLoading={form.formState.isSubmitting}
         >
-          login
+          Login
         </LoadingButton>
       </form>
       <OtpVerificationDialog
