@@ -40,6 +40,10 @@ import {
 } from "lucide-react";
 
 import EventTypeSelector from "@/components/event-type-selector";
+import BankAccountSelector from "@/components/bank-account-selector";
+import AddBankAccountDialog from "@/components/add-bank-account-dialog";
+import { TicketTypeForm } from "@/types/ticket";
+import { useTicketTypesQuery } from "@/queries/ticketTypes";
 
 const createEventSchema = z.object({
   title: z.string().min(1, "Event title is required"),
@@ -60,11 +64,7 @@ const createEventSchema = z.object({
   image: z.string().optional(),
   tags: z.string().optional(),
   // Bank account information for public events with ticket sales
-  bankAccountHolder: z.string().optional(),
-  bankName: z.string().optional(),
-  accountNumber: z.string().optional(),
-  routingNumber: z.string().optional(),
-  accountType: z.enum(["checking", "savings"]).optional(),
+  bankAccountId: z.string().optional(),
 
   // Event planning fields for private events
   budget: z.string().optional(),
@@ -85,8 +85,16 @@ export function EventCreator({
   const navigate = useNavigate();
   const createMutation = useCreateEventMutation();
   const { toast } = useToast();
-  const [selectedTicketTypes, setSelectedTicketTypes] = useState([
-    { type: "General Admission", price: "", benefits: ["Entry to event"] },
+  const { data: ticketTypes, isLoading: isLoadingTicketTypes } =
+    useTicketTypesQuery();
+  const [selectedTicketTypes, setSelectedTicketTypes] = useState<
+    TicketTypeForm[]
+  >([
+    {
+      ticket_type_id: 1,
+      ticket_query: "General Admission",
+      price: "",
+    },
   ]);
 
   const form = useForm<CreateEventForm>({
@@ -109,11 +117,7 @@ export function EventCreator({
       requiresApproval: false,
       image: "",
       tags: "",
-      bankAccountHolder: "",
-      bankName: "",
-      accountNumber: "",
-      routingNumber: "",
-      accountType: "checking" as "checking" | "savings",
+      bankAccountId: "",
 
       // Event planning fields
       budget: "",
@@ -128,7 +132,7 @@ export function EventCreator({
   // Venue selection is handled by the reusable VenueSelector component
 
   const onSubmit = async (data: CreateEventForm) => {
-    const payload = {
+    const payload: any = {
       name_title: data.title,
       event_type_id: data.eventType,
       ticketed_events: eventType === "public",
@@ -151,13 +155,17 @@ export function EventCreator({
       status: true,
     };
 
-    // Include ticket types if provided (convert prices to numbers)
+    // Include bank account ID for public events
+    if (eventType === "public" && data.bankAccountId) {
+      payload.bank_branch_name_id = parseInt(data.bankAccountId);
+    }
+
+    // Include ticket details if provided (convert prices to numbers)
     if (selectedTicketTypes && selectedTicketTypes.length > 0) {
-      // Attach as `ticket_types` alongside the main payload (backend may ignore if not expected)
-      (payload as any).ticket_types = selectedTicketTypes.map((t) => ({
-        type: t.type,
+      payload.ticketDetails = selectedTicketTypes.map((t) => ({
+        ticket_type_id: t.ticket_type_id,
+        ticket_query: t.ticket_query,
         price: parseFloat(t.price) || 0,
-        benefits: t.benefits || [],
       }));
     }
 
@@ -169,8 +177,14 @@ export function EventCreator({
 
       // success toast
       toast({
-        title: "Event Created Successfully!",
-        description: "Redirecting to event planning...",
+        title:
+          eventType === "public"
+            ? "Event Listed Successfully!"
+            : "Event Created Successfully!",
+        description:
+          eventType === "public"
+            ? "Redirecting to event discovery..."
+            : "Redirecting to event planning...",
       });
       setTimeout(
         () =>
@@ -193,9 +207,15 @@ export function EventCreator({
   };
 
   const addTicketType = () => {
+    // Get the first available ticket type ID if available
+    const firstTicketTypeId = ticketTypes?.[0]?.ticket_type_id || 1;
     setSelectedTicketTypes([
       ...selectedTicketTypes,
-      { type: "", price: "", benefits: [""] },
+      {
+        ticket_type_id: firstTicketTypeId,
+        ticket_query: "",
+        price: "",
+      },
     ]);
   };
 
@@ -203,13 +223,16 @@ export function EventCreator({
     setSelectedTicketTypes(selectedTicketTypes.filter((_, i) => i !== index));
   };
 
-  const updateTicketType = (index: number, field: string, value: string) => {
+  const updateTicketType = (
+    index: number,
+    field: string,
+    value: string | number
+  ) => {
     const updated = [...selectedTicketTypes];
-    if (field === "benefits") {
-      updated[index].benefits = value.split(",").map((b) => b.trim());
-    } else if (field === "type" || field === "price") {
-      // both are string fields on the ticket object
-      (updated[index] as any)[field] = value;
+    if (field === "price") {
+      updated[index].price = String(value);
+    } else if (field === "ticket_type_id") {
+      updated[index].ticket_type_id = Number(value);
     }
     setSelectedTicketTypes(updated);
   };
@@ -711,128 +734,38 @@ export function EventCreator({
                 {/* Bank Account Information - Only for public events */}
                 {eventType === "public" && (
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 pb-2 border-b border-white/10">
-                      <CreditCard className="h-5 w-5 text-purple-300" />
-                      <h3 className="text-xl font-semibold text-white">
-                        Payment Information
-                      </h3>
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="h-5 w-5 text-purple-300" />
+                        <h3 className="text-xl font-semibold text-white">
+                          Payment Information
+                        </h3>
+                      </div>
+                      <AddBankAccountDialog />
                     </div>
                     <p className="text-purple-200 text-sm">
-                      Enter your bank account details to receive automatic
-                      payouts from ticket sales. We take a 7% platform fee, and
-                      you'll receive 93% of all sales directly to your account.
+                      Select a bank account to receive automatic payouts from
+                      ticket sales. We take a 7% platform fee, and you'll
+                      receive 93% of all sales directly to your account.
                     </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="bankAccountHolder"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100">
-                              Account Holder Name
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="John Doe"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="bankName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100">
-                              Bank Name
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Chase Bank"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="accountNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100">
-                              Account Number
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="1234567890"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="routingNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100">
-                              Routing Number
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="021000021"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="accountType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100">
-                              Account Type
-                            </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                                  <SelectValue placeholder="Select account type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="checking">
-                                  Checking
-                                </SelectItem>
-                                <SelectItem value="savings">Savings</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="bankAccountId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-purple-100">
+                            Bank Account
+                          </FormLabel>
+                          <BankAccountSelector
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            placeholder="Select a bank account"
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 )}
 
@@ -855,50 +788,95 @@ export function EventCreator({
                       </Button>
                     </div>
 
-                    {selectedTicketTypes.map((ticket, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white/5 rounded-lg border border-white/10"
-                      >
-                        <Input
-                          placeholder="Ticket type name"
-                          value={ticket.type}
-                          onChange={(e) =>
-                            updateTicketType(index, "type", e.target.value)
-                          }
-                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                        />
-                        <Input
-                          placeholder="Price"
-                          type="number"
-                          step="0.01"
-                          value={ticket.price}
-                          onChange={(e) =>
-                            updateTicketType(index, "price", e.target.value)
-                          }
-                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                        />
-                        <Input
-                          placeholder="Benefits (comma separated)"
-                          value={ticket.benefits.join(", ")}
-                          onChange={(e) =>
-                            updateTicketType(index, "benefits", e.target.value)
-                          }
-                          className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                        />
-                        {index > 0 && (
-                          <Button
-                            type="button"
-                            onClick={() => removeTicketType(index)}
-                            variant="outline"
-                            size="sm"
-                            className="bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
+                    {isLoadingTicketTypes ? (
+                      <div className="text-center text-purple-200 py-4">
+                        Loading ticket types...
                       </div>
-                    ))}
+                    ) : (
+                      selectedTicketTypes.map((ticket, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/5 rounded-lg border border-white/10"
+                        >
+                          <div className="space-y-2">
+                            <label className="text-sm text-purple-200">
+                              Ticket Type
+                            </label>
+                            <Select
+                              value={String(ticket.ticket_type_id)}
+                              onValueChange={(value) =>
+                                updateTicketType(index, "ticket_type_id", value)
+                              }
+                            >
+                              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                                <SelectValue placeholder="Select ticket type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ticketTypes?.map((type) => (
+                                  <SelectItem
+                                    key={type.ticket_type_id}
+                                    value={String(type.ticket_type_id)}
+                                  >
+                                    {type.ticket_type}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm text-purple-200">
+                              Ticket Name (Auto-filled)
+                            </label>
+                            <Input
+                              placeholder="Ticket type name"
+                              value={ticket.ticket_query}
+                              onChange={(e) =>
+                                updateTicketType(
+                                  index,
+                                  "ticket_query",
+                                  e.target.value
+                                )
+                              }
+                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm text-purple-200">
+                              Price
+                            </label>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="25.00"
+                                type="number"
+                                step="0.01"
+                                value={ticket.price}
+                                onChange={(e) =>
+                                  updateTicketType(
+                                    index,
+                                    "price",
+                                    e.target.value
+                                  )
+                                }
+                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                              />
+                              {index > 0 && (
+                                <Button
+                                  type="button"
+                                  onClick={() => removeTicketType(index)}
+                                  variant="outline"
+                                  size="icon"
+                                  className="bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30 shrink-0"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
 
