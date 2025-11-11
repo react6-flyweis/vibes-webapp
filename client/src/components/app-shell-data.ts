@@ -143,12 +143,6 @@ export const userNavigationItems: NavCategory[] = [
         icon: Star,
         description: "Find event vendors",
       },
-      {
-        name: "Catering Services",
-        href: "/catering-marketplace",
-        icon: Heart,
-        description: "Food and beverage options",
-      },
     ],
   },
 ];
@@ -187,11 +181,11 @@ export const vendorNavigationItems: NavCategory[] = [
       //   href: "/staffings",
       //   icon: Users,
       // },
-      {
-        name: "Catering Services",
-        href: "/caterings",
-        icon: Heart,
-      },
+      // {
+      //   name: "Catering Services",
+      //   href: "/caterings",
+      //   icon: Heart,
+      // },
     ],
   },
   // Vibes fund
