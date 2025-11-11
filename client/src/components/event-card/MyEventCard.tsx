@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { IEvent } from "@/hooks/useEvents";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Clock, DollarSign, Star, Users } from "lucide-react";
 import { formatDate } from "@/lib/formatDate";
 
@@ -107,12 +107,12 @@ export default function MyEventCard({ event }: Props) {
           ))}
         </div>
 
-        <Button
+        {/* <Button
           onClick={() => navigate(`/plan-event/${event.event_id}`)}
           className="w-full bg-linear-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-medium"
         >
           Plan Event
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   );
