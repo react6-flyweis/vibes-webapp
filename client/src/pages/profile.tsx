@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import StaffBookings from "@/components/staff/StaffBookings";
+import VendorBookings from "@/components/vendor/VendorBookings";
 // import CateringBookings from "@/components/catering/CateringBookings";
 import {
   Select,
@@ -326,9 +327,14 @@ export default function Profile() {
             </Form>
           </div>
 
-          {/* Staff bookings section */}
+          {/* Vendor bookings section - only render for vendor users (role_id === 3) */}
+          {user?.role_id === 1 && (
+            <div className="mt-8">
+              <VendorBookings />
+            </div>
+          )}
 
-          {/* Staff bookings section - only render for vendor users (role_id === 3) */}
+          {/* Staff bookings section - only render for staff users (role_id === 4) */}
           {user?.role_id === 3 && (
             <div className="mt-8">
               <StaffBookings />
