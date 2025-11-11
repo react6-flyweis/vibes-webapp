@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useMemo } from "react";
 import { Routes, Route, Navigate } from "react-router";
 import { Layout } from "@/components/layout";
 import { AppShell } from "./components/app-shell";
@@ -207,9 +207,16 @@ const FinancialDashboard_RefundsTab = lazy(
 );
 
 function DashboardRouter() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const checkIsAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!isAuthenticated()) {
+  const isAuthenticated = useMemo(
+    () => checkIsAuthenticated(),
+    [checkIsAuthenticated]
+  );
+
+  console.log("DashboardRouter - isAuthenticated:", isAuthenticated);
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   return (
@@ -246,8 +253,7 @@ function DashboardRouter() {
           path="/vendor-onboarding-portal"
           element={<VendorOnboardingPortal />}
         />
-        <Route path="/vendors" element={<VendorMarketplace />} />
-        <Route path="/vendor-marketplace" element={<VendorMarketplace />} />
+
         <Route path="/ai-theme-generator" element={<AIThemeGenerator />} />
         <Route path="/guest-matchmaking" element={<GuestMatchmaking />} />
         <Route path="/social-groups" element={<SocialGroups />} />
@@ -316,7 +322,7 @@ function DashboardRouter() {
         <Route path="/vendor-liquidity" element={<VendorLiquidity />} />
         <Route path="/branded-micro-events" element={<BrandedMicroEvents />} />
         <Route path="/venue-integration" element={<VenueIntegration />} />
-        <Route path="/event-discovery" element={<EventDiscovery />} />
+
         <Route path="/my-events" element={<MyEvents />} />
         <Route path="/find-events" element={<FindAndBookEvents />} />
         <Route path="/unique-parties" element={<UniquePartyExperiences />} />
@@ -463,10 +469,38 @@ function DashboardRouter() {
 function Router() {
   return (
     <Routes>
+      {/* Auth Routes */}
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
+      {/* Public Routes */}
+      <Route
+        path="/event-discovery"
+        element={
+          <Layout>
+            <EventDiscovery />
+          </Layout>
+        }
+      />
+      <Route
+        path="/vendors"
+        element={
+          <Layout>
+            <VendorMarketplace />
+          </Layout>
+        }
+      />
+      <Route
+        path="/vendor-marketplace"
+        element={
+          <Layout>
+            <VendorMarketplace />
+          </Layout>
+        }
+      />
+
+      {/* Home Route */}
       <Route
         path="/"
         element={
@@ -475,6 +509,8 @@ function Router() {
           </AppShell>
         }
       />
+
+      {/* Protected Routes - Catch all other routes */}
       <Route path="*" element={<DashboardRouter />} />
     </Routes>
   );
