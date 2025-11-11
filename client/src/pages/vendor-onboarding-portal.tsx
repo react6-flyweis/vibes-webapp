@@ -310,7 +310,7 @@ export default function VendorOnboardingPortal() {
       Basic_information_State_id: undefined,
       Basic_information_ZipCode: values.zip,
       Basic_information_Country_id: undefined,
-      categories: values.categories,
+      service_categories: values.categories,
       initial_payment_required: values.initialPaymentRequired,
       service_areas_locaiton: values.primaryServiceLocation,
       service_areas_Regions: values.optionalRegions,
