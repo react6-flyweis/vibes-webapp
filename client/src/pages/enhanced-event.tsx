@@ -18,6 +18,7 @@ import VenueTab from "@/components/enhanced-event/VenueTab";
 import PhotosTab from "@/components/enhanced-event/PhotosTab";
 import GuestsTab from "@/components/enhanced-event/GuestsTab";
 import SettingsTab from "@/components/enhanced-event/SettingsTab";
+import TemplatesTab from "@/components/enhanced-event/TemplatesTab";
 import SocialMediaSharing from "@/components/social-media-sharing";
 import { useGuestsByEvent } from "@/queries/guests";
 
@@ -27,6 +28,10 @@ export default function EnhancedEventPage() {
   const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
   // active tab state
   const [activeTab, setActiveTab] = useState<string>("overview");
+  // selected template state
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
+    null
+  );
 
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
 
@@ -102,10 +107,11 @@ export default function EnhancedEventPage() {
           }}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-9 bg-[#24292D] p-1">
+          <TabsList className="grid w-full grid-cols-10 bg-[#24292D] p-1">
             {[
               "overview",
               "menu",
+              "templates",
               "tasks",
               "chat",
               "budget",
@@ -148,6 +154,16 @@ export default function EnhancedEventPage() {
 
           <TabsContent value="menu" className="space-y-6">
             <MenuBuilder planMap={planMap?.[0]} eventId={eventId} />
+          </TabsContent>
+
+          <TabsContent value="templates" className="space-y-6">
+            <TemplatesTab
+              selectedTemplateId={selectedTemplateId || undefined}
+              onTemplateSelect={(template) => {
+                setSelectedTemplateId(template.id);
+                console.log("Selected template:", template);
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="tasks" className="space-y-6">
