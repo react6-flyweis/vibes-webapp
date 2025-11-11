@@ -248,7 +248,7 @@ function DashboardRouter() {
         <Route path="/premium-dashboard/*" element={<PremiumDashboard />} />
         <Route path="/vendor-dashboard" element={<VendorDashboard />} />
         <Route path="/corporate" element={<CorporateDashboard />} />
-        <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
+        <Route path="/vendor-onboarding" element={<VendorOnboardingPortal />} />
         <Route
           path="/vendor-onboarding-portal"
           element={<VendorOnboardingPortal />}
