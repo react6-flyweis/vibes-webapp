@@ -48,17 +48,21 @@ export default function VenueSelector({ value, onChange }: VenueSelectorProps) {
         }}
         defaultValue={value}
       >
-        <SelectTrigger className="bg-white/10 border-white/20 text-white">
+        <SelectTrigger className="bg-background border-border text-foreground">
           <SelectValue placeholder="Select a venue" />
         </SelectTrigger>
         <SelectContent>
           {loading && (
-            <SelectItem value="__loading__" disabled>
+            <SelectItem
+              value="__loading__"
+              disabled
+              className="text-foreground"
+            >
               Loading venues...
             </SelectItem>
           )}
           {error && (
-            <SelectItem value="__error__" disabled>
+            <SelectItem value="__error__" disabled className="text-foreground">
               Failed to load venues
             </SelectItem>
           )}
@@ -66,7 +70,7 @@ export default function VenueSelector({ value, onChange }: VenueSelectorProps) {
             venues.length === 0 &&
             !loading &&
             !error && (
-              <SelectItem value="__none__" disabled>
+              <SelectItem value="__none__" disabled className="text-foreground">
                 No venues available
               </SelectItem>
             )}
@@ -75,6 +79,7 @@ export default function VenueSelector({ value, onChange }: VenueSelectorProps) {
               <SelectItem
                 key={v._id ?? v.venue_details_id}
                 value={String(v.venue_details_id ?? v._id)}
+                className="text-foreground"
               >
                 {v.name} {v.capacity ? `· ${v.capacity} capacity` : ""}
               </SelectItem>
