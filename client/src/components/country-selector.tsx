@@ -38,7 +38,7 @@ export default function CountrySelector({
       value={value}
     >
       <SelectTrigger
-        className={"bg-white/10 border-white/20 text-white " + className}
+        className={"bg-background border-border text-foreground " + className}
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

@@ -36,7 +36,7 @@ export default function CategorySelector({
     >
       <FormControl>
         <SelectTrigger
-          className={className || "bg-white/10 border-white/20 text-white"}
+          className={className || "bg-background border-border text-foreground"}
         >
           <SelectValue
             placeholder={isLoading ? "Loading categories..." : placeholder}
