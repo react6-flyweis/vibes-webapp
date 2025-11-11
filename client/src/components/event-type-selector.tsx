@@ -37,12 +37,12 @@ export default function EventTypeSelector({ value, onChange }: Props) {
       )}
 
       {data?.map((it) => {
-        const val = it.code || it._id || String(it.event_type_id || "");
+        const val = String(it.event_type_id || "");
         const active = value === val;
 
         return (
           <Card
-            key={val}
+            key={it.event_type_id}
             className={`p-6 cursor-pointer transition-all ${
               active
                 ? "bg-purple-500/30 border-purple-400 scale-105"
