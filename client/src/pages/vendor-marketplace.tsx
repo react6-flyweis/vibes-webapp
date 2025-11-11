@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { Link } from "react-router";
-import { useVendors } from "@/queries/vendors";
+import { usePublicVendors } from "@/queries/vendors";
 import VendorCard from "@/components/vendor-card";
 import Navigation from "@/components/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,37 +14,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
-import { Search, Filter, X, Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Search, Filter, X } from "lucide-react";
 
-// simple helper to make category keys readable when we don't have a label map
-function humanizeCategory(key?: string) {
-  if (!key) return "";
-  return key
-    .toString()
-    .replace(/[-_]/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/(^|\s)\S/g, (t) => t.toUpperCase());
-}
+import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 
 export default function VendorMarketplace() {
-  const navigate = useNavigate();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState("");
   const [location, setLocation] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [bookedOpen, setBookedOpen] = useState(false);
+  const [bookedInfo, setBookedInfo] = useState<any | null>(null);
 
-  const { data: vendors = [], isLoading, error } = useVendors(3);
+  const { data: vendors = [], isLoading, error } = usePublicVendors();
   const { data: serviceTypes = [] } = useVendorServiceTypes();
 
   // Toggle category selection
@@ -66,29 +48,61 @@ export default function VendorMarketplace() {
   const filteredVendors = vendorsArray.filter((vendor: any) => {
     const matchesSearch =
       !searchQuery ||
-      vendor.businessName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.businessDescription
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      vendor.Basic_information_business_name?.toLowerCase().includes(
+        searchQuery.toLowerCase()
+      ) ||
+      vendor.Basic_information_Business_Description?.toLowerCase().includes(
+        searchQuery.toLowerCase()
+      );
 
     const matchesLocation =
       !location ||
-      vendor.serviceLocation?.toLowerCase().includes(location.toLowerCase());
+      vendor.service_areas_locaiton
+        ?.toLowerCase()
+        .includes(location.toLowerCase()) ||
+      vendor.Basic_information_BusinessAddress?.toLowerCase().includes(
+        location.toLowerCase()
+      ) ||
+      vendor.service_areas_pincode?.includes(location);
 
     const matchesCategory =
       selectedCategories.length === 0 ||
       selectedCategories.some((selectedCat) => {
-        return (
-          // match by string category key
-          vendor.category === selectedCat ||
-          vendor.categories?.includes(selectedCat) ||
-          // match by business_category_id (numeric selection) or business_category_details name
-          vendor.business_category_id === Number(selectedCat) ||
-          vendor.business_category_details?.business_category === selectedCat
+        // Check if any of the vendor's service_categories match the selected category
+        return vendor.service_categories?.some(
+          (serviceCat: any) =>
+            String(serviceCat.category_id) === selectedCat ||
+            serviceCat.category_name?.toLowerCase() ===
+              selectedCat.toLowerCase()
         );
       });
 
-    return matchesSearch && matchesLocation && matchesCategory;
+    const matchesPriceRange =
+      !priceRange ||
+      priceRange === "any-price" ||
+      (() => {
+        const prices =
+          vendor.service_categories?.map((cat: any) => cat.pricing) || [];
+        if (prices.length === 0) return true;
+        const minPrice = Math.min(...prices);
+
+        switch (priceRange) {
+          case "0-500":
+            return minPrice <= 500;
+          case "500-1000":
+            return minPrice >= 500 && minPrice <= 1000;
+          case "1000-2500":
+            return minPrice >= 1000 && minPrice <= 2500;
+          case "2500+":
+            return minPrice >= 2500;
+          default:
+            return true;
+        }
+      })();
+
+    return (
+      matchesSearch && matchesLocation && matchesCategory && matchesPriceRange
+    );
   });
 
   return (
@@ -105,6 +119,14 @@ export default function VendorMarketplace() {
             Discover and book the perfect vendors for your party
           </p>
         </div>
+
+        {/* Booked success dialog (can be triggered by other components) */}
+        <BookedSuccessDialog
+          open={bookedOpen}
+          onOpenChange={setBookedOpen}
+          info={bookedInfo}
+          onDone={() => setBookedInfo(null)}
+        />
 
         {/* Search and Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-8">
@@ -128,53 +150,31 @@ export default function VendorMarketplace() {
                   <SelectValue placeholder="Select Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  {serviceTypes.map((st) => (
-                    <SelectItem
-                      key={st.vendor_service_type_id}
-                      value={String(st.vendor_service_type_id)}
-                    >
-                      {st.name}
-                    </SelectItem>
-                  ))}
+                  {(() => {
+                    const categoryMap = new Map<string, string>();
+                    vendorsArray.forEach((vendor: any) => {
+                      if (
+                        vendor.service_categories &&
+                        Array.isArray(vendor.service_categories)
+                      ) {
+                        vendor.service_categories.forEach((cat: any) => {
+                          const id = String(cat.category_id);
+                          if (!categoryMap.has(id)) {
+                            categoryMap.set(id, cat.category_name);
+                          }
+                        });
+                      }
+                    });
+                    return Array.from(categoryMap.entries())
+                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .map(([id, name]) => (
+                        <SelectItem key={id} value={id}>
+                          {name}
+                        </SelectItem>
+                      ));
+                  })()}
                 </SelectContent>
               </Select>
-
-              {/* Date Range Picker */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-48 justify-start text-left font-normal",
-                      !dateRange.from && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "LLL dd")} -{" "}
-                          {format(dateRange.to, "LLL dd")}
-                        </>
-                      ) : (
-                        format(dateRange.from, "LLL dd, yyyy")
-                      )
-                    ) : (
-                      "Select dates"
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateRange.from}
-                    onSelect={(date) =>
-                      setDateRange({ from: date, to: dateRange.to })
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
 
               <Input
                 placeholder="Location..."
@@ -201,16 +201,30 @@ export default function VendorMarketplace() {
                 Selected:
               </span>
               {selectedCategories.map((categoryId) => {
-                const category = serviceTypes.find(
-                  (st) => String(st.vendor_service_type_id) === categoryId
-                );
+                // Find category name from vendors' service_categories
+                let categoryName = categoryId;
+                for (const vendor of vendorsArray) {
+                  if (
+                    vendor.service_categories &&
+                    Array.isArray(vendor.service_categories)
+                  ) {
+                    const foundCat = vendor.service_categories.find(
+                      (cat: any) => String(cat.category_id) === categoryId
+                    );
+                    if (foundCat) {
+                      categoryName = foundCat.category_name;
+                      break;
+                    }
+                  }
+                }
+
                 return (
                   <Badge
                     key={categoryId}
                     variant="secondary"
                     className="flex items-center gap-1 bg-party-coral text-white"
                   >
-                    {category?.name || categoryId}
+                    {categoryName}
                     <button
                       onClick={() => removeCategory(categoryId)}
                       className="ml-1 hover:bg-white/20 rounded-full"
@@ -280,70 +294,61 @@ export default function VendorMarketplace() {
             <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-6">
               <h3 className="font-semibold party-dark mb-4">Categories</h3>
               <div className="space-y-3">
-                {/* {categoryGroups.map((group) => (
-                  <div key={group.title}>
-                    <h4 className="text-sm font-medium party-gray mb-2">
-                      {group.title}
-                    </h4>
-                    <div className="space-y-1 ml-2">
-                      {serviceTypes.length > 0 && (
-                        <div className="mb-2">
-                          <div className="text-xs font-medium party-gray mb-1">Service Types</div>
-                          {serviceTypes.map((st) => (
-                            <button
-                              key={st.vendor_service_type_id}
-                              onClick={() =>
-                                setSelectedCategory(String(st.vendor_service_type_id))
-                              }
-                              className={`block text-sm w-full text-left px-2 py-1 rounded transition-colors ${
-                                selectedCategory === String(st.vendor_service_type_id)
-                                  ? "bg-party-coral text-white"
-                                  : "party-gray hover:bg-gray-100"
-                              }`}
-                            >
-                              {st.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {group.categories.map((category) => (
-                        <button
-                          key={category}
-                          onClick={() =>
-                            setSelectedCategory(
-                              category === selectedCategory ? "" : category
-                            )
+                <div className="space-y-1">
+                  {/* Extract unique categories from all vendors */}
+                  {(() => {
+                    const categoryMap = new Map<
+                      string,
+                      { id: string; name: string; count: number }
+                    >();
+
+                    vendorsArray.forEach((vendor: any) => {
+                      if (
+                        vendor.service_categories &&
+                        Array.isArray(vendor.service_categories)
+                      ) {
+                        vendor.service_categories.forEach((cat: any) => {
+                          const id = String(cat.category_id);
+                          if (categoryMap.has(id)) {
+                            categoryMap.get(id)!.count++;
+                          } else {
+                            categoryMap.set(id, {
+                              id,
+                              name: cat.category_name,
+                              count: 1,
+                            });
                           }
-                          className={`block text-sm w-full text-left px-2 py-1 rounded transition-colors ${
-                            selectedCategory === category
-                              ? "bg-party-coral text-white"
-                              : "party-gray hover:bg-gray-100"
+                        });
+                      }
+                    });
+
+                    const uniqueCategories = Array.from(
+                      categoryMap.values()
+                    ).sort((a, b) => a.name.localeCompare(b.name));
+
+                    return uniqueCategories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => toggleCategory(category.id)}
+                        className={`flex items-center justify-between text-sm w-full text-left px-3 py-2 rounded transition-colors ${
+                          selectedCategories.includes(category.id)
+                            ? "bg-party-coral text-white"
+                            : "party-gray hover:bg-gray-100"
+                        }`}
+                      >
+                        <span>{category.name}</span>
+                        <span
+                          className={`text-xs ${
+                            selectedCategories.includes(category.id)
+                              ? "text-white/80"
+                              : "text-gray-400"
                           }`}
                         >
-                          {categoryLabels[category]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))} */}
-                <div className="space-y-1 ml-2">
-                  {serviceTypes?.map((st) => (
-                    <button
-                      key={st.vendor_service_type_id}
-                      onClick={() =>
-                        toggleCategory(String(st.vendor_service_type_id))
-                      }
-                      className={`block text-sm w-full text-left px-2 py-1 rounded transition-colors ${
-                        selectedCategories.includes(
-                          String(st.vendor_service_type_id)
-                        )
-                          ? "bg-party-coral text-white"
-                          : "party-gray hover:bg-gray-100"
-                      }`}
-                    >
-                      {st.name}
-                    </button>
-                  ))}
+                          ({category.count})
+                        </span>
+                      </button>
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
@@ -394,6 +399,10 @@ export default function VendorMarketplace() {
                   <VendorCard
                     key={vendor._id ?? vendor.user_id ?? vendor.userId}
                     vendor={vendor}
+                    onBooked={(info: any) => {
+                      setBookedInfo(info);
+                      setBookedOpen(true);
+                    }}
                   />
                 ))}
               </div>
