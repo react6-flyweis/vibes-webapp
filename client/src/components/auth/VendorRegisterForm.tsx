@@ -87,7 +87,7 @@ export function VendorRegisterForm() {
         description:
           "Welcome to Vibes! Please check your email to verify your vendor account.",
       });
-      navigate("/login");
+      navigate("/login?redirect=/vendor-onboarding");
     } catch (error: any) {
       console.error("Vendor signup error:", error);
       const message = extractApiErrorMessage(error);
