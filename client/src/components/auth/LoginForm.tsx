@@ -117,7 +117,10 @@ export function LoginForm() {
 
       toast({ title: "Logged in", description: "Verification successful." });
       setShowOtp(false);
-      navigate("/");
+      const redirect = new URLSearchParams(window.location.search).get(
+        "redirect"
+      );
+      navigate(redirect || "/");
     } catch (err: any) {
       const errorMessage = extractApiErrorMessage(err);
       toast({
