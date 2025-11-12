@@ -13,10 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
 import { Search, Filter, X } from "lucide-react";
-
-import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 
 export default function VendorMarketplace() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,11 +21,9 @@ export default function VendorMarketplace() {
   const [priceRange, setPriceRange] = useState("");
   const [location, setLocation] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [bookedOpen, setBookedOpen] = useState(false);
-  const [bookedInfo, setBookedInfo] = useState<any | null>(null);
+  // booking success dialog moved into each VendorCard
 
   const { data: vendors = [], isLoading, error } = usePublicVendors();
-  const { data: serviceTypes = [] } = useVendorServiceTypes();
 
   // Toggle category selection
   const toggleCategory = (categoryId: string) => {
@@ -46,30 +41,53 @@ export default function VendorMarketplace() {
   // Filter vendors based on search and filters
   const vendorsArray = Array.isArray(vendors) ? vendors : [];
   const filteredVendors = vendorsArray.filter((vendor: any) => {
+    // Helper to get business name from either flat or nested structure
+    const businessName =
+      vendor.Basic_information_business_name ||
+      vendor.business_information_details?.business_name;
+
+    const businessDescription =
+      vendor.Basic_information_Business_Description ||
+      vendor.business_information_details
+        ?.Basic_information_Business_Description;
+
     const matchesSearch =
       !searchQuery ||
-      vendor.Basic_information_business_name?.toLowerCase().includes(
-        searchQuery.toLowerCase()
-      ) ||
-      vendor.Basic_information_Business_Description?.toLowerCase().includes(
-        searchQuery.toLowerCase()
-      );
+      businessName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      businessDescription?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Helper to get location info from either flat or nested structure
+    const serviceLocation =
+      vendor.service_areas_locaiton ||
+      vendor.business_information_details?.service_areas_locaiton;
+
+    const businessAddress =
+      vendor.Basic_information_BusinessAddress ||
+      vendor.business_information_details?.Basic_information_BusinessAddress;
+
+    const pincode =
+      vendor.service_areas_pincode ||
+      vendor.business_information_details?.service_areas_pincode;
 
     const matchesLocation =
       !location ||
-      vendor.service_areas_locaiton
-        ?.toLowerCase()
-        .includes(location.toLowerCase()) ||
-      vendor.Basic_information_BusinessAddress?.toLowerCase().includes(
-        location.toLowerCase()
-      ) ||
-      vendor.service_areas_pincode?.includes(location);
+      serviceLocation?.toLowerCase().includes(location.toLowerCase()) ||
+      businessAddress?.toLowerCase().includes(location.toLowerCase()) ||
+      pincode?.includes(location);
+
+    // Get categories from either flat service_categories or nested categories_fees_details
+    const categories =
+      vendor.service_categories ||
+      vendor.categories_fees_details?.map((cat: any) => ({
+        category_id: cat.category_id,
+        category_name: cat.category_details?.category_name,
+      })) ||
+      [];
 
     const matchesCategory =
       selectedCategories.length === 0 ||
       selectedCategories.some((selectedCat) => {
-        // Check if any of the vendor's service_categories match the selected category
-        return vendor.service_categories?.some(
+        return categories.some(
           (serviceCat: any) =>
             String(serviceCat.category_id) === selectedCat ||
             serviceCat.category_name?.toLowerCase() ===
@@ -81,8 +99,12 @@ export default function VendorMarketplace() {
       !priceRange ||
       priceRange === "any-price" ||
       (() => {
+        // Get prices from either structure
         const prices =
-          vendor.service_categories?.map((cat: any) => cat.pricing) || [];
+          vendor.service_categories?.map((cat: any) => cat.pricing) ||
+          vendor.categories_fees_details?.map((cat: any) => cat.Price) ||
+          [];
+
         if (prices.length === 0) return true;
         const minPrice = Math.min(...prices);
 
@@ -120,13 +142,7 @@ export default function VendorMarketplace() {
           </p>
         </div>
 
-        {/* Booked success dialog (can be triggered by other components) */}
-        <BookedSuccessDialog
-          open={bookedOpen}
-          onOpenChange={setBookedOpen}
-          info={bookedInfo}
-          onDone={() => setBookedInfo(null)}
-        />
+        {/* Booked success dialog moved into individual vendor cards */}
 
         {/* Search and Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6 mb-8">
@@ -153,6 +169,7 @@ export default function VendorMarketplace() {
                   {(() => {
                     const categoryMap = new Map<string, string>();
                     vendorsArray.forEach((vendor: any) => {
+                      // Handle flat service_categories structure
                       if (
                         vendor.service_categories &&
                         Array.isArray(vendor.service_categories)
@@ -164,12 +181,30 @@ export default function VendorMarketplace() {
                           }
                         });
                       }
+                      // Handle nested categories_fees_details structure
+                      else if (
+                        vendor.categories_fees_details &&
+                        Array.isArray(vendor.categories_fees_details)
+                      ) {
+                        vendor.categories_fees_details.forEach((cat: any) => {
+                          const id = String(cat.category_id);
+                          const name =
+                            cat.category_details?.category_name || "Unknown";
+                          if (!categoryMap.has(id)) {
+                            categoryMap.set(id, name);
+                          }
+                        });
+                      }
                     });
                     return Array.from(categoryMap.entries())
-                      .sort((a, b) => a[1].localeCompare(b[1]))
+                      .sort((a, b) => {
+                        const nameA = (a[1] ?? "").toString();
+                        const nameB = (b[1] ?? "").toString();
+                        return nameA.localeCompare(nameB);
+                      })
                       .map(([id, name]) => (
                         <SelectItem key={id} value={id}>
-                          {name}
+                          {name ?? id}
                         </SelectItem>
                       ));
                   })()}
@@ -201,9 +236,10 @@ export default function VendorMarketplace() {
                 Selected:
               </span>
               {selectedCategories.map((categoryId) => {
-                // Find category name from vendors' service_categories
+                // Find category name from vendors' service_categories or categories_fees_details
                 let categoryName = categoryId;
                 for (const vendor of vendorsArray) {
+                  // Check flat structure
                   if (
                     vendor.service_categories &&
                     Array.isArray(vendor.service_categories)
@@ -213,6 +249,20 @@ export default function VendorMarketplace() {
                     );
                     if (foundCat) {
                       categoryName = foundCat.category_name;
+                      break;
+                    }
+                  }
+                  // Check nested structure
+                  else if (
+                    vendor.categories_fees_details &&
+                    Array.isArray(vendor.categories_fees_details)
+                  ) {
+                    const foundCat = vendor.categories_fees_details.find(
+                      (cat: any) => String(cat.category_id) === categoryId
+                    );
+                    if (foundCat) {
+                      categoryName =
+                        foundCat.category_details?.category_name || categoryId;
                       break;
                     }
                   }
@@ -303,6 +353,7 @@ export default function VendorMarketplace() {
                     >();
 
                     vendorsArray.forEach((vendor: any) => {
+                      // Handle flat service_categories structure
                       if (
                         vendor.service_categories &&
                         Array.isArray(vendor.service_categories)
@@ -320,11 +371,35 @@ export default function VendorMarketplace() {
                           }
                         });
                       }
+                      // Handle nested categories_fees_details structure
+                      else if (
+                        vendor.categories_fees_details &&
+                        Array.isArray(vendor.categories_fees_details)
+                      ) {
+                        vendor.categories_fees_details.forEach((cat: any) => {
+                          const id = String(cat.category_id);
+                          const name =
+                            cat.category_details?.category_name || "Unknown";
+                          if (categoryMap.has(id)) {
+                            categoryMap.get(id)!.count++;
+                          } else {
+                            categoryMap.set(id, {
+                              id,
+                              name,
+                              count: 1,
+                            });
+                          }
+                        });
+                      }
                     });
 
                     const uniqueCategories = Array.from(
                       categoryMap.values()
-                    ).sort((a, b) => a.name.localeCompare(b.name));
+                    ).sort((a, b) => {
+                      const nameA = (a.name ?? "").toString();
+                      const nameB = (b.name ?? "").toString();
+                      return nameA.localeCompare(nameB);
+                    });
 
                     return uniqueCategories.map((category) => (
                       <button
@@ -336,7 +411,7 @@ export default function VendorMarketplace() {
                             : "party-gray hover:bg-gray-100"
                         }`}
                       >
-                        <span>{category.name}</span>
+                        <span>{category.name ?? category.id}</span>
                         <span
                           className={`text-xs ${
                             selectedCategories.includes(category.id)
@@ -399,10 +474,6 @@ export default function VendorMarketplace() {
                   <VendorCard
                     key={vendor._id ?? vendor.user_id ?? vendor.userId}
                     vendor={vendor}
-                    onBooked={(info: any) => {
-                      setBookedInfo(info);
-                      setBookedOpen(true);
-                    }}
                   />
                 ))}
               </div>
