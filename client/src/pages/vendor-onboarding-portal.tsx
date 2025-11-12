@@ -57,16 +57,12 @@ const schema = z.object({
       z.object({
         category_id: z.number(),
         category_name: z.string(),
-        pricing: z.number().min(0, "Pricing must be non-negative"),
-        pricing_currency: z.string(),
+        Price: z.number().min(0, "Price must be non-negative"),
+        pricing_currency: z.string().optional(),
+        MinFee: z.number().min(0).max(100).optional(),
       })
     )
     .min(1, "At least one category is required"),
-  initialPaymentRequired: z
-    .number()
-    .min(0, "Initial payment must be non-negative")
-    .max(50, "Initial payment cannot exceed 50%")
-    .optional(),
   yearsInBusiness: z.string().optional(),
   numberOfEmployees: z.string().optional(),
   description: z.string().optional(),
@@ -152,7 +148,6 @@ export default function VendorOnboardingPortal() {
       email: "",
       phone: "",
       categories: [],
-      initialPaymentRequired: 0,
       yearsInBusiness: "",
       numberOfEmployees: "",
       description: "",
@@ -191,7 +186,6 @@ export default function VendorOnboardingPortal() {
         "email",
         "phone",
         "categories",
-        "initialPaymentRequired",
         "yearsInBusiness",
         "numberOfEmployees",
         "description",
@@ -311,7 +305,6 @@ export default function VendorOnboardingPortal() {
       Basic_information_ZipCode: values.zip,
       Basic_information_Country_id: undefined,
       service_categories: values.categories,
-      initial_payment_required: values.initialPaymentRequired,
       service_areas_locaiton: values.primaryServiceLocation,
       service_areas_Regions: values.optionalRegions,
       service_areas_pincode: values.pinCode,
@@ -532,43 +525,6 @@ export default function VendorOnboardingPortal() {
                                 onChange={field.onChange}
                               />
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Initial Payment Required */}
-                    <div className="mt-4">
-                      <FormField
-                        control={form.control}
-                        name="initialPaymentRequired"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              Initial Payment Required (% - Max 50%)
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="50"
-                                step="1"
-                                className="bg-gray-100"
-                                placeholder="0"
-                                {...field}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
-                                value={field.value || ""}
-                              />
-                            </FormControl>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Percentage of total amount to be paid upfront
-                              (0-50%)
-                            </p>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -1209,7 +1165,10 @@ export default function VendorOnboardingPortal() {
                             form.getValues("categories").map((cat) => (
                               <li key={cat.category_id}>
                                 {cat.category_name} - {cat.pricing_currency}{" "}
-                                {cat.pricing.toFixed(2)}
+                                {cat.Price?.toFixed(2)}
+                                {cat.MinFee !== undefined
+                                  ? ` (MinFee: ${cat.MinFee}%)`
+                                  : ""}
                               </li>
                             ))
                           ) : (
@@ -1217,16 +1176,6 @@ export default function VendorOnboardingPortal() {
                               No categories added
                             </li>
                           )}
-                        </ul>
-
-                        <h3 className="text-base font-semibold mt-6 mb-3">
-                          Payment Terms:
-                        </h3>
-                        <ul className="list-disc pl-5 text-sm text-gray-800">
-                          <li>
-                            Initial Payment Required:{" "}
-                            {form.getValues("initialPaymentRequired") || 0}%
-                          </li>
                         </ul>
 
                         <h3 className="text-base font-semibold mt-6 mb-3">
