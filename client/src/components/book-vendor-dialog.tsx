@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/form";
 import { useCreateVendorBooking } from "@/queries/vendorBookings";
 import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
+import { useCreateVendorBookingPayment } from "@/mutations/useCreateVendorBookingPayment";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
@@ -50,6 +51,7 @@ import {
 import { extractApiErrorMessage } from "@/lib/apiErrors";
 import { LoadingButton } from "./ui/loading-button";
 import { useAuthStore } from "@/store/auth-store";
+import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 
 interface BookVendorDialogProps {
   vendorId: number;
@@ -65,6 +67,7 @@ interface BookVendorDialogProps {
     date?: string | null;
     time?: string | null;
   }) => void;
+  vendorName?: string;
 }
 
 export default function BookVendorDialog({
@@ -73,9 +76,16 @@ export default function BookVendorDialog({
   eventId,
   trigger,
   onBooked,
+  vendorName,
 }: BookVendorDialogProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Payment dialog state
+  const [showPriceDialog, setShowPriceDialog] = useState(false);
+  const [pendingBookingPayload, setPendingBookingPayload] = useState<any>(null);
+  const [priceEstimate, setPriceEstimate] = useState<number>(0);
+  const [pendingPayment, setPendingPayment] = useState<any | null>(null);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [timingMode, setTimingMode] = useState<
@@ -89,6 +99,7 @@ export default function BookVendorDialog({
 
   const { data: serviceTypes = [] } = useVendorServiceTypes();
   const createBooking = useCreateVendorBooking();
+  const createVendorBookingPaymentMutation = useCreateVendorBookingPayment();
 
   const handleReset = () => {
     form.reset();
@@ -249,6 +260,7 @@ export default function BookVendorDialog({
     }
 
     const payload = {
+      vendor_id: vendorId,
       Year: sDate.getFullYear(),
       Month: sDate.getMonth() + 1,
       Date_start: sDate.toISOString(),
@@ -263,29 +275,27 @@ export default function BookVendorDialog({
     };
 
     try {
+      // Create booking first
       const res = await createBooking.mutateAsync(payload);
-      const info = {
-        vendorName: undefined,
-        menuName: undefined,
-        guestCount: undefined,
-        pricePerPerson: undefined,
-        totalAmount: undefined,
-        date: startDate ? format(startDate, "PPP") : undefined,
-        time:
-          timingMode === "hourly"
-            ? startTimeSlot
-            : timingMode === "fullday"
-            ? "Full day (00:00 - 23:59)"
-            : startDate && endDate
-            ? `${format(startDate, "PPP")} - ${format(endDate, "PPP")}`
-            : undefined,
-      };
-      // notify parent to show success dialog (parent is responsible for rendering it)
-      if (typeof onBooked === "function") {
-        onBooked(info);
-      }
+
+      // Store booking response for payment flow
+      const bookingResponse = res?.data;
+      setPendingPayment({ bookingResponse });
+      setPendingBookingPayload(payload);
+
+      // Calculate price estimate from booking response
+      const estimate =
+        bookingResponse?.vendor_price || bookingResponse?.price || 0;
+      setPriceEstimate(estimate);
+
+      // Close booking dialog and show payment dialog
       setOpen(false);
-      handleReset();
+      setShowPriceDialog(true);
+
+      toast({
+        title: "Booking Created — Complete Payment to Confirm",
+        description: "Please complete payment to confirm the booking.",
+      });
     } catch (error) {
       const errorMessage = extractApiErrorMessage(error);
       form.setError("root", {
@@ -686,6 +696,110 @@ export default function BookVendorDialog({
           </form>
         </Form>
       </DialogContent>
+
+      {/* Payment Confirmation Dialog */}
+      <PriceConfirmationDialog
+        open={showPriceDialog}
+        onOpenChange={(open) => {
+          setShowPriceDialog(open);
+          if (!open) {
+            // Reset on close
+            setPendingBookingPayload(null);
+            setPendingPayment(null);
+          }
+        }}
+        priceEstimate={priceEstimate}
+        onPrevious={() => {
+          // Go back to booking dialog
+          setShowPriceDialog(false);
+          setOpen(true);
+        }}
+        onConfirm={async (payment) => {
+          const created = pendingPayment?.bookingResponse;
+          if (!created) {
+            toast({
+              title: "Missing booking",
+              description: "Cannot finalize payment: booking missing.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Successful payment - show booked dialog with details
+          const serviceName = pendingBookingPayload?.Vendor_Category_id?.map(
+            (id: number) => {
+              const cat = serviceTypes.find(
+                (st) => st.vendor_service_type_id === id
+              );
+              return cat?.name;
+            }
+          )
+            .filter(Boolean)
+            .join(", ");
+
+          const info = {
+            vendorName: vendorName || undefined,
+            menuName: serviceName || "Vendor Services",
+            guestCount: undefined,
+            pricePerPerson: priceEstimate,
+            totalAmount: priceEstimate,
+            date: startDate ? format(startDate, "PPP") : undefined,
+            time:
+              timingMode === "hourly"
+                ? startTimeSlot
+                : timingMode === "fullday"
+                ? "Full day (00:00 - 23:59)"
+                : startDate && endDate
+                ? `${format(startDate, "PPP")} - ${format(endDate, "PPP")}`
+                : undefined,
+          };
+
+          // Notify parent to show success dialog
+          if (typeof onBooked === "function") {
+            onBooked(info);
+          }
+
+          // Reset state
+          setShowPriceDialog(false);
+          setPendingBookingPayload(null);
+          setPendingPayment(null);
+          handleReset();
+
+          toast({
+            title: "Payment Received",
+            description:
+              "Your payment was received. The booking is now confirmed.",
+          });
+        }}
+        onMethodSelect={async (method: number) => {
+          try {
+            const created = pendingPayment?.bookingResponse;
+            const vendorBookingId =
+              created?.Vendor_Booking_id ??
+              created?.vendor_booking_id ??
+              created?._id;
+
+            if (!vendorBookingId) {
+              throw new Error("Missing vendor booking id");
+            }
+
+            const res = await createVendorBookingPaymentMutation.mutateAsync({
+              vendor_booking_id: Number(vendorBookingId),
+              payment_method_id: method,
+              billingDetails: "VendorBooking",
+            });
+
+            const paymentIntent = res.data.data.paymentIntent;
+            return paymentIntent;
+          } catch (err) {
+            console.error(
+              "Failed to create vendor booking payment intent:",
+              err
+            );
+            throw err;
+          }
+        }}
+      />
     </Dialog>
   );
 }
