@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import StaffBookings from "@/components/staff/StaffBookings";
 import VendorBookings from "@/components/vendor/VendorBookings";
+import VendorOnboardingDetails from "@/components/vendor/VendorOnboardingDetails";
 // import CateringBookings from "@/components/catering/CateringBookings";
 import {
   Select,
@@ -327,14 +328,21 @@ export default function Profile() {
             </Form>
           </div>
 
-          {/* Vendor bookings section - only render for vendor users (role_id === 3) */}
+          {/* Vendor bookings section - only render for vendor users (role_id === 1) */}
           {user?.role_id === 1 && (
             <div className="mt-8">
               <VendorBookings />
             </div>
           )}
 
-          {/* Staff bookings section - only render for staff users (role_id === 4) */}
+          {/* Vendor onboarding details section - only render for vendor users (role_id === 3) */}
+          {user?.role_id === 3 && (
+            <div className="mt-8">
+              <VendorOnboardingDetails vendorId={user?.user_id} />
+            </div>
+          )}
+
+          {/* Staff bookings section - only render for staff users (role_id === 3) */}
           {user?.role_id === 3 && (
             <div className="mt-8">
               <StaffBookings />
