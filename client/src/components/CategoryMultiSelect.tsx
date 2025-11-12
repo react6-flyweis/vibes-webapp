@@ -27,8 +27,12 @@ import { useCreateCategory } from "@/mutations/useCreateCategory";
 export type CategoryWithPricing = {
   category_id: number;
   category_name: string;
-  pricing: number;
-  pricing_currency: string;
+  // old fields
+  pricing?: number;
+  pricing_currency?: string;
+  // new fields
+  Price?: number;
+  MinFee?: number;
 };
 
 type Props = {
@@ -47,6 +51,7 @@ export default function CategoryMultiSelect({
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [pricing, setPricing] = useState<string>("");
   const [currency, setCurrency] = useState<string>("USD");
+  const [minFee, setMinFee] = useState<string>("");
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryEmoji, setNewCategoryEmoji] = useState("");
@@ -79,11 +84,19 @@ export default function CategoryMultiSelect({
       return;
     }
 
+    const parsedMinFee = minFee ? parseFloat(minFee) : undefined;
+
     const newItem: CategoryWithPricing = {
       category_id: category.category_id!,
       category_name: category.category_name || "",
+      // populate both old and new fields for compatibility
       pricing: parseFloat(pricing),
       pricing_currency: currency,
+      Price: parseFloat(pricing),
+      MinFee:
+        typeof parsedMinFee === "number" && !isNaN(parsedMinFee)
+          ? parsedMinFee
+          : undefined,
     };
 
     onChange([...value, newItem]);
@@ -152,29 +165,38 @@ export default function CategoryMultiSelect({
           <div className="space-y-2">
             <Label>Selected Categories</Label>
             <div className="flex flex-wrap gap-2">
-              {value.map((item) => (
-                <Badge
-                  key={item.category_id}
-                  variant="secondary"
-                  className="px-3 py-1.5 text-sm"
-                >
-                  {item.category_name} - {item.pricing_currency}{" "}
-                  {item.pricing.toFixed(2)}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCategory(item.category_id)}
-                    className="ml-2 hover:text-destructive"
+              {value.map((item) => {
+                const price =
+                  typeof item.Price === "number"
+                    ? item.Price
+                    : item.pricing || 0;
+                const currency = item.pricing_currency || "";
+                const minFee =
+                  typeof item.MinFee === "number" ? item.MinFee : undefined;
+                return (
+                  <Badge
+                    key={item.category_id}
+                    variant="secondary"
+                    className="px-3 py-1.5 text-sm"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+                    {item.category_name} - {currency} {price.toFixed(2)}
+                    {minFee !== undefined ? ` (MinFee: ${minFee}%)` : ""}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCategory(item.category_id)}
+                      className="ml-2 hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* Add Category Form */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+        <div className="flex gap-3 items-end">
           <div className="md:col-span-2">
             <Label>Category</Label>
             <Select
@@ -228,7 +250,17 @@ export default function CategoryMultiSelect({
                 placeholder="0.00"
                 value={pricing}
                 onChange={(e) => setPricing(e.target.value)}
-                className="bg-gray-100"
+                className="bg-gray-100 w-32"
+              />
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                placeholder="MinFee %"
+                value={minFee}
+                onChange={(e) => setMinFee(e.target.value)}
+                className="bg-gray-100 w-28"
               />
             </div>
           </div>
@@ -236,7 +268,7 @@ export default function CategoryMultiSelect({
           <Button
             type="button"
             onClick={handleAddCategory}
-            className="w-full"
+            className=""
             variant="outline"
           >
             Add
