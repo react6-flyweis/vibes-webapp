@@ -76,16 +76,7 @@ export function StaffRegisterForm() {
           "Welcome to Vibes! Please complete your onboarding to get started.",
       });
 
-      // Navigate to onboarding with user ID from response
-      // Assuming response structure: { data: { user: { id: number } } }
-      const userId =
-        (response as any)?.data?.data?.user?.id ||
-        (response as any)?.data?.user?.id;
-      if (userId) {
-        navigate(`/staff-onboarding?userId=${userId}`);
-      } else {
-        navigate("/login");
-      }
+      navigate("/login?redirect=/staff-onboarding");
     } catch (error: any) {
       console.error("Staff signup error:", error);
       const message = extractApiErrorMessage(error);
