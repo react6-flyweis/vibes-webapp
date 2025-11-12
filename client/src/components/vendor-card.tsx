@@ -23,7 +23,9 @@ import {
   Clock,
 } from "lucide-react";
 import BookVendorDialog from "@/components/book-vendor-dialog";
+import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 import { useAuthStore } from "@/store/auth-store";
+import { useState } from "react";
 
 function humanizeCategory(key?: string) {
   if (!key) return "";
@@ -36,11 +38,11 @@ function humanizeCategory(key?: string) {
 
 export default function VendorCard({
   vendor,
-  onBooked,
 }: {
   vendor: IVendor | IVendorOnboarding | any;
-  onBooked?: (info: any) => void;
 }) {
+  const [bookedOpen, setBookedOpen] = useState(false);
+  const [bookedInfo, setBookedInfo] = useState<any | null>(null);
   const formatPrice = (price: number) => `$${price.toLocaleString()}`;
   const rating = 4.5 + Math.random() * 0.5; // Simulated rating
   const navigate = useNavigate();
@@ -48,20 +50,28 @@ export default function VendorCard({
 
   // Helper to check if vendor is from new onboarding API
   const isOnboardingVendor = (v: any): v is IVendorOnboarding => {
-    return "Basic_information_business_name" in v;
+    return (
+      "Basic_information_business_name" in v ||
+      "business_information_details" in v
+    );
   };
 
-  // Extract vendor details based on type
+  // Extract vendor details based on type (handles both flat and nested structures)
   const vendorName = isOnboardingVendor(vendor)
-    ? vendor.Basic_information_business_name
+    ? vendor.Basic_information_business_name ||
+      vendor.business_information_details?.business_name
     : vendor.business_name || vendor.name;
 
   const vendorDescription = isOnboardingVendor(vendor)
-    ? vendor.Basic_information_Business_Description
+    ? vendor.Basic_information_Business_Description ||
+      vendor.business_information_details
+        ?.Basic_information_Business_Description ||
+      "No description available for this vendor."
     : "No description available for this vendor.";
 
   const vendorLocation = isOnboardingVendor(vendor)
-    ? vendor.service_areas_locaiton
+    ? vendor.service_areas_locaiton ||
+      vendor.business_information_details?.service_areas_locaiton
     : vendor.city_details?.name ||
       vendor.country_details?.name ||
       "Unknown Location";
@@ -71,7 +81,8 @@ export default function VendorCard({
     : vendor.user_id ?? vendor._id;
 
   const workingHours = isOnboardingVendor(vendor)
-    ? vendor.service_areas_workingHoures
+    ? vendor.service_areas_workingHoures ||
+      vendor.business_information_details?.service_areas_workingHoures
     : null;
 
   return (
@@ -111,53 +122,81 @@ export default function VendorCard({
         </CardDescription>
 
         {/* Service Categories - Now displaying from array */}
-        {isOnboardingVendor(vendor) &&
-        vendor.service_categories &&
-        vendor.service_categories.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {vendor.service_categories.map((category) => (
-              <Badge
-                key={category._id}
-                variant="secondary"
-                className="text-xs bg-gradient-primary text-white"
-              >
-                {category.category_name}
-              </Badge>
-            ))}
-          </div>
-        ) : !isOnboardingVendor(vendor) &&
-          vendor.business_category_details?.business_category ? (
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant="secondary"
-              className="text-xs bg-gradient-primary text-white"
-            >
-              {vendor.business_category_details.business_category}
-            </Badge>
-          </div>
-        ) : null}
+        {(() => {
+          // Get categories from either flat or nested structure
+          const categories = isOnboardingVendor(vendor)
+            ? vendor.service_categories ||
+              vendor.categories_fees_details?.map((cat) => ({
+                _id: cat._id,
+                category_name: cat.category_details?.category_name || "Unknown",
+                category_id: cat.category_id,
+                pricing: cat.Price,
+                pricing_currency: cat.pricing_currency,
+              }))
+            : null;
+
+          if (categories && categories.length > 0) {
+            return (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <Badge
+                    key={category._id}
+                    variant="secondary"
+                    className="text-xs bg-gradient-primary text-white"
+                  >
+                    {category.category_name}
+                  </Badge>
+                ))}
+              </div>
+            );
+          } else if (
+            !isOnboardingVendor(vendor) &&
+            vendor.business_category_details?.business_category
+          ) {
+            return (
+              <div className="flex flex-wrap gap-2">
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gradient-primary text-white"
+                >
+                  {vendor.business_category_details.business_category}
+                </Badge>
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         {/* Pricing - Now showing from service categories */}
-        {isOnboardingVendor(vendor) &&
-          vendor.service_categories &&
-          vendor.service_categories.length > 0 && (
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center text-gray-600 dark:text-gray-300">
-                <DollarSign className="w-4 h-4 mr-1" />
-                <span className="text-xs font-medium">
-                  Starting from{" "}
-                  {formatPrice(
-                    Math.min(...vendor.service_categories.map((c) => c.pricing))
-                  )}
-                </span>
-              </div>
-              {vendor.service_categories.length > 1 && (
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {vendor.service_categories.length} services
+        {(() => {
+          // Get categories for pricing from either flat or nested structure
+          const categories = isOnboardingVendor(vendor)
+            ? vendor.service_categories ||
+              vendor.categories_fees_details?.map((cat) => ({
+                pricing: cat.Price,
+              }))
+            : null;
+
+          if (categories && categories.length > 0) {
+            const minPrice = Math.min(...categories.map((c) => c.pricing));
+            return (
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center text-gray-600 dark:text-gray-300">
+                  <DollarSign className="w-4 h-4 mr-1" />
+                  <span className="text-xs font-medium">
+                    Starting from {formatPrice(minPrice)}
+                  </span>
                 </div>
-              )}
-            </div>
-          )}
+                {categories.length > 1 && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {categories.length} services
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         {/* Working Hours */}
         {workingHours && (
@@ -168,40 +207,61 @@ export default function VendorCard({
         )}
 
         {/* Service Areas */}
-        {isOnboardingVendor(vendor) &&
-          (vendor.service_areas_pincode ||
-            vendor.Basic_information_BusinessAddress) && (
-            <div className="flex items-start text-xs text-gray-600 dark:text-gray-300">
-              <MapPin className="w-4 h-4 mr-2 mt-0.5" />
-              <div className="flex-1">
-                {vendor.Basic_information_BusinessAddress && (
-                  <div className="line-clamp-1">
-                    {vendor.Basic_information_BusinessAddress}
-                  </div>
-                )}
-                {vendor.service_areas_pincode && (
-                  <div className="text-gray-500">
-                    Pincode: {vendor.service_areas_pincode}
-                  </div>
-                )}
+        {(() => {
+          const pincode = isOnboardingVendor(vendor)
+            ? vendor.service_areas_pincode ||
+              vendor.business_information_details?.service_areas_pincode
+            : null;
+
+          const address = isOnboardingVendor(vendor)
+            ? vendor.Basic_information_BusinessAddress ||
+              vendor.business_information_details
+                ?.Basic_information_BusinessAddress
+            : null;
+
+          if (pincode || address) {
+            return (
+              <div className="flex items-start text-xs text-gray-600 dark:text-gray-300">
+                <MapPin className="w-4 h-4 mr-2 mt-0.5" />
+                <div className="flex-1">
+                  {address && <div className="line-clamp-1">{address}</div>}
+                  {pincode && (
+                    <div className="text-gray-500">Pincode: {pincode}</div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          }
+          return null;
+        })()}
 
         {/* Single action: Book Vendor — opens booking dialog */}
         <div className="pt-2">
           <BookVendorDialog
             vendorId={vendorId}
             userId={user?.user_id ?? 0}
+            vendorName={vendorName}
             trigger={
               <Button className="w-full bg-gradient-cta">
                 <Calendar className="w-4 h-4 mr-2" />
                 Book Now
               </Button>
             }
-            onBooked={onBooked}
+            onBooked={(info: any) => {
+              // open the local success dialog
+              setBookedInfo(info);
+              setBookedOpen(true);
+            }}
           />
         </div>
+
+        {/* Booked success dialog scoped to this vendor card */}
+        <BookedSuccessDialog
+          open={bookedOpen}
+          onOpenChange={setBookedOpen}
+          info={bookedInfo}
+          onDone={() => setBookedInfo(null)}
+        />
 
         {/* Reviews Link: commented because IVendor does not include reviewsLink */}
         {/* vendor.reviewsLink && (
