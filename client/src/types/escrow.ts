@@ -27,6 +27,9 @@ export type EscrowTransactionResponse = {
   id?: string; // transaction id returned by provider
   status?: string; // provider status: pending/created/failed
   raw?: any; // raw response body for debugging until typed
+  createdAt?: string; // ISO timestamp
+  amount?: number; // smallest currency unit or cents depending on provider
+  currency?: string;
 };
 
 export default {} as const;
