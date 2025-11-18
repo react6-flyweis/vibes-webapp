@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -8,30 +7,23 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEscrowTransactions } from "@/queries/integrations/escrow";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import LegacyEscrowForm from "@/components/escrow/LegacyEscrowForm";
+import type { EscrowTransactionResponse } from "@/types/escrow";
+import type { UseQueryResult } from "@tanstack/react-query";
+
 import {
   Shield,
   Lock,
   Clock,
   CheckCircle,
-  AlertCircle,
   DollarSign,
   FileText,
-  Users,
   Zap,
-  TrendingUp,
-  Wallet,
   Eye,
-  ChevronRight,
-  ArrowUpDown,
-  Calendar,
 } from "lucide-react";
-import { Link } from "react-router";
 
 interface EscrowContract {
   id: string;
@@ -73,79 +65,45 @@ interface ContractStats {
 }
 
 export default function SmartContractEscrow() {
-  const [selectedContract, setSelectedContract] = useState<string | null>(null);
-  const [newContractData, setNewContractData] = useState({
-    vendorId: "",
-    amount: "",
-    eventDate: "",
-    beneficiaryAddress: "",
-    milestones: [{ description: "", percentage: 100 }],
-  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const {
+    data: escrowTransactions,
+    isLoading: isLoadingEscrowTransactions,
+    error: escrowTransactionsError,
+  } = useEscrowTransactions({ page: 1, limit: 25 }) as UseQueryResult<
+    EscrowTransactionResponse[] | undefined
+  >;
+
   // Fetch escrow contracts
-  const { data: contracts, isLoading } = useQuery({
+  const { data: contracts, isLoading } = useQuery<EscrowContract[]>({
     queryKey: ["/api/escrow/contracts"],
     retry: false,
   });
 
   // Fetch contract statistics
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<ContractStats | undefined>({
     queryKey: ["/api/escrow/stats"],
     retry: false,
   });
 
-  // Fetch available vendors
-  const { data: vendors } = useQuery({
-    queryKey: ["/api/vendors"],
-    retry: false,
-  });
+  // Vendors are fetched inside the legacy form using `useVendors` to better support the onboarding portal format
 
   // Fetch real blockchain network info
-  const { data: networkInfo } = useQuery({
+  const { data: networkInfo } = useQuery<
+    { name?: string; blockNumber?: number } | undefined
+  >({
     queryKey: ["/api/blockchain/network"],
     retry: false,
   });
 
   // Fetch gas prices
-  const { data: gasPrice } = useQuery({
+  const { data: gasPrice } = useQuery<
+    { gasPrice?: string | number } | undefined
+  >({
     queryKey: ["/api/blockchain/gas-price"],
     retry: false,
-  });
-
-  // Create escrow contract mutation
-  const createContractMutation = useMutation({
-    mutationFn: async (contractData: any) => {
-      const response = await fetch("/api/escrow/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contractData),
-      });
-      if (!response.ok) throw new Error("Failed to create contract");
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Smart Contract Created",
-        description: "Escrow contract deployed to blockchain successfully!",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/escrow/contracts"] });
-      setNewContractData({
-        vendorId: "",
-        amount: "",
-        eventDate: "",
-        beneficiaryAddress: "",
-        milestones: [{ description: "", percentage: 100 }],
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Contract Creation Failed",
-        description: "Failed to deploy smart contract. Please try again.",
-        variant: "destructive",
-      });
-    },
   });
 
   // Release milestone payment mutation
@@ -280,7 +238,7 @@ export default function SmartContractEscrow() {
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-200 mb-1">
                   {gasPrice?.gasPrice
-                    ? Math.round(parseInt(gasPrice.gasPrice) / 1e9) + " Gwei"
+                    ? Math.round(Number(gasPrice.gasPrice) / 1e9) + " Gwei"
                     : "Loading..."}
                 </div>
                 <p className="text-white/80 text-sm">Gas Price</p>
@@ -355,116 +313,26 @@ export default function SmartContractEscrow() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="vendor">Select Vendor</Label>
-                <select
-                  className="w-full p-2 border rounded-lg"
-                  value={newContractData.vendorId}
-                  onChange={(e) =>
-                    setNewContractData((prev) => ({
-                      ...prev,
-                      vendorId: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">Choose a vendor...</option>
-                  {vendors?.map((vendor: any) => (
-                    <option key={vendor.id} value={vendor.id}>
-                      {vendor.name} - {vendor.category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <Label htmlFor="amount">Contract Amount (USD)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="0.00"
-                  value={newContractData.amount}
-                  onChange={(e) =>
-                    setNewContractData((prev) => ({
-                      ...prev,
-                      amount: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="eventDate">Event Date</Label>
-                <Input
-                  id="eventDate"
-                  type="date"
-                  value={newContractData.eventDate}
-                  onChange={(e) =>
-                    setNewContractData((prev) => ({
-                      ...prev,
-                      eventDate: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <Label>Payment Milestones</Label>
-                {newContractData.milestones.map((milestone, index) => (
-                  <div key={index} className="flex gap-2 mt-2">
-                    <Input
-                      placeholder="Milestone description"
-                      value={milestone.description}
-                      onChange={(e) => {
-                        const updated = [...newContractData.milestones];
-                        updated[index].description = e.target.value;
-                        setNewContractData((prev) => ({
-                          ...prev,
-                          milestones: updated,
-                        }));
-                      }}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="%"
-                      className="w-20"
-                      value={milestone.percentage}
-                      onChange={(e) => {
-                        const updated = [...newContractData.milestones];
-                        updated[index].percentage =
-                          parseInt(e.target.value) || 0;
-                        setNewContractData((prev) => ({
-                          ...prev,
-                          milestones: updated,
-                        }));
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <Button
-                onClick={() => createContractMutation.mutate(newContractData)}
-                disabled={
-                  createContractMutation.isPending ||
-                  !newContractData.vendorId ||
-                  !newContractData.amount
-                }
-                className="w-full bg-party-gradient-2 hover:scale-105 transition-transform"
-              >
-                {createContractMutation.isPending ? (
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Deploying to Blockchain...
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Create Smart Contract
-                  </div>
-                )}
-              </Button>
+              <LegacyEscrowForm />
             </CardContent>
           </Card>
+          {/* EscrowForm usage commented out while keeping legacy UI for now */}
+          {/*
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
+            <CardHeader>
+              <CardTitle className="text-party-dark flex items-center">
+                <Zap className="w-5 h-5 mr-2" />
+                Create Escrow Transaction
+              </CardTitle>
+              <CardDescription>
+                Create a transaction using the integrated escrow provider
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <EscrowForm />
+            </CardContent>
+          </Card>
+          */}
 
           {/* Active Contracts */}
           <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
@@ -483,7 +351,7 @@ export default function SmartContractEscrow() {
                   <div className="w-8 h-8 border-4 border-party-coral border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                   <p className="text-party-gray">Loading contracts...</p>
                 </div>
-              ) : contracts?.length > 0 ? (
+              ) : contracts && contracts.length > 0 ? (
                 <div className="space-y-4">
                   {contracts.map((contract: EscrowContract) => (
                     <div
@@ -516,7 +384,7 @@ export default function SmartContractEscrow() {
 
                       {/* Milestones */}
                       <div className="space-y-2">
-                        {contract.milestones.map((milestone, index) => (
+                        {contract.milestones.map((milestone) => (
                           <div
                             key={milestone.id}
                             className="flex items-center justify-between"
@@ -573,6 +441,93 @@ export default function SmartContractEscrow() {
                   <p className="text-sm mt-1">
                     Create your first secure vendor payment
                   </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          {/* Escrow Provider Transactions */}
+          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
+            <CardHeader>
+              <CardTitle className="text-party-dark flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
+                Escrow Provider Transactions
+              </CardTitle>
+              <CardDescription>
+                Recent transactions from your configured escrow provider
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-party-gray">
+                  Latest transactions
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ["/api/integrations/escrow/transactions"],
+                      })
+                    }
+                    className="bg-party-coral hover:bg-party-coral/90"
+                  >
+                    Refresh
+                  </Button>
+                </div>
+              </div>
+
+              {isLoadingEscrowTransactions ? (
+                <div className="text-center py-6">
+                  <div className="w-6 h-6 border-4 border-party-coral border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-party-gray text-sm">
+                    Loading transactions...
+                  </p>
+                </div>
+              ) : Array.isArray(escrowTransactions) &&
+                escrowTransactions.length > 0 ? (
+                <div className="space-y-3">
+                  {(escrowTransactions as EscrowTransactionResponse[]).map(
+                    (tx: EscrowTransactionResponse) => (
+                      <div
+                        key={tx.id}
+                        className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <div>
+                            <h4 className="font-semibold text-party-dark">
+                              {tx.id}
+                            </h4>
+                            <p className="text-sm text-party-gray">
+                              {tx.raw?.provider ||
+                                tx.currency?.toUpperCase() ||
+                                "provider"}{" "}
+                              •{" "}
+                              {tx.amount
+                                ? `$${(tx.amount / 100).toFixed(2)}`
+                                : "—"}
+                            </p>
+                          </div>
+                          <Badge className={getStatusColor(tx.status || "")}>
+                            {(tx.status || "unknown").replace("_", " ")}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-party-gray mt-2">
+                          {tx.createdAt
+                            ? new Date(tx.createdAt).toLocaleString()
+                            : "—"}
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-party-gray">
+                  <p>No transactions yet</p>
+                </div>
+              )}
+              {escrowTransactionsError && (
+                <div className="mt-4 text-center text-sm text-red-500">
+                  Failed to load transactions
                 </div>
               )}
             </CardContent>
