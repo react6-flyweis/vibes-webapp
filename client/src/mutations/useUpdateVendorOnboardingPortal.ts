@@ -57,6 +57,9 @@ export interface UpdateVendorOnboardingPortalInput {
   Payment_Setup_AccountNo?: string;
   Payment_Setup_Ifsc?: string;
   Payment_Setup_UPI?: string;
+  // optional cancellation charges percentage (0-30)
+  CancellationCharges?: number;
+  EscrowPayment?: boolean;
 
   [key: string]: any;
 }
