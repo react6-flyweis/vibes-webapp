@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
+import type { VendorOnboardingPortal } from "@/queries/vendorOnboardingPortal";
 
 export interface VendorOnboardingPayload {
   Vendor_id?: number;
@@ -38,14 +39,19 @@ export interface VendorOnboardingPayload {
   Payment_Setup_Ifsc?: string;
   Payment_Setup_UPI?: string;
   ifConfirm?: boolean;
+  EscrowPayment?: boolean;
   Status?: boolean;
+  // optional cancellation charges percentage (0-30)
+  CancellationCharges?: number;
   [k: string]: any;
 }
+
+// Use existing VendorOnboardingPortal type from queries to avoid duplication
 
 export interface VendorOnboardingResponse {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: VendorOnboardingPortal;
 }
 
 export function useVendorOnboarding() {
