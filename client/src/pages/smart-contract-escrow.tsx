@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEscrowTransactions } from "@/queries/integrations/escrow";
 import { useToast } from "@/hooks/use-toast";
 import LegacyEscrowForm from "@/components/escrow/LegacyEscrowForm";
+import EscrowContractsList from "@/components/escrow/EscrowContractsList";
 import type { EscrowTransactionResponse } from "@/types/escrow";
 import type { UseQueryResult } from "@tanstack/react-query";
 
@@ -132,6 +133,21 @@ export default function SmartContractEscrow() {
       queryClient.invalidateQueries({ queryKey: ["/api/escrow/contracts"] });
     },
   });
+
+  const handleReleaseMilestone = ({
+    contractId,
+    milestoneId,
+  }: {
+    contractId: string;
+    milestoneId: string;
+  }) => releaseMilestoneMutation.mutate({ contractId, milestoneId });
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/escrow/contracts"] });
+    queryClient.invalidateQueries({
+      queryKey: ["/api/integrations/escrow/transactions"],
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -316,222 +332,17 @@ export default function SmartContractEscrow() {
               <LegacyEscrowForm />
             </CardContent>
           </Card>
-          {/* EscrowForm usage commented out while keeping legacy UI for now */}
-          {/*
-          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
-            <CardHeader>
-              <CardTitle className="text-party-dark flex items-center">
-                <Zap className="w-5 h-5 mr-2" />
-                Create Escrow Transaction
-              </CardTitle>
-              <CardDescription>
-                Create a transaction using the integrated escrow provider
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <EscrowForm />
-            </CardContent>
-          </Card>
-          */}
 
-          {/* Active Contracts */}
-          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
-            <CardHeader>
-              <CardTitle className="text-party-dark flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
-                Your Escrow Contracts
-              </CardTitle>
-              <CardDescription>
-                Manage active blockchain payment contracts
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="w-8 h-8 border-4 border-party-coral border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-party-gray">Loading contracts...</p>
-                </div>
-              ) : contracts && contracts.length > 0 ? (
-                <div className="space-y-4">
-                  {contracts.map((contract: EscrowContract) => (
-                    <div
-                      key={contract.id}
-                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-semibold text-party-dark">
-                            {contract.eventTitle}
-                          </h3>
-                          <p className="text-sm text-party-gray">
-                            Vendor: {contract.vendorName}
-                          </p>
-                        </div>
-                        <Badge className={getStatusColor(contract.status)}>
-                          {contract.status.replace("_", " ")}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-lg font-bold text-party-coral">
-                          ${contract.amount.toLocaleString()}
-                        </span>
-                        <span className="text-sm text-party-gray">
-                          Event:{" "}
-                          {new Date(contract.eventDate).toLocaleDateString()}
-                        </span>
-                      </div>
-
-                      {/* Milestones */}
-                      <div className="space-y-2">
-                        {contract.milestones.map((milestone) => (
-                          <div
-                            key={milestone.id}
-                            className="flex items-center justify-between"
-                          >
-                            <div className="flex items-center flex-1">
-                              {milestone.completed ? (
-                                <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                              ) : (
-                                <Clock className="w-4 h-4 text-yellow-500 mr-2" />
-                              )}
-                              <span className="text-sm">
-                                {milestone.description}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">
-                                {milestone.percentage}%
-                              </span>
-                              {!milestone.completed &&
-                                contract.status === "in_progress" && (
-                                  <Button
-                                    size="sm"
-                                    onClick={() =>
-                                      releaseMilestoneMutation.mutate({
-                                        contractId: contract.id,
-                                        milestoneId: milestone.id,
-                                      })
-                                    }
-                                    className="bg-party-coral hover:bg-party-coral/90"
-                                  >
-                                    Release
-                                  </Button>
-                                )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-3 pt-3 border-t text-xs text-party-gray">
-                        Contract: {contract.contractAddress.substring(0, 10)}...
-                        {contract.transactionHash && (
-                          <span className="ml-2">
-                            TX: {contract.transactionHash.substring(0, 10)}...
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-party-gray">
-                  <Shield className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No escrow contracts yet</p>
-                  <p className="text-sm mt-1">
-                    Create your first secure vendor payment
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          {/* Escrow Provider Transactions */}
-          <Card className="bg-white/95 backdrop-blur-sm border-2 border-white/30">
-            <CardHeader>
-              <CardTitle className="text-party-dark flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
-                Escrow Provider Transactions
-              </CardTitle>
-              <CardDescription>
-                Recent transactions from your configured escrow provider
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center mb-4">
-                <div className="text-sm text-party-gray">
-                  Latest transactions
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      queryClient.invalidateQueries({
-                        queryKey: ["/api/integrations/escrow/transactions"],
-                      })
-                    }
-                    className="bg-party-coral hover:bg-party-coral/90"
-                  >
-                    Refresh
-                  </Button>
-                </div>
-              </div>
-
-              {isLoadingEscrowTransactions ? (
-                <div className="text-center py-6">
-                  <div className="w-6 h-6 border-4 border-party-coral border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-party-gray text-sm">
-                    Loading transactions...
-                  </p>
-                </div>
-              ) : Array.isArray(escrowTransactions) &&
-                escrowTransactions.length > 0 ? (
-                <div className="space-y-3">
-                  {(escrowTransactions as EscrowTransactionResponse[]).map(
-                    (tx: EscrowTransactionResponse) => (
-                      <div
-                        key={tx.id}
-                        className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <div>
-                            <h4 className="font-semibold text-party-dark">
-                              {tx.id}
-                            </h4>
-                            <p className="text-sm text-party-gray">
-                              {tx.raw?.provider ||
-                                tx.currency?.toUpperCase() ||
-                                "provider"}{" "}
-                              •{" "}
-                              {tx.amount
-                                ? `$${(tx.amount / 100).toFixed(2)}`
-                                : "—"}
-                            </p>
-                          </div>
-                          <Badge className={getStatusColor(tx.status || "")}>
-                            {(tx.status || "unknown").replace("_", " ")}
-                          </Badge>
-                        </div>
-                        <div className="text-xs text-party-gray mt-2">
-                          {tx.createdAt
-                            ? new Date(tx.createdAt).toLocaleString()
-                            : "—"}
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-party-gray">
-                  <p>No transactions yet</p>
-                </div>
-              )}
-              {escrowTransactionsError && (
-                <div className="mt-4 text-center text-sm text-red-500">
-                  Failed to load transactions
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Your Escrow Contracts - extracted component */}
+          <EscrowContractsList
+            contracts={contracts}
+            escrowTransactions={escrowTransactions}
+            isLoading={isLoading}
+            isLoadingEscrowTransactions={isLoadingEscrowTransactions}
+            escrowTransactionsError={escrowTransactionsError}
+            onRefresh={handleRefresh}
+            onReleaseMilestone={handleReleaseMilestone}
+          />
         </div>
 
         {/* How It Works */}
