@@ -60,6 +60,8 @@ export type VendorOnboardingPortal = {
   Payment_Setup_AccountNo?: string;
   Payment_Setup_Ifsc?: string;
   Payment_Setup_UPI?: string;
+  CancellationCharges?: number;
+  EscrowPayment?: boolean;
 
   // Populated details
   vendor_details?: {
