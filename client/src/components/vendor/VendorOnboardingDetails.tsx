@@ -48,6 +48,9 @@ type VendorOnboardingFormValues = {
   Payment_Setup_AccountNo?: string;
   Payment_Setup_Ifsc?: string;
   Payment_Setup_UPI?: string;
+  EscrowPayment?: boolean;
+  // Cancellation charges percentage
+  CancellationCharges?: number;
 
   // KYC Information
   KYC_fullname?: string;
@@ -185,6 +188,8 @@ export default function VendorOnboardingDetails({
           bankInfo?.ifsc || selectedPortal.Payment_Setup_Ifsc || "",
         Payment_Setup_UPI:
           bankInfo?.upi || selectedPortal.Payment_Setup_UPI || "",
+        CancellationCharges: selectedPortal.CancellationCharges || undefined,
+        EscrowPayment: selectedPortal.EscrowPayment ?? false,
 
         // KYC Information
         KYC_fullname:
@@ -579,6 +584,31 @@ export default function VendorOnboardingDetails({
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+
+                    <FormItem>
+                      <FormLabel>Cancellation Charges (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...methods.register("CancellationCharges")}
+                          disabled={!isEditing}
+                          placeholder="e.g., 20"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                    <FormItem className="flex items-center gap-3">
+                      <FormLabel>Escrow Payment</FormLabel>
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          {...methods.register("EscrowPayment")}
+                          disabled={!isEditing}
+                        />
+                      </FormControl>
+                      <div className="text-sm text-muted-foreground">
+                        Accept escrow payments for bookings
+                      </div>
                     </FormItem>
                   </div>
                 </div>
