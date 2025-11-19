@@ -39,9 +39,8 @@ import { useCreateVendorBooking } from "@/queries/vendorBookings";
 import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
 import { useCreateVendorBookingPayment } from "@/mutations/useCreateVendorBookingPayment";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Calendar as CalendarIcon, X, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -52,6 +51,14 @@ import { extractApiErrorMessage } from "@/lib/apiErrors";
 import { LoadingButton } from "./ui/loading-button";
 import { useAuthStore } from "@/store/auth-store";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
+import SuccessDialog from "@/components/SuccessDialog";
+import {
+  useStaffAvailability,
+  isDateBooked,
+  isDateRangeBooked,
+} from "@/hooks/useStaffAvailability";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface BookVendorDialogProps {
   vendorId: number;
@@ -86,6 +93,10 @@ export default function BookVendorDialog({
   const [pendingBookingPayload, setPendingBookingPayload] = useState<any>(null);
   const [priceEstimate, setPriceEstimate] = useState<number>(0);
   const [pendingPayment, setPendingPayment] = useState<any | null>(null);
+  const [bookingSuccessOpen, setBookingSuccessOpen] = useState(false);
+  const [bookingSuccessData, setBookingSuccessData] = useState<any | null>(
+    null
+  );
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [timingMode, setTimingMode] = useState<
@@ -100,6 +111,25 @@ export default function BookVendorDialog({
   const { data: serviceTypes = [] } = useVendorServiceTypes();
   const createBooking = useCreateVendorBooking();
   const createVendorBookingPaymentMutation = useCreateVendorBookingPayment();
+
+  // Fetch vendor availability data
+  const { data: availabilityBookings = [], isLoading: loadingAvailability } =
+    useStaffAvailability(vendorId, open);
+
+  // Check if selected dates have conflicts
+  const hasDateConflict =
+    timingMode === "fullday" &&
+    startDate &&
+    isDateBooked(availabilityBookings, format(startDate, "yyyy-MM-dd"));
+  const hasRangeConflict =
+    timingMode === "multiday" &&
+    startDate &&
+    endDate &&
+    isDateRangeBooked(
+      availabilityBookings,
+      format(startDate, "yyyy-MM-dd"),
+      format(endDate, "yyyy-MM-dd")
+    );
 
   const handleReset = () => {
     form.reset();
@@ -284,8 +314,7 @@ export default function BookVendorDialog({
       setPendingBookingPayload(payload);
 
       // Calculate price estimate from booking response
-      const estimate =
-        bookingResponse?.vendor_price || bookingResponse?.price || 0;
+      const estimate = bookingResponse?.amount;
       setPriceEstimate(estimate);
 
       // Close booking dialog and show payment dialog
@@ -429,6 +458,11 @@ export default function BookVendorDialog({
                     : "1. Select Event Date"}
                 </h3>
               </div>
+              {loadingAvailability && (
+                <p className="text-xs text-muted-foreground">
+                  Checking vendor availability...
+                </p>
+              )}
               <div
                 className={cn(
                   "grid gap-4",
@@ -495,6 +529,26 @@ export default function BookVendorDialog({
                   </div>
                 )}
               </div>
+
+              {/* Show availability warning for full day and multiday modes */}
+              {timingMode === "fullday" && hasDateConflict && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    This date has existing bookings. Please choose another date
+                    or select hourly mode for available time slots.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {timingMode === "multiday" && hasRangeConflict && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    This date range has existing bookings. Please choose
+                    different dates.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             {/* Section 2: Time Slot Selection (Only for Hourly) */}
@@ -689,6 +743,11 @@ export default function BookVendorDialog({
               <LoadingButton
                 type="submit"
                 isLoading={form.formState.isSubmitting}
+                disabled={
+                  form.formState.isSubmitting ||
+                  (timingMode === "fullday" && hasDateConflict) ||
+                  (timingMode === "multiday" && hasRangeConflict)
+                }
               >
                 {createBooking.isPending ? "Booking..." : "Create Booking"}
               </LoadingButton>
@@ -759,17 +818,17 @@ export default function BookVendorDialog({
             onBooked(info);
           }
 
-          // Reset state
+          // Reset state and show success dialog instead of a toast
           setShowPriceDialog(false);
           setPendingBookingPayload(null);
           setPendingPayment(null);
           handleReset();
 
-          toast({
-            title: "Payment Received",
-            description:
-              "Your payment was received. The booking is now confirmed.",
-          });
+          const payload = payment?.data ?? payment;
+          const transaction =
+            payload?.transaction ?? payload?.paymentIntent ?? payload;
+          setBookingSuccessData({ booking: created, transaction });
+          setBookingSuccessOpen(true);
         }}
         onMethodSelect={async (method: number) => {
           try {
@@ -799,6 +858,53 @@ export default function BookVendorDialog({
             throw err;
           }
         }}
+      />
+      <SuccessDialog
+        open={bookingSuccessOpen}
+        onOpenChange={(open) => {
+          setBookingSuccessOpen(open);
+          if (!open) setBookingSuccessData(null);
+        }}
+        title={bookingSuccessData?.booking ? "Payment Received" : "Success"}
+        description={"Your payment was received. The booking is now confirmed."}
+        details={
+          bookingSuccessData
+            ? [
+                {
+                  label: "Amount",
+                  value:
+                    bookingSuccessData.transaction?.amount ||
+                    bookingSuccessData.transaction?.value
+                      ? `$${(
+                          (bookingSuccessData.transaction?.amount ||
+                            bookingSuccessData.transaction?.value) / 100
+                        ).toFixed(2)}`
+                      : "-",
+                },
+                {
+                  label: "Reference",
+                  value:
+                    bookingSuccessData.transaction?.reference_number ||
+                    bookingSuccessData.transaction?.id ||
+                    bookingSuccessData.transaction?.payment_intent_id ||
+                    bookingSuccessData.transaction?.paymentIntent?.id ||
+                    "-",
+                },
+                {
+                  label: "Booking Date",
+                  value: bookingSuccessData.booking?.Date_start
+                    ? format(
+                        parseISO(bookingSuccessData.booking.Date_start),
+                        "PPP"
+                      )
+                    : bookingSuccessData.booking?.Date
+                    ? format(parseISO(bookingSuccessData.booking.Date), "PPP")
+                    : "-",
+                },
+              ]
+            : null
+        }
+        onDone={() => setBookingSuccessOpen(false)}
       />
     </Dialog>
   );
