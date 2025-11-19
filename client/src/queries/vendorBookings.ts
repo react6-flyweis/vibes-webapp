@@ -123,6 +123,45 @@ export function useMyVendorBookingsQuery() {
   });
 }
 
+// Reschedule vendor booking payload and hook
+export type VendorBookingReschedulePayload = {
+  vendor_booking_id: number;
+  Date_start: string;
+  End_date: string;
+  Start_time: string;
+  End_time: string;
+  Year: number;
+  Month: number;
+  reschedule_reason?: string;
+};
+
+export function useRescheduleVendorBooking(options?: {
+  onSuccess?: (data: IResponse<any>) => void;
+  onError?: (err: unknown) => void;
+}) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: VendorBookingReschedulePayload) =>
+      axiosInstance
+        .post<IResponse<any>>(
+          "/api/vendor/bookingsCancellation/reschedule",
+          payload
+        )
+        .then((res) => res.data),
+    onSuccess: (data) => {
+      // Refresh vendor bookings lists
+      queryClient.invalidateQueries({
+        queryKey: ["/api/master/vendor-event-book/getByAuth"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/vendor/bookings/getByAuth"],
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: options?.onError,
+  });
+}
+
 // Fetch all vendor bookings (for admin view)
 export const fetchAllVendorBookings = async () => {
   const res = await axiosInstance.get<IResponseList<VendorBooking>>(
