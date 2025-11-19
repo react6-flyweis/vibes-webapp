@@ -33,6 +33,9 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useVendorOnboarding } from "@/mutations/useVendorOnboarding";
+import useUpdateVendorOnboardingPortalMutation from "@/mutations/useUpdateVendorOnboardingPortal";
+import { useVendorOnboardingPortalList } from "@/queries/vendorOnboardingPortal";
+import { useAuthStore } from "@/store/auth-store";
 import StepProgress from "@/components/onboarding/StepProgress";
 import DocumentUploadItem from "@/components/onboarding/DocumentUploadItem";
 import { extractApiErrorMessage } from "@/lib/apiErrors";
@@ -78,7 +81,17 @@ const schema = z.object({
   preferredWorkingHours: z
     .string()
     .min(1, "Preferred working hours are required"),
+  // Cancellation charges: percentage value between 0 and 30
+  cancellationCharges: z.preprocess(
+    (val) => (val === "" || val === undefined ? undefined : Number(val)),
+    z
+      .number()
+      .min(0, "Cancellation charges must be at least 0%")
+      .max(30, "Maximum cancellation charges is 30%")
+      .optional()
+  ),
   payoutEmail: z.string().optional(),
+  escrowPayment: z.boolean().optional(),
   kycFullName: z.string().min(1, "Authorized person's full name is required"),
   kycDob: z.string().min(1, "Date of birth is required"),
   kycIdType: z.string().min(1, "ID type is required"),
@@ -100,6 +113,37 @@ export default function VendorOnboardingPortal() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
+  const [showValidationDebug, setShowValidationDebug] = useState(false);
+  const isDev = import.meta.env.DEV;
+
+  function flattenErrors(errObj: any, prefix = "") {
+    const items: string[] = [];
+    if (!errObj) return items;
+    for (const key of Object.keys(errObj)) {
+      const val = errObj[key];
+      const path = prefix ? `${prefix}.${key}` : key;
+      if (val?.message) {
+        items.push(`${path}: ${val.message}`);
+      }
+      // Arrays: errors like categories[0]
+      if (val?.type && val?.message) {
+        items.push(`${path}: ${val.message}`);
+      }
+      if (val?.root && typeof val?.root === "object") {
+        items.push(...flattenErrors(val.root, path));
+      }
+      if (val && typeof val === "object") {
+        // dive deeper
+        const subKeys = Object.keys(val).filter(
+          (k) => k !== "message" && k !== "type"
+        );
+        if (subKeys.length > 0) {
+          items.push(...flattenErrors(val, path));
+        }
+      }
+    }
+    return items;
+  }
   type DocKey =
     | "businessRegistration"
     | "gst"
@@ -168,15 +212,126 @@ export default function VendorOnboardingPortal() {
       accountNumber: "",
       ifscCode: "",
       upiId: "",
+      escrowPayment: false,
       kycFullName: "",
       kycDob: "",
       kycIdType: "",
       kycIdNumber: "",
       kycPan: "",
       kycGst: "",
+      cancellationCharges: 0,
       termsAccepted: false,
     },
   });
+
+  // Get current user (vendor) id so we can fetch existing onboarding portal data
+  const currentUser = useAuthStore((s) => s.user);
+  const vendorId = currentUser?.user_id;
+
+  const { data: portalListRes } = useVendorOnboardingPortalList(
+    { Vendor_id: vendorId, page: 1, limit: 100 },
+    !!vendorId
+  );
+
+  const existingPortal = portalListRes?.data?.[0] || null;
+  const updateMutation = useUpdateVendorOnboardingPortalMutation();
+
+  // When existing portal is available, prefill the form fields
+  React.useEffect(() => {
+    if (!existingPortal) return;
+
+    const businessInfo = existingPortal.business_information_details;
+    const bankInfo = existingPortal.bank_branch_details;
+
+    const mappedCategories: any[] = (
+      existingPortal.service_categories ||
+      existingPortal.categories_fees_details ||
+      []
+    ).map((c: any) => ({
+      category_id: c.category_id ?? c.category_id,
+      category_name: c.category_name ?? c.category_details?.category_name ?? "",
+      Price: c.Price ?? c.pricing ?? 0,
+      pricing: c.pricing ?? c.Price ?? 0,
+      pricing_currency: c.pricing_currency ?? c.pricing_currency ?? "",
+      MinFee: c.MinFee ?? c.MinFee ?? (c.MinFee === 0 ? 0 : undefined),
+    }));
+
+    form.reset({
+      businessName:
+        businessInfo?.business_name ||
+        existingPortal.Basic_information_business_name ||
+        "",
+      legalName:
+        businessInfo?.Basic_information_LegalName ||
+        existingPortal.Basic_information_LegalName ||
+        "",
+      email:
+        businessInfo?.business_email ||
+        existingPortal.Basic_information_Email ||
+        "",
+      phone:
+        businessInfo?.business_phone ||
+        existingPortal.Basic_information_phone ||
+        "",
+      description:
+        businessInfo?.Basic_information_Business_Description ||
+        existingPortal.Basic_information_Business_Description ||
+        "",
+      streetAddress:
+        businessInfo?.Basic_information_BusinessAddress ||
+        existingPortal.Basic_information_BusinessAddress ||
+        "",
+      zip:
+        businessInfo?.Basic_information_ZipCode ||
+        existingPortal.Basic_information_ZipCode ||
+        "",
+      primaryServiceLocation:
+        businessInfo?.service_areas_locaiton ||
+        existingPortal.service_areas_locaiton ||
+        "",
+      optionalRegions:
+        businessInfo?.service_areas_Regions ||
+        existingPortal.service_areas_Regions ||
+        "",
+      pinCode:
+        businessInfo?.service_areas_pincode ||
+        existingPortal.service_areas_pincode ||
+        "",
+      preferredWorkingHours:
+        businessInfo?.service_areas_workingHoures ||
+        existingPortal.service_areas_workingHoures ||
+        "",
+      categories: mappedCategories || [],
+      accountHolderName:
+        bankInfo?.holderName || existingPortal.Payment_Setup_HolderName || "",
+      bankName: existingPortal.Payment_Setup_BankName || "",
+      branchName:
+        bankInfo?.bank_branch_name ||
+        existingPortal.Payment_Setup_BranchName ||
+        "",
+      accountNumber:
+        bankInfo?.accountNo || existingPortal.Payment_Setup_AccountNo || "",
+      ifscCode: bankInfo?.ifsc || existingPortal.Payment_Setup_Ifsc || "",
+      upiId: bankInfo?.upi || existingPortal.Payment_Setup_UPI || "",
+      kycFullName:
+        existingPortal.KYC_fullname || existingPortal.KYC_fullname || "",
+      kycDob: existingPortal.KYC_DoB || existingPortal.KYC_DoB || "",
+      kycIdType:
+        existingPortal.KYC_GovtIdtype || existingPortal.KYC_GovtIdtype || "",
+      kycIdNumber: existingPortal.KYC_Idno || existingPortal.KYC_Idno || "",
+      kycPan:
+        existingPortal.KYC_Business_PanCard ||
+        existingPortal.KYC_Business_PanCard ||
+        "",
+      kycGst: existingPortal.KYC_GSTNo || existingPortal.KYC_GSTNo || "",
+      cancellationCharges:
+        existingPortal.CancellationCharges !== undefined
+          ? existingPortal.CancellationCharges
+          : undefined,
+      termsAccepted: existingPortal.ifConfirm ?? false,
+      escrowPayment: existingPortal.EscrowPayment ?? false,
+    });
+  }, [existingPortal]);
   const stepFields = useMemo(
     () => [
       // Step 0: Basic information
@@ -214,7 +369,9 @@ export default function VendorOnboardingPortal() {
         "accountNumber",
         "ifscCode",
         "upiId",
+        "escrowPayment",
         "payoutEmail",
+        "cancellationCharges",
       ],
       // Step 5: Preview & Publish (termsAccepted validated on submit)
       [],
@@ -227,7 +384,20 @@ export default function VendorOnboardingPortal() {
 
     if (fields.length) {
       const valid = await form.trigger(fields as any);
-      if (!valid) return;
+      if (!valid) {
+        // collect and show errors for debugging
+        const errors = form.formState.errors;
+        console.warn("Validation errors on step", current, errors);
+        toast({
+          title: "Validation errors",
+          description:
+            "Please fix the errors in the fields before continuing. Open debug to inspect.",
+          variant: "destructive",
+        });
+        // Optionally open debug view so user can inspect (only in dev)
+        if (isDev) setShowValidationDebug(true);
+        return;
+      }
     }
 
     // // Custom validation for steps that rely on component state (files)
@@ -316,16 +486,53 @@ export default function VendorOnboardingPortal() {
       Payment_Setup_Ifsc: values.ifscCode,
       Payment_Setup_UPI: values.upiId,
       ifConfirm: !!values.termsAccepted,
+      EscrowPayment: !!values.escrowPayment,
       Status: true,
       documentsCount,
+      CancellationCharges: values.cancellationCharges,
     };
+
+    // Validate whole form before submit
+    const isFormValid = await form.trigger();
+    if (!isFormValid) {
+      const errors = form.formState.errors;
+      console.warn("Validation errors on submit:", errors);
+      toast({
+        title: "Validation errors",
+        description:
+          "Please fix the validation errors in the form before submitting.",
+        variant: "destructive",
+      });
+      if (isDev) setShowValidationDebug(true);
+      return;
+    }
 
     // trigger the mutation using async API so we can await and catch
     try {
-      const res = await vendorOnboardingMutation.mutateAsync(payload);
+      let res;
+      if (existingPortal?.Vendor_Onboarding_Portal_id) {
+        // use update mutation
+        const updatePayload = {
+          ...payload,
+          Vendor_Onboarding_Portal_id:
+            existingPortal.Vendor_Onboarding_Portal_id,
+          Vendor_id: existingPortal.Vendor_id ?? vendorId,
+        };
+        res = await updateMutation.mutateAsync(updatePayload as any);
+      } else {
+        res = await vendorOnboardingMutation.mutateAsync(payload);
+      }
+      // Normalize response shape for success and message
+      const anyRes: any = res;
+      const normalizedSuccess =
+        anyRes?.data?.success ?? anyRes?.success ?? false;
+      const normalizedMessage =
+        anyRes?.data?.message ??
+        anyRes?.message ??
+        "Redirecting you to subscription setup";
       toast({
-        title: res?.success ? "Onboarding Completed" : "Submission result",
-        description: res?.message || "Redirecting you to subscription setup",
+        title: normalizedSuccess ? "Onboarding Completed" : "Submission result",
+        description: normalizedMessage,
       });
       setCurrent(steps.length - 1);
 
@@ -398,6 +605,53 @@ export default function VendorOnboardingPortal() {
         </Card>
 
         <div className="mt-6">
+          {isDev && (
+            <>
+              <div className="flex justify-end mb-3">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowValidationDebug((s) => !s)}
+                >
+                  {showValidationDebug ? "Hide" : "Show"} Validation Debug
+                </Button>
+              </div>
+              {showValidationDebug && (
+                <Card className="mb-4">
+                  <CardHeader>
+                    <CardTitle>Form Validation Errors (Debug)</CardTitle>
+                    <CardDescription>
+                      Shows a JSON dump of current validation errors from
+                      react-hook-form
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="bg-black text-white p-3 rounded overflow-auto text-xs max-h-96">
+                      {JSON.stringify(form.formState.errors, null, 2)}
+                    </pre>
+                    <div className="mt-3">
+                      <div className="font-medium">Flattened errors:</div>
+                      <ul className="list-disc pl-5 text-sm text-red-600">
+                        {flattenErrors(form.formState.errors).length === 0 ? (
+                          <li className="text-green-600">
+                            No validation errors
+                          </li>
+                        ) : (
+                          flattenErrors(form.formState.errors).map(
+                            (err, idx) => <li key={idx}>{err}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                    <div className="mt-3 text-sm text-muted-foreground">
+                      Fields with errors will also show inline messages near the
+                      field.
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               {/* Step content */}
@@ -1128,6 +1382,52 @@ export default function VendorOnboardingPortal() {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name="cancellationCharges"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Cancellation Charges (%)</FormLabel>
+                            <FormControl>
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  max={30}
+                                  step={0.1}
+                                  className="bg-gray-100"
+                                  placeholder="e.g., 20"
+                                  {...field}
+                                />
+                                <div className="text-sm text-gray-500">%</div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="escrowPayment"
+                        render={({ field }) => (
+                          <FormItem className="col-span-1 md:col-span-2">
+                            <FormLabel>Escrow Payment</FormLabel>
+                            <FormControl>
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                                <div className="text-sm text-gray-700">
+                                  Accept escrow payments for bookings
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -1207,6 +1507,17 @@ export default function VendorOnboardingPortal() {
                               : ""}
                           </li>
                         </ul>
+                        {form.getValues("cancellationCharges") !==
+                          undefined && (
+                          <p className="text-sm text-gray-600 mt-2">
+                            Cancellation charges:{" "}
+                            {form.getValues("cancellationCharges")}%
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-2">
+                          Escrow payments accepted:{" "}
+                          {form.getValues("escrowPayment") ? "Yes" : "No"}
+                        </p>
                       </div>
 
                       <div>
