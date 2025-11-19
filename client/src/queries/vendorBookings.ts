@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
 import { IResponseList, IResponse } from "@/types";
 
@@ -222,6 +222,31 @@ export function useCancelVendorBooking(options?: {
     mutationFn: (bookingId: number) =>
       axiosInstance
         .patch<IResponse<any>>(`/api/vendor/bookings/${bookingId}/cancel`)
+        .then((res) => res.data),
+    onSuccess: options?.onSuccess,
+    onError: options?.onError,
+  });
+}
+
+// New: Cancel vendor booking using the cancellation service endpoint that supports
+// additional fields (cancellation_reason, process_refund).
+export type VendorBookingCancellationPayload = {
+  vendor_booking_id: number;
+  cancellation_reason?: string;
+  process_refund?: boolean;
+};
+
+export function useVendorBookingCancellation(options?: {
+  onSuccess?: (data: IResponse<any>) => void;
+  onError?: (err: unknown) => void;
+}) {
+  return useMutation({
+    mutationFn: (payload: VendorBookingCancellationPayload) =>
+      axiosInstance
+        .post<IResponse<any>>(
+          "/api/vendor/bookingsCancellation/VendorBooking/cancel",
+          payload
+        )
         .then((res) => res.data),
     onSuccess: options?.onSuccess,
     onError: options?.onError,
