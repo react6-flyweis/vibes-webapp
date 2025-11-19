@@ -9,6 +9,7 @@ import {
 
 export interface CreateVendorBookingPaymentPayload {
   vendor_booking_id: number;
+  vendor_id?: number;
   payment_method_id?: number;
   billingDetails?: string;
   // optional fields used by callers
