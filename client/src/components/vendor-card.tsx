@@ -256,12 +256,12 @@ export default function VendorCard({
         </div>
 
         {/* Booked success dialog scoped to this vendor card */}
-        <BookedSuccessDialog
+        {/* <BookedSuccessDialog
           open={bookedOpen}
           onOpenChange={setBookedOpen}
           info={bookedInfo}
           onDone={() => setBookedInfo(null)}
-        />
+        /> */}
 
         {/* Reviews Link: commented because IVendor does not include reviewsLink */}
         {/* vendor.reviewsLink && (
