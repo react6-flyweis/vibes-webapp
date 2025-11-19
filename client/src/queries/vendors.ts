@@ -241,6 +241,9 @@ export interface IVendorOnboarding {
     pricing_currency: string;
     _id: string;
   }>;
+  // Cancellation charges percentage
+  CancellationCharges?: number;
+  EscrowPayment?: boolean;
 }
 
 export async function fetchVendors(roleId: number = 3) {
@@ -288,6 +291,8 @@ function transformVendorData(vendor: IVendorOnboarding): IVendorOnboarding {
       pricing: cat.Price,
       pricing_currency: cat.pricing_currency,
     })),
+    CancellationCharges: vendor.CancellationCharges,
+    EscrowPayment: (vendor as any).EscrowPayment,
   };
 }
 
