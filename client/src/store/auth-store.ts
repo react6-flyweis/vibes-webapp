@@ -4,8 +4,8 @@ import { persist } from "zustand/middleware";
 
 import { createJSONStorage } from "zustand/middleware";
 
-const STORAGE_KEY = "homvill_auth";
-const REMEMBERED_KEY = "homvill_auth_remembered";
+const STORAGE_KEY = "vibes_auth";
+const REMEMBERED_KEY = "vibes_auth_remembered";
 
 export interface User {
   agreePrivacyPolicy?: boolean;
