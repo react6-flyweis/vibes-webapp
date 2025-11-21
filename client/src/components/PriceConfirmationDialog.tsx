@@ -123,10 +123,6 @@ export default function PriceConfirmationDialog({
 
   const handleMethodSelect = async () => {
     setPaymentError(null);
-    // if (!onMethodSelect) {
-    //   setPaymentError("Payment method selection is not available.");
-    //   return;
-    // }
     setIsProcessing(true);
     try {
       console.log("Selected method:", method);
@@ -205,8 +201,19 @@ export default function PriceConfirmationDialog({
 
         <div className="py-4">
           <div className="mb-6">
-            <div className="text-sm text-gray-700">Price Estimation:</div>
-            <div className="text-2xl font-bold">{priceEstimate}$</div>
+            <div className="text-sm text-gray-700">
+              {createdPaymentIntent ? "Amount to Pay:" : "Price Estimation:"}
+            </div>
+            <div className="text-2xl font-bold">
+              {createdPaymentIntent
+                ? `$${(createdPaymentIntent.amount / 100).toFixed(2)}`
+                : `$${priceEstimate.toFixed(2)}`}
+            </div>
+            {createdPaymentIntent && (
+              <div className="text-xs text-gray-500 mt-1">
+                Amount verified by payment processor
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
