@@ -2,6 +2,17 @@ import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router";
 import { useAuthStore, User } from "@/store/auth-store";
 import { LogOutIcon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useMemo } from "react";
 
@@ -54,10 +65,31 @@ export default function Topbar() {
             </>
           ) : (
             <>
-              <Button variant="ghost" onClick={handleLogout}>
-                <LogOutIcon />
-                Logout
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost">
+                    <LogOutIcon />
+                    Logout
+                  </Button>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Sign out</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to sign out? You will be redirected
+                      to the login page.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction className="" onClick={handleLogout}>
+                      Logout
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Link to="/profile">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.name} alt={user?.name || "User"} />
