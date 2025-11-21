@@ -20,10 +20,10 @@ import { Calendar as CalendarIcon, Clock, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AvailabilityTimeSlotSelector } from "@/components/AvailabilityTimeSlotSelector";
 import {
-  useStaffAvailability,
+  useAvailability,
   isDateBooked,
   isDateRangeBooked,
-} from "@/hooks/useStaffAvailability";
+} from "@/hooks/useAvailability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 
@@ -116,7 +116,7 @@ export default function RescheduleBookingDialog({
 
   // Always call hooks - control with enabled flag
   const { data: availabilityBookings = [], isLoading: loadingAvailability } =
-    useStaffAvailability(vendorId, open && !!vendorId);
+    useAvailability(vendorId, { enabled: open && !!vendorId });
 
   // Check if selected dates have conflicts
   const hasDateConflict =
