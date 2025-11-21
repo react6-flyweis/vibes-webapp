@@ -23,7 +23,6 @@ import {
   Clock,
 } from "lucide-react";
 import BookVendorDialog from "@/components/book-vendor-dialog";
-import BookedSuccessDialog from "@/components/BookedSuccessDialog";
 import { useAuthStore } from "@/store/auth-store";
 import { useState } from "react";
 
