@@ -76,36 +76,59 @@ export default function CancelConfirmationDialog({
             <div className="px-4 pt-2 pb-3">
               {processRefund ? (
                 <div className="text-sm space-y-1">
-                  <div>
-                    <strong>Original amount:</strong>{" "}
-                    {formatMoney(
-                      selectedBookingForCancel.amount ??
-                        selectedBookingForCancel.vendor_price ??
-                        selectedBookingForCancel.vendor_amount ??
-                        selectedBookingForCancel.transaction_amount
-                    )}
-                  </div>
-                  <div>
-                    <strong>Cancellation fee:</strong>{" "}
-                    {(() => {
-                      const { fee } = getCancellationBreakdown(
-                        selectedBookingForCancel
+                  {(() => {
+                    // Prefer explicit Cancellation_Charge on the booking when present.
+                    // Fall back to the generic breakdown helper otherwise.
+                    const breakdown = getCancellationBreakdown(
+                      selectedBookingForCancel
+                    );
+                    const original =
+                      breakdown.original ??
+                      Number(
+                        selectedBookingForCancel.amount ??
+                          selectedBookingForCancel.vendor_price ??
+                          selectedBookingForCancel.vendor_amount ??
+                          selectedBookingForCancel.transaction_amount ??
+                          null
                       );
-                      return fee !== null ? formatMoney(fee) : "Unknown";
-                    })()}
-                  </div>
-                  <div>
-                    <strong>Estimated refund:</strong>{" "}
-                    {(() => {
-                      const { refund } = getCancellationBreakdown(
-                        selectedBookingForCancel
-                      );
-                      return (
-                        (refund !== null && formatMoney(refund)) ||
-                        getCancellationRefundEstimate(selectedBookingForCancel)
-                      );
-                    })()}
-                  </div>
+
+                    const explicitCharge =
+                      selectedBookingForCancel?.Cancellation_Charge ??
+                      selectedBookingForCancel?.cancellation_charge ??
+                      null;
+
+                    const fee =
+                      explicitCharge !== null && explicitCharge !== undefined
+                        ? Number(explicitCharge)
+                        : breakdown.fee;
+
+                    const refund =
+                      original != null && fee != null ? original - fee : null;
+
+                    return (
+                      <>
+                        <div>
+                          <strong>Original amount:</strong>{" "}
+                          {formatMoney(original)}
+                        </div>
+                        <div>
+                          <strong>Cancellation fee:</strong>{" "}
+                          {fee !== null && fee !== undefined
+                            ? formatMoney(fee)
+                            : "Unknown"}
+                        </div>
+                        <div>
+                          <strong>Estimated refund:</strong>{" "}
+                          {(refund !== null &&
+                            refund !== undefined &&
+                            formatMoney(refund)) ||
+                            getCancellationRefundEstimate(
+                              selectedBookingForCancel
+                            )}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               ) : (
                 <div className="text-sm">Refund will not be processed</div>
