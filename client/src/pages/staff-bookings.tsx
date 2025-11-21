@@ -34,9 +34,10 @@ import {
   endOfWeek,
 } from "date-fns";
 import { Link } from "react-router";
+import { useMyStaffBookings } from "@/hooks/useStaffBookings";
 
 export default function StaffBookings() {
-  const { data: bookings, isLoading } = useMyStaffBookingsQuery();
+  const { data: bookings, isLoading } = useMyStaffBookings();
   const { data: availabilityCalendar, isLoading: isLoadingAvailability } =
     useAvailabilityCalendarByAuthQuery();
 
@@ -76,7 +77,11 @@ export default function StaffBookings() {
       }
       acc[date].push(booking);
     } catch (e) {
-      console.error("Invalid booking date:", resolveDateString(booking), booking);
+      console.error(
+        "Invalid booking date:",
+        resolveDateString(booking),
+        booking
+      );
     }
     return acc;
   }, {} as Record<string, any[]>);
@@ -555,13 +560,13 @@ export default function StaffBookings() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col items-end gap-2">
+                        {/* <div className="flex flex-col items-end gap-2">
                           {booking.staff_price && (
                             <div className="text-2xl font-bold text-white">
                               ${(booking.staff_price / 100).toFixed(2)}
                             </div>
                           )}
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   ))}
@@ -597,9 +602,7 @@ export default function StaffBookings() {
                     <span className="font-medium">
                       {(() => {
                         const ds = resolveDateString(selectedBooking);
-                        return ds
-                          ? format(parseISO(ds), "MMMM dd, yyyy")
-                          : "—";
+                        return ds ? format(parseISO(ds), "MMMM dd, yyyy") : "—";
                       })()}
                     </span>
                   </div>
