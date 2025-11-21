@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useStaffBookings from "@/hooks/useStaffBookings";
+import { useStaffBookingsByAuth } from "@/hooks/useStaffBookings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
 export function StaffBookings() {
-  const { data: bookings, isLoading, error } = useStaffBookings();
+  const { data: bookings, isLoading, error } = useStaffBookingsByAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
