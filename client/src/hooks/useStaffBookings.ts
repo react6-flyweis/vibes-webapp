@@ -25,7 +25,7 @@ export type StaffBooking = {
   staff_event_book_id?: number;
 };
 
-export function useStaffBookings() {
+export function useStaffBookingsByAuth() {
   return useQuery({
     queryKey: ["/api/master/staff-event-book/getByAuth"],
     queryFn: async () => {
@@ -40,4 +40,17 @@ export function useStaffBookings() {
   });
 }
 
-export default useStaffBookings;
+export function useMyStaffBookings() {
+  return useQuery({
+    queryKey: ["/api/master/staff-event-book/getStaffByVendorId"],
+    queryFn: async () => {
+      const res = await axiosInstance.get<IResponseList<StaffBooking>>(
+        "/api/master/staff-event-book/getStaffByVendorId"
+      );
+      return res.data;
+    },
+    select: (data) => {
+      return data?.data;
+    },
+  });
+}
