@@ -53,10 +53,10 @@ import { useAuthStore } from "@/store/auth-store";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 import SuccessDialog from "@/components/SuccessDialog";
 import {
-  useStaffAvailability,
+  useAvailability,
   isDateBooked,
   isDateRangeBooked,
-} from "@/hooks/useStaffAvailability";
+} from "@/hooks/useAvailability";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
@@ -112,9 +112,9 @@ export default function BookVendorDialog({
   const createBooking = useCreateVendorBooking();
   const createVendorBookingPaymentMutation = useCreateVendorBookingPayment();
 
-  // Fetch vendor availability data
+  // Fetch availability data
   const { data: availabilityBookings = [], isLoading: loadingAvailability } =
-    useStaffAvailability(vendorId, open);
+    useAvailability(vendorId, { enabled: open });
 
   // Check if selected dates have conflicts
   const hasDateConflict =
@@ -494,7 +494,20 @@ export default function BookVendorDialog({
                         selected={startDate}
                         onSelect={setStartDate}
                         initialFocus
-                        disabled={(date) => date < new Date()}
+                        disabled={(date) => {
+                          // Disable past dates
+                          if (date < new Date()) return true;
+
+                          // For full day mode, disable dates that are fully booked
+                          if (timingMode === "fullday") {
+                            return isDateBooked(
+                              availabilityBookings,
+                              format(date, "yyyy-MM-dd")
+                            );
+                          }
+
+                          return false;
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -522,7 +535,16 @@ export default function BookVendorDialog({
                           selected={endDate}
                           onSelect={setEndDate}
                           initialFocus
-                          disabled={(date) => date < (startDate || new Date())}
+                          disabled={(date) => {
+                            // Disable dates before start date
+                            if (date < (startDate || new Date())) return true;
+
+                            // For multiday mode, disable dates that are booked
+                            return isDateBooked(
+                              availabilityBookings,
+                              format(date, "yyyy-MM-dd")
+                            );
+                          }}
                         />
                       </PopoverContent>
                     </Popover>
@@ -876,8 +898,8 @@ export default function BookVendorDialog({
                     bookingSuccessData.transaction?.amount ||
                     bookingSuccessData.transaction?.value
                       ? `$${(
-                          (bookingSuccessData.transaction?.amount ||
-                            bookingSuccessData.transaction?.value) / 100
+                          bookingSuccessData.transaction?.amount ||
+                          bookingSuccessData.transaction?.value
                         ).toFixed(2)}`
                       : "-",
                 },
