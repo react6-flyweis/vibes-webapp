@@ -335,6 +335,12 @@ export const vendorNavigationItems: NavCategory[] = [
         description:
           "Migrate your store from Etsy, Aliexpress, Temu, Amazon in one click",
       },
+      {
+        name: "My Bookings",
+        href: "/vendor-bookings",
+        icon: Calendar,
+        description: "View and manage your bookings",
+      },
       // {
       //   name: "Advanced Business Intelligence",
       //   href: "/advanced-bi",
