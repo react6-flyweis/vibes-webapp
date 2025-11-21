@@ -3,12 +3,7 @@ import { useMyVendorBookingsQuery } from "@/queries/vendorBookings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import {
   CalendarIcon,
   Clock,
@@ -463,180 +458,11 @@ export default function VendorBookings() {
       </div>
 
       {/* Booking Detail Dialog */}
-      <Dialog
+      <BookingDetailsDialog
+        booking={selectedBooking}
         open={!!selectedBooking}
         onOpenChange={(open) => !open && setSelectedBooking(null)}
-      >
-        <DialogContent className="bg-white/20 text-white max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">
-              {selectedBooking?.event_details?.name_title || "Booking Details"}
-            </DialogTitle>
-          </DialogHeader>
-          {selectedBooking && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-white/60">Date</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <CalendarIcon className="h-4 w-4 text-purple-400" />
-                    <span className="font-medium">
-                      {(() => {
-                        const d = resolveDateString(selectedBooking);
-                        return d ? format(parseISO(d), "MMMM dd, yyyy") : "—";
-                      })()}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Time</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Clock className="h-4 w-4 text-purple-400" />
-                    <span className="font-medium">
-                      {selectedBooking.Start_time} - {selectedBooking.End_time}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-white/60">Booking ID</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.vendor_event_book_id ?? selectedBooking._id}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">
-                    Transaction ID
-                  </label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.transaction_id ?? "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Amount</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.amount
-                      ? `$${selectedBooking.amount.toFixed(2)}`
-                      : "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Vendor Amount</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.vendor_amount
-                      ? `$${selectedBooking.vendor_amount.toFixed(2)}`
-                      : "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Amount Status</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.amount_status ?? "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">
-                    Vendor Amount Status
-                  </label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.vendor_amount_status ?? "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Vendor</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.vendor_details?.name ??
-                      selectedBooking.vendor_details?.email ??
-                      "—"}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-white/60">Customer</label>
-                  <div className="mt-1 font-medium">
-                    {selectedBooking.user_details?.name ??
-                      selectedBooking.user_details?.email ??
-                      "—"}
-                  </div>
-                </div>
-              </div>
-
-              {selectedBooking.event_details?.street_address && (
-                <div>
-                  <label className="text-sm text-white/60">Location</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <MapPin className="h-4 w-4 text-purple-400" />
-                    <span className="font-medium">
-                      {selectedBooking.event_details.street_address}
-                      {selectedBooking.event_details.city && `, ${selectedBooking.event_details.city}`}
-                      {selectedBooking.event_details.state && `, ${selectedBooking.event_details.state}`}
-                      {selectedBooking.event_details.zip_code && ` ${selectedBooking.event_details.zip_code}`}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {selectedBooking.event_details?.max_capacity && (
-                <div>
-                  <label className="text-sm text-white/60">Guests</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Users className="h-4 w-4 text-purple-400" />
-                    <span className="font-medium">
-                      {selectedBooking.event_details.max_capacity} guests
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {selectedBooking.special_instruction && (
-                <div>
-                  <label className="text-sm text-white/60">
-                    Special Instructions
-                  </label>
-                  <p className="mt-1 text-sm bg-white/5 p-3 rounded-lg">
-                    {selectedBooking.special_instruction}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                <div>
-                  <label className="text-sm text-white/60">
-                    Payment Status
-                  </label>
-                  <div className="mt-1">
-                    <Badge
-                      variant={
-                        selectedBooking.vendor_amount_status === "Completed"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className={
-                        selectedBooking.vendor_amount_status === "Completed"
-                          ? "bg-green-500/20 text-green-200 border-green-500/30"
-                          : "bg-yellow-500/20 text-yellow-200 border-yellow-500/30"
-                      }
-                    >
-                      {selectedBooking.vendor_amount_status || "Pending"}
-                    </Badge>
-                  </div>
-                </div>
-                {selectedBooking.vendor_amount && (
-                  <div className="text-right">
-                    <label className="text-sm text-white/60">
-                      Total Amount
-                    </label>
-                    <div className="text-3xl font-bold text-white mt-1">
-                      ${selectedBooking.vendor_amount.toFixed(2)}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      />
     </div>
   );
 }
