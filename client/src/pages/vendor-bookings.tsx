@@ -3,7 +3,6 @@ import { useMyVendorBookingsQuery } from "@/queries/vendorBookings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Calendar as CalendarIcon,
+  CalendarIcon,
   Clock,
   MapPin,
   Users,
@@ -33,7 +32,6 @@ import {
   startOfWeek,
   endOfWeek,
 } from "date-fns";
-import { Link } from "react-router";
 
 export default function VendorBookings() {
   const { data: bookings, isLoading } = useMyVendorBookingsQuery();
@@ -55,24 +53,39 @@ export default function VendorBookings() {
     );
   }
 
+  // Helper to resolve a date string from vendor booking entry
+  const resolveDateString = (b: any) =>
+    b?.Date_start || b?.dateFrom || b?.date_start || b?.startDate || null;
+
   // Group bookings by date
   const bookingsByDate = (bookings || []).reduce((acc, booking) => {
     try {
-      const date = format(parseISO(booking.dateFrom), "yyyy-MM-dd");
+      const ds = resolveDateString(booking);
+      if (!ds) {
+        console.warn("Vendor booking has no recognizable date field:", booking);
+        return acc;
+      }
+      const date = format(parseISO(ds), "yyyy-MM-dd");
       if (!acc[date]) {
         acc[date] = [];
       }
       acc[date].push(booking);
     } catch (e) {
-      console.error("Invalid date:", booking.dateFrom);
+      console.error(
+        "Invalid booking date:",
+        resolveDateString(booking),
+        booking
+      );
     }
     return acc;
   }, {} as Record<string, any[]>);
 
-  // Get bookings for selected date
+  // Get bookings for selected date (vendor bookings)
   const selectedDateBookings = selectedDate
     ? bookingsByDate[format(selectedDate, "yyyy-MM-dd")] || []
     : [];
+
+  // Availability API integration removed for now.
 
   // Generate calendar days
   const monthStart = startOfMonth(currentDate);
@@ -84,14 +97,19 @@ export default function VendorBookings() {
     end: calendarEnd,
   });
 
+  /**
+   * Indicate whether the day has a vendor booking OR is marked as unavailable in the staff availability calendar.
+   */
   const hasBooking = (day: Date) => {
     const dateStr = format(day, "yyyy-MM-dd");
-    return bookingsByDate[dateStr]?.length > 0;
+    const vendorHas = bookingsByDate[dateStr]?.length > 0;
+    return vendorHas;
   };
 
   const getBookingCount = (day: Date) => {
     const dateStr = format(day, "yyyy-MM-dd");
-    return bookingsByDate[dateStr]?.length || 0;
+    const vendorCount = bookingsByDate[dateStr]?.length || 0;
+    return vendorCount;
   };
 
   return (
@@ -108,14 +126,14 @@ export default function VendorBookings() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Link to="/vendor-dashboard">
+            {/* <Link to="/vendor-dashboard">
               <Button
                 variant="outline"
                 className="bg-white/20 text-white hover:bg-white/10"
               >
                 Back to Dashboard
               </Button>
-            </Link>
+            </Link> */}
             <Button
               variant="outline"
               className="bg-white/20 text-white hover:bg-white/10"
@@ -172,6 +190,7 @@ export default function VendorBookings() {
                       >
                         <ChevronRight className="h-4 w-4" />
                       </Button>
+                      {/* availability check removed */}
                     </div>
                   </div>
                 </CardHeader>
@@ -197,6 +216,8 @@ export default function VendorBookings() {
                         : false;
                       const hasBookings = hasBooking(day);
                       const bookingCount = getBookingCount(day);
+                      const dateStr = format(day, "yyyy-MM-dd");
+                      // availability code removed
 
                       return (
                         <button
@@ -239,7 +260,7 @@ export default function VendorBookings() {
                                 }).map((_, i) => (
                                   <div
                                     key={i}
-                                    className="w-1.5 h-1.5 rounded-full bg-green-400"
+                                    className={`w-1.5 h-1.5 rounded-full bg-green-400`}
                                   />
                                 ))}
                               </div>
@@ -265,6 +286,7 @@ export default function VendorBookings() {
                 </CardHeader>
                 <CardContent>
                   {selectedDate ? (
+                    // Show vendor bookings
                     selectedDateBookings.length > 0 ? (
                       <div className="space-y-4">
                         {selectedDateBookings.map((booking) => (
@@ -274,20 +296,20 @@ export default function VendorBookings() {
                             onClick={() => setSelectedBooking(booking)}
                           >
                             <h4 className="font-semibold text-white mb-2">
-                              {booking.event_name || "Event"}
+                              {booking.event_details?.name_title || "Event"}
                             </h4>
                             <div className="space-y-1 text-sm text-white/70">
                               <div className="flex items-center gap-2">
                                 <Clock className="h-3 w-3" />
                                 <span>
-                                  {booking.timeFrom} - {booking.timeTo}
+                                  {booking.Start_time} - {booking.End_time}
                                 </span>
                               </div>
-                              {booking.vendor_price && (
+                              {booking.vendor_amount && (
                                 <div className="flex items-center gap-2">
                                   <DollarSign className="h-3 w-3" />
                                   <span>
-                                    ${(booking.vendor_price / 100).toFixed(2)}
+                                    ${booking.vendor_amount.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -295,15 +317,16 @@ export default function VendorBookings() {
                             <Badge
                               className="mt-2"
                               variant={
-                                booking.transaction_status === "Completed"
+                                booking.vendor_amount_status === "Completed"
                                   ? "default"
                                   : "secondary"
                               }
                             >
-                              {booking.transaction_status || "Pending"}
+                              {booking.vendor_amount_status || "Pending"}
                             </Badge>
                           </div>
                         ))}
+                        {/* Availability UI removed */}
                       </div>
                     ) : (
                       <div className="text-center text-white/60 py-8">
@@ -334,6 +357,7 @@ export default function VendorBookings() {
                     </div>
                     <span className="text-white/70">Has booking(s)</span>
                   </div>
+                  {/* Availability legend removed */}
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded bg-purple-500/30 border border-purple-500" />
                     <span className="text-white/70">Selected</span>
@@ -361,21 +385,22 @@ export default function VendorBookings() {
                         <div className="flex-1 space-y-2">
                           <div className="flex items-start justify-between">
                             <h3 className="text-lg font-semibold text-white">
-                              {booking.event_name || "Event Booking"}
+                              {booking.event_details?.name_title ||
+                                "Event Booking"}
                             </h3>
                             <Badge
                               variant={
-                                booking.transaction_status === "Completed"
+                                booking.vendor_amount_status === "Completed"
                                   ? "default"
                                   : "secondary"
                               }
                               className={
-                                booking.transaction_status === "Completed"
+                                booking.vendor_amount_status === "Completed"
                                   ? "bg-green-500/20 text-green-200 border-green-500/30"
                                   : "bg-yellow-500/20 text-yellow-200 border-yellow-500/30"
                               }
                             >
-                              {booking.transaction_status || "Pending"}
+                              {booking.vendor_amount_status || "Pending"}
                             </Badge>
                           </div>
 
@@ -383,39 +408,43 @@ export default function VendorBookings() {
                             <div className="flex items-center gap-2">
                               <CalendarIcon className="h-4 w-4" />
                               <span>
-                                {format(
-                                  parseISO(booking.dateFrom),
-                                  "MMM dd, yyyy"
-                                )}
+                                {(() => {
+                                  const ds = resolveDateString(booking);
+                                  return ds
+                                    ? format(parseISO(ds), "MMM dd, yyyy")
+                                    : "—";
+                                })()}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="h-4 w-4" />
                               <span>
-                                {booking.timeFrom} - {booking.timeTo}
+                                {booking.Start_time} - {booking.End_time}
                               </span>
                             </div>
-                            {booking.event_address && (
+                            {booking?.event_details?.street_address && (
                               <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4" />
                                 <span className="truncate">
-                                  {booking.event_address}
+                                  {booking?.event_details?.street_address}
                                 </span>
                               </div>
                             )}
-                            {booking.no_of_guests && (
+                            {booking.event_details?.max_capacity && (
                               <div className="flex items-center gap-2">
                                 <Users className="h-4 w-4" />
-                                <span>{booking.no_of_guests} guests</span>
+                                <span>
+                                  {booking.event_details?.max_capacity} guests
+                                </span>
                               </div>
                             )}
                           </div>
                         </div>
 
                         <div className="flex flex-col items-end gap-2">
-                          {booking.vendor_price && (
+                          {booking.vendor_amount && (
                             <div className="text-2xl font-bold text-white">
-                              ${(booking.vendor_price / 100).toFixed(2)}
+                              ${booking.vendor_amount.toFixed(2)}
                             </div>
                           )}
                         </div>
@@ -438,10 +467,10 @@ export default function VendorBookings() {
         open={!!selectedBooking}
         onOpenChange={(open) => !open && setSelectedBooking(null)}
       >
-        <DialogContent className="bg-gray-900 bg-white/20 text-white max-w-2xl">
+        <DialogContent className="bg-white/20 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              {selectedBooking?.event_name || "Booking Details"}
+              {selectedBooking?.event_details?.name_title || "Booking Details"}
             </DialogTitle>
           </DialogHeader>
           {selectedBooking && (
@@ -452,10 +481,10 @@ export default function VendorBookings() {
                   <div className="flex items-center gap-2 mt-1">
                     <CalendarIcon className="h-4 w-4 text-purple-400" />
                     <span className="font-medium">
-                      {format(
-                        parseISO(selectedBooking.dateFrom),
-                        "MMMM dd, yyyy"
-                      )}
+                      {(() => {
+                        const d = resolveDateString(selectedBooking);
+                        return d ? format(parseISO(d), "MMMM dd, yyyy") : "—";
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -464,31 +493,97 @@ export default function VendorBookings() {
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="h-4 w-4 text-purple-400" />
                     <span className="font-medium">
-                      {selectedBooking.timeFrom} - {selectedBooking.timeTo}
+                      {selectedBooking.Start_time} - {selectedBooking.End_time}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {selectedBooking.event_address && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-white/60">Booking ID</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.vendor_event_book_id ?? selectedBooking._id}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">
+                    Transaction ID
+                  </label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.transaction_id ?? "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">Amount</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.amount
+                      ? `$${selectedBooking.amount.toFixed(2)}`
+                      : "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">Vendor Amount</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.vendor_amount
+                      ? `$${selectedBooking.vendor_amount.toFixed(2)}`
+                      : "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">Amount Status</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.amount_status ?? "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">
+                    Vendor Amount Status
+                  </label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.vendor_amount_status ?? "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">Vendor</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.vendor_details?.name ??
+                      selectedBooking.vendor_details?.email ??
+                      "—"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60">Customer</label>
+                  <div className="mt-1 font-medium">
+                    {selectedBooking.user_details?.name ??
+                      selectedBooking.user_details?.email ??
+                      "—"}
+                  </div>
+                </div>
+              </div>
+
+              {selectedBooking.event_details?.street_address && (
                 <div>
                   <label className="text-sm text-white/60">Location</label>
                   <div className="flex items-center gap-2 mt-1">
                     <MapPin className="h-4 w-4 text-purple-400" />
                     <span className="font-medium">
-                      {selectedBooking.event_address}
+                      {selectedBooking.event_details.street_address}
+                      {selectedBooking.event_details.city && `, ${selectedBooking.event_details.city}`}
+                      {selectedBooking.event_details.state && `, ${selectedBooking.event_details.state}`}
+                      {selectedBooking.event_details.zip_code && ` ${selectedBooking.event_details.zip_code}`}
                     </span>
                   </div>
                 </div>
               )}
 
-              {selectedBooking.no_of_guests && (
+              {selectedBooking.event_details?.max_capacity && (
                 <div>
                   <label className="text-sm text-white/60">Guests</label>
                   <div className="flex items-center gap-2 mt-1">
                     <Users className="h-4 w-4 text-purple-400" />
                     <span className="font-medium">
-                      {selectedBooking.no_of_guests} guests
+                      {selectedBooking.event_details.max_capacity} guests
                     </span>
                   </div>
                 </div>
@@ -513,27 +608,27 @@ export default function VendorBookings() {
                   <div className="mt-1">
                     <Badge
                       variant={
-                        selectedBooking.transaction_status === "Completed"
+                        selectedBooking.vendor_amount_status === "Completed"
                           ? "default"
                           : "secondary"
                       }
                       className={
-                        selectedBooking.transaction_status === "Completed"
+                        selectedBooking.vendor_amount_status === "Completed"
                           ? "bg-green-500/20 text-green-200 border-green-500/30"
                           : "bg-yellow-500/20 text-yellow-200 border-yellow-500/30"
                       }
                     >
-                      {selectedBooking.transaction_status || "Pending"}
+                      {selectedBooking.vendor_amount_status || "Pending"}
                     </Badge>
                   </div>
                 </div>
-                {selectedBooking.vendor_price && (
+                {selectedBooking.vendor_amount && (
                   <div className="text-right">
                     <label className="text-sm text-white/60">
                       Total Amount
                     </label>
                     <div className="text-3xl font-bold text-white mt-1">
-                      ${(selectedBooking.vendor_price / 100).toFixed(2)}
+                      ${selectedBooking.vendor_amount.toFixed(2)}
                     </div>
                   </div>
                 )}
