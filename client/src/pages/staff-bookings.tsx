@@ -58,16 +58,25 @@ export default function StaffBookings() {
     );
   }
 
+  // Helper to resolve a date string from booking entries (support legacy and new fields)
+  const resolveDateString = (b: any) =>
+    b?.dateFrom || b?.Date_start || b?.date_start || b?.startDate || null;
+
   // Group bookings by date
   const bookingsByDate = (bookings || []).reduce((acc, booking) => {
     try {
-      const date = format(parseISO(booking.dateFrom), "yyyy-MM-dd");
+      const ds = resolveDateString(booking);
+      if (!ds) {
+        console.warn("Staff booking has no recognizable date field:", booking);
+        return acc;
+      }
+      const date = format(parseISO(ds), "yyyy-MM-dd");
       if (!acc[date]) {
         acc[date] = [];
       }
       acc[date].push(booking);
     } catch (e) {
-      console.error("Invalid date:", booking.dateFrom);
+      console.error("Invalid booking date:", resolveDateString(booking), booking);
     }
     return acc;
   }, {} as Record<string, any[]>);
@@ -515,10 +524,12 @@ export default function StaffBookings() {
                             <div className="flex items-center gap-2">
                               <CalendarIcon className="h-4 w-4" />
                               <span>
-                                {format(
-                                  parseISO(booking.dateFrom),
-                                  "MMM dd, yyyy"
-                                )}
+                                {(() => {
+                                  const ds = resolveDateString(booking);
+                                  return ds
+                                    ? format(parseISO(ds), "MMM dd, yyyy")
+                                    : "—";
+                                })()}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -584,10 +595,12 @@ export default function StaffBookings() {
                   <div className="flex items-center gap-2 mt-1">
                     <CalendarIcon className="h-4 w-4 text-purple-400" />
                     <span className="font-medium">
-                      {format(
-                        parseISO(selectedBooking.dateFrom),
-                        "MMMM dd, yyyy"
-                      )}
+                      {(() => {
+                        const ds = resolveDateString(selectedBooking);
+                        return ds
+                          ? format(parseISO(ds), "MMMM dd, yyyy")
+                          : "—";
+                      })()}
                     </span>
                   </div>
                 </div>
