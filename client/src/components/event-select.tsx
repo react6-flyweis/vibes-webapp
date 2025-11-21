@@ -28,7 +28,10 @@ export default function EventSelector({
       value={value ?? ""}
       onValueChange={(val) => {
         if (typeof val !== "string") return;
-        const found = events?.find((e) => String(e._id) === String(val));
+        const found = events?.find(
+          (e) =>
+            String(e.event_id) === String(val) || String(e._id) === String(val)
+        );
         onChange?.(val, found);
       }}
     >
