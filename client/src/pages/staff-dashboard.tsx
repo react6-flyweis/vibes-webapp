@@ -17,7 +17,12 @@ import {
 import { format, parseISO, isAfter, isBefore, startOfDay } from "date-fns";
 import { Link } from "react-router";
 
+// Helper to normalize date field names across API responses
+const resolveDateString = (b: any) =>
+  b?.dateFrom || b?.Date_start || b?.date_start || b?.startDate || null;
+
 export default function StaffDashboard() {
+  // component-level helpers
   const { data: bookings, isLoading } = useMyStaffBookingsQuery();
   const [selectedTab, setSelectedTab] = useState("overview");
 
@@ -43,7 +48,9 @@ export default function StaffDashboard() {
   const upcomingBookings =
     bookings?.filter((booking) => {
       try {
-        const bookingDate = startOfDay(parseISO(booking.dateFrom));
+        const ds = resolveDateString(booking);
+        if (!ds) return false;
+        const bookingDate = startOfDay(parseISO(ds));
         return (
           isAfter(bookingDate, now) || bookingDate.getTime() === now.getTime()
         );
@@ -55,7 +62,9 @@ export default function StaffDashboard() {
   const pastBookings =
     bookings?.filter((booking) => {
       try {
-        const bookingDate = startOfDay(parseISO(booking.dateFrom));
+        const ds = resolveDateString(booking);
+        if (!ds) return false;
+        const bookingDate = startOfDay(parseISO(ds));
         return isBefore(bookingDate, now);
       } catch {
         return false;
@@ -254,7 +263,10 @@ function BookingsList({ bookings }: { bookings: any[] }) {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {format(parseISO(booking.dateFrom), "MMM dd, yyyy")}
+                    {(() => {
+                      const ds = resolveDateString(booking);
+                      return ds ? format(parseISO(ds), "MMM dd, yyyy") : "—";
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
