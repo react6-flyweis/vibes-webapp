@@ -1,9 +1,6 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
-import {
-  useStaffAvailability,
-  isDateRangeBooked,
-} from "@/hooks/useStaffAvailability";
+import { useAvailability, isDateRangeBooked } from "@/hooks/useAvailability";
 
 interface AvailabilityDateRangeSelectorProps {
   userId: string | number | null | undefined;
@@ -38,7 +35,7 @@ export function AvailabilityDateRangeSelector({
 }: AvailabilityDateRangeSelectorProps) {
   // Fetch availability data
   const { data: bookings = [], isLoading: loadingAvailability } =
-    useStaffAvailability(userId, enabled);
+    useAvailability(userId, { enabled });
 
   const hasConflict = React.useMemo(() => {
     if (!startDate || !endDate) return false;

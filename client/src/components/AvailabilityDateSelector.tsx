@@ -1,9 +1,6 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
-import {
-  useStaffAvailability,
-  isDateBooked,
-} from "@/hooks/useStaffAvailability";
+import { useAvailability, isDateBooked } from "@/hooks/useAvailability";
 
 interface AvailabilityDateSelectorProps {
   userId: string | number | null | undefined;
@@ -34,7 +31,7 @@ export function AvailabilityDateSelector({
 }: AvailabilityDateSelectorProps) {
   // Fetch availability data
   const { data: bookings = [], isLoading: loadingAvailability } =
-    useStaffAvailability(userId, enabled);
+    useAvailability(userId, { enabled });
 
   const dateIsBooked = value && isDateBooked(bookings, value);
 

@@ -6,10 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useStaffAvailability,
-  isTimeSlotBooked,
-} from "@/hooks/useStaffAvailability";
+import { useAvailability, isTimeSlotBooked } from "@/hooks/useAvailability";
 
 // Generate hourly time slots (24-hour format)
 const generateTimeSlots = () => {
@@ -53,7 +50,7 @@ export function AvailabilityTimeSlotSelector({
 }: AvailabilityTimeSlotSelectorProps) {
   // Fetch availability data
   const { data: bookings = [], isLoading: loadingAvailability } =
-    useStaffAvailability(userId, enabled);
+    useAvailability(userId, { enabled });
 
   const dateSelected = !!selectedDate;
   const isDisabled = disabled || !dateSelected;
