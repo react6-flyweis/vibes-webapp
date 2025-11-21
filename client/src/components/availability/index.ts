@@ -16,9 +16,9 @@ export { AvailabilityDateRangeSelector } from "../AvailabilityDateRangeSelector"
 
 // Re-export hooks and utilities for convenience
 export {
-  useStaffAvailability,
+  useAvailability,
   isTimeSlotBooked,
   isDateBooked,
   isDateRangeBooked,
   type AvailabilityBooking,
-} from "@/hooks/useStaffAvailability";
+} from "@/hooks/useAvailability";
