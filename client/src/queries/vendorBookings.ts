@@ -44,7 +44,18 @@ export type VendorBookingDetails = {
   CreateBy: number;
   CreateAt: string;
   UpdatedBy: number | null;
-  UpdatedAt: string;
+  vendor_id?: number;
+  amount?: number;
+  amount_status?: string;
+  vendor_amount?: number;
+  vendor_amount_status?: string;
+  transaction_id?: string | number | null;
+  cancellation_reason?: string | null;
+  cancelled_at?: string | null;
+  cancelled_by?: number | null;
+  refund_amount?: number | null;
+  refund_status?: string | null;
+  refund_transaction_id?: string | null;
   Vendor_Booking_id: number;
   vendor_category_details: Array<{
     _id: string;
@@ -62,6 +73,28 @@ export type VendorBookingDetails = {
     name: string;
     email: string;
     user_id: number;
+  };
+  updated_by_details?: {
+    _id: string;
+    name: string;
+    email: string;
+    user_id: number;
+  };
+  user_details?: {
+    _id?: string;
+    name?: string;
+    mobile?: string;
+    email?: string;
+    user_id?: number;
+    [key: string]: any;
+  };
+  vendor_details?: {
+    _id?: string;
+    name?: string;
+    email?: string;
+    role_id?: number;
+    user_id?: number;
+    [key: string]: any;
   };
   event_details?: {
     Event_type: string;
@@ -108,15 +141,15 @@ export type CreateVendorBookingPayload = {
 
 // Fetch vendor bookings for the current logged-in vendor
 export const fetchMyVendorBookings = async () => {
-  const res = await axiosInstance.get<IResponseList<VendorBooking>>(
-    `/api/master/vendor-event-book/getByAuth`
+  const res = await axiosInstance.get<IResponseList<VendorBookingDetails>>(
+    `/api/vendor/bookings/getByAuth`
   );
   return res.data;
 };
 
 export function useMyVendorBookingsQuery() {
-  return useQuery<IResponseList<VendorBooking>, Error, VendorBooking[]>({
-    queryKey: ["/api/master/vendor-event-book/getByAuth"],
+  return useQuery({
+    queryKey: ["/api/vendor/bookings/getByAuth"],
     queryFn: fetchMyVendorBookings,
     select: (res) => res?.data ?? [],
     staleTime: 1000 * 60 * 2,
@@ -151,9 +184,6 @@ export function useRescheduleVendorBooking(options?: {
     onSuccess: (data) => {
       // Refresh vendor bookings lists
       queryClient.invalidateQueries({
-        queryKey: ["/api/master/vendor-event-book/getByAuth"],
-      });
-      queryClient.invalidateQueries({
         queryKey: ["/api/vendor/bookings/getByAuth"],
       });
       options?.onSuccess?.(data);
@@ -185,14 +215,14 @@ export const fetchVendorBookingsByAuth = async (
   limit: number = 10
 ) => {
   const res = await axiosInstance.get<IResponseList<VendorBookingDetails>>(
-    `/api/vendor/bookings/getByAuth?page=${page}&limit=${limit}`
+    `/api/vendor/bookings/getByuserAuth?page=${page}&limit=${limit}`
   );
   return res.data;
 };
 
 export function useVendorBookingsByAuth(page: number = 1, limit: number = 10) {
-  return useQuery<IResponseList<VendorBookingDetails>, Error>({
-    queryKey: ["/api/vendor/bookings/getByAuth", page, limit],
+  return useQuery({
+    queryKey: ["/api/vendor/bookings/getByuserAuth", page, limit],
     queryFn: () => fetchVendorBookingsByAuth(page, limit),
     staleTime: 1000 * 60 * 2,
   });
