@@ -9,22 +9,8 @@ const calculateSubtotal = (
 ) => {
   let subtotal = 0;
   Object.entries(selectedTickets).forEach(([ticketId, qty]) => {
-    // try to get ticket details directly by map key
-    let t = ticketDetailsMap?.[ticketId] ?? null;
-    // fallback: search values for matching id fields
-    if (!t && ticketDetailsMap) {
-      const values = Object.values(ticketDetailsMap);
-      t = (values as any[]).find((x) => {
-        if (!x) return false;
-        return (
-          String(x.id) === String(ticketId) ||
-          String(x.event_entry_tickets_id) === String(ticketId) ||
-          String(x.eventEntryTicketId) === String(ticketId)
-        );
-      });
-    }
-
-    const price = Number(t?.price) || 0;
+    const ticket = ticketDetailsMap?.[ticketId];
+    const price = ticket?.price || 0;
     subtotal += price * qty;
   });
   return subtotal;
@@ -75,22 +61,9 @@ export default function OrderSummary({
         {Object.entries(selectedTickets)
           .filter(([_, q]) => q > 0)
           .map(([ticketId, quantity]) => {
-            // Prefer the mapped ticket detail; fallback to searching values
-            let ticket = selectedTicketDetails?.[ticketId] ?? null;
-            if (!ticket && selectedTicketDetails) {
-              const values = Object.values(selectedTicketDetails);
-              ticket = (values as any[]).find((x) => {
-                if (!x) return false;
-                return (
-                  String(x.id) === String(ticketId) ||
-                  String(x.event_entry_tickets_id) === String(ticketId) ||
-                  String(x.eventEntryTicketId) === String(ticketId)
-                );
-              }) as any;
-            }
-
-            const name = ticket?.name ?? ticket?.title ?? `Ticket ${ticketId}`;
-            const price = Number(ticket?.price ?? ticket?.amount ?? 0) || 0;
+            const ticket = selectedTicketDetails?.[ticketId];
+            const name = ticket?.query || `Ticket #${ticketId}`;
+            const price = ticket?.price || 0;
 
             return (
               <div key={ticketId} className="flex justify-between">
