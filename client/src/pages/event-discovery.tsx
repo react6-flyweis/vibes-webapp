@@ -80,6 +80,8 @@ export default function EventDiscovery() {
   const pagination = (paginated as IResponseList<IEvent> | undefined)
     ?.pagination;
 
+  const totalCount = pagination?.totalItems;
+
   const handleFilterChange = (key: keyof EventFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
@@ -244,9 +246,7 @@ export default function EventDiscovery() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-purple-100">All Events</h2>
-            <div className="text-purple-200">
-              {Array.isArray(events) ? events.length : 0} events found
-            </div>
+            <div className="text-purple-200">{totalCount} events found</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
