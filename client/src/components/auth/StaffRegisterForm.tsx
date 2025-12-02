@@ -174,33 +174,37 @@ export function StaffRegisterForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm text-gray-600">
-                  Password <span className="text-red-500">*</span>
+                <FormLabel className="flex justify-between">
+                  <span className="text-sm text-gray-600">Password</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <span className="flex gap-1">
+                        <EyeOff className="w-4 h-4" />
+                        Hide
+                      </span>
+                    ) : (
+                      <span className="flex gap-1">
+                        <Eye className="w-4 h-4" />
+                        Show
+                      </span>
+                    )}
+                  </button>
                 </FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password"
-                      {...field}
-                      disabled={createUserMutation.isPending}
-                      className="rounded-xl border-gray-200 h-10 px-4"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
+                    {...field}
+                    disabled={createUserMutation.isPending}
+                    className="rounded-xl border-gray-200 h-10 px-4"
+                  />
                 </FormControl>
 
                 {field.value && (
