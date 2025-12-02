@@ -41,7 +41,7 @@ export default function Header({ event, guests, getTimeUntilEvent }: Props) {
             </h1>
             {event.event_type_id && (
               <Badge variant="secondary" className="capitalize">
-                {event.event_type_id}
+                {event.event_type_id?.name || "Type"}
               </Badge>
             )}
           </div>
