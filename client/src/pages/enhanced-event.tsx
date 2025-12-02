@@ -19,13 +19,13 @@ import PhotosTab from "@/components/enhanced-event/PhotosTab";
 import GuestsTab from "@/components/enhanced-event/GuestsTab";
 import SettingsTab from "@/components/enhanced-event/SettingsTab";
 import TemplatesTab from "@/components/enhanced-event/TemplatesTab";
-import SocialMediaSharing from "@/components/social-media-sharing";
+// import SocialMediaSharing from "@/components/social-media-sharing";
 import { useGuestsByEvent } from "@/queries/guests";
 
 export default function EnhancedEventPage() {
   const { id: eventId } = useParams();
 
-  const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
+  // const [isSocialSharingOpen, setIsSocialSharingOpen] = useState(false);
   // active tab state
   const [activeTab, setActiveTab] = useState<string>("overview");
   // selected template state
@@ -34,6 +34,8 @@ export default function EnhancedEventPage() {
   );
 
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
+
+  console.log(event);
 
   const { data: planMap, isLoading: planMapLoading } =
     usePlanEventMapsByEventQuery(eventId);
