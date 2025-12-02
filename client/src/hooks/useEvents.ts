@@ -26,6 +26,25 @@ export interface ICategoryTag {
   country_id: number;
 }
 
+export interface IEventTicket {
+  _id: string;
+  event_id: number;
+  max_capacity: number;
+  ticketDateils: {
+    ticket_type_id: number;
+    ticket_query: string;
+    price: number;
+    _id: string;
+  }[];
+  reply: string;
+  status: boolean;
+  created_by: number;
+  updated_by: number | null;
+  created_at: string;
+  updated_at: string;
+  ticket_id: number;
+}
+
 export interface IEvent {
   _id: string;
   name_title: string;
@@ -47,14 +66,20 @@ export interface IEvent {
   live_vibes_invite_music_preview?: string[];
   live_vibes_invite_vip_perks?: string[];
   status?: boolean;
-  created_by?: number;
+  created_by?: number | {
+    _id: string;
+    name: string;
+    mobile: string;
+    email: string;
+    user_id: number;
+    [key: string]: any;
+  };
   updated_by?: number | null;
   created_at?: string;
   updated_at?: string;
   ticketed_events?: boolean;
   event_id?: number;
-  venue_details_id?: number;
-  venue_details?: {
+  venue_details_id?: {
     _id: string;
     name: string;
     address?: string;
@@ -63,6 +88,8 @@ export interface IEvent {
     map?: string;
     venue_details_id?: number;
   };
+  EventTicketsData?: IEventTicket[];
+  TotalofTicketsBookingbyEvent?: number;
 }
 
 export async function fetchEvents(params: FetchEventsParams = {}) {
