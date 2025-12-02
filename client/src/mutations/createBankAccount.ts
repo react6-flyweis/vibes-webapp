@@ -2,17 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
 
 export type CreateBankAccountData = {
-  bank_branch_name: string;
   emoji?: string;
   bank_name_id: number;
-  status?: boolean;
   holderName: string;
-  ifsc: string;
   accountNo: string;
-  zipcode: string;
-  address: string;
-  upi?: string;
-  cardNo?: string;
+  routing: string;
+  status?: boolean;
+  // bank_branch_name: string;
+  // zipcode: string;
+  // address: string;
+  // upi?: string;
+  // cardNo?: string;
 };
 
 export default function useCreateBankAccountMutation() {
