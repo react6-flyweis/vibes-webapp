@@ -17,6 +17,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -25,40 +32,49 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Plus } from "lucide-react";
+import BankNameSelect from "@/components/bank-name-select";
 
 const createBankAccountSchema = z.object({
-  bank_branch_name: z.string().min(1, "Branch name is required"),
-  emoji: z.string().optional(),
+  // bank_branch_name: z.string().min(1, "Branch name is required"),
+  // emoji: z.string().optional(),
   bank_name_id: z.number().min(1, "Bank name ID is required"),
   holderName: z.string().min(1, "Account holder name is required"),
-  ifsc: z.string().min(1, "IFSC code is required"),
+  routing: z.string().min(1, "Routing number is required"),
   accountNo: z.string().min(1, "Account number is required"),
-  zipcode: z.string().min(1, "Zipcode is required"),
-  address: z.string().min(1, "Address is required"),
-  upi: z.string().optional(),
-  cardNo: z.string().optional(),
+  accountType: z.string().min(1, "Account type is required"),
+  // zipcode: z.string().min(1, "Zipcode is required"),
+  // address: z.string().min(1, "Address is required"),
+  // upi: z.string().optional(),
+  // cardNo: z.string().optional(),
 });
 
 type CreateBankAccountForm = z.infer<typeof createBankAccountSchema>;
 
-export default function AddBankAccountDialog() {
-  const [open, setOpen] = useState(false);
+export default function AddBankAccountDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const createMutation = useCreateBankAccountMutation();
   const { toast } = useToast();
 
   const form = useForm<CreateBankAccountForm>({
     resolver: zodResolver(createBankAccountSchema),
     defaultValues: {
-      bank_branch_name: "",
-      emoji: "🏦",
+      // bank_branch_name: "",
+      // emoji: "🏦",
+      // ifsc: "",
+      // zipcode: "",
+      // address: "",
+      // upi: "",
+      // cardNo: "",
       bank_name_id: 1,
       holderName: "",
-      ifsc: "",
       accountNo: "",
-      zipcode: "",
-      address: "",
-      upi: "",
-      cardNo: "",
+      routing: "",
+      accountType: "",
     },
   });
 
@@ -77,7 +93,7 @@ export default function AddBankAccountDialog() {
       });
 
       form.reset();
-      setOpen(false);
+      onOpenChange(false);
     } catch (err: any) {
       toast({
         title: "Error",
@@ -88,18 +104,7 @@ export default function AddBankAccountDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Bank Account
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Bank Account</DialogTitle>
@@ -112,7 +117,7 @@ export default function AddBankAccountDialog() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="bank_branch_name"
                 render={({ field }) => (
@@ -124,9 +129,9 @@ export default function AddBankAccountDialog() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="emoji"
                 render={({ field }) => (
@@ -138,7 +143,7 @@ export default function AddBankAccountDialog() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
               <FormField
                 control={form.control}
@@ -159,15 +164,12 @@ export default function AddBankAccountDialog() {
                 name="bank_name_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bank Name ID</FormLabel>
+                    <FormLabel>Bank</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="1"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 1)
-                        }
+                      <BankNameSelect
+                        value={field.value}
+                        onChange={(v) => field.onChange(v)}
+                        className="w-full"
                       />
                     </FormControl>
                     <FormMessage />
@@ -177,12 +179,12 @@ export default function AddBankAccountDialog() {
 
               <FormField
                 control={form.control}
-                name="ifsc"
+                name="routing"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>IFSC Code</FormLabel>
+                    <FormLabel>Routing Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="IBIB00000" {...field} />
+                      <Input type="number" placeholder="123456789" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -204,6 +206,31 @@ export default function AddBankAccountDialog() {
               />
 
               <FormField
+                control={form.control}
+                name="accountType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Type</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(v) => field.onChange(v)}
+                        value={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select account type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Savings">Savings</SelectItem>
+                          <SelectItem value="Checking">Checking</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* <FormField
                 control={form.control}
                 name="zipcode"
                 render={({ field }) => (
@@ -243,10 +270,10 @@ export default function AddBankAccountDialog() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="address"
               render={({ field }) => (
@@ -258,13 +285,13 @@ export default function AddBankAccountDialog() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex gap-2 justify-end pt-4">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
