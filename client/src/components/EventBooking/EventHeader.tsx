@@ -8,18 +8,23 @@ interface Props {
 }
 
 export default function EventHeader({ event }: Props) {
+  // Use event image if provided, otherwise use a random fallback image
+  const fallbackImage = `https://picsum.photos/1200/600?random=${Math.floor(
+    Math.random() * 100000
+  )}`;
+  const imageUrl = event.event_image || fallbackImage;
   return (
     <Card className="mb-6 bg-white/10 backdrop-blur-sm border-white/20">
       <div className="relative">
         <img
-          src={event.event_image}
+          src={imageUrl}
           alt={event.name_title}
           className="w-full h-48 object-cover rounded-t-lg"
         />
         <div className="absolute inset-0 bg-black/40 rounded-t-lg" />
         <div className="absolute bottom-4 left-4 text-white">
           <h1 className="text-2xl font-bold">{event.name_title}</h1>
-          <p className="text-blue-100">{event.created_by}</p>
+          <p className="text-blue-100">{event.created_by?.Name}</p>
         </div>
       </div>
       <CardContent className="p-4">
