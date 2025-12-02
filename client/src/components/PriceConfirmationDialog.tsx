@@ -206,7 +206,7 @@ export default function PriceConfirmationDialog({
             </div>
             <div className="text-2xl font-bold">
               {createdPaymentIntent
-                ? `$${(createdPaymentIntent.amount / 100).toFixed(2)}`
+                ? `$${createdPaymentIntent.amount.toFixed(2)}`
                 : `$${priceEstimate.toFixed(2)}`}
             </div>
             {createdPaymentIntent && (
