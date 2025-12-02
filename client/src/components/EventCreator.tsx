@@ -7,6 +7,7 @@ import useCreateEventMutation from "@/mutations/createEvent";
 import { useToast } from "@/hooks/use-toast";
 import VenueSelector from "@/components/venue-selector";
 import CountrySelector from "@/components/country-selector";
+import EventTypeSelect from "@/components/event-type-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,6 +45,7 @@ import BankAccountSelector from "@/components/bank-account-selector";
 import AddBankAccountDialog from "@/components/add-bank-account-dialog";
 import { TicketTypeForm } from "@/types/ticket";
 import { useTicketTypesQuery } from "@/queries/ticketTypes";
+import { LoadingButton } from "./ui/loading-button";
 
 const createEventSchema = z.object({
   title: z.string().min(1, "Event title is required"),
@@ -78,10 +80,13 @@ const createEventSchema = z.object({
 type CreateEventForm = z.infer<typeof createEventSchema>;
 
 export function EventCreator({
-  eventType,
+  defaultEventType,
 }: {
-  eventType?: "private" | "public";
+  defaultEventType?: "private" | "public";
 }) {
+  const [eventType, setEventType] = useState<"private" | "public" | undefined>(
+    defaultEventType
+  );
   const navigate = useNavigate();
   const createMutation = useCreateEventMutation();
   const { toast } = useToast();
@@ -96,6 +101,8 @@ export function EventCreator({
       price: "",
     },
   ]);
+
+  const [openAddBankDialog, setOpenAddBankDialog] = useState(false);
 
   const form = useForm<CreateEventForm>({
     resolver: zodResolver(createEventSchema),
@@ -255,19 +262,7 @@ export function EventCreator({
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit, (errors) => {
-                  // Log full validation errors for debugging
-                  // Use console.group for clearer nested output
-                  console.group("CreateEvent form validation errors");
-                  console.log(errors);
-                  try {
-                    // Also log react-hook-form's formState.errors snapshot
-                    console.log("formState.errors:", form.formState.errors);
-                  } catch (e) {
-                    console.log("Could not read formState.errors", e);
-                  }
-                  console.groupEnd();
-                })}
+                onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
               >
                 {/* Event Type Selection */}
@@ -275,7 +270,15 @@ export function EventCreator({
                   <h3 className="text-xl font-semibold text-white mb-4">
                     Choose Event Type
                   </h3>
-                  <FormField
+                  <div>
+                    <EventTypeSelector
+                      value={eventType}
+                      onChange={(value) =>
+                        setEventType(value as "private" | "public")
+                      }
+                    />
+                  </div>
+                  {/* <FormField
                     control={form.control}
                     name="eventType"
                     render={({ field }) => (
@@ -283,7 +286,7 @@ export function EventCreator({
                         <EventTypeSelector {...field} />
                       </div>
                     )}
-                  />
+                  /> */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -368,6 +371,20 @@ export function EventCreator({
                               {...field}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="eventType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-purple-100">
+                            Event Type
+                          </FormLabel>
+                          <EventTypeSelect {...field} />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -505,29 +522,29 @@ export function EventCreator({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="maxCapacity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-purple-100 flex items-center gap-2">
-                          <Users className="h-4 w-4" />
-                          {eventType === "public"
-                            ? "Maximum Capacity"
-                            : "Guest Limit"}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="100"
-                            className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {eventType === "public" && (
+                    <FormField
+                      control={form.control}
+                      name="maxCapacity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-purple-100 flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Maximum Capacity
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="100"
+                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
 
                 {/* Pricing - Conditional based on event type */}
@@ -589,7 +606,7 @@ export function EventCreator({
                   </div>
                 )}
 
-                {/* {eventType === "private" && (
+                {eventType === "private" && (
                   <div className="space-y-6">
                     <div className="bg-pink-500/20 border border-pink-400/30 rounded-lg p-6">
                       <h4 className="text-pink-200 font-semibold mb-2 flex items-center gap-2">
@@ -600,10 +617,10 @@ export function EventCreator({
                         Complete the planning details below to help us create
                         your perfect event.
                       </p>
-                    </div> */}
+                    </div>
 
-                {/* Event Planning Fields */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Event Planning Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
                         name="budget"
@@ -627,7 +644,7 @@ export function EventCreator({
 
                       <FormField
                         control={form.control}
-                        name="guestCount"
+                        name="maxCapacity"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-purple-100 flex items-center gap-2">
@@ -636,7 +653,8 @@ export function EventCreator({
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="50-75 guests"
+                                type="number"
+                                placeholder="50 guests"
                                 className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
                                 {...field}
                               />
@@ -727,9 +745,9 @@ export function EventCreator({
                           </FormItem>
                         )}
                       />
-                    </div> */}
-                {/* </div>
-                )} */}
+                    </div>
+                  </div>
+                )}
 
                 {/* Bank Account Information - Only for public events */}
                 {eventType === "public" && (
@@ -741,7 +759,16 @@ export function EventCreator({
                           Payment Information
                         </h3>
                       </div>
-                      <AddBankAccountDialog />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setOpenAddBankDialog(true)}
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add New Bank Account
+                      </Button>
                     </div>
                     <p className="text-purple-200 text-sm">
                       Select a bank account to receive automatic payouts from
@@ -964,18 +991,22 @@ export function EventCreator({
                     Cancel
                   </Button>
 
-                  <Button
+                  <LoadingButton
                     type="submit"
                     className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
-                    disabled={form.formState.isSubmitting}
+                    isLoading={form.formState.isSubmitting}
                   >
                     {eventType === "public"
                       ? "List Event"
                       : "Create Event & send invites"}
-                  </Button>
+                  </LoadingButton>
                 </div>
               </form>
             </Form>
+            <AddBankAccountDialog
+              open={openAddBankDialog}
+              onOpenChange={setOpenAddBankDialog}
+            />
           </CardContent>
         </Card>
       </div>
