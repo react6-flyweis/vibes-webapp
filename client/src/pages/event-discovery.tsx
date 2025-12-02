@@ -43,7 +43,7 @@ export default function EventDiscovery() {
 
   const debouncedSearch = useDebounce(searchQuery, 350);
   const [page, setPage] = useState(1);
-  const limit = 8;
+  const limit = 9;
 
   // Fetch events from the server using paginated endpoint (debounced search)
   const queryKey = [
