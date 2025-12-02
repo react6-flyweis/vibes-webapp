@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/queryClient";
 import { IResponse, IResponseList } from "@/types";
+import { IEvent } from "@/hooks/useEvents";
 
 // EventData represents the shape returned by the events API.
 // Fields are typed based on a sample API response; many fields are optional
@@ -38,7 +39,7 @@ export type EventData = {
 
 export const fetchEventById = async (eventId?: string | null) => {
   if (!eventId) return null;
-  const res = await axiosInstance.get<IResponse<EventData>>(
+  const res = await axiosInstance.get<IResponse<IEvent>>(
     `/api/events/getById/${eventId}`
   );
   return res.data;
