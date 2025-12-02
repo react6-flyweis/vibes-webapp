@@ -24,7 +24,7 @@ import { extractApiErrorMessage } from "@/lib/apiErrors";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  name: z.string().min(3, "Full Name must be at least 3 characters"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -51,7 +51,7 @@ export function RegisterForm() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       email: "",
-      username: "",
+      name: "",
       password: "",
       agreeToTerms: false,
       subscribeNewsletter: true,
@@ -65,7 +65,7 @@ export function RegisterForm() {
   const onSubmit = async (data: SignupForm) => {
     // map local form fields to API payload
     const payload = {
-      name: data.username,
+      name: data.name,
       email: data.email,
       password: data.password,
       agreePrivacyPolicy: !!data.agreeToTerms,
@@ -127,13 +127,13 @@ export function RegisterForm() {
       >
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm text-gray-600">Username</FormLabel>
+              <FormLabel className="text-sm text-gray-600">Full Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="yourusername"
+                  placeholder="Your full name"
                   {...field}
                   disabled={createUserMutation.isPending}
                   className="rounded-xl border-gray-200 h-12 px-4"
@@ -170,33 +170,37 @@ export function RegisterForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm text-gray-600">
-                  Password
+                <FormLabel className="flex justify-between">
+                  <span className="text-sm text-gray-600">Password</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <span className="flex gap-1">
+                        <EyeOff className="w-4 h-4" />
+                        Hide
+                      </span>
+                    ) : (
+                      <span className="flex gap-1">
+                        <Eye className="w-4 h-4" />
+                        Show
+                      </span>
+                    )}
+                  </button>
                 </FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password"
-                      {...field}
-                      disabled={createUserMutation.isPending}
-                      className="rounded-xl border-gray-200 h-12 px-4"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
+                    {...field}
+                    disabled={createUserMutation.isPending}
+                    className="rounded-xl border-gray-200 h-12 px-4"
+                  />
                 </FormControl>
 
                 {field.value && (
