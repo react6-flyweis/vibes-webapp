@@ -46,14 +46,12 @@ export default function BankAccountSelector({
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="bg-white/20 text-white">
-        <SelectValue placeholder={placeholder} />
+      <SelectTrigger className="bg-white/10 text-white">
+        <SelectValue className="text-white" placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         {activeBankAccounts.length === 0 ? (
-          <div className="p-2 text-sm text-gray-500">
-            No active bank accounts found
-          </div>
+          <div className="p-2 text-sm ">No active bank accounts found</div>
         ) : (
           activeBankAccounts.map((account) => (
             <SelectItem
@@ -61,11 +59,8 @@ export default function BankAccountSelector({
               value={String(account.bank_branch_name_id)}
             >
               <div className="flex items-center gap-2">
-                <span>{account.emoji || "🏦"}</span>
+                {/* <span>{account.emoji || "🏦"}</span> */}
                 <div className="flex flex-col justify-start">
-                  <span className="font-medium">
-                    {account.bank_branch_name}
-                  </span>
                   <span className="text-xs ">
                     {account.holderName} - ****{account.accountNo.slice(-4)}
                   </span>
