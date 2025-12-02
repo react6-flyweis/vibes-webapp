@@ -1,38 +1,34 @@
 import React from "react";
 import TicketItem from "./TicketItem";
-import {
-  EventEntryTicket,
-  useAllEventEntryTicketsQuery,
-} from "@/queries/tickets";
+// import { EventEntryTicket } from "@/queries/tickets";
+import { IEventTicket } from "@/hooks/useEvents";
 
 interface Props {
   selectedTickets: Record<string, number>;
-  onChange: (ticket: EventEntryTicket, qty: number) => void;
+  onChange: (ticket: any, qty: number) => void;
+  tickets: IEventTicket[];
 }
 
-export default function TicketList({ selectedTickets, onChange }: Props) {
-  const {
-    data: fetchedTickets = [],
-    isLoading,
-    isError,
-    error,
-  } = useAllEventEntryTicketsQuery();
-
-  if (isLoading) return <div>Loading tickets...</div>;
-  if (isError)
+export default function TicketList({
+  selectedTickets,
+  onChange,
+  tickets,
+}: Props) {
+  if (!tickets || tickets.length === 0) {
     return (
-      <div className="text-red-500">
-        Failed to load tickets: {(error as any)?.message || "Unknown error"}
+      <div className="text-yellow-400 p-4 text-center">
+        No tickets available for this event.
       </div>
     );
+  }
 
   return (
     <div className="space-y-4">
-      {fetchedTickets?.map((t) => (
+      {tickets.map((t, i) => (
         <TicketItem
-          key={t.event_entry_tickets_id}
-          ticket={t}
-          value={selectedTickets[t.event_entry_tickets_id] || 0}
+          key={t._id}
+          ticket={{ ...t, ...t.ticketDateils?.[i] }}
+          value={selectedTickets[t.ticket_id] || 0}
           onChange={(qty) => onChange(t, qty)}
         />
       ))}
