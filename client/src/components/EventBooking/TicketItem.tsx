@@ -8,9 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EventEntryTicket } from "@/queries/tickets";
+import { IEventTicket } from "@/hooks/useEvents";
 
 interface Props {
-  ticket: EventEntryTicket;
+  ticket: EventEntryTicket | IEventTicket | any;
   value: number;
   onChange: (qty: number) => void;
 }
@@ -31,19 +32,25 @@ const getCategoryColor = (category: string) => {
 };
 
 export default function TicketItem({ ticket, value, onChange }: Props) {
+  const title = ticket.query || `Ticket #${ticket.ticket_id}`;
+  const price = ticket.price || 0;
+  const tag = ticket.tag || "general";
+  const facility = ticket.facility || [];
+  const maxCapacity = ticket.max_capacity || ticket.total_seats || 100;
+
   return (
     <div className="p-4 border border-white/20 rounded-lg">
       <div className="flex justify-between items-start mb-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-white">{ticket.title}</h3>
-            <Badge className={getCategoryColor(ticket.tag)}>
-              {ticket.tag?.replace("_", " ")}
+            <h3 className="font-semibold text-white">{title}</h3>
+            <Badge className={getCategoryColor(tag)}>
+              {tag?.replace("_", " ")}
             </Badge>
           </div>
           {/* <p className="text-blue-100 text-sm mb-2">{ticket.description}</p> */}
           <div className="flex flex-wrap gap-1">
-            {ticket.facility?.map((facility, i) => (
+            {facility?.map((facility: any, i: number) => (
               <Badge key={i} variant="outline" className="text-xs text-white">
                 {facility.name}
               </Badge>
@@ -51,10 +58,11 @@ export default function TicketItem({ ticket, value, onChange }: Props) {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-white">${ticket.price}</div>
+          <div className="text-lg font-bold text-white">${price}</div>
           <p className="text-xs text-blue-100">
             {/* {ticket.available} */}
-            available
+            {maxCapacity} available
+            {/* max capacity */}
           </p>
         </div>
       </div>
@@ -86,7 +94,7 @@ export default function TicketItem({ ticket, value, onChange }: Props) {
 
         {value > 0 && (
           <div className="text-green-400 font-semibold">
-            ${(ticket.price * value).toFixed(2)}
+            ${(price * value).toFixed(2)}
           </div>
         )}
       </div>
