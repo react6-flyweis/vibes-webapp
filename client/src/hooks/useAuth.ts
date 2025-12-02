@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 interface User {
   id: number;
+  user_id: number;
   username: string;
   email: string;
   fullName: string;
@@ -18,16 +19,16 @@ export function useAuth() {
 
   useEffect(() => {
     // Check localStorage on mount
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('vibes_user');
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("vibes_user");
       if (saved) {
         try {
           const userData = JSON.parse(saved);
           setUser(userData);
           globalUser = userData;
         } catch (error) {
-          console.error('Error parsing user data:', error);
-          localStorage.removeItem('vibes_user');
+          console.error("Error parsing user data:", error);
+          localStorage.removeItem("vibes_user");
         }
       }
     }
@@ -36,22 +37,22 @@ export function useAuth() {
     const listener = (newUser: User | null) => setUser(newUser);
     authListeners.push(listener);
     return () => {
-      authListeners = authListeners.filter(l => l !== listener);
+      authListeners = authListeners.filter((l) => l !== listener);
     };
   }, []);
 
   const login = (userData: User) => {
     globalUser = userData;
     setUser(userData);
-    localStorage.setItem('vibes_user', JSON.stringify(userData));
-    authListeners.forEach(listener => listener(userData));
+    localStorage.setItem("vibes_user", JSON.stringify(userData));
+    authListeners.forEach((listener) => listener(userData));
   };
 
   const logout = () => {
     globalUser = null;
     setUser(null);
-    localStorage.removeItem('vibes_user');
-    authListeners.forEach(listener => listener(null));
+    localStorage.removeItem("vibes_user");
+    authListeners.forEach((listener) => listener(null));
   };
 
   return {
@@ -59,6 +60,6 @@ export function useAuth() {
     isAuthenticated: !!user,
     isLoading,
     login,
-    logout
+    logout,
   };
 }
