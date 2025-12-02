@@ -20,13 +20,19 @@ export interface EventTicketSeat {
 
 /**
  * Fetch all booked event ticket seats. If eventId is provided, it will be added
- * as a query param: /api/master/event-tickets-seats/all?event_id=1
+ * as a query param: /api/master/event-tickets-seats/all?event_id=1&status=true
  */
 export const fetchAllEventTicketSeats = async (eventId?: number | null) => {
-  const url = `/api/master/event-tickets-seats/all`;
-  //   const url = eventId
-  //     ? `/api/master/event-tickets-seats/all?event_id=${eventId}`
-  //     : `/api/master/event-tickets-seats/all`;
+  const params = new URLSearchParams();
+
+  if (eventId) {
+    params.append("event_id", eventId.toString());
+  }
+
+  // Only fetch booked/active seats
+  params.append("status", "true");
+
+  const url = `/api/master/event-tickets-seats/all?${params.toString()}`;
 
   const res = await axiosInstance.get<IResponseList<EventTicketSeat>>(url);
   return res.data;
