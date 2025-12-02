@@ -46,12 +46,12 @@ export default function MyEventCard({ event }: Props) {
 
       <CardContent className="p-6">
         <div className="mb-3">
-          <Badge
+          {/* <Badge
             variant="outline"
             className="text-purple-300 border-purple-300 mb-2"
           >
             {event.event_category_tags_id?.name}
-          </Badge>
+          </Badge> */}
           <h3 className="text-xl font-bold text-white mb-1 line-clamp-2">
             {event.name_title}
           </h3>
@@ -76,7 +76,7 @@ export default function MyEventCard({ event }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4">
+        {/* <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <DollarSign className="h-4 w-4 text-green-400 mr-1" />
             <span className="text-green-400 font-bold">0</span>
@@ -93,7 +93,7 @@ export default function MyEventCard({ event }: Props) {
               <span className="text-purple-200 text-sm">0</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="flex flex-wrap gap-1 mb-4">
           {event.tags?.slice(0, 3).map((tag, index) => (
