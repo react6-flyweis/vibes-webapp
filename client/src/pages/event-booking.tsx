@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useParams } from "react-router";
 import { CheckCircle, AlertTriangle, Download } from "lucide-react";
+import useTicketDownloader from "@/hooks/useTicketDownloader";
 import TicketList from "@/components/EventBooking/TicketList";
 import Stepper from "@/components/EventBooking/Stepper";
 import { useEventByIdQuery } from "@/queries/events";
@@ -23,6 +24,7 @@ import EventHeader from "@/components/EventBooking/EventHeader";
 import { EventEntryTicket } from "@/queries/tickets";
 import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
 import { useCreateEntryTicketsPayment } from "@/mutations/useCreateEntryTicketsPayment";
+import { useCreateEventTicketSeats } from "@/mutations/createEventTicketSeats";
 
 export default function EventBooking() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -53,9 +55,14 @@ export default function EventBooking() {
   const [step, setStep] = useState<
     "tickets" | "seats" | "checkout" | "confirmation"
   >("tickets");
+  // store created userget tickets data for seat assignment
+  const [userGetTicketsData, setUserGetTicketsData] = useState<any>(null);
 
   // shared payment mutation used by dialogs/pages
   const createEntryTicketsPaymentMutation = useCreateEntryTicketsPayment();
+
+  // ticket downloader helper
+  const { openPrintable } = useTicketDownloader();
 
   // Fetch event details using centralized query
   const { data: event, isLoading: eventLoading } = useEventByIdQuery(eventId);
@@ -67,12 +74,33 @@ export default function EventBooking() {
         title: "Tickets reserved",
         description: `Reserved ${data.tickets?.length ?? 0} ticket types.`,
       });
-      // proceed to checkout after successful reservation
-      setStep("checkout");
+      // store the userget tickets data for seat assignment
+      setUserGetTicketsData(data);
+      // proceed to seat selection after successful reservation
+      setStep("seats");
     },
     onError: (err) => {
       toast({
         title: "Could not reserve tickets",
+        description: (err && (err as any).message) || String(err),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // mutation to create seat assignments
+  const createTicketSeats = useCreateEventTicketSeats({
+    onSuccess: (data) => {
+      toast({
+        title: "Seats assigned",
+        description: "Your seats have been successfully assigned.",
+      });
+      // proceed to checkout after seat assignment
+      setStep("checkout");
+    },
+    onError: (err) => {
+      toast({
+        title: "Seat assignment failed",
         description: (err && (err as any).message) || String(err),
         variant: "destructive",
       });
@@ -100,22 +128,20 @@ export default function EventBooking() {
     },
   });
 
-  const handleTicketQuantityChange = (
-    ticket: EventEntryTicket,
-    quantity: number
-  ) => {
-    const ticketId = ticket.event_entry_tickets_id;
+  const handleTicketQuantityChange = (ticket: any, quantity: number) => {
+    const ticketId = ticket.ticket_id || ticket.event_entry_tickets_id;
     setSelectedTickets((prev) => ({
       ...prev,
       [ticketId]: quantity,
     }));
 
     // also store/remove full ticket details using event data if available
-
     setSelectedTicketDetails((prev) => {
       const next = { ...prev };
       if (quantity > 0 && ticket) {
-        next[ticketId] = ticket;
+        // Merge the ticket with its details (same as TicketList/TicketItem)
+        const mergedTicket = { ...ticket, ...ticket.ticketDateils?.[0] };
+        next[ticketId] = mergedTicket;
       } else {
         // remove if quantity is zero
         delete next[ticketId];
@@ -128,13 +154,12 @@ export default function EventBooking() {
     return Object.values(selectedTickets).reduce((sum, qty) => sum + qty, 0);
   };
 
-  // Extracted handler to reserve/book seats (calls createUserGetTickets mutation)
-  const handleBookSeats = () => {
-    // prepare payload from selectedTickets and call reservation mutation
+  // Handler to reserve tickets (Step 2: after selecting ticket counts)
+  const handleReserveTickets = () => {
     const ticketsPayload = Object.entries(selectedTickets)
       .filter(([, quantity]) => quantity > 0)
       .map(([typeId, quantity]) => ({
-        event_entry_tickets_id: Number(typeId),
+        ticket_id: Number(typeId),
         quantity,
       }));
 
@@ -162,12 +187,75 @@ export default function EventBooking() {
     });
   };
 
+  // Handler to assign seats (Step 3: after selecting seats)
+  const handleBookSeats = async () => {
+    if (!userGetTicketsData) {
+      toast({
+        title: "Tickets not reserved",
+        description: "Please go back and reserve tickets first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!eventId) {
+      toast({
+        title: "Missing event id",
+        description: "Cannot assign seats without an event id.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedSeats.length !== getTotalTickets()) {
+      toast({
+        title: "Seat selection incomplete",
+        description: `Please select ${getTotalTickets()} seat(s).`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const ticketsPayload = Object.entries(selectedTickets)
+      .filter(([, quantity]) => quantity > 0)
+      .map(([typeId, quantity]) => ({
+        ticket_id: Number(typeId),
+        quantity,
+      }));
+
+    try {
+      // Assign seats for each ticket type
+      let seatIndex = 0;
+      for (const ticketPayload of ticketsPayload) {
+        const seatsForThisTicket = selectedSeats.slice(
+          seatIndex,
+          seatIndex + ticketPayload.quantity
+        );
+        seatIndex += ticketPayload.quantity;
+
+        // Create seat assignment
+        await createTicketSeats.mutateAsync({
+          event_entry_tickets_id: Number(ticketPayload.ticket_id),
+          event_entry_userget_tickets_id:
+            userGetTicketsData.event_entry_userget_tickets_id,
+          event_id: Number(eventId),
+          seat_no: seatsForThisTicket,
+          capacity: ticketPayload.quantity,
+          status: true,
+        });
+      }
+    } catch (err) {
+      // Error handling is done in mutation callbacks
+      console.error("Error during seat assignment:", err);
+    }
+  };
+
   // Step 1: create order on server which returns calculation details + order id
   const createOrderOnServer = () => {
     const tickets = Object.entries(selectedTickets)
       .filter(([_, quantity]) => quantity > 0)
       .map(([typeId, quantity]) => ({
-        event_entry_tickets_id: Number(typeId),
+        ticket_id: Number(typeId),
         quantity,
       }));
 
@@ -246,208 +334,35 @@ export default function EventBooking() {
     const breakdown = calc.ticket_breakdown || [];
 
     const eventTitle = (event && (event.name_title || "Event")) || "Event";
-    const orderId = order.event_entry_tickets_order_id ?? order._id ?? "-";
-    const finalAmount = order.final_amount ?? calc.final_amount ?? 0;
+    const venueDetails = event?.venue_details;
+    const eventDate = event?.date;
+    const eventTime = event?.time;
 
-    const styles = `
-      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color: #0f172a; }
-      .ticket { max-width: 720px; margin: 24px auto; padding: 20px; border-radius: 12px; background: linear-gradient(135deg,#0ea5e9,#7c3aed); color: #fff; }
-      .ticket h1 { margin: 0 0 8px 0; font-size: 22px; }
-      .meta { display:flex; justify-content:space-between; margin-bottom:12px; }
-      .section { background: rgba(255,255,255,0.06); padding:12px; border-radius:8px; margin-top:8px }
-      table { width:100%; border-collapse:collapse; }
-      td, th { padding:8px; text-align:left; }
-      .right { text-align:right; }
-      .actions { margin-top:16px; display:flex; gap:8px; }
-      button { background:#fff; color:#0f172a; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-    `;
-
-    const ticketsHtml = breakdown
-      .map(
-        (t: any) => `
-          <div class="section">
-            <strong>${t.ticket_title || t.title || "Ticket"}</strong>
-            <div>Quantity: ${t.quantity}</div>
-            <div>Price per ticket: ${t.price_per_ticket ?? t.price ?? "-"}</div>
-            <div>Subtotal: ${t.item_subtotal ?? "-"}</div>
-          </div>`
-      )
-      .join("");
-
-    const html = `<!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>Tickets - ${eventTitle}</title>
-        <style>${styles}</style>
-      </head>
-      <body>
-        <div class="ticket">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <h1>${eventTitle}</h1>
-              <div>Order: <strong>${orderId}</strong></div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:700;font-size:18px">Total</div>
-              <div style="font-size:20px">${finalAmount}</div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px">
-            ${ticketsHtml}
-          </div>
-
-          <div class="section">
-            <table>
-              <tbody>
-                <tr><td>Subtotal</td><td class="right">${
-                  calc.subtotal ?? order.subtotal ?? "-"
-                }</td></tr>
-                <tr><td>Tax (${
-                  calc.tax_percentage ?? "-"
-                }%)</td><td class="right">${
-      calc.tax_amount ?? order.tax ?? "-"
-    }</td></tr>
-                <tr><td><strong>Final</strong></td><td class="right"><strong>${finalAmount}</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="actions">
-            <button id="printBtn">Print / Save as PDF</button>
-            <button id="closeBtn">Close</button>
-          </div>
-        </div>
-
-        <script>
-          document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
-          document.getElementById('closeBtn').addEventListener('click', function(){ window.close(); });
-        </script>
-      </body>
-    </html>`;
-
-    // Try a few strategies to reliably open the printable ticket view.
-    // 1) window.open without features (some blockers disallow feature strings)
-    // 2) fall back to a data: URL via programmatic anchor click
-    // Only show the "popup blocked" toast if all methods fail.
-    let opened = false;
-
-    try {
-      const w = window.open("", "_blank");
-      if (w) {
-        try {
-          w.document.open();
-          w.document.write(html);
-          w.document.close();
-          opened = true;
-        } catch (e) {
-          // Some browsers may refuse write on a newly opened window. Try navigating it to a data URL instead.
-          try {
-            w.location.href =
-              "data:text/html;charset=utf-8," + encodeURIComponent(html);
-            opened = true;
-          } catch (err) {
-            // give up on this window handle
-            try {
-              w.close();
-            } catch {}
-          }
-        }
-      }
-    } catch (e) {
-      // ignore and try anchor fallback
-    }
-
-    if (!opened) {
-      try {
-        const a = document.createElement("a");
-        a.href = "data:text/html;charset=utf-8," + encodeURIComponent(html);
-        a.target = "_blank";
-        // Safari requires the element to be in the document
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        opened = true;
-      } catch (e) {
-        opened = false;
-      }
-    }
-
-    if (!opened) {
-      toast({
-        title: "Popup blocked",
-        description:
-          "Please allow popups to download tickets or use the browser's print to save.",
-        variant: "destructive",
-      });
-    }
+    openPrintable({
+      eventTitle,
+      order,
+      breakdown,
+      toast,
+      venueDetails,
+      eventDate,
+      eventTime,
+    });
   };
-  // category color helper was moved into TicketItem component
 
   if (eventLoading) {
-    // Skeleton loading state: mimic page layout so content doesn't jump
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 text-white">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              {/* Header skeleton */}
-              <div className="bg-white/6 rounded-lg p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-28 h-28 bg-white/10 rounded-md animate-pulse" />
-                  <div className="flex-1">
-                    <div className="h-6 bg-white/10 rounded w-3/4 mb-3 animate-pulse" />
-                    <div className="h-4 bg-white/8 rounded w-1/2 animate-pulse" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Tickets selection skeletons */}
-              <div className="bg-white/10 backdrop-blur-sm border-white/20 rounded-md p-4">
-                <div className="mb-4">
-                  <div className="h-5 bg-white/10 rounded w-1/3 mb-2 animate-pulse" />
-                  <div className="h-4 bg-white/8 rounded w-1/4 animate-pulse" />
-                </div>
-
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between gap-4 p-3 bg-white/6 rounded-md"
-                    >
-                      <div className="flex-1">
-                        <div className="h-4 bg-white/10 rounded w-2/3 mb-2 animate-pulse" />
-                        <div className="h-3 bg-white/8 rounded w-1/3 animate-pulse" />
-                      </div>
-
-                      <div className="w-24 h-8 bg-white/8 rounded animate-pulse" />
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <div className="h-10 w-48 bg-blue-600/70 rounded-md animate-pulse" />
-                </div>
-              </div>
+      <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+        <Card className="bg-white/5 backdrop-blur-sm border-white/10 text-white">
+          <CardContent className="p-8 text-center">
+            <div className="animate-spin mx-auto mb-4">
+              <div className="h-12 w-12 border-4 border-t-transparent rounded-full border-white/40"></div>
             </div>
-
-            {/* Sidebar skeleton */}
-            <div>
-              <div className="bg-white/10 backdrop-blur-sm border-white/20 rounded-md p-4 sticky top-4">
-                <div className="h-6 bg-white/10 rounded w-1/2 mb-4 animate-pulse" />
-                <div className="space-y-3">
-                  <div className="h-4 bg-white/8 rounded w-full animate-pulse" />
-                  <div className="h-4 bg-white/8 rounded w-5/6 animate-pulse" />
-                  <div className="h-4 bg-white/8 rounded w-3/4 animate-pulse" />
-                </div>
-
-                <div className="mt-6 h-10 bg-blue-600/70 rounded-md animate-pulse" />
-              </div>
-            </div>
-          </div>
-        </div>
+            <h2 className="text-xl font-semibold mb-2">Loading event...</h2>
+            <p className="text-gray-300">
+              Fetching event details, please wait.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -493,15 +408,21 @@ export default function EventBooking() {
                   <TicketList
                     selectedTickets={selectedTickets}
                     onChange={handleTicketQuantityChange}
+                    tickets={event?.EventTicketsData || []}
                   />
 
                   <div className="mt-6 flex justify-end">
                     <Button
-                      onClick={() => setStep("seats")}
-                      disabled={getTotalTickets() === 0}
+                      onClick={handleReserveTickets}
+                      disabled={
+                        getTotalTickets() === 0 ||
+                        createUserGetTickets.isPending
+                      }
                       className="bg-blue-600 hover:bg-blue-700"
                     >
-                      Continue to Seat Selection
+                      {createUserGetTickets.isPending
+                        ? "Reserving..."
+                        : "Reserve Tickets"}
                     </Button>
                   </div>
                 </CardContent>
@@ -523,9 +444,10 @@ export default function EventBooking() {
                     selectedSeats={selectedSeats}
                     onChange={setSelectedSeats}
                     requiredCount={getTotalTickets()}
+                    eventId={eventId}
                     onBack={() => setStep("tickets")}
                     onContinue={handleBookSeats}
-                    reserving={createUserGetTickets.isPending}
+                    reserving={createTicketSeats.isPending}
                   />
                 </CardContent>
               </Card>
