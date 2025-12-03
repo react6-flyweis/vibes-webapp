@@ -27,6 +27,7 @@ import {
   startOfWeek,
   endOfWeek,
 } from "date-fns";
+import { Link } from "react-router";
 
 export default function VendorBookings() {
   const { data: bookings, isLoading } = useMyVendorBookingsQuery();
@@ -121,14 +122,14 @@ export default function VendorBookings() {
             </p>
           </div>
           <div className="flex gap-2">
-            {/* <Link to="/vendor-dashboard">
+            <Link to="/vendor-dashboard">
               <Button
                 variant="outline"
                 className="bg-white/20 text-white hover:bg-white/10"
               >
                 Back to Dashboard
               </Button>
-            </Link> */}
+            </Link>
             <Button
               variant="outline"
               className="bg-white/20 text-white hover:bg-white/10"
