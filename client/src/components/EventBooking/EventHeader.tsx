@@ -39,7 +39,7 @@ export default function EventHeader({ event }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-blue-400" />
-            <span>{event.venue_details?.name}</span>
+            <span>{event.venue_details_id?.name}</span>
           </div>
         </div>
       </CardContent>
