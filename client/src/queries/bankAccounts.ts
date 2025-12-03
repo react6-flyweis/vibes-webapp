@@ -44,7 +44,7 @@ export function useBankAccountsQuery() {
     queryKey: ["/api/admin/bank-branch-names/getByAuth"],
     queryFn: async () => {
       const res = await apiRequest<BankAccountsResponse>(
-        "/api/admin/bank-branch-names/getAll"
+        "/api/admin/bank-branch-names/getByAuth"
       );
       return Array.isArray(res?.data) ? res.data : [];
     },
