@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router";
 import { usePublicVendors } from "@/queries/vendors";
+import { useCategoriesQuery } from "@/queries/categories";
 import VendorCard from "@/components/vendor-card";
 import Navigation from "@/components/navigation";
 import { Button } from "@/components/ui/button";
@@ -16,14 +17,50 @@ import {
 import { Search, Filter, X } from "lucide-react";
 
 export default function VendorMarketplace() {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState("");
+  const [minPrice, setMinPrice] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [location, setLocation] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Read min and max from URL params on mount
+  useEffect(() => {
+    const min = searchParams.get("min");
+    const max = searchParams.get("max");
+    if (min) setMinPrice(parseFloat(min));
+    if (max) setMaxPrice(parseFloat(max));
+
+    // Update price range dropdown to reflect URL params
+    if (min || max) {
+      const minVal = min ? parseFloat(min) : 0;
+      const maxVal = max ? parseFloat(max) : Infinity;
+
+      // Try to match with existing ranges
+      if (minVal === 0 && maxVal === 500) {
+        setPriceRange("0-500");
+      } else if (minVal === 500 && maxVal === 1000) {
+        setPriceRange("500-1000");
+      } else if (minVal === 1000 && maxVal === 2500) {
+        setPriceRange("1000-2500");
+      } else if (minVal >= 2500 && maxVal === Infinity) {
+        setPriceRange("2500+");
+      } else {
+        // Custom range - set a special value
+        setPriceRange("custom");
+      }
+
+      // Keep filters open when min/max params are present
+      setShowFilters(true);
+    }
+  }, [searchParams]);
   // booking success dialog moved into each VendorCard
 
   const { data: vendors = [], isLoading, error } = usePublicVendors();
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategoriesQuery();
 
   // Toggle category selection
   const toggleCategory = (categoryId: string) => {
@@ -95,32 +132,39 @@ export default function VendorMarketplace() {
         );
       });
 
-    const matchesPriceRange =
-      !priceRange ||
-      priceRange === "any-price" ||
-      (() => {
-        // Get prices from either structure
-        const prices =
-          vendor.service_categories?.map((cat: any) => cat.pricing) ||
-          vendor.categories_fees_details?.map((cat: any) => cat.Price) ||
-          [];
+    const matchesPriceRange = (() => {
+      // Get prices from either structure
+      const prices =
+        vendor.service_categories?.map((cat: any) => cat.pricing) ||
+        vendor.categories_fees_details?.map((cat: any) => cat.Price) ||
+        [];
 
-        if (prices.length === 0) return true;
-        const minPrice = Math.min(...prices);
+      if (prices.length === 0) return true;
+      const vendorMinPrice = Math.min(...prices);
 
-        switch (priceRange) {
-          case "0-500":
-            return minPrice <= 500;
-          case "500-1000":
-            return minPrice >= 500 && minPrice <= 1000;
-          case "1000-2500":
-            return minPrice >= 1000 && minPrice <= 2500;
-          case "2500+":
-            return minPrice >= 2500;
-          default:
-            return true;
-        }
-      })();
+      // First check URL params (min/max)
+      if (minPrice !== null || maxPrice !== null) {
+        const aboveMin = minPrice === null || vendorMinPrice >= minPrice;
+        const belowMax = maxPrice === null || vendorMinPrice <= maxPrice;
+        return aboveMin && belowMax;
+      }
+
+      // Fallback to dropdown price range if no URL params
+      if (!priceRange || priceRange === "any-price") return true;
+
+      switch (priceRange) {
+        case "0-500":
+          return vendorMinPrice <= 500;
+        case "500-1000":
+          return vendorMinPrice >= 500 && vendorMinPrice <= 1000;
+        case "1000-2500":
+          return vendorMinPrice >= 1000 && vendorMinPrice <= 2500;
+        case "2500+":
+          return vendorMinPrice >= 2500;
+        default:
+          return true;
+      }
+    })();
 
     return (
       matchesSearch && matchesLocation && matchesCategory && matchesPriceRange
@@ -166,48 +210,16 @@ export default function VendorMarketplace() {
                   <SelectValue placeholder="Select Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(() => {
-                    const categoryMap = new Map<string, string>();
-                    vendorsArray.forEach((vendor: any) => {
-                      // Handle flat service_categories structure
-                      if (
-                        vendor.service_categories &&
-                        Array.isArray(vendor.service_categories)
-                      ) {
-                        vendor.service_categories.forEach((cat: any) => {
-                          const id = String(cat.category_id);
-                          if (!categoryMap.has(id)) {
-                            categoryMap.set(id, cat.category_name);
-                          }
-                        });
-                      }
-                      // Handle nested categories_fees_details structure
-                      else if (
-                        vendor.categories_fees_details &&
-                        Array.isArray(vendor.categories_fees_details)
-                      ) {
-                        vendor.categories_fees_details.forEach((cat: any) => {
-                          const id = String(cat.category_id);
-                          const name =
-                            cat.category_details?.category_name || "Unknown";
-                          if (!categoryMap.has(id)) {
-                            categoryMap.set(id, name);
-                          }
-                        });
-                      }
-                    });
-                    return Array.from(categoryMap.entries())
-                      .sort((a, b) => {
-                        const nameA = (a[1] ?? "").toString();
-                        const nameB = (b[1] ?? "").toString();
-                        return nameA.localeCompare(nameB);
-                      })
-                      .map(([id, name]) => (
-                        <SelectItem key={id} value={id}>
-                          {name ?? id}
-                        </SelectItem>
-                      ));
-                  })()}
+                  {categories.map((category) => (
+                    <SelectItem
+                      key={category._id}
+                      value={String(
+                        category.category_id || category.item_category_id
+                      )}
+                    >
+                      {category.category_name || category.categorytxt}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -236,37 +248,15 @@ export default function VendorMarketplace() {
                 Selected:
               </span>
               {selectedCategories.map((categoryId) => {
-                // Find category name from vendors' service_categories or categories_fees_details
-                let categoryName = categoryId;
-                for (const vendor of vendorsArray) {
-                  // Check flat structure
-                  if (
-                    vendor.service_categories &&
-                    Array.isArray(vendor.service_categories)
-                  ) {
-                    const foundCat = vendor.service_categories.find(
-                      (cat: any) => String(cat.category_id) === categoryId
-                    );
-                    if (foundCat) {
-                      categoryName = foundCat.category_name;
-                      break;
-                    }
-                  }
-                  // Check nested structure
-                  else if (
-                    vendor.categories_fees_details &&
-                    Array.isArray(vendor.categories_fees_details)
-                  ) {
-                    const foundCat = vendor.categories_fees_details.find(
-                      (cat: any) => String(cat.category_id) === categoryId
-                    );
-                    if (foundCat) {
-                      categoryName =
-                        foundCat.category_details?.category_name || categoryId;
-                      break;
-                    }
-                  }
-                }
+                const category = categories.find(
+                  (cat) =>
+                    String(cat.category_id || cat.item_category_id) ===
+                    categoryId
+                );
+                const categoryName =
+                  category?.category_name ||
+                  category?.categorytxt ||
+                  categoryId;
 
                 return (
                   <Badge
@@ -298,9 +288,36 @@ export default function VendorMarketplace() {
           {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Select value={priceRange} onValueChange={setPriceRange}>
+              <Select
+                value={priceRange}
+                onValueChange={(value) => {
+                  setPriceRange(value);
+                  // Clear URL-based min/max when user manually changes the dropdown
+                  if (value !== "custom") {
+                    setMinPrice(null);
+                    setMaxPrice(null);
+                  }
+                }}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Price Range" />
+                  <SelectValue placeholder="Price Range">
+                    {priceRange === "custom" &&
+                    (minPrice !== null || maxPrice !== null)
+                      ? `$${minPrice ?? 0} - ${
+                          maxPrice !== null ? `$${maxPrice}` : "∞"
+                        }`
+                      : priceRange === "any-price"
+                      ? "Any Price"
+                      : priceRange === "0-500"
+                      ? "$0 - $500"
+                      : priceRange === "500-1000"
+                      ? "$500 - $1,000"
+                      : priceRange === "1000-2500"
+                      ? "$1,000 - $2,500"
+                      : priceRange === "2500+"
+                      ? "$2,500+"
+                      : "Price Range"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="any-price">Any Price</SelectItem>
@@ -308,6 +325,13 @@ export default function VendorMarketplace() {
                   <SelectItem value="500-1000">$500 - $1,000</SelectItem>
                   <SelectItem value="1000-2500">$1,000 - $2,500</SelectItem>
                   <SelectItem value="2500+">$2,500+</SelectItem>
+                  {priceRange === "custom" &&
+                    (minPrice !== null || maxPrice !== null) && (
+                      <SelectItem value="custom">
+                        Custom: ${minPrice ?? 0} -{" "}
+                        {maxPrice !== null ? `$${maxPrice}` : "∞"}
+                      </SelectItem>
+                    )}
                 </SelectContent>
               </Select>
 
@@ -345,85 +369,55 @@ export default function VendorMarketplace() {
               <h3 className="font-semibold party-dark mb-4">Categories</h3>
               <div className="space-y-3">
                 <div className="space-y-1">
-                  {/* Extract unique categories from all vendors */}
-                  {(() => {
-                    const categoryMap = new Map<
-                      string,
-                      { id: string; name: string; count: number }
-                    >();
+                  {categoriesLoading ? (
+                    <div className="text-sm text-gray-400">
+                      Loading categories...
+                    </div>
+                  ) : (
+                    categories.map((category) => {
+                      const categoryId = String(
+                        category.category_id || category.item_category_id
+                      );
+                      const categoryName =
+                        category.category_name || category.categorytxt;
 
-                    vendorsArray.forEach((vendor: any) => {
-                      // Handle flat service_categories structure
-                      if (
-                        vendor.service_categories &&
-                        Array.isArray(vendor.service_categories)
-                      ) {
-                        vendor.service_categories.forEach((cat: any) => {
-                          const id = String(cat.category_id);
-                          if (categoryMap.has(id)) {
-                            categoryMap.get(id)!.count++;
-                          } else {
-                            categoryMap.set(id, {
-                              id,
-                              name: cat.category_name,
-                              count: 1,
-                            });
-                          }
-                        });
-                      }
-                      // Handle nested categories_fees_details structure
-                      else if (
-                        vendor.categories_fees_details &&
-                        Array.isArray(vendor.categories_fees_details)
-                      ) {
-                        vendor.categories_fees_details.forEach((cat: any) => {
-                          const id = String(cat.category_id);
-                          const name =
-                            cat.category_details?.category_name || "Unknown";
-                          if (categoryMap.has(id)) {
-                            categoryMap.get(id)!.count++;
-                          } else {
-                            categoryMap.set(id, {
-                              id,
-                              name,
-                              count: 1,
-                            });
-                          }
-                        });
-                      }
-                    });
+                      // Count vendors with this category
+                      const count = vendorsArray.filter((vendor: any) => {
+                        const categories =
+                          vendor.service_categories ||
+                          vendor.categories_fees_details?.map((cat: any) => ({
+                            category_id: cat.category_id,
+                          })) ||
+                          [];
+                        return categories.some(
+                          (cat: any) => String(cat.category_id) === categoryId
+                        );
+                      }).length;
 
-                    const uniqueCategories = Array.from(
-                      categoryMap.values()
-                    ).sort((a, b) => {
-                      const nameA = (a.name ?? "").toString();
-                      const nameB = (b.name ?? "").toString();
-                      return nameA.localeCompare(nameB);
-                    });
-
-                    return uniqueCategories.map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => toggleCategory(category.id)}
-                        className={`flex items-center justify-between text-sm w-full text-left px-3 py-2 rounded transition-colors ${
-                          selectedCategories.includes(category.id)
-                            ? "bg-party-coral text-white"
-                            : "party-gray hover:bg-gray-100"
-                        }`}
-                      >
-                        <span>{category.name ?? category.id}</span>
-                        <span
-                          className={`text-xs ${
-                            selectedCategories.includes(category.id)
-                              ? "text-white/80"
-                              : "text-gray-400"
+                      return (
+                        <button
+                          key={category._id}
+                          onClick={() => toggleCategory(categoryId)}
+                          className={`flex items-center justify-between text-sm w-full text-left px-3 py-2 rounded transition-colors ${
+                            selectedCategories.includes(categoryId)
+                              ? "bg-party-coral text-white"
+                              : "party-gray hover:bg-gray-100"
                           }`}
                         >
-                          ({category.count})
-                        </span>
-                      </button>
-                    ));
-                  })()}
+                          <span>{categoryName}</span>
+                          <span
+                            className={`text-xs ${
+                              selectedCategories.includes(categoryId)
+                                ? "text-white/80"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            ({count})
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
