@@ -22,6 +22,7 @@ const VendorMarketplace = lazy(() => import("@/pages/vendor-marketplace"));
 const PricingPage = lazy(() => import("@/pages/pricing"));
 const PremiumDashboard = lazy(() => import("@/pages/premium-dashboard"));
 const VendorDashboard = lazy(() => import("@/pages/vendor-dashboard"));
+const VendorDashboardMain = lazy(() => import("@/pages/vendor-dashboard-main"));
 const CorporateDashboard = lazy(() => import("@/pages/corporate-dashboard"));
 const StaffingMarketplace = lazy(() => import("@/pages/staffing-marketplace"));
 const CateringMarketplace = lazy(() => import("@/pages/catering-marketplace"));
@@ -246,7 +247,8 @@ function DashboardRouter() {
         <Route path="/vendor-payments" element={<VendorPaymentSetup />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/premium-dashboard/*" element={<PremiumDashboard />} />
-        <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+        {/* <Route path="/vendor-dashboard" element={<VendorDashboard />} /> */}
+        <Route path="/vendor-dashboard" element={<VendorDashboardMain />} />
         <Route path="/corporate" element={<CorporateDashboard />} />
         <Route path="/vendor-onboarding" element={<VendorOnboardingPortal />} />
         <Route
