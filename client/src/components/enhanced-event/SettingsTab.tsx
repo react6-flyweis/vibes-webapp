@@ -9,13 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import PriceConfirmationDialog from "@/components/PriceConfirmationDialog";
-import PaymentDialog from "@/components/enhanced-event/PaymentDialog";
-import InvitationSuccessDialog from "@/components/InvitationSuccessDialog";
-import useCreateEventPayment, {
-  CreateEventPaymentPayload,
-  PaymentIntent,
-} from "@/mutations/useCreateEventPayment";
+import { useNavigate } from "react-router";
 import EventTypeSelector from "@/components/event-type-select";
 import { Input } from "@/components/ui/input";
 import ThemeSelector from "@/components/theme-selector";
@@ -33,6 +27,8 @@ export default function SettingsTab({
   console.log("SettingsTab planMap:", planMap);
   const { toast } = useToast();
 
+  const navigate = useNavigate();
+
   // UI state
   const [selectedTheme, setSelectedTheme] = useState<string | undefined>();
   const [selectedEventType, setSelectedEventType] = useState<
@@ -42,25 +38,15 @@ export default function SettingsTab({
     string | undefined
   >();
 
-  // Payment dialog shown after successful save
-  // first show a simple confirmation `PaymentDialog`; when user proceeds,
-  // open the full `PriceConfirmationDialog` with methods/Stripe.
-  const [showPrePaymentDialog, setShowPrePaymentDialog] = useState(false);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [priceEstimate, setPriceEstimate] = useState<number>(99.99);
-
-  const createEventPaymentMutation = useCreateEventPayment();
-  const [showInviteSuccess, setShowInviteSuccess] = useState(false);
+  // (No payment flow) we'll redirect to vendor marketplace after save
 
   const eid = planMap?.event_id ?? event?.event_id ?? event?._id ?? null;
 
   const updatePlanMapMutation = useUpdatePlanEventMap({
     onSuccess: () => {
       toast({ title: "Settings saved", description: "Plan map updated." });
-      // open payment dialog after saving
-      setPriceEstimate(99.99);
-      // show a lightweight pre-payment confirmation first
-      setShowPrePaymentDialog(true);
+      // Redirect hosts to vendor marketplace after saving settings
+      navigate(`/vendor-marketplace?max=${event.budget_max}`);
     },
     onError: (err: any) => {
       toast({
@@ -149,65 +135,7 @@ export default function SettingsTab({
           </div>
         </CardContent>
       </Card>
-      <PaymentDialog
-        open={showPrePaymentDialog}
-        onOpenChange={setShowPrePaymentDialog}
-        amount={priceEstimate}
-        onPay={() => {
-          // When user proceeds from the lightweight dialog, open the full flow
-          setShowPrePaymentDialog(false);
-          setShowPaymentDialog(true);
-        }}
-      />
-
-      <PriceConfirmationDialog
-        open={showPaymentDialog}
-        onOpenChange={setShowPaymentDialog}
-        priceEstimate={priceEstimate}
-        onConfirm={(payment) => {
-          // payment reached a terminal "confirmed" state
-          toast({
-            title: "Payment confirmed",
-            description: `Payment successful`,
-          });
-          setShowPaymentDialog(false);
-          // show the invitation success dialog with GIF
-          setShowInviteSuccess(true);
-          console.log("Payment confirmed from SettingsTab:", payment);
-        }}
-        onPrevious={() => setShowPaymentDialog(false)}
-        onMethodSelect={async (method: number) => {
-          if (!eid) {
-            throw new Error("Missing event id");
-          }
-
-          const payload: CreateEventPaymentPayload = {
-            amount: priceEstimate || 0,
-            payment_method_id: method,
-            billingDetails: "EventSettings",
-            event_id: Number(eid) ?? 0,
-          };
-
-          const res = await createEventPaymentMutation.mutateAsync(payload);
-          const apiPayload = res?.data?.data ?? res?.data ?? res;
-
-          if (apiPayload?.amount) setPriceEstimate(Number(apiPayload.amount));
-
-          const paymentIntent: PaymentIntent = {
-            id: apiPayload.payment_intent_id,
-            clientSecret: apiPayload.client_secret ?? "",
-            amount: apiPayload.amount,
-            currency: apiPayload.currency,
-            status: apiPayload.status || apiPayload.payment_status,
-          };
-
-          return paymentIntent;
-        }}
-      />
-      <InvitationSuccessDialog
-        open={showInviteSuccess}
-        onOpenChange={setShowInviteSuccess}
-      />
+      {/* Payment flow removed: users are redirected to vendor marketplace after saving settings. */}
     </>
   );
 }
