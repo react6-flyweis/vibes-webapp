@@ -299,6 +299,12 @@ export const vendorNavigationItems: NavCategory[] = [
       //   description: "AI-powered CRM with predictive analytics",
       // },
       {
+        name: "Vendor Dashboard",
+        href: "/vendor-dashboard",
+        icon: Star,
+        description: "my dashboard",
+      },
+      {
         name: "CRM Dashboard",
         href: "/crm-dashboard",
         icon: Layout,
@@ -335,6 +341,7 @@ export const vendorNavigationItems: NavCategory[] = [
         description:
           "Migrate your store from Etsy, Aliexpress, Temu, Amazon in one click",
       },
+
       {
         name: "My Bookings",
         href: "/vendor-bookings",
