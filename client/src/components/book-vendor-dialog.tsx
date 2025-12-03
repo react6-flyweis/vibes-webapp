@@ -35,8 +35,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import EventSelector from "@/components/event-select";
 import { useCreateVendorBooking } from "@/queries/vendorBookings";
-import { useVendorServiceTypes } from "@/queries/vendorServiceTypes";
 import { useCreateVendorBookingPayment } from "@/mutations/useCreateVendorBookingPayment";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router";
@@ -75,6 +75,7 @@ interface BookVendorDialogProps {
     time?: string | null;
   }) => void;
   vendorName?: string;
+  vendor?: any; // Vendor object with categories_fees_details
 }
 
 export default function BookVendorDialog({
@@ -84,6 +85,7 @@ export default function BookVendorDialog({
   trigger,
   onBooked,
   vendorName,
+  vendor,
 }: BookVendorDialogProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -108,7 +110,8 @@ export default function BookVendorDialog({
   const [endTimeSlot, setEndTimeSlot] = useState<string>("");
   const { toast } = useToast();
 
-  const { data: serviceTypes = [] } = useVendorServiceTypes();
+  // Extract service categories from vendor prop
+  const serviceCategories = vendor?.categories_fees_details || [];
   const createBooking = useCreateVendorBooking();
   const createVendorBookingPaymentMutation = useCreateVendorBookingPayment();
 
@@ -158,6 +161,7 @@ export default function BookVendorDialog({
       endDate: z.string().optional().nullable(),
       startTimeSlot: z.string().optional().nullable(),
       selectedCategories: z.array(z.number()).optional(),
+      eventId: z.string().optional().nullable(),
     })
     .superRefine((val, ctx) => {
       if (!val.startDate) {
@@ -200,6 +204,7 @@ export default function BookVendorDialog({
       endDate: undefined,
       startTimeSlot: undefined,
       selectedCategories: [],
+      eventId: undefined,
     },
   });
 
@@ -300,7 +305,7 @@ export default function BookVendorDialog({
       User_availabil: "Book",
       user_id: userId,
       Vendor_Category_id: data.selectedCategories || [],
-      Event_id: eventId,
+      Event_id: data.eventId ? Number(data.eventId) : eventId,
       Status: true,
     };
 
@@ -646,14 +651,12 @@ export default function BookVendorDialog({
                             <SelectValue placeholder="Select service categories..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {serviceTypes.map((serviceType) => (
+                            {serviceCategories.map((categoryFee: any) => (
                               <SelectItem
-                                key={serviceType.vendor_service_type_id}
-                                value={String(
-                                  serviceType.vendor_service_type_id
-                                )}
+                                key={categoryFee.categories_fees_id}
+                                value={String(categoryFee.categories_fees_id)}
                               >
-                                {serviceType.name}
+                                {categoryFee.category_details?.category_name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -667,8 +670,9 @@ export default function BookVendorDialog({
                         <div className="flex flex-wrap gap-2 mt-2">
                           {(form.getValues("selectedCategories") || []).map(
                             (categoryId) => {
-                              const category = serviceTypes.find(
-                                (st) => st.vendor_service_type_id === categoryId
+                              const category = serviceCategories.find(
+                                (cat: any) =>
+                                  cat.categories_fees_id === categoryId
                               );
                               return (
                                 <Badge
@@ -676,7 +680,7 @@ export default function BookVendorDialog({
                                   variant="secondary"
                                   className="flex items-center gap-1"
                                 >
-                                  {category?.name}
+                                  {category?.category_details?.category_name}
                                   <button
                                     type="button"
                                     onClick={() => removeCategory(categoryId)}
@@ -690,6 +694,35 @@ export default function BookVendorDialog({
                           )}
                         </div>
                       )}
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Optional: Select an Event (user's events) */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b">
+                <Badge className="w-5 h-5 p-0 flex items-center justify-center bg-primary">
+                  E
+                </Badge>
+                <h3 className="font-semibold text-sm">Event </h3>
+              </div>
+              <div className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name="eventId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choose Event</FormLabel>
+                      <FormControl>
+                        <EventSelector
+                          value={field.value ?? null}
+                          onChange={(val) => field.onChange(val)}
+                          placeholder="Select an event (optional)"
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -738,16 +771,28 @@ export default function BookVendorDialog({
                       <span className="font-medium">Services:</span>{" "}
                       {watchedSelectedCategories
                         .map((id: number) => {
-                          const cat = serviceTypes.find(
-                            (st) => st.vendor_service_type_id === id
+                          const cat = serviceCategories.find(
+                            (c: any) => c.categories_fees_id === id
                           );
-                          return cat?.name;
+                          return cat?.category_details?.category_name;
                         })
                         .filter(Boolean)
                         .join(", ")}
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Root-level form error (e.g. server error) */}
+            {form.formState.errors.root?.message && (
+              <div className="pt-2">
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {String(form.formState.errors.root.message)}
+                  </AlertDescription>
+                </Alert>
               </div>
             )}
 
@@ -809,10 +854,10 @@ export default function BookVendorDialog({
           // Successful payment - show booked dialog with details
           const serviceName = pendingBookingPayload?.Vendor_Category_id?.map(
             (id: number) => {
-              const cat = serviceTypes.find(
-                (st) => st.vendor_service_type_id === id
+              const cat = serviceCategories.find(
+                (c: any) => c.categories_fees_id === id
               );
-              return cat?.name;
+              return cat?.category_details?.category_name;
             }
           )
             .filter(Boolean)
