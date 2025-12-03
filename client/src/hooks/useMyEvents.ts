@@ -8,6 +8,7 @@ export interface FetchMyEventsParams {
   limit?: number;
   search?: string;
   sortBy?: string;
+  Event_type?: string;
   sortOrder?: "asc" | "desc";
 }
 
@@ -18,12 +19,14 @@ export async function fetchMyEvents(params: FetchMyEventsParams = {}) {
     limit = 20,
     search = "",
     sortBy = "created_at",
+    Event_type = "Private",
     sortOrder = "desc",
   } = params;
 
   query.set("page", String(page));
   query.set("limit", String(limit));
   query.set("search", String(search ?? ""));
+  query.set("Event_type", Event_type);
   if (sortBy) query.set("sortBy", sortBy);
   if (sortOrder) query.set("sortOrder", sortOrder);
 
