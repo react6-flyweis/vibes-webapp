@@ -240,6 +240,7 @@ export default function VendorCard({
             vendorId={vendorId}
             userId={user?.user_id ?? 0}
             vendorName={vendorName}
+            vendor={vendor}
             trigger={
               <Button className="w-full bg-gradient-cta">
                 <Calendar className="w-4 h-4 mr-2" />
