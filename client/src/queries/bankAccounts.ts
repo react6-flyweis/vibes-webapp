@@ -41,7 +41,7 @@ export type BankAccountsResponse = {
  */
 export function useBankAccountsQuery() {
   return useQuery<BankAccount[], Error>({
-    queryKey: ["/api/admin/bank-branch-names/getAll"],
+    queryKey: ["/api/admin/bank-branch-names/getByAuth"],
     queryFn: async () => {
       const res = await apiRequest<BankAccountsResponse>(
         "/api/admin/bank-branch-names/getAll"
