@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  useEventTicketSeatsQuery,
-  getBookedSeatNumbers,
-} from "@/queries/eventSeats";
+
+interface TicketDetail {
+  seat_no: string[];
+  capacity: number;
+  status: boolean;
+}
 
 interface Props {
   selectedSeats: string[];
@@ -13,6 +15,7 @@ interface Props {
   onBack?: () => void;
   onContinue?: () => void;
   reserving?: boolean;
+  bookedSeats?: TicketDetail[];
 }
 
 export default function SeatSelection({
@@ -23,32 +26,26 @@ export default function SeatSelection({
   onBack,
   onContinue,
   reserving = false,
+  bookedSeats,
 }: Props) {
-  // Parse eventId (component accepts number|string)
-  const parsedEventId =
-    typeof eventId === "undefined" || eventId === null
-      ? undefined
-      : Number(eventId);
-
-  const {
-    data: seats = [],
-    isLoading: loading,
-    error,
-  } = useEventTicketSeatsQuery(
-    typeof parsedEventId === "number" && !Number.isNaN(parsedEventId)
-      ? parsedEventId
-      : undefined
-  );
-
   const occupiedNumbers = useMemo(() => {
     const set = new Set<number>();
-    const apiSet = getBookedSeatNumbers(seats);
-    apiSet.forEach((s) => {
-      const n = Number(s);
-      if (!Number.isNaN(n)) set.add(n);
-    });
+
+    if (bookedSeats && bookedSeats.length > 0) {
+      bookedSeats.forEach((detail) => {
+        if (detail.seat_no && Array.isArray(detail.seat_no)) {
+          detail.seat_no.forEach((seat) => {
+            // Handle both 'A-12' and '12' formats
+            const cleaned = String(seat).replace(/^A-?/i, "");
+            const n = Number(cleaned);
+            if (!Number.isNaN(n)) set.add(n);
+          });
+        }
+      });
+    }
+
     return set;
-  }, [seats]);
+  }, [bookedSeats]);
 
   const toggleSeat = (seatIndex: number) => {
     // seatIndex is numeric id (1..100)
@@ -71,7 +68,7 @@ export default function SeatSelection({
     }
   };
 
-  // If any of the currently selected seats become occupied (from API), remove them
+  // If any of the currently selected seats become occupied, remove them
   useEffect(() => {
     if (!selectedSeats || selectedSeats.length === 0) return;
 
@@ -95,7 +92,7 @@ export default function SeatSelection({
         })
       );
     }
-  }, [seats]);
+  }, [occupiedNumbers]);
 
   return (
     <div>
@@ -161,12 +158,6 @@ export default function SeatSelection({
             <span>Occupied</span>
           </div>
         </div>
-
-        {loading && (
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            Loading booked seats...
-          </p>
-        )}
       </div>
 
       <div className="flex justify-between">
