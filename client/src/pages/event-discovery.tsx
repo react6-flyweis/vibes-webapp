@@ -19,6 +19,7 @@ import {
 import EventCategorySelector from "@/components/event-category-selector";
 import CountrySelector from "@/components/country-selector";
 import { Calendar, MapPin, Search, Plus } from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
 
 interface EventFilters {
   category: string;
@@ -30,6 +31,7 @@ interface EventFilters {
 }
 
 export default function EventDiscovery() {
+  const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<EventFilters>({
@@ -45,6 +47,29 @@ export default function EventDiscovery() {
   const [page, setPage] = useState(1);
   const limit = 9;
 
+  // parse priceRange like "0-50", "50-100", "200+" into min/max numbers
+  const parsePriceRange = (priceRange: string) => {
+    if (!priceRange || priceRange === "any")
+      return { min_price: undefined, max_price: undefined };
+    if (priceRange.endsWith("+")) {
+      const min = Number(priceRange.replace("+", ""));
+      return {
+        min_price: Number.isFinite(min) ? min : undefined,
+        max_price: undefined,
+      };
+    }
+    const parts = priceRange.split("-").map((p) => p.trim());
+    if (parts.length === 2) {
+      const min = Number(parts[0]);
+      const max = Number(parts[1]);
+      return {
+        min_price: Number.isFinite(min) ? min : undefined,
+        max_price: Number.isFinite(max) ? max : undefined,
+      };
+    }
+    return { min_price: undefined, max_price: undefined };
+  };
+
   // Fetch events from the server using paginated endpoint (debounced search)
   const queryKey = [
     "/api/events/getAll",
@@ -55,6 +80,9 @@ export default function EventDiscovery() {
       sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
       sortOrder: "desc",
       status: true,
+      // include explicit min/max price and DateRange for API filtering
+      ...parsePriceRange(filters.priceRange),
+      DateRange: filters.dateRange === "any" ? undefined : filters.dateRange,
     },
   ];
 
@@ -64,10 +92,14 @@ export default function EventDiscovery() {
       fetchEvents({
         page,
         limit,
+        Event_type: "Public",
+        user_id: user?.user_id,
         search: debouncedSearch,
         status: true,
         sortBy: filters.sortBy === "date" ? "created_at" : filters.sortBy,
         sortOrder: "desc",
+        ...parsePriceRange(filters.priceRange),
+        DateRange: filters.dateRange === "any" ? undefined : filters.dateRange,
       }),
     select: (res) => res.data,
   });
