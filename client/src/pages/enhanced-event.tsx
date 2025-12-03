@@ -177,7 +177,7 @@ export default function EnhancedEventPage() {
           </TabsContent>
 
           <TabsContent value="budget" className="space-y-6">
-            <BudgetTab eventId={eventId} planMap={planMap?.[0]} />
+            <BudgetTab event={event} eventId={eventId} planMap={planMap?.[0]} />
           </TabsContent>
 
           <TabsContent value="venue" className="space-y-6">
