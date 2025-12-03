@@ -5,6 +5,8 @@ import { IResponseList } from "@/types";
 export interface FetchEventsParams {
   page?: number;
   limit?: number;
+  user_id?: string | number;
+  Event_type?: string;
   search?: string;
   status?: boolean | string;
   event_type_id?: string | number;
@@ -13,6 +15,9 @@ export interface FetchEventsParams {
   city_id?: string | number;
   event_category_tags_id?: string | number;
   ticketed_events?: boolean | string;
+  min_price?: number | string;
+  max_price?: number | string;
+  DateRange?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }
@@ -66,14 +71,16 @@ export interface IEvent {
   live_vibes_invite_music_preview?: string[];
   live_vibes_invite_vip_perks?: string[];
   status?: boolean;
-  created_by?: number | {
-    _id: string;
-    name: string;
-    mobile: string;
-    email: string;
-    user_id: number;
-    [key: string]: any;
-  };
+  created_by?:
+    | number
+    | {
+        _id: string;
+        name: string;
+        mobile: string;
+        email: string;
+        user_id: number;
+        [key: string]: any;
+      };
   updated_by?: number | null;
   created_at?: string;
   updated_at?: string;
@@ -100,11 +107,16 @@ export async function fetchEvents(params: FetchEventsParams = {}) {
     search = "",
     status = true,
     event_type_id = "",
+    user_id = "",
+    Event_type = "Public",
     country_id = "",
     state_id = "",
     city_id = "",
     event_category_tags_id = "",
     ticketed_events = "",
+    min_price = "",
+    max_price = "",
+    DateRange = "",
     sortBy = "created_at",
     sortOrder = "desc",
   } = params;
@@ -125,8 +137,18 @@ export async function fetchEvents(params: FetchEventsParams = {}) {
     query.set("event_category_tags_id", String(event_category_tags_id));
   if (ticketed_events !== "" && ticketed_events !== undefined)
     query.set("ticketed_events", String(ticketed_events));
+  if (min_price !== "" && min_price !== undefined)
+    query.set("min_price", String(min_price));
+  if (max_price !== "" && max_price !== undefined)
+    query.set("max_price", String(max_price));
+  if (DateRange !== "" && DateRange !== undefined)
+    query.set("DateRange", String(DateRange));
   if (sortBy) query.set("sortBy", sortBy);
   if (sortOrder) query.set("sortOrder", sortOrder);
+  if (user_id !== "" && user_id !== undefined)
+    query.set("user_id", String(user_id));
+  if (Event_type !== "" && Event_type !== undefined)
+    query.set("Event_type", String(Event_type));
 
   const url = `/api/events/getAll?${query.toString()}`;
   return axiosInstance.get<IResponseList<IEvent>>(url);
