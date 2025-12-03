@@ -334,7 +334,7 @@ export default function EventBooking() {
     const breakdown = calc.ticket_breakdown || [];
 
     const eventTitle = (event && (event.name_title || "Event")) || "Event";
-    const venueDetails = event?.venue_details;
+    const venueDetails = event?.venue_details_id;
     const eventDate = event?.date;
     const eventTime = event?.time;
 
@@ -354,8 +354,8 @@ export default function EventBooking() {
       <div className="min-h-screen bg-linear-to-br from-blue-900 to-purple-900 flex items-center justify-center">
         <Card className="bg-white/5 backdrop-blur-sm border-white/10 text-white">
           <CardContent className="p-8 text-center">
-            <div className="animate-spin mx-auto mb-4">
-              <div className="h-12 w-12 border-4 border-t-transparent rounded-full border-white/40"></div>
+            <div className="flex justify-center items-center w-full mb-4">
+              <div className=" animate-spin h-12 w-12 border-4 border-t-transparent rounded-full border-white/40"></div>
             </div>
             <h2 className="text-xl font-semibold mb-2">Loading event...</h2>
             <p className="text-gray-300">
@@ -448,6 +448,7 @@ export default function EventBooking() {
                     onBack={() => setStep("tickets")}
                     onContinue={handleBookSeats}
                     reserving={createTicketSeats.isPending}
+                    bookedSeats={event?.ticket_details}
                   />
                 </CardContent>
               </Card>
