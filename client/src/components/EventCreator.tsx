@@ -7,6 +7,8 @@ import useCreateEventMutation from "@/mutations/createEvent";
 import { useToast } from "@/hooks/use-toast";
 import VenueSelector from "@/components/venue-selector";
 import CountrySelector from "@/components/country-selector";
+import StateSelector from "@/components/state-selector";
+import CitySelector from "@/components/city-selector";
 import EventTypeSelect from "@/components/event-type-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +56,7 @@ const createEventSchema = z.object({
   category: z.string().min(1, "Category is required"),
   venue: z.string().min(1, "Venue is required"),
   address: z.string().min(1, "Address is required"),
+  state: z.string().min(1, "State is required"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
   date: z.string().min(1, "Date is required"),
@@ -69,7 +72,8 @@ const createEventSchema = z.object({
   bankAccountId: z.string().optional(),
 
   // Event planning fields for private events
-  budget: z.string().optional(),
+  budgetMin: z.string().optional(),
+  budgetMax: z.string().optional(),
   guestCount: z.string().optional(),
   specialRequests: z.string().optional(),
   dietaryRestrictions: z.string().optional(),
@@ -127,7 +131,8 @@ export function EventCreator({
       bankAccountId: "",
 
       // Event planning fields
-      budget: "",
+      budgetMin: "",
+      budgetMax: "",
       guestCount: "",
       specialRequests: "",
       dietaryRestrictions: "",
@@ -135,6 +140,12 @@ export function EventCreator({
       musicPreferences: "",
     },
   });
+
+  // watch selected country so StateSelector can fetch states for that country
+  const selectedCountry = form.watch("country") || null;
+
+  // watch selected state so CitySelector can fetch cities for that state
+  const selectedState = form.watch("state") || null;
 
   // Venue selection is handled by the reusable VenueSelector component
 
@@ -147,8 +158,8 @@ export function EventCreator({
       street_address: data.address,
       venue_details_id: data.venue,
       country_id: data.country,
-      state_id: 1,
-      city_id: 1,
+      state_id: data.state,
+      city_id: data.city,
       event_category_tags_id: data.category,
       tags: data.tags ? data.tags.split(",").map((t) => t.trim()) : [],
       date: data.date,
@@ -174,6 +185,56 @@ export function EventCreator({
         ticket_query: t.ticket_query,
         price: parseFloat(t.price) || 0,
       }));
+    }
+
+    // Map private event planning fields to API fields if present
+    if (eventType === "private") {
+      // Budget min/max: try to parse numbers, otherwise null
+      payload.budget_min = data.budgetMin
+        ? (() => {
+            const n = parseFloat(
+              String(data.budgetMin).replace(/[^0-9.\-]/g, "")
+            );
+            return Number.isFinite(n) ? n : null;
+          })()
+        : null;
+      payload.budget_max = data.budgetMax
+        ? (() => {
+            const n = parseFloat(
+              String(data.budgetMax).replace(/[^0-9.\-]/g, "")
+            );
+            return Number.isFinite(n) ? n : null;
+          })()
+        : null;
+
+      // ExpectedGuestCount
+      payload.ExpectedGuestCount = data.guestCount
+        ? parseInt(String(data.guestCount)) || null
+        : null;
+
+      // ThemeOrStyle and MusicPreferences as arrays
+      payload.ThemeOrStyle = data.theme
+        ? String(data.theme)
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
+
+      payload.MusicPreferences = data.musicPreferences
+        ? String(data.musicPreferences)
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
+
+      // DietaryRestrictionsAllergies and SpecialRequestsNotes as strings or null
+      payload.DietaryRestrictionsAllergies = data.dietaryRestrictions
+        ? String(data.dietaryRestrictions)
+        : null;
+
+      payload.SpecialRequestsNotes = data.specialRequests
+        ? String(data.specialRequests)
+        : null;
     }
 
     try {
@@ -458,17 +519,39 @@ export function EventCreator({
 
                     <FormField
                       control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-purple-100">
+                            State
+                          </FormLabel>
+                          <FormControl>
+                            <StateSelector
+                              value={field.value}
+                              onChange={field.onChange}
+                              countryId={selectedCountry}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="city"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-purple-100">
-                            City/Town/Village
+                            City
                           </FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Enter your city, town, or village"
+                            <CitySelector
+                              value={field.value}
+                              onChange={field.onChange}
+                              stateId={selectedState}
                               className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -621,26 +704,51 @@ export function EventCreator({
 
                     {/* Event Planning Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="budget"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-purple-100 flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" />
-                              Budget Range
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="$5,000 - $10,000"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="budgetMin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-purple-100 flex items-center gap-2">
+                                <DollarSign className="h-4 w-4" />
+                                Budget Minimum
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="$1,000"
+                                  className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="budgetMax"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-purple-100 flex items-center gap-2">
+                                <DollarSign className="h-4 w-4" />
+                                Budget Maximum
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="$10,000"
+                                  className="bg-white/10 border-white/20 text-white placeholder:text-purple-200"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <FormField
                         control={form.control}
