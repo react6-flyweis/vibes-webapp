@@ -653,8 +653,8 @@ export default function BookVendorDialog({
                           <SelectContent>
                             {serviceCategories.map((categoryFee: any) => (
                               <SelectItem
-                                key={categoryFee.categories_fees_id}
-                                value={String(categoryFee.categories_fees_id)}
+                                key={categoryFee.category_id}
+                                value={String(categoryFee.category_id)}
                               >
                                 {categoryFee.category_details?.category_name}
                               </SelectItem>
@@ -671,8 +671,7 @@ export default function BookVendorDialog({
                           {(form.getValues("selectedCategories") || []).map(
                             (categoryId) => {
                               const category = serviceCategories.find(
-                                (cat: any) =>
-                                  cat.categories_fees_id === categoryId
+                                (cat: any) => cat.category_id === categoryId
                               );
                               return (
                                 <Badge
@@ -772,7 +771,7 @@ export default function BookVendorDialog({
                       {watchedSelectedCategories
                         .map((id: number) => {
                           const cat = serviceCategories.find(
-                            (c: any) => c.categories_fees_id === id
+                            (c: any) => c.category_id === id
                           );
                           return cat?.category_details?.category_name;
                         })
@@ -855,7 +854,7 @@ export default function BookVendorDialog({
           const serviceName = pendingBookingPayload?.Vendor_Category_id?.map(
             (id: number) => {
               const cat = serviceCategories.find(
-                (c: any) => c.categories_fees_id === id
+                (c: any) => c.category_id === id
               );
               return cat?.category_details?.category_name;
             }
